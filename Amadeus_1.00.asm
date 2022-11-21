@@ -1,4 +1,4 @@
-;	25/9/22
+;	24/11/22
 
 	
 	DEVICE ZXSPECTRUM48
@@ -10,6 +10,16 @@
  	defw $a101											 ; $9000. Rutina de interrupciones.
 
 	org $a101		
+
+; Cada vez que se produce una interrupción estoy aquí.
+
+;	ld a,(Switch)
+;	xor 1
+;	ld (Switch),a
+;	call nz,Frame
+;	ld a,(Switch)
+;	and a
+;	call z,Frame2
 
 	call Frame
 	reti									 
@@ -150,7 +160,7 @@ Indice_restore defw 0
 
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 
-Numero_de_entidades db 2								; Nº de objetos en pantalla, (contando con Amadeus).
+Numero_de_entidades db 4								; Nº de objetos en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -224,13 +234,10 @@ Frame
 ; He de imprimir sólo el nº de fotos que he hecho. Sólo BORRAMOS/PINTAMOS los objetos que se han desplazado.
 ; Necesito calcular nª de malotes, para ello utilizaré (Stack_snapshot)-(Album_de_fotos).
 
-
 	call Calcula_numero_de_malotes						; Nº de entidades que vamos a imprimir en pantalla.
-
 	ld a,7                                      	     
     out ($fe),a  
 	call Extrae_foto_registros 							; Pintamos el fotograma anterior.
-
 	ld a,0                                      	     
     out ($fe),a  
 
@@ -238,39 +245,26 @@ Frame
 
 	ld a,1
 	out ($fe),a  
-
 	ld hl,Album_de_fotos
     ld (Stack_snapshot),hl								; Nos situamos al principio del álbum de fotos.
     ld a,(Numero_de_entidades)
     ld b,a
-
 2 push bc
-
 	call Mov_obj										; MOVEMOS y decrementamos (Numero_de_malotes)
-
  	ld a,(Ctrl_0)
 	bit 4,a
 	jr z,1F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
 ; ---------
-
     call Borra_Pinta_obj								; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!!!
-	
 	ld hl,Ctrl_0
     res 4,(hl)
-
 1 call Store_Restore_entidades
-
 	pop bc
 	djnz 2B
-
 	call Inicia_punteros_de_entidades
 	call Restore_Primera_entidad
-
 	ld a,0
 	out ($fe),a  
-
-;	jr $
-
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
