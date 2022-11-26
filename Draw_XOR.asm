@@ -1065,7 +1065,7 @@ Pintorrejeo
 ;	H´ (Filas)
 ;	L´ (Attr)
 
-	call Define_atributos 
+;	call Define_atributos 
 
 	exx
 	ld de,$0002 								;	El registro D' nos indicará, (si está a "1"), que vamos a imprimir_

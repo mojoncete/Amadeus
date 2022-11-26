@@ -13,16 +13,19 @@
 
 ; Cada vez que se produce una interrupción estoy aquí.
 
-;	ld a,(Switch)
-;	xor 1
-;	ld (Switch),a
-;	call nz,Frame
-;	ld a,(Switch)
-;	and a
-;	call z,Frame2
+; 25 fps
 
-	call Frame
-	reti									 
+	ld a,(Switch)
+	xor 1
+	ld (Switch),a
+	call nz,Frame
+	call Frame2
+	reti
+
+; 50 fps
+
+;	call Frame
+;	reti									 
 
 ; ----- ----- ----- ----- -----
 
@@ -86,10 +89,10 @@ Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 
 ; Variables de objeto. (Características).
 
-Vel_left db 1 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
-Vel_right db 1 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
-Vel_up db 1 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
-Vel_down db 3 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
+Vel_left db 2 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
+Vel_right db 2 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
+Vel_up db 2 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
+Vel_down db 6 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
 
 Variables_de_borrado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
 	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
@@ -160,7 +163,7 @@ Indice_restore defw 0
 
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 
-Numero_de_entidades db 4								; Nº de objetos en pantalla, (contando con Amadeus).
+Numero_de_entidades db 3								; Nº de objetos en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -240,8 +243,15 @@ Frame
 	call Extrae_foto_registros 							; Pintamos el fotograma anterior.
 	ld a,0                                      	     
     out ($fe),a  
+	ret
 
 ; ----------------------------------------------------------------------
+
+Frame2
+
+	ld a,(Switch)
+	and a
+	ret nz  											; Salimos si ya hemos ejecutado Frame.
 
 	ld a,1
 	out ($fe),a  
@@ -504,7 +514,7 @@ Pulsa_ENTER ld a,$bf 									; Esperamos la pulsación de la tecla "ENTER".
 
 ;	!!!!!!!! DESTRUYE BC !!!!!!!!!!!
 
-DELAY LD BC,$03ef							;$0320 ..... Delay mínimo
+DELAY LD BC,$0320							;$0320 ..... Delay mínimo
 wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: si el Sprite ocupa la 1ª y 2ª_				
 	LD A,B 										
 	AND A

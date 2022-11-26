@@ -25,8 +25,9 @@ Define_atributos push hl
     ld a,e 									; (Attr) en A.
 
 4 push bc 									; FBPPPIII (Flash, Brillo, Papel, Tinta).
-
  	push hl 								; Guardo dirección de attr.
+
+; ----- 
 
 2 ld (hl),a
 	dec c 									; Decremento (Columnas).

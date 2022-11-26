@@ -4,10 +4,12 @@
 ; 05/11/22
 
 Indice_de_entidades	defw Coracao_db
-	defw Amadeus_db
 	defw Coracao2_db
-	defw Coracao3_db
-	defw Coracao4_db
+	defw Amadeus_db
+
+;	defw Coracao3_db
+;	defw Coracao4_db
+;	defw Amadeus_db
 ;	...
 ;	...
 ;	+ entidades ...
@@ -27,7 +29,7 @@ Amadeus_db db 3,3
 	defw $50af
 	db 0,0,0
 
-	db 2,2,0,0
+	db 4,4,0,0
 
 	db 0,0
 	defw 0
@@ -61,7 +63,7 @@ Coracao_db db 2,2
 	defw $47a1	
 	db 0,0,0
 
-	db 1,1,1,2
+	db 4,4,4,6
 
 	db 0,0
 	defw 0
@@ -95,7 +97,7 @@ Coracao2_db db 2,2                                    ; Filas/Columns
 	defw $4761                                        ; Posicion_inicio
 	db 0,0,0
 
-	db 1,1,1,1                                        ; Vel_right, left, up, down.
+	db 4,4,4,4                                        ; Vel_right, left, up, down.
 
 	db 0,0
 	defw 0
@@ -129,7 +131,7 @@ Coracao3_db db 2,2                                    ; Filas/Columns
 	defw $477e                                        ; Posicion_inicio
 	db 0,0,0
 
-	db 1,1,1,1                                        ; Vel_right, left, up, down.
+	db 4,4,4,4                                        ; Vel_right, left, up, down.
 
 	db 0,0
 	defw 0
@@ -163,7 +165,7 @@ Coracao4_db db 2,2                                    ; Filas/Columns
 	defw $47be                                        ; Posicion_inicio
 	db 0,0,0
 
-	db 1,1,1,1                                        ; Vel_right, left, up, down.
+	db 4,4,4,4                                        ; Vel_right, left, up, down.
 
 	db 0,0
 	defw 0
