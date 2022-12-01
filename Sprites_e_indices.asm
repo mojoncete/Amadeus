@@ -146,15 +146,15 @@ Indice_Amadeus defw Amadeus
 	defw Amadeus_Fd							; [$FD] right - [$FE] left 
 	defw 0	 								; (Fín de índice).
 
-Amadeus DEFB $00,$18,$00,$00,$24,$00,$00,$42
-	DEFB	$00,$00,$7E,$00,$00,$CF,$00,$04
-	DEFB	$BF,$20,$0D,$7F,$B0,$1D,$C3,$B8
-	DEFB	$19,$81,$98,$3B,$81,$DC,$3B,$81
-	DEFB	$DC,$7A,$C3,$DE,$5A,$FF,$DE,$DB
-	DEFB	$7F,$DF,$DD,$3F,$BF,$CD,$BF,$BF
-	DEFB	$65,$9F,$BE,$66,$CF,$7E,$3E,$CF
-	DEFB	$7C,$3C,$FF,$3C,$19,$7E,$98,$01
-	DEFB	$BD,$80,$03,$DB,$C0,$07,$00,$E0 ; Sprite principal, (sin desplazar).
+;Amadeus DEFB $00,$18,$00,$00,$24,$00,$00,$42
+;	DEFB	$00,$00,$7E,$00,$00,$CF,$00,$04
+;	DEFB	$BF,$20,$0D,$7F,$B0,$1D,$C3,$B8
+;	DEFB	$19,$81,$98,$3B,$81,$DC,$3B,$81
+;	DEFB	$DC,$7A,$C3,$DE,$5A,$FF,$DE,$DB
+;	DEFB	$7F,$DF,$DD,$3F,$BF,$CD,$BF,$BF
+;	DEFB	$65,$9F,$BE,$66,$CF,$7E,$3E,$CF
+;	DEFB	$7C,$3C,$FF,$3C,$19,$7E,$98,$01
+;	DEFB	$BD,$80,$03,$DB,$C0,$07,$00,$E0 ; Sprite principal, (sin desplazar).
 
 Amadeus_F9 DEFB	$00,$06,$00,$00,$00,$09,$00,$00
 	DEFB	$00,$10,$80,$00,$00,$1F,$80,$00
@@ -195,4 +195,7 @@ Amadeus_Fd	DEFB $00,$00,$60,$00,$00,$00,$90,$00
 	DEFB	$00,$65,$FA,$60,$00,$06,$F6,$00
 	DEFB	$00,$0F,$6F,$00,$00,$1C,$03,$80 ; $Fa (6º DESPLZ a derecha).
 
-	
+Amadeus DEFB $01,$80,$02,$40,$16,$68,$24,$24
+	DEFB	$6E,$76,$4F,$F2,$DE,$7B,$DD,$3B
+	DEFB	$D9,$9B,$DC,$BB,$EE,$77,$F7,$EF
+	DEFB	$7B,$DE,$7B,$DE,$3B,$DC,$16,$68 ; Sprite principal, (sin desplazar).
