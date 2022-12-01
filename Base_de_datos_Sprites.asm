@@ -19,17 +19,17 @@ Indice_de_entidades	defw Coracao_db
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Amadeus_db db 3,3
+Amadeus_db db 2,2
 	defw 0
 	db 0
 
 	db %00000101
 	defw Indice_Amadeus
 	defw 0
-	defw $50af
+	defw $50cf
 	db 0,0,0
 
-	db 4,4,0,0
+	db 2,2,0,0
 
 	db 0,0
 	defw 0
