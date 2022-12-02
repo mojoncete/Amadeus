@@ -26,10 +26,10 @@ Amadeus_db db 3,3
 	db %00000101
 	defw Indice_Amadeus
 	defw 0
-	defw $50af
+	defw $50cf
 	db 0,0,0
 
-	db 4,4,0,0
+	db 2,2,0,0
 
 	db 0,0
 	defw 0
@@ -63,7 +63,7 @@ Coracao_db db 2,2
 	defw $47a1	
 	db 0,0,0
 
-	db 4,4,4,6
+	db 1,1,1,2
 
 	db 0,0
 	defw 0
@@ -97,7 +97,7 @@ Coracao2_db db 2,2                                    ; Filas/Columns
 	defw $4761                                        ; Posicion_inicio
 	db 0,0,0
 
-	db 4,4,4,4                                        ; Vel_right, left, up, down.
+	db 1,1,1,1                                        ; Vel_right, left, up, down.
 
 	db 0,0
 	defw 0
@@ -131,7 +131,7 @@ Coracao3_db db 2,2                                    ; Filas/Columns
 	defw $477e                                        ; Posicion_inicio
 	db 0,0,0
 
-	db 4,4,4,4                                        ; Vel_right, left, up, down.
+	db 1,1,1,1                                        ; Vel_right, left, up, down.
 
 	db 0,0
 	defw 0

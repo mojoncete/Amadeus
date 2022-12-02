@@ -15,17 +15,17 @@
 
 ; 25 fps
 
-	ld a,(Switch)
-	xor 1
-	ld (Switch),a
-	call nz,Frame
-	call Frame2
-	reti
+;	ld a,(Switch)
+;	xor 1
+;	ld (Switch),a
+;	call nz,Frame
+;	call Frame2
+;	reti
 
 ; 50 fps
 
-;	call Frame
-;	reti									 
+	call Frame
+	reti									 
 
 ; ----- ----- ----- ----- -----
 
@@ -243,7 +243,7 @@ Frame
 	call Extrae_foto_registros 							; Pintamos el fotograma anterior.
 	ld a,0                                      	     
     out ($fe),a  
-	ret
+;	ret
 
 ; ----------------------------------------------------------------------
 
