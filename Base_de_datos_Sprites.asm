@@ -19,7 +19,7 @@ Indice_de_entidades	defw Coracao_db
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Amadeus_db db 3,3
+Amadeus_db db 2,2
 	defw 0
 	db 0
 

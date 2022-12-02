@@ -15,12 +15,12 @@
 
 ; 25 fps
 
-;	ld a,(Switch)
-;	xor 1
-;	ld (Switch),a
-;	call nz,Frame
-;	call Frame2
-;	reti
+;;	ld a,(Switch)
+;;	xor 1
+;;	ld (Switch),a
+;;	call nz,Frame
+;;	call Frame2
+;;	reti
 
 ; 50 fps
 
@@ -243,11 +243,11 @@ Frame
 	call Extrae_foto_registros 							; Pintamos el fotograma anterior.
 	ld a,0                                      	     
     out ($fe),a  
-;	ret
+	ret
 
 ; ----------------------------------------------------------------------
 
-Frame2
+;Frame2
 
 	ld a,(Switch)
 	and a
@@ -515,6 +515,7 @@ Pulsa_ENTER ld a,$bf 									; Esperamos la pulsación de la tecla "ENTER".
 ;	!!!!!!!! DESTRUYE BC !!!!!!!!!!!
 
 DELAY LD BC,$0320							;$0320 ..... Delay mínimo
+
 wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: si el Sprite ocupa la 1ª y 2ª_				
 	LD A,B 										
 	AND A
@@ -553,8 +554,9 @@ Movimiento_Amadeus
 	include "Patrones_de_mov.asm"
 	include "Guarda_foto_registros.asm"
 
-
 	SAVESNA "Amadeus_1.xx.sna", START
+
+	
 
 
 
