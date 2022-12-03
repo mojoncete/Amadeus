@@ -14,8 +14,8 @@
 ;   % abajo,arriba,derecha,izquierda ..... nº de repeticiones del movimiento.
 ;
 
-
-Derecha db 2,%00101000,0
+Izquierda db 2,%00010000,0
+Derecha db 2,%00100000,0
 Escaloncitos_izquierda_arriba db 3,%00010100,%01000100,0
 Escaloncitos_derecha_arriba db 3,%00100100,%01000100,0
 Escaloncitos_derecha_abajo db 3,%00100100,%10000100,0
@@ -27,10 +27,10 @@ Onda_senoidal db 44,%01000100,%01100000,%01000010,%01100000,%01000010,%01100000,
     db %00100101,%01100000,%00100010,%01100011,%01000000,%01100000,%01000010,%01100000
     db %01000010,%01100000,%01000100,0
 
-Indice_mov_coracao defw Onda_senoidal
-Indice_mov_coracao2 defw Escaloncitos_derecha_arriba
-Indice_mov_coracao3 defw Escaloncitos_izquierda
-Indice_mov_coracao4 defw Escaloncitos_izquierda_arriba
+Indice_mov_Badsat defw Izquierda
+Indice_mov_Badsat2 defw Escaloncitos_derecha_arriba
+Indice_mov_Badsat3 defw Escaloncitos_izquierda
+Indice_mov_Badsat4 defw Escaloncitos_izquierda_arriba
 
 Movimiento 
 

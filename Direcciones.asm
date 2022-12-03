@@ -521,7 +521,7 @@ Dec_CTRL_DESPLZ ld hl,CTRL_DESPLZ
 ;	(cp 30)   ""  ""    ""     2 Columns.
 
 Stop_Amadeus_right ld a,(Coordenada_X)	 	  										 ; Posición horizontal de Amadeus.							
-	cp 29																			 ; Hemos llegado al límite derecho de la pantalla??.
+	cp 30																			 ; Hemos llegado al límite derecho de la pantalla??.
 	ret
 
 ; ---------- ---------- ---------- ---------- ---------- ----------
@@ -532,7 +532,7 @@ Stop_Amadeus_right ld a,(Coordenada_X)	 	  										 ; Posición horizontal de 
 ;	(cp 1)   ""  ""    ""     2 Columns.
 
 Stop_Amadeus_left ld a,(Coordenada_X)	 	  										 ; Posición horizontal de Amadeus.							
-	cp 2																			 ; Hemos llegado al límite izquierdo de la pantalla??. 
+	cp 1																			 ; Hemos llegado al límite izquierdo de la pantalla??. 
 	ret
 
 ; ---------- ---------- ---------- ---------- ---------- ----------
