@@ -6,9 +6,8 @@
 Indice_de_entidades	defw Badsat_der
 	defw Badsat_der2
 ;	defw Badsat_der3
-	defw Amadeus_db
 ;	defw Badsat_der4
-;	defw Amadeus_db
+	defw Amadeus_db
 ;	...
 ;	...
 ;	+ entidades ...
@@ -164,7 +163,7 @@ Badsat_der4 db 2,2                                    ; Filas/Columns
 	defw $47be                                        ; Posicion_inicio
 	db 0,0,0
 
-	db 4,4,4,4                                        ; Vel_right, left, up, down.
+	db 1,1,1,1                                        ; Vel_right, left, up, down.
 
 	db 0,0
 	defw 0

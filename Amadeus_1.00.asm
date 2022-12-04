@@ -15,12 +15,12 @@
 
 ; 25 fps
 
-;;	ld a,(Switch)
-;;	xor 1
-;;	ld (Switch),a
-;;	call nz,Frame
-;;	call Frame2
-;;	reti
+;	ld a,(Switch)
+;	xor 1
+;	ld (Switch),a
+;	call nz,Frame
+;	call Frame2
+;	reti
 
 ; 50 fps
 
@@ -42,7 +42,7 @@
 ; Constantes generales.
 ;
 
-Centro_arriba equ $0160 								; Emplearemos estas constantes en la rutina de `recolocación´ del objeto:_
+tuCentro_arriba equ $0160 								; Emplearemos estas constantes en la rutina de `recolocación´ del objeto:_
 Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto en las dos primeras constantes_
 Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
@@ -89,10 +89,10 @@ Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 
 ; Variables de objeto. (Características).
 
-Vel_left db 2 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
+Vel_left db 1 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
 Vel_right db 1 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
 Vel_up db 1 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
-Vel_down db 1 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
+Vel_down db 2 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
 
 Variables_de_borrado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
 	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
