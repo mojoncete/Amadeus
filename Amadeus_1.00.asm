@@ -82,7 +82,7 @@ Attr db %00000110										; Atributos de la entidad:
 
 Indice_Sprite defw Indice_Badsat_der
 Puntero_DESPLZ defw 0
-Posicion_inicio defw $47a1								; Dirección de pantalla donde aparece el objeto. [DRAW]
+Posicion_inicio defw $4720								; Dirección de pantalla donde aparece el objeto. [DRAW]
 Cuad_objeto db 0			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
 Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
@@ -92,7 +92,7 @@ Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 Vel_left db 1 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
 Vel_right db 1 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
 Vel_up db 1 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
-Vel_down db 2 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
+Vel_down db 1 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
 
 Variables_de_borrado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
 	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
@@ -163,7 +163,7 @@ Indice_restore defw 0
 
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 
-Numero_de_entidades db 3								; Nº de objetos en pantalla, (contando con Amadeus).
+Numero_de_entidades db 2								; Nº de objetos en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
