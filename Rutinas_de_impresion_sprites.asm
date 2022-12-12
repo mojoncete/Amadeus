@@ -163,7 +163,7 @@ Pinta_enemigo_3x2_izquierda_2columnas ld (Stack),sp
 	ret
 
 Pinta_enemigo_3x2_izquierda_1columna ld (Stack),sp
-	ld sp,Badsat_der_f8
+	ld sp,Badsat_der_fd
 1 pop de
 	pop de
 	ld a,e
@@ -199,6 +199,52 @@ Pinta_enemigo_3x2_izquierda_1columna ld (Stack),sp
 	ld sp,(Stack)
 	ret
 
+Pinta_enemigo_3x2_derecha_2columnas ld (Stack),sp
+	ld sp,Badsat_der_fd
+1 pop de
+	ld a,e
+	xor (hl)
+	ld (hl),a
+	inc hl     
+	ld a,d
+	xor (hl)
+	ld (hl),a
+	dec hl	
+  	inc h
+    ld a,h
+    and 7
+    jr nz,2F             
+    ld a,l              
+    add a,$20           
+    ld l,a
+    jr c,2F              
+    ld a,h             
+    sub 8               
+    ld h,a
+2 pop de
+	ld a,d
+	xor (hl)
+	ld (hl),a
+	inc hl
+    pop de
+	ld a,e
+	xor (hl)
+	ld (hl),a
+	dec hl
+	inc h
+    ld a,h
+    and 7
+    jr nz,3F             
+    ld a,l              
+    add a,$20           
+    ld l,a
+    jr c,3F              
+    ld a,h             
+    sub 8               
+    ld h,a
+3 djnz 1B
+	ld sp,(Stack)
+	ret
 
 
 
@@ -217,9 +263,7 @@ Pinta_enemigo_3x2_izquierda_1columna ld (Stack),sp
 
 
 
-
-
-
+; ---------------------------------------------------
 
 Pinta_enemigo_2x2 ld (Stack),sp
 	ld sp,Badsat_derecha

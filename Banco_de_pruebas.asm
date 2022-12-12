@@ -275,9 +275,9 @@ Frame
 
 ; -----
 
-	ld hl,$50c1
+	ld hl,$50de
 	ld b,8
-	call Pinta_enemigo_3x2_izquierda_2columnas
+	call Pinta_enemigo_3x2_derecha_2columnas
 
     xor a
     out ($fe),a
