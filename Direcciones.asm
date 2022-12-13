@@ -454,7 +454,7 @@ Ciclo_completo_2 ld a,(CTRL_DESPLZ)
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Mod_puntero_datas call Prepara_draw									; Recabamos los datos de la entidad, (Filas) y (Columns).
-	call Calcula_dbs_totales	 									; (Filas * Columnas)*8 en BC´.
+;	call Calcula_dbs_totales	 									; (Filas * Columnas)*8 en BC´.
 ;																	; Filas * Columnas en DE´.
 	ld a,(Cuad_objeto)
 	cp 2
@@ -463,7 +463,7 @@ Mod_puntero_datas call Prepara_draw									; Recabamos los datos de la entidad,
 	and 1
 	jr z,1F 														; Necesitamos saber en que cuadrante de pantalla se encuentra_
 ; 																	; _la entidad para poder calcular su puntero de .db´s, (Puntero_datas).
-	call puntero_cuarcuad 											; Nos encontramos en el 3º cuadrante. 
+;	call puntero_cuarcuad 											; Nos encontramos en el 3º cuadrante. 
 	push bc
 	push hl
 	ld b,0 															; BC = $00xx, (nº de columnas-1) que tiene el objeto.
@@ -475,13 +475,15 @@ Mod_puntero_datas call Prepara_draw									; Recabamos los datos de la entidad,
 	pop hl
 	pop bc
 	jr 4F
-1 	call puntero_cuarcuad 											; 4º CUADRANTE !!!!!!!!!!
+1 
+;	call puntero_cuarcuad 											; 4º CUADRANTE !!!!!!!!!!
 	jr 4F
 2 and 1 															
 	jr z,3F
-	call puntero_primcuad 											; 1er CUADRANTE !!!!!!!!!!!!!
+;	call puntero_primcuad 											; 1er CUADRANTE !!!!!!!!!!!!!
 	jr 4F
-3 call puntero_primcuad 											; 2º CUADRANTE !!!!!!!!!!!!!!		
+3
+;	call puntero_primcuad 											; 2º CUADRANTE !!!!!!!!!!!!!!		
 	push bc
 	push hl
 	ld b,0 															; BC = $00xx, (nº de columnas-1) que tiene el objeto.

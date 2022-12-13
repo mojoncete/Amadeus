@@ -48,7 +48,7 @@ Album_de_fotos equ $7000								; En (Album_de_fotos) vamos a ir almacenando los
 ;
 
 Filas db 2												; Filas. [DRAW]
-Columns db 2  											; Columnas. [DRAW]
+Columns db 3  											; Nº de columnas. [DRAW]
 Posicion_actual defw $0000								; Dirección actual del Sprite. [DRAW]
 CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos. Si el valor es negativo,_
 ; 														; _ estamos desplazados hacia la izquierda y si es positivo, hacia la derecha.
@@ -69,8 +69,8 @@ Attr db %00000110										; Atributos de la entidad:
 
 Indice_Sprite defw 0
 Puntero_DESPLZ defw 0
-Posicion_inicio defw $50cb								; Dirección de pantalla donde aparece el objeto. [DRAW]
-Cuad_objeto db 3			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+Posicion_inicio defw $50d7								; Dirección de pantalla donde aparece el objeto. [DRAW]
+Cuad_objeto db 4			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
 Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 
@@ -108,8 +108,10 @@ Ctrl_0 db 0 											; Byte de control. A través de este byte de control. Las
 ; 																_parte inferior de la pantalla y ha de `reaparecer´ por la superior. ([Comprueba_limite_horizontal]).
 ; 														SET 4, El Bit4 a "1", indica que hubo movimiento de la entidad. Necesitamos esta información
 ;												                _para "NO BORRAR/PINTAR" en objeto si NO hubo MOVIMIENTO. 
+;														SET 5, La rutina [Inicializacion] de Draw_XOR.asm, pone este bit a "1". Con esta información evitamos ejecutar las
+;																_rutinas: (Comprueba_limite_horizontal) y (Comprueba_limite_vertical) justo después de `inicializar´ un objeto.
 ; 														SET 6, Está a "1" si el Sprite que tenemos cargado en el `Engine´ es AMADEUS.
-;															   
+;
 ; 														SET 7, El bit 7 se encuentra alto, ("1"), cuando el último movimiento horizontal se ha producido a la "DERECHA".
 ; 															   _ Utilizo la información que proporciona este BIT para modificar (CTRL_DESPLZ) si el siguiente movimiento_
 ; 															   _ se va a producir a la izquierda. "1" DERECHA - "0" IZQUIERDA.
@@ -127,7 +129,7 @@ Repetimos_db db 0
 
 ; Variables de funcionamiento. [DRAW].
 
-Puntero_objeto defw Amadeus								; Donde están los datos para pintar el Sprite.
+Puntero_objeto defw Amadeus_F9							; Donde están los datos para pintar el Sprite.
 Puntero_datas defw 0 
 Columnas db 0
 Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado en función del tamaño del Sprite. Si el objeto llega a esta línea se modifica_    

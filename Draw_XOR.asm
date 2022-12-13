@@ -14,19 +14,19 @@ Draw call Prepara_draw
 	ld (Posicion_actual),hl							; Indicamos que (Posicion_actual) = (Posicion_inicio) y saltamos a la subrutina [Inicializacion], (donde asignaremos_			
 	call Inicializacion
 	call Prepara_Puntero_mov 						; El objeto está inicializado. Antes de salir inicializamos tb el puntero de movimiento del objeto.
-
-1 
-	jr $ ; VprA 12/12/22
+1 ld a,(Ctrl_0)
+	bit 5,a
+	jr nz,3F
 	call Comprueba_limite_horizontal
 	call Comprueba_limite_vertical
-	
-3 push bc 											; Guardo el nº de filas y columnas del objeto en BC´.
-	exx 												
-	pop bc
-	exx
 
-	call calcolumn
-    call Converter
+; Llegados a este punto, tengo Filas/Columnas en BC y (Cuad_objeto) en A´.
+
+3 call calcula_columna
+;    call Converter
+
+	ld hl,Ctrl_0
+	res 5,(hl)
 	ret
 
 ; *******************************************************************************************************************************************************************************************
@@ -362,7 +362,6 @@ Modificaccionne ex af,af
 
 ; 	OUTPUT: DESTRUYE [AF] y [D].
 	 
-
 Inicializacion call calcula_tercio																			
 	jr z,primit 													
 	and 2
@@ -410,6 +409,8 @@ primcuad call Fija_punteros
 	ld (hl),$12
 	ex af,af
 1 call Genera_coordenadas
+	ld hl,Ctrl_0
+	set 5,(hl)
 	ret
 
 ; -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -462,31 +463,39 @@ column ld a,l
 ;
 ; Esta subrutina se encarga de asignar valor a la variable (Columnas), (nº de columnas del objeto que podemos pintar).
 
-calcolumn exx                                        	; Calcula (Columnas) en cuadrantes 1º y 3º.
-	push bc
-	exx
-	pop de 												; Situamos en D el contenido de (Filas_objeto) y en E el nº de columnas.
-	ld a,l
-	and $1f  											; Posición absoluta de L, (0 a 31).
-	ex af,af 											; Consultamos A´, (Cuad_objeto). Si estamos en un cuadrante impar, (1º o 3º): Posición abs. de (L+1) - Columnas que tiene el objeto.
-	bit 0,a 											; Si estamos en un cuadrante par: ($20 - Posición abs. de (L+1)) - Columnas que tiene el objeto.
-	jr nz,1F 											
-	ex af,af 											
-	ld b,a   											
-	ld a,32
-	sub b 		
-	jr 2F
-1 ex af,af
+calcula_columna 
+
+	jr $
+
+	ld e,0
+	ld a,(Cuad_objeto)
+	and 1
+	jr z,1F
+
+; Nos encontramos en la parte izquierda de la pantalla
+
+	ld a,(Coordenada_X)
 	inc a
-2 ld b,a   												; Columnas que tenemos disponibles.
-	sub e 												; Restamos el nº de columnas que tiene el objeto. 
-	jr c,3F 											; Si el resultado es "0" o no existe acarreo, la variable (Columnas) tendrá el mismo valor que las columnas que tiene el Sprite en su _
-	ld a,e 												; _ base de datos.
-	ld (Columnas),a 									; Si se produce acarreo, (Columnas) será igual a el resultado de restar: Posición abs. de (L+1) - Columnas que tiene el objeto.
-	jr 4F 												; Este valor siempre será inferior a las columnas que tiene el Sprite en su base de datos.
-3 ld a,b
+	sub c
+	jr c,2F
+	
+	ld a,c
+	ld (Columnas),a				
+	jr $	; RET ---
+
+2 ; El objeto no entra completo en pantalla.
+	inc e
+	inc a
+	jr nz,2B
+
+	ld a,c
+	sub e
 	ld (Columnas),a
-4 ret
+	jr $	; RET ---
+
+1 ; Nos encontramos en la parte derecha de la pantalla.	
+
+	jr $
 
 ; ******************************************************************************************************************************************************************************************
 ;
@@ -618,7 +627,7 @@ Extrae_foto_registros ld (Stack),sp															; Guardo el puntero de pila y 
 	ld (Stack_2),sp
 	ld sp,(Stack)
 
-	call Pintorrejeo														; call Pintorrejeo. Hemos pintado la entidad.
+;	call Pintorrejeo														; call Pintorrejeo. Hemos pintado la entidad.
 ;																			; Esta dirección ha de ser correcta. Cada vez que modifique 
 	ld (Stack),sp
 	ld a,(Numero_de_malotes)
