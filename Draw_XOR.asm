@@ -3,60 +3,21 @@
 ; 17/08/22
 ;
 ; DRAW. ************************************************************************************************************************************************************************************
-;
-; Rutina para pintar objetos en pantalla.
-;
-; Está diseñada para PINTAR un objeto de ( X Filas x Y Columnas) en pantalla, ej.: (2x2), (3x3), (5x5), etc.
-; El tamaño del objeto a imprimir lo definen las variables de programa: (Filas) y (Columns). Ambas son variables de 1 byte y representan caracteres completos de pantalla,_
-; _ ejemplo.: 2 (filas de alto) x 4 (columnas de ancho).
-;
-; La rutina PINTA pinta el objeto o sprite, en la dirección de mem. de pantalla que contiene la variable de programa (Posicion_actual).
-; Esta dirección indica, donde se va a imprimir `la 1ª línea del 1er char´ que compone el objeto.
-; La rutina divide la pantalla en cuatro cuadrantes e imprime de manera distinta en función del cuadrante de pantalla en el que nos encontremos. 
-; Esto se hace así con la finalidad de poder "esconder" objetos en cualquier borde de la pantalla y tener un control total de la misma.
-;
-; El `paso´ de un cuadrante a otro de la pantalla es detectado automáticamente por la rutina, modificando el puntero (Posición_actual).
-; La dirección de mem. donde se encuentran los gráficos del objeto a imprimir se encuentra almacenada en la variable de programa, (Puntero_objeto).
-;		
-;
-;		1. Función XOR cuando queremos que el objeto `pase´ por `delante´ del escenario. En ese caso, la variable de programa (Obj_atras)="0".
-;		2. Función OR cuando queremos que el objeto `pase´ por `detrás´ del fondo. En ese caso, la variable de programa (Obj_atras)="1".
-;
-;	
-; INPUT:  AF --
-;		  DE --
-; 		  IX --
-; 		  IY --
-;		  HL apunta a la dirección de memoria de pantalla donde se va a pintar el objeto.
-; 		  BC contiene: Filas/Columnas del objeto. Ejempl.: 5x5, 3x3, 2x3, 4x2, etc.
-; 		  El registro E="0".
 
-; OUTPUT: DESTRUYE AF,BC,DE y HL.
-;
-;
 Draw call Prepara_draw 
-
 	ld a,h 						 					; El objeto existe, o se está iniciando?. Si se está iniciando, (Posicion_inicio = Posicion_actual) y saltamos_
 	and a 											; _a la subrutina [Inicializacion] donde asignaremos cuadrante y límites.
 	jr z,2F
-
 	ld a,(Cuad_objeto)			 					; El objeto ya se inició. Cargamos en A el cuadrante de pantalla en el que lo hizo y saltamos a 1F.
 	jr 1F
-
 2 ld hl,(Posicion_inicio) 							; No hay (Posicion_actual), por lo que el objeto se está iniciando.
 	ld (Posicion_actual),hl							; Indicamos que (Posicion_actual) = (Posicion_inicio) y saltamos a la subrutina [Inicializacion], (donde asignaremos_			
-;		 											; _ cuadrante a (Posicion_actual)).
 	call Inicializacion
 	call Prepara_Puntero_mov 						; El objeto está inicializado. Antes de salir inicializamos tb el puntero de movimiento del objeto.
 
-1 push af	 										; Antes de nada, guardo (Cuad_objeto) en A´ para acceder a él más rapido, (me va a hacer falta en la rutina calcolum).
-	ex af,af
-	pop af 											; Ahora tengo (Cuad_objeto) en A y A´.
-
-; En este punto, el objeto existe. (Posicion_actual)<>"0" y el objeto tiene asignado un cuadrante. En función de la posición que ocupa en pantalla vamos a calcular los_
-; _ límites horizontal y vertical. 
-
-    call Comprueba_limite_horizontal
+1 
+	jr $ ; VprA 12/12/22
+	call Comprueba_limite_horizontal
 	call Comprueba_limite_vertical
 	
 3 push bc 											; Guardo el nº de filas y columnas del objeto en BC´.
@@ -81,6 +42,7 @@ Comprueba_limite_horizontal ld a,(Obj_dibujado)
 	ld a,(Ctrl_0)          							; Si no hemos desaparecido por arriba o por abajo, saltamos a ^14F^ para comprobar_ 
 	bit 2,a                                         ; _si hemos llegado o sobrepasado el (Limite_horizontal), (seguimos con la rutina).
 	jr z,1F                                         ; Si por el contrario hemos desaparecido por arriba o por abajo, (bit2/bit3 de (Ctrl_0)="1"))_
+
 	and $fb 										; _hay que modificar el puntero de posición. (E="1" y salimos de la rutina). Antes inicializaremos los_ 
 	ld (Ctrl_0),a 									; _ bits 2 y 3 de (Ctrl_0).
     jr 6F
@@ -401,160 +363,54 @@ Modificaccionne ex af,af
 ; 	OUTPUT: DESTRUYE [AF] y [D].
 	 
 
-Inicializacion call calcula_tercio									; Entrega "0", "1" o "2" en A en función del tercio donde nos encontremos.												
-	jr z,primit 													; 1er tercio. Estamos en la primera mitad de pantalla, (cuadrantes 1 o 2).
+Inicializacion call calcula_tercio																			
+	jr z,primit 													
 	and 2
 	jr nz,segmit
-	ld a,l 															; Cuando estamos en el segundo tercio: Las 4 primeras filas pertenecen a la 1ª mitad y las 4 últimas del tercio, a la 2ª.
+	ld a,l 															
 	cp $7f
 	jr c,primit
 	jr z,primit
-segmit call column  												; 3er tercio, Estamos en la segunda mitad de pantalla, (cuadrantes 3 o 4).
+segmit call column  												
 	jr c,tercuad
-cuarcuad call Calcula_dbs_totales
-	call puntero_cuarcuad
-	call Limite3
-	ld a,4
+cuarcuad ld a,4
 	ld (Cuad_objeto),a
+	ld hl,$4820
+	ld (Limite_horizontal),hl
+	ld hl,Limite_vertical
+	ld (hl),$0d
 	ex af,af
-	call Limite2
 	jr 1F
-tercuad	call Calcula_dbs_totales 
-	call puntero_cuarcuad
-	push hl 														; Voy a utilizar las dos parejas de registros para operar. POP antes de salir de la rutina.
-	push bc
-	ld b,0 															; BC = $00xx, (nº de columnas-1) que tiene el objeto.
-	dec c
-	ld hl,(Puntero_datas)
-	and a
-	adc hl,bc
-	ld (Puntero_datas),hl
-	pop bc
-	pop hl	
-	call Limite3
+tercuad	call Fija_punteros
 	ld a,3
 	ld (Cuad_objeto),a 
+	ld hl,$4820
+	ld (Limite_horizontal),hl
+	ld hl,Limite_vertical
+	ld (hl),$12
 	ex af,af
-	call Limite2
 	jr 1F
-primit call column 													; Tras el regreso de column, sabremos, (en función del FLAG C), si estamos en un cuadrante_ 
-	jr c, primcuad 													; _ par o impar. ¨C¨="1" cuadrante impar.
-segcuad call Calcula_dbs_totales
-	call puntero_primcuad
-	push hl 														; Voy a utilizar las dos parejas de registros para operar. POP antes de salir de la rutina.
-	push bc
-	ld b,0 															; BC = $00xx, (nº de columnas-1) que tiene el objeto.
-	dec c
-	ld hl,(Puntero_datas)
-	and a
-	sbc hl,bc
-	ld (Puntero_datas),hl
-	pop bc
-	pop hl
-	call Limite
+primit call column 													
+	jr c, primcuad 													
+segcuad call Fija_punteros
 	ld a,2
 	ld (Cuad_objeto),a
+	ld hl,$4fc0
+	ld (Limite_horizontal),hl
+	ld hl,Limite_vertical
+	ld (hl),$0d
 	ex af,af
-	call Limite2	
 	jr 1F
-primcuad call Calcula_dbs_totales 									; Nos encontramos en el 1er cuadrante de la pantalla.
-	call puntero_primcuad
-	call Limite
+primcuad call Fija_punteros
 	ld a,1
 	ld (Cuad_objeto),a 
+	ld hl,$4fc0
+	ld (Limite_horizontal),hl
+	ld hl,Limite_vertical
+	ld (hl),$12
 	ex af,af
-	call Limite2
-1 call Genera_coordenadas											; El objeto está Inicializado y "ocupa una coordenada en el mundo".
+1 call Genera_coordenadas
 	ret
-
-; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-; 
-;	16/7/22
-;
-;	Calcula_dbs_totales .......... (Subrutina de [Inicializacion]).
-;
-;	En función del valor de BC, (Filas/Columns) de un objeto, la rutina entrga dos cantidades:
-;
-;	INPUTS:
-;
-;	(Filas)/(Columns) de una entidad en BC.
-;
-;
-;	OUTPUTS:
-;
-;	[(Filas)*(Columns)]*8 en BC´.
-;	[(Filas)*(Columns)] en DE´.
-;
-;	DESTRUYE:
-;
-;	AF,BC´ y DE´ 	
-
-
-Calcula_dbs_totales push bc		   									; Guardo Filas/Columnas en la pila.
-	ld a,c															; Compruebo si (Columns) es "1", en ese caso,_
-	dec a 															; _cargo el nº de filas en A y multiplico *8. (JR 3F).
-	jr nz,2F
-	ld a,b
-	jr 3F
-2 dec c 															; (Columns-1) en C.
-	ld a,b
-1 add b 															; El loop dl, multiplica Filas*Columnas.
-	dec c
-	jr nz,1B 
-3 push af 															; Guardo Filas * Columnas en la pila.
-	sla a
-	sla a
-	sla a 															; Ahora tengo en A: (Filas*Columnas)*8
-	exx 
-	ld c,a 															; Finalmente: 
-	pop af
-	ld e,a 															; (Filas*Columnas)*8 en BC.
-	xor a
-	ld b,a 															; Filas*Columnas en DE.
-	ld d,b
-	exx
-	pop bc
-	ret
-
-; -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;
-;	17/7/22
-;
-;	Puntero_primcuad .......... (Subrutina de [Inicializacion]).
-;
-;	Estamos en el 1er cuadrante de pantalla. La rutina fija (Puntero_datas) al final de los .db de .....
-; 	
-;		(Puntero_objeto) cuando el objeto no está desplazado. (CTRL_DESPLZ)="0".
-;		Caja_de_DESPLZ cuando el objeto está desplazado y estamos pintando, (Obj_dibujado)="0".
-;		Caja_de_BORRADO cuando el objeto está desplazado y estamos borrando, (Obj_dibujado)="1".
-
-puntero_primcuad push hl 
-	exx
-	call Fija_punteros
-	ld hl,(Puntero_datas)
-	call suma
-	ld (Puntero_datas),hl
-	exx
-	pop hl
-	ret
-suma and a
-	adc hl,bc 														; [(Puntero_objeto)+(Filas*Columnas)*8]-1 en HL.
-	dec hl
-	ret
-
-; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;
-;	Puntero_cuarcuad .......... (Subrutina de [Inicializacion]).
-;
-;	Asigna una dirección a cada una de las tres variables que podemos necesitar a la hora de `pintar´ el Sprite en pantalla cuando nos encontramos en el 4º cuadrante de pantalla.
-; 	Antes de llamar a esta rutina hay que ejecutar la rutina: [Calcula_dbs_totales].
-
-puntero_cuarcuad push hl
-	exx
-	call Fija_punteros
- 	exx
- 	pop hl
- 	ret
 
 ; -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
@@ -570,125 +426,32 @@ puntero_cuarcuad push hl
 
 Fija_punteros push bc 												; Guardamos en la pila (Filas)*(Columns)*8 y _
 	push de 														; _(Filas)*(Columns). BC y DE respectivamente.
-
 	ld a,(Obj_dibujado) 											; Pintamos o borramos???. (Obj_dibujado)="0" PINTAMOS.
 	and a
 	jr z,1F 	
-
 	ld a,(CTRL_DESPLZ)		 										; Borramos el objeto.
 	and a 															; Si (CTRL_DESPLZ)="0", el objeto no está desplazado, en ese caso (Puntero_datas)=(Puntero_objeto).
 	jr z,2F 														; Si (CTRL_DESPLZ)="1", el objeto está desplazado, por lo que tendrá una (Columns) más. En ese caso,_
-	ld hl,(Caja_de_BORRADO) 											; _(Puntero_datas)=Caja_de_BORRADO. 
+	ld hl,(Caja_de_BORRADO) 										; _(Puntero_datas)=Caja_de_BORRADO. 
 	ld (Puntero_datas),hl
 	jr 3F
-
 1 ld a,(CTRL_DESPLZ) 												; Pintamos el objeto.								 
 	and a 															; Si (CTRL_DESPLZ)="0", el objeto no está desplazado, en ese caso (Puntero_datas)=(Puntero_objeto).
 	jr z,2F 														; Si (CTRL_DESPLZ)="1", el objeto está desplazado, por lo que tendrá una (Columns) más. En ese caso,_
 	ld hl,(Caja_de_DESPLZ) 											; _(Puntero_datas)=Caja_de_DESPLZ.		
 	ld (Puntero_datas),hl 								
 	jr 3F
-
 2 ld hl,(Puntero_objeto) 											; (Puntero_datas)=(Puntero_objeto). 
 	ld (Puntero_datas),hl	 										; Fijamos el puntero de atributos y salimos.
-
 3 pop de
 	pop bc
 	ret	
 
 ; *********************************************************************************************************************************************************************************************
-; 14/8/22	
 
-; Limite y Limite3.
-;
-;
-; Calculan, (a partir del centro de la pantalla y del nº de filas que tiene el Sprite), el (Limite_horizontal).
-;
-; Limite se aplica en el 1er y 2º cuadrante.
-; Limite3 se aplica en el 3er y 4º cuadrante.
-;
-; NOTA: No destruyen ningún registro!!!.
-
-Limite push hl 														; Guardamos la posición del objeto en pantalla, (HL) y las dimensiones FILAS/COLUMNAS en BC.
-	push bc
-	ld hl,$48a0														; Esta es la línea que fijamos como referencia para calcular (Limite_horizontal) cuando nos_	
-	ld bc,32 														; _encontramos en el 1er o 2º tercio de pantalla.
- 	ld a,(Filas)	 								 				
-	dec a
-	ld d,a 		 													; (Filas)-1 en D.													
-	and a 															; Carry off.
-1 adc hl,bc 														; El límite se sitúa en: ($4880)+[$20*(Filas-1)]
-	dec d 															; Si H es igual a $49 es que ha habido cambio de tercio. En ese caso, situamos H en $57.
-	jr nz,1B 														; Si no hay cambio de tercio, H=$4f.
-	ld a,h 															; Guardamos la línea límite en la variable: (Limite_horizontal).
-	and 1 															; Recuperamos HL y BC y salimos.
-	jr z,2F
-	ld h,$57
-	jr 3F
-2 ld h,$4f
-3 ld (Limite_horizontal),hl
-	pop bc
-	pop hl
-	ret
-
-Limite3 push HL		 	 											; Guardamos la posición del objeto en pantalla, (HL) y las dimensiones FILAS/COLUMNAS en BC.
-	push bc
-	ld hl,$4840														; Esta es la línea que fijamos como referencia para calcular (Limite_horizontal) cuando nos_
-	ld bc,32 														; _encontramos en el 3er o 4º tercio de pantalla.
- 	ld a,(Filas)	 								 				
-	dec a
-	ld d,a 															; (Filas-1) en D.
-	and a 															; Carry off.
-1 sbc hl,bc 														; El límite se sitúa en: ($4840)-[$20*(Filas-1)]
-	dec d 															; Si H es igual a $4e es que ha habido cambio de tercio. En ese caso, situamos H en $40.
-	jr nz,1B														; Si no hay cambio de tercio, H=$48.
-	ld a,h 															; Guardamos la línea límite en la variable: (Limite_horizontal).
-	and 1 															; Recuperamos HL y BC y salimos.
-	jr nz,2F
-	ld h,$48
-	jr 3F
-2 ld h,$40
-3 ld (Limite_horizontal),hl
-	pop bc
-	pop hl
-	ret
-
-; *********************************************************************************************************************************************************************************************
-; 13/8/22
-;
-; Limite2
-;
-; Calcula, (a partir del centro de la pantalla y del nº de columnas que tiene el Sprite), el (Limite_vertical).
-;
-; Esta subrutina se aplica en todos los cuadrantes.
-;
-; NOTA: No destruye ningún registro!!!.
-
-Limite2 push hl 													; Guardamos la posición del objeto en pantalla, (HL).
-	ld hl,Columns 											
- 	ld d,(hl)
- 	ex af,af
- 	bit 0,a
- 	jr z,1F	
- 	ex af,af
- 	ld a,16 														; $10 + (Columnas-1) = (Limite_vertical), (cuando estamos en los cuadrantes 1º y 3º).
- 	add d 															; $0f - (Columnas-1) = (Limite_vertical), (cuando estamos en los cuadrantes 2º y 4º).
- 	jr 2F
-1 ex af,af
-	ld a,15
-	sub d
-2 ld (Limite_vertical),a
- 	pop hl
- 	ex af,af 														; Entrega [Cuad_cuadrante] en A.
- 	ret
-
-; ***********************************************************************************************************************************************************************
-; 
 ; Esta pequeña subrutina determina el nº de columna en la que nos encontramos, Introducimos en A el valor absoluto de L, (0-31).
 ; 
 ; OUTPUT: "FLAG C". Si se produce 1, nos encontramos en las primeras 16 columnas de pantalla, (cuadrantes 1 y 3). Si no es así, (cuadrantes 2 y 4).
-;
-; ***********************************************************************************************************************************************************************
 
 column ld a,l
 	and $1f 											
@@ -749,170 +512,6 @@ Prepara_draw ld hl,Filas 		 					 					 ; Prepara los registros BC, E y HL.
 	ld hl,(Posicion_actual)
 	ld e,0 																 ; Byte de control. Ha de estar a "0" cuando llamamos a [DRAW].
 	ret
-
-; ***********************************************************************************************************************************************************************
-;
-;	05/11/22
-;
-;	La rutina ha de proporcionar los datos necesarios para que la rutina de pintado imprima un objeto en pantalla:
-;
-;   Necesitamos:	- El nº de scanlines que podemos imprimir del objeto en B.
-;             		- La dirección de pantalla del puntero de impresión en HL.
-;			  		- La nueva ubicacion de (Puntero_datas) en DE.
-;					- También necesitamos saber el nº de columnas que `podemos´ imprimir el objeto.
-;	 					Este valor es el resultado de la diferencia entre (Columns)-(Columnas).
-;						En función de este valor desplazaremos el puntero SP por los .db de la entidad_
-; 	 					_incrementando su posición en "1" o "2" unidades.
-;
-Converter call Prepara_draw					;	Necesito (Filas)/(Columns) en BC para llamar a [Calcula_dbs_totales].
-	push bc									;	También necesito disponer de la variable (Filas), que colocaré en H´ y (Attr),_	
-	exx 									;	_que alojaré en L´.
-	pop hl 									;	El objetivo de esta rutina es de proveer de todos los datos necesarios a la rutina_
-
-	ld a,(Attr) 							;	_[Pintorrejeo] para que no tenga que acceder a memoria a por ninguno.
-	ld l,a									;	Todos los datos necesarios para que [Pintorrejeo] se ejecute correctamente han de estar contenidos en los registros!!!!!
-	exx										
-
-	call Calcula_dbs_totales				
-
-	ld hl,Columnas
-	ld c,(hl)
-
-	exx
-	push bc
-	exx
-	pop de									;	Tenemos:
-; 											;	(Filas)/(Columnas) en BC.
-;											;	[(Filas)*(Columns)]*8 en BC´y DE.
-;											;	[(Filas)*(Columns)] en DE´.
-    ld a,(Cuad_objeto)
-    cp 2
-    call c,Cuad_one
-    call z,Cuad_two
-    ret m
-    and 1
-    call nz,Cuad_three 						; 	Salimos de la rutina si hemos ejecutado antes, alguna de las_	
-    ret m 									;	_anteriores, [Cuad_one], [Cuad_two] o [Cuad_three].
-    call Cuad_four
-	ret
-
-Cuad_four ld de,(Puntero_datas)
-	push de
-	pop ix 									;	New Puntero_datas en DE e IX.	
-	ld a,(Columns)
-	sub c
-	exx
-	ld b,a
-	exx
-	ex af,af 								;	(Columns)-(Columnas) en B´ y A´.
-	call Filas_por_ocho
-	ld hl,(Posicion_actual)
-	ret
-
-Cuad_three push bc							;	(Filas)/(Columnas) en la pila.
-	ld hl,(Puntero_datas)
-	ld b,c
-	dec b 									;	(Columnas)-1 en B.
-	jr z,1F
-2 dec hl
-	djnz 2B
-1 ex de,hl
-	push de
-	pop ix 									;	New Puntero_datas en DE e IX.
-	ld hl,(Posicion_actual)
-	ld b,c
-	dec b
-	jr z,3F
-4 dec hl 									; 	Puntero de impresión en HL.
-	djnz 4B	
-3 pop bc 									;	Recupero (Filas)/(Columnas) en BC.
-	call Filas_por_ocho						;	Scanlines que componen la entidad en B. 
-	ld a,(Columns)
-	sub c
-	exx
-	ld b,a
-	exx
-	ex af,af 								;	(Columns)-(Columnas) en B´ y A´. 
-	xor a
-	dec a
-	and a
-	ret
-
-Cuad_two push bc
-    ld hl,Columns
-    ld b,(hl)
-    ld hl,(Puntero_datas)
-1 inc hl
-    djnz 1B 								;	Ahora (Puntero_datas) en el último .db.
-    and a
-	sbc hl,de
-    ex de,hl 					    	
-    push de
-    pop ix                                  ;	New (Puntero_datas) en DE e IX.
-    pop bc                                  ;   (Filas)/(Columnas) en BC.
-    call Filas_por_ocho
-	push bc 								;	Guardo Scanlines/Columns en la pila.
-	dec b 									;	Scanlines-1.
- 	ld hl,(Posicion_actual)
-2 call PreviousScan
-	djnz 2B 								;	Ahora Puntero de impresión en HL.
- 	ld a,(Columns)
-	sub c
-	exx
-	ld b,a
-	exx
-	ex af,af 								; 	(Columns)-(Columnas) en B´ y A´.
-	pop bc
-	xor a 									;	A tiene un valor negativo antes de salir de la rutina. 
-	dec a
-	and a
-	ret
-    
-Cuad_one ld hl,(Puntero_datas) 				;	En el 1er cuadrante, (Puntero_datas) apuntará al último .db del objeto. Para situarlo_
-	and a 									;	_en el 1er .db, restaremos el nº total de .db a hl y sumaremos 1.
-	sbc hl,de
-	inc hl
-	ex de,hl 								;	New (Puntero_datas) en DE.
-	call Filas_por_ocho                                               
-	dec b									;	[(Filas)*8]-1 en [B].
-	push bc
-	ld hl,(Posicion_actual)
-1 call PreviousScan
-	djnz 1B 									
-	ld b,c									;	(Columnas) en B.
-	dec b
-	jr nz,2F
-	jr 3F
-2 dec l
-	djnz 2B	 								;	Ahora tenemos el puntero de impresión, (donde vamos a empezar a pintar el 1er .db)_
-3 pop bc 									;	_ en HL. (Arriba-izquierda).
-	inc b 									;	Scanlines totales a imprimir en B y (Columnas) en C.
-    push bc
-	exx
-	pop bc 									;	Scanlines/(Columnas) en BC´.
-	ld a,(Columns)
-	sub c
-	ld b,a 									; 	B´ contiene (Columns)-(Columnas).
-	jr z,4F 								; 	Si el objeto se imprime completo, (Columns)-(Columnas)="0" saltamos a 4F y salimos.
-	exx 									;	El objeto no se imprime completo. Hay que situar, New (Puntero_datas) en el .db_
-	push af 								;	_correspondiente. Sumaemos la diferencia entre (Columns) y (Columnas) al puntero.
-	ex af,af 								;	El objeto está apareciendo.
-	pop af
-5 inc de
-	dec a
-	jr nz,5B
-	jr 6F
-4 exx
-	ex af,af								; 	BC contiene Scanlines/(Columns).
-6 push de 									;	HL contiene el Puntero de impresión.
-	pop ix 									;	DE e IX contienen el New Puntero_datas.
-;											;	A´y B´contienen (Columns)-(Columnas).											
-;											;	H´ (Filas)
-;											;	L´ (Attr)
-	xor a
-	dec a
-	and a 									;	A es negativo antes de salir de la rutina.
-    ret
 
 ;----------------------------------------------------------------------------------------------------------------
 ;
@@ -1032,251 +631,3 @@ Extrae_foto_registros ld (Stack),sp															; Guardo el puntero de pila y 
 1 ld sp,(Stack)
 
 	ret
-
-; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;
-;	17/10/22
-;
-;	Instrucciones donde interviene el Stack Pointer, (SP).
-
-;	ADC HL,SP	LD (addr),SP
-;	ADD HL,SP	LD SP,(addr)
-;	ADD IX,SP	LD SP,nn
-; 	ADD IY,SP	LD SP,HL
-;				LD SP,IX
-;	DEC SP		LD SP,IY
-
-;	EX (SP),HL
-;	EX (SP),IX
-;	EX (SP),IY
-
-;	INC SP
-
-Pintorrejeo  
-
-;	INPUTS:
-;
-;   Estos parámetros los proporciona la subrutina Converter.
-
-; 	BC contiene los Scanlines/(Columnas) a imprimir.
-;	HL contiene el Puntero de impresión, dirección de pantalla, (arriba-izquierda) del sprite.
-;	DE e IX contienen el New Puntero_datas.
-;	A´y B´contienen (Columns)-(Columnas).											
-;	H´ (Filas)
-;	L´ (Attr)
-
-;	call Define_atributos 
-
-	exx
-	ld de,$0002 								;	El registro D' nos indicará, (si está a "1"), que vamos a imprimir_
-	exx											;	_una entidad de 4 Columnas. Utilizaremos la subrutina (Columnas2) para hacerlo.	
-; 												;	Inicializamos D'.
-    ld a,c
-    cp 2
-    jr z,Columnas2
-    jp c,Columnas1
-	and 1
-    jr nz,Columnas3
-
-	exx
-	inc d
-	exx
-	jr Columnas2
-
-; -----------------------------------------------------------------------------------------
-
-Columnas3 push bc
-
-	ld (Stack),sp						; Guardo SP.
-	ld sp,ix							; Sitúo el SP en el 1er .db de la entidad.
-
-1 pop de
-		
-    ld a,e								; Funcion_xor de la FILA.
-	xor (hl)
-    ld e,a
-	inc hl
-	ld a,d
-	xor (hl)
-	ld d,a
-    dec hl
-
-    ld (hl),e
-	inc hl
-	ld (hl),d
-	inc hl
-	
-    pop de
-    ld a,e
-    xor (hl)
-    ld e,a
-
-    ld (hl),e
-    dec sp
-    dec l
-    dec l
-    jr 2F
-
-4 djnz 1B
- 
-6 ld sp,(Stack)
-	pop bc
-    ret
-
-2 inc h       						; Incrementamos el scanline.
-    ld a,h
-    and 7
-    jr nz,3F              			; Salimos de la rutina si el scanline se encuentra entre (1-7).
-	ld a,l             				; Scanlines a "0", cambiamos de tercio. (Siempre que estemos en la última línea, LLL).
-    add a,$20           			; Vamos a comprobarlo...
-    ld l,a
-    jr nc,5F               			; Salimos si se produce el cambio de tercio.
-
-; Si se produce cambio de tercio:
-
-	ld a,h 							; Salimos de la rutina si estamos en el último tercio de la pantalla y se produce cambio de cuadrante.
-	sub $58
-	jr z,6B
-	jr nc,6B
-	jr 3F
-
-5 ld a,h              				; No estamos en la última línea del tercio, por lo que inicializamos H restando una_
-    sub 8               			; _unidad a los bits que definen el tercio TT, (sub $08).
-    ld h,a
-
-3 jr 4B
- 
-; -----------------------------------------------------------------------------------------
-
-Columnas2 ld (Stack),sp					; Guardo SP.
-	ld sp,ix						; Sitúo el SP en el 1er .db de Coracao.
-2 pop de 							; 2º .db y 1er .db en DE respectivamente. Esto decrementa en 2 pos. el puntero SP.
-	jr 4F	
-
-1 ld (hl),e							; Imprimo el scanline con la función XOR implementada.
-	inc hl
-	ld (hl),d
-	dec hl
-	jr 5F 							; Vamos a preparar el puntero de impresión HL, en el scanline siguiente.
-
-3 exx 								; Consulto (Columns)-(Columnas), (Corrección del puntero SP).
-	inc b
-	dec b
-	jr z,8F 						; Si (Columns)=(Columnas) no hago corrección de SP.
-
-7 inc sp							; Hago la corrección de SP y repongo (Columns)-(Columnas) en B´.
-	djnz 7B
-	
-	ex af,af
-	ld b,a
-	ex af,af
-
-8 exx
- 	djnz 2B
-9 ld sp,(Stack)	
-
-	ret
-
-; --------------------------
-
-4 ld a,e						; Funcion_xor de la FILA. .db XOR (HL). El resultado sigue en DE.
-	xor (hl)
-	ld e,a
-	inc hl
-	ld a,d
-	xor (hl)
-	ld d,a
-	dec hl
-	jr 1B
-
-; Nota: No utilizo la rutina Next Scan / Previous Scan porque estoy utilizando la pila para pintar.
-
-5 exx
-	inc d
-	dec d
-	jr z,11F 					; Imprimimos 2 o 4 Columnas???
-
-	dec e 						; Vamos a imprimir 4 Columnas. Decrementamos el contador E'.
-	jr z,12F
-
-	exx
-	inc l
-	inc l
-	jr 2B
-
-12 inc e
-	inc e
-	exx
-	dec l
-	dec l 						; Inicializamos E' y HL a su posición inicial para imprimir el siguiente scanline.
-	jr 13F
-
-11 exx 
-13 inc h       				; Incrementamos el scanline.
-	ld a,h
-	and 7
-    jr nz,6F              		; Salimos de la rutina si el scanline se encuentra entre (1-7).
-	ld a,l             			; Scanlines a "0", cambiamos de tercio. (Siempre que estemos en la última línea, LLL).
-    add a,$20           		; Vamos a comprobarlo...
-    ld l,a
-    jr nc,10F               	; Salimos si no se produce el cambio de tercio.
-
-; Si se produce cambio de tercio:
-
-	ld a,h 						; Salimos de la rutina si estamos en el último tercio de la pantalla y se produce cambio de cuadrante.
-	sub $58
-	jr z,9B
-	jr nc,9B
-	jr 6F
-		
-10 ld a,h              				; No estamos en la última línea del tercio, por lo que inicializamos H restando una_
-    sub 8               			; _unidad a los bits que definen el tercio TT, (sub $08).
-    ld h,a
-6 jr 3B
-
-; -----------------------------------------------------------------------------------------
-
-Columnas1 ld a,(de)
-	xor (hl)
-	ld (hl),a
-    jr 2F
-5 djnz Columnas1                    ; Quedan scanlines que imprimir ???. REPETIMOS.
-    ret
-2 inc h       						; Incrementamos el scanline.
-    ld a,h
-    and 7
-    jr nz,3F              			; Salimos de la rutina si el scanline se encuentra entre (1-7).
-	ld a,l             				; Scanlines a "0", cambiamos de tercio. (Siempre que estemos en la última línea, LLL).
-    add a,$20           			; Vamos a comprobarlo...
-    ld l,a
-    jr nc,8F               			; Salimos si se produce el cambio de tercio.
-
-; Si se produce cambio de tercio:
-
-	ld a,h 							; Salimos de la rutina si estamos en el último tercio de la pantalla y se produce cambio de cuadrante.
-	sub $58
-	ret z
-	ret nc
-	jr 3F 							; Se produce el cambio de tercio pero no estamos en el 3er tercio.
-8 ld a,h              				; No estamos en la última línea del tercio, por lo que inicializamos H restando una_
-    sub 8               			; _unidad a los bits que definen el tercio TT, (sub $08).
-    ld h,a
-3 exx 								; Comprobamos si estamos imprimiendo un sprite compuesto por 1 sóla (Columns), o se trata_
-	inc B                           ; _de imprimir parte de un Sprite, (imprimimos 1 Columna de un sprite compuesto por más).
-	dec b
-	jr z,6F
-	exx
-	ex af,af 						; A contiene ahora (Columns)-(Columnas).
-7 inc de 							; El sprite consta de más de una columna, debemos desplazar el puntero DE hasta el siguiente_
-	dec a  							; _.DB, este valor de desplazamiento lo proporciona: [(Columns)-(Columnas)]+1.
-	jr nz,7B 						
-	inc de 							; Corrección de DE. Es necesaria para situar el puntero DE en el .db correspondiente.
-	exx 							; Restauramos A´ con la variable (Columns)-(Columnas) para volverla a utilizar en el siguiente_
-	ld a,b 							; _scanline.
-	exx
-	ex af,af
-	jr 5B
-6 exx
-    inc de
-    jr 5B 
-

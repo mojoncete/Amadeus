@@ -67,10 +67,10 @@ Attr db %00000110										; Atributos de la entidad:
 ;			 6 ..... AMARILLO
 ; 			 7 ..... BLANCO
 
-Indice_Sprite defw Indice_Badsat_der
+Indice_Sprite defw 0
 Puntero_DESPLZ defw 0
-Posicion_inicio defw $47a1								; Dirección de pantalla donde aparece el objeto. [DRAW]
-Cuad_objeto db 0			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+Posicion_inicio defw $50cb								; Dirección de pantalla donde aparece el objeto. [DRAW]
+Cuad_objeto db 3			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
 Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 
@@ -118,7 +118,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
-Puntero_indice_mov defw Indice_mov_Badsat
+Puntero_indice_mov defw 0
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0
@@ -127,8 +127,8 @@ Repetimos_db db 0
 
 ; Variables de funcionamiento. [DRAW].
 
-Puntero_objeto defw 0									; Donde están los datos para pintar el Sprite.
-Puntero_datas defw 0
+Puntero_objeto defw Amadeus								; Donde están los datos para pintar el Sprite.
+Puntero_datas defw 0 
 Columnas db 0
 Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado en función del tamaño del Sprite. Si el objeto llega a esta línea se modifica_    
 ; 														; _(Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
@@ -192,7 +192,7 @@ START ld sp,$ffff
 	ld a,%00000111
 	call Cls
 
-	call Pinta_FILAS
+;	call Pinta_FILAS
 
 	call Pulsa_ENTER
 
@@ -206,7 +206,7 @@ START ld sp,$ffff
 
 ;1 push bc  												; Guardo el contador de entidades.
 ; 	call Inicia_sprite
-;	call Draw
+	call Draw
 ;	call Guarda_foto_registros
 ;	call Store_Restore_entidades 				    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_entidades) en la siguiente.
 ;	pop bc
@@ -231,7 +231,7 @@ Frame
 ;	call Calcula_numero_de_malotes						; Nº de entidades que vamos a imprimir en pantalla.
 
 ;	ld a,7                                      	     
-;    out ($fe),a  
+;   out ($fe),a  
 ;	call Extrae_foto_registros 							; Pintamos el fotograma anterior.
 
 
@@ -275,12 +275,12 @@ Frame
 
 ; -----
 
-	ld hl,$50de
-	ld b,8
-	call Pinta_enemigo_3x2_derecha_2columnas
+;	ld hl,$50df
+;	ld b,8
+;;	call Pinta_enemigo_3x2_derecha_1columna;;
 
-    xor a
-    out ($fe),a
+;    xor a
+;    out ($fe),a
 
 
 ; ----------------------------------------------------------------------
