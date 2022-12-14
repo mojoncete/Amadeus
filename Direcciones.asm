@@ -602,32 +602,6 @@ Reaparece_arriba ld bc,$17e0
 	ret
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;   24/07/22
-;
-;	INPUT: 
-;	
-;	B contiene el nº de filas del objeto.
-;
-;	OUTPUT:
-;	        
-;	B, DE y DE´ ..... Contendrán el nº de scanlines del objeto. (Filas*8).
-;	C ..... Contendrá la variable (Columns).	
-;		
-;	DESTRUYE !!!!! BC, DE y DE´.
-
-Calcula_scanlines_totales call Prepara_draw                         ; [Prepara_draw] proporciona (Filas) y (Columns) del objeto. 
- 	sla b	
-	sla b
-	sla b 															; Ahora tengo en A: (Filas*Columnas)*8
-    ld e,b                                                          
-    ld d,0                                                          ; (Filas)*8 en E.
-    push de
-	exx
-    pop de                                                          ; (Filas)*8 en DE y DE´.
-	exx
-	ret	
-
-; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Reinicio ld hl,(Posicion_inicio)
 

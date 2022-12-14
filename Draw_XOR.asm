@@ -22,7 +22,11 @@ Draw call Prepara_draw
 
 ; Llegados a este punto, tengo Filas/Columnas en BC y (Cuad_objeto) en A´.
 
-3 call calcula_columna
+3 call calcula_CColumnass
+	call calcula_PPuntero_datass
+
+
+
 ;    call Converter
 
 	ld hl,Ctrl_0
@@ -305,7 +309,9 @@ Comprueba_limite_vertical ld a,(Obj_dibujado)
 
 ; --------------------
 
-Modifica_Pos_actual call Calcula_scanlines_totales  ; Ahora tenemos el nº total de scanlines en B, DE y DE´.
+Modifica_Pos_actual 
+
+;	call Calcula_scanlines_totales  ; Ahora tenemos el nº total de scanlines en B, DE y DE´.
     dec B                                           ; Scanlines-1 en B.
 1 call PreviousScan
     djnz 1B
@@ -315,7 +321,9 @@ Modifica_Pos_actual call Calcula_scanlines_totales  ; Ahora tenemos el nº total
 
 ; --------------------
 
-Modifica_Pos_actual2 call Calcula_scanlines_totales ; Ahora tenemos el nº total de scanlines en B, DE y DE´.
+Modifica_Pos_actual2 
+
+;	call Calcula_scanlines_totales ; Ahora tenemos el nº total de scanlines en B, DE y DE´.
     dec B                                           ; Scanlines-1 en B.
 1 call NextScan
     djnz 1B
@@ -448,7 +456,7 @@ Fija_punteros push bc 												; Guardamos en la pila (Filas)*(Columns)*8 y _
 	pop bc
 	ret	
 
-; *********************************************************************************************************************************************************************************************
+; ------------------------------------------------------------------------------------------------------------------
 
 ; Esta pequeña subrutina determina el nº de columna en la que nos encontramos, Introducimos en A el valor absoluto de L, (0-31).
 ; 
@@ -459,45 +467,117 @@ column ld a,l
  	cp $10												
  	ret
 
-; ********************************************************************** calcolumn / calcolumn2 *************************************************************************
+; --------------------------------------------------------------------------------------------------------------------
 ;
 ; Esta subrutina se encarga de asignar valor a la variable (Columnas), (nº de columnas del objeto que podemos pintar).
+;
+; 14/12/22
+;
+;	Modifica: A y BC.
 
-calcula_columna 
-
-	jr $
-
-	ld e,0
-	ld a,(Cuad_objeto)
+calcula_CColumnass ld a,(Cuad_objeto)
 	and 1
 	jr z,1F
 
 ; Nos encontramos en la parte izquierda de la pantalla
 
 	ld a,(Coordenada_X)
-	inc a
-	sub c
+	ld b,a
+	inc b											; (Coordenada_X)+1 en B.
+	ld a,c
+	sub b											; (Columns)-[(Coordenada_X)+1] en A.
 	jr c,2F
-	
+	ld b,a
 	ld a,c
-	ld (Columnas),a				
-	jr $	; RET ---
-
-2 ; El objeto no entra completo en pantalla.
-	inc e
-	inc a
-	jr nz,2B
-
-	ld a,c
-	sub e
+	sub b
 	ld (Columnas),a
-	jr $	; RET ---
+	jr 4F
+2 ld a,c
+	ld (Columnas),a
+	jr 4F
 
-1 ; Nos encontramos en la parte derecha de la pantalla.	
+; Nos encontramos en la parte derecha de la pantalla.
 
+1 ld a,(Coordenada_X)
+	add c
+	dec a
+	sub $1f
+	jr c,3F
+	ld b,a
+	ld a,c
+	sub b
+	ld (Columnas),a
+	jr 4F
+3 ld a,c
+	ld (Columnas),a
+4 ret	
+
+; --------------------------------------------------------------------------------------------------------------------
+
+calcula_PPuntero_datass ld a,(Cuad_objeto)
+	cp 2
+	jr c,2F
+	jr z,2F
+
+; El objeto se encuentra en la parte inferior de la pantalla.
+
+	
+
+; El objeto se encuentra en la parte superior de la pantalla.
+
+2 
 	jr $
 
-; ******************************************************************************************************************************************************************************************
+	ld a,(Coordenada_y)
+	ld c,a
+	inc c
+	ld a,(Filas)
+	sub c
+	jr c,1F
+	jr nz,3F
+
+; Aparece/desaparece por la parte alta de la pantalla.
+	jr $
+
+
+; No podemos imprimir todos los scanlines del objeto.
+3 jr $	
+
+	ld hl,(Posicion_actual)
+	ld a,h
+	and 7
+
+; Podemos imprimr todos los scanlines del objeto.
+1 ld hl,(Puntero_objeto)
+	ld (Puntero_datas),hl
+	jr $	; RET -----
+
+
+					
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+; --------------------------------------------------------------------------------------------------------------------
 ;
 ;	Prepara_draw
 ;
@@ -589,19 +669,6 @@ PreviousScan ld a,h
     add a,8             ; _unidad a los bits que definen el tercio TT, (add a,$08).
     ld h,a
     ret
-
-; ----------------------------------------------------------
-;
-;	17/10/22
-;
-;	(Macro). Esta operación es utilizada en las cuatro subrutinas de Converter.
-;
-;	Multiplica la cantidad contenida en B por 8. (B)*8.
-
-Filas_por_ocho sla b
-	sla b
-	sla b
-	ret
 
 ; -----------------------------------------------------------------------------------
 ;
