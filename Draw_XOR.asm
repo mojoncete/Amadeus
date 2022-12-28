@@ -12,22 +12,24 @@ Draw call Prepara_draw
 	jr 1F
 2 ld hl,(Posicion_inicio) 							; No hay (Posicion_actual), por lo que el objeto se está iniciando.
 	ld (Posicion_actual),hl							; Indicamos que (Posicion_actual) = (Posicion_inicio) y saltamos a la subrutina [Inicializacion], (donde asignaremos_			
-	call Inicializacion
+	call Inicializacion   							; _(Limite_horizontal), (Limite_vertical) y (Cuad_objeto). También asignaremos las coordenadas X e Y. (Posición 0,0)_
+;													; _la esquina superior izquierda de la pantalla.	
 	call Prepara_Puntero_mov 						; El objeto está inicializado. Antes de salir inicializamos tb el puntero de movimiento del objeto.
 1 ld a,(Ctrl_0)
 	bit 5,a
-	jr nz,3F
-	call Comprueba_limite_horizontal
+	jr nz,3F										; Si acabamos de inicializar un objeto, NO COMPROBAMOS LÍMITES. 
+
+	call Comprueba_limite_horizontal   				
 	call Comprueba_limite_vertical
 
 ; Llegados a este punto, tengo Filas/Columnas en BC y (Cuad_objeto) en A´.
 
 3 call calcula_CColumnass
-	call calcula_PPuntero_datass
+	call calcula_variable_B
 
 
 
-;    call Converter
+	jr $
 
 	ld hl,Ctrl_0
 	res 5,(hl)
@@ -510,59 +512,148 @@ calcula_CColumnass ld a,(Cuad_objeto)
 	jr 4F
 3 ld a,c
 	ld (Columnas),a
-4 ret	
+4 exx
+	ld c,a
+	exx
+ ret	
 
 ; --------------------------------------------------------------------------------------------------------------------
+;
+;	
+calcula_variable_B 
+	 					
+	call Prepara_draw					; (Filas)/(Columns) en BC.
 
-calcula_PPuntero_datass ld a,(Cuad_objeto)
+	ld a,(Cuad_objeto)
 	cp 2
 	jr c,2F
 	jr z,2F
 
 ; El objeto se encuentra en la parte inferior de la pantalla.
 
-	
+	jr $
 
 ; El objeto se encuentra en la parte superior de la pantalla.
 
-2 
-	jr $
+2 ld a,c
+	and 1
+	jr z,1F
+	
+; El sprite tiene 3 columnas, la variable B será "8".
+
+	exx
+	ld b,8
+	exx
+	jr 3F
+
+; El sprite tiene 2 columnas, la variable B será "16".
+
+1 exx
+	ld b,16
+	exx
+
+3 ret														; Al salir de la rutina tendremos: Variable B de impresión en B´.
+;															;								   (Columnas) en C´.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	ld a,(Coordenada_y)
-	ld c,a
-	inc c
-	ld a,(Filas)
-	sub c
+	ld d,a
+	inc d
+
+	ld a,b
+	sub d
 	jr c,1F
 	jr nz,3F
 
-; Aparece/desaparece por la parte alta de la pantalla.
+; Aparece/desaparece por la parte alta de la pantalla. Nos encontramos en la SEGUNDA (Fila). (Coordenada_Y)="1".
+; Recuerdo que la 1ª (Fila) es la "0".
+
 	jr $
 
+	call Calcula_lineas_a_restar 
+	and a
+	jr z,1F 							; Si nos encontamos en el último scanline, el sprite se pintará entero.
 
-; No podemos imprimir todos los scanlines del objeto.
-3 jr $	
+; Si la (Posición_actual) de pantalla no se encuentra en el último scanline, (de la 2ª fila), el objeto no se puede imprimir entero. 
 
-	ld hl,(Posicion_actual)
-	ld a,h
-	and 7
+	ld b,a
+	ld a,16
+	sub b 								; AHORA tenemos en "B", el nº total de scanlines que podemos imprimir para una entidad de 2 (Columns).
+	ld b,a 
+
+	ld a,c
+	and 1
+	jr z,6F
+
+
+
+
+6 ld a,b
+	exx
+	ld b,a
+	exx
+	jr 4F								; Variable de impresión 
+
+
+3 call Calcula_lineas_a_restar
+	ld b,a
+	ld a,16
+	sub b
+	ld b,a
+	call Fija_Puntero_datas
+	jr 4F
 
 ; Podemos imprimr todos los scanlines del objeto.
-1 ld hl,(Puntero_objeto)
-	ld (Puntero_datas),hl
-	jr $	; RET -----
 
+1 ld a,c
+	and 1
+	jr z,5F
+	
+; El sprite tiene 3 columnas, la variable B será "8".
 
-					
+	exx
+	ld b,8
+	exx
+	jr 4F
 
+; El sprite tiene 2 columnas, la variable B será "16".
 
+5 exx
+	ld b,16
+	exx
 
+4 ret														; Al salir de la rutina tendremos: Variable B de impresión en B´.
+;															;								   (Columnas) en C´.
 
+; ----- ----- ----- ----- ----- ----- 					
 
+Calcula_lineas_a_restar ld a,h 								; HL contiene (Posicion_actual).
+	and 7
+	ld b,a 													; B contiene el nº de scanlines que `NO PODEMOS IMPRIMIR´ del sprite.
+	ld a,7
+	sub b
+	ret 
 
-
-
-
+; --------------------------------------------------------------------------------------------------------------------
 
 
 

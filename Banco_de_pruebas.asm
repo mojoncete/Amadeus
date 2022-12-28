@@ -48,7 +48,7 @@ Album_de_fotos equ $7000								; En (Album_de_fotos) vamos a ir almacenando los
 ;
 
 Filas db 2												; Filas. [DRAW]
-Columns db 3  											; Nº de columnas. [DRAW]
+Columns db 2  											; Nº de columnas. [DRAW]
 Posicion_actual defw $0000								; Dirección actual del Sprite. [DRAW]
 CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos. Si el valor es negativo,_
 ; 														; _ estamos desplazados hacia la izquierda y si es positivo, hacia la derecha.
@@ -69,7 +69,7 @@ Attr db %00000110										; Atributos de la entidad:
 
 Indice_Sprite defw 0
 Puntero_DESPLZ defw 0
-Posicion_inicio defw $4328								; Dirección de pantalla donde aparece el objeto. [DRAW]
+Posicion_inicio defw $4020								; Dirección de pantalla donde aparece el objeto. [DRAW]
 Cuad_objeto db 1			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
 Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
@@ -129,7 +129,7 @@ Repetimos_db db 0
 
 ; Variables de funcionamiento. [DRAW].
 
-Puntero_objeto defw Amadeus_F9							; Donde están los datos para pintar el Sprite.
+Puntero_objeto defw Amadeus 							; Donde están los datos para pintar el Sprite.
 Puntero_datas defw 0 
 Columnas db 0
 Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado en función del tamaño del Sprite. Si el objeto llega a esta línea se modifica_    
