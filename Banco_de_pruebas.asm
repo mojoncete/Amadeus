@@ -69,8 +69,8 @@ Attr db %00000110										; Atributos de la entidad:
 
 Indice_Sprite defw 0
 Puntero_DESPLZ defw 0
-Posicion_inicio defw $4020								; Dirección de pantalla donde aparece el objeto. [DRAW]
-Cuad_objeto db 1			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+Posicion_inicio defw $53a6								; Dirección de pantalla donde aparece el objeto. [DRAW]
+Cuad_objeto db 3			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
 Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 
@@ -129,7 +129,7 @@ Repetimos_db db 0
 
 ; Variables de funcionamiento. [DRAW].
 
-Puntero_objeto defw Amadeus 							; Donde están los datos para pintar el Sprite.
+Puntero_objeto defw Amadeus								; Donde están los datos para pintar el Sprite.
 Puntero_datas defw 0 
 Columnas db 0
 Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado en función del tamaño del Sprite. Si el objeto llega a esta línea se modifica_    

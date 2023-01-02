@@ -25,9 +25,9 @@ Draw call Prepara_draw
 ; Llegados a este punto, tengo Filas/Columnas en BC y (Cuad_objeto) en A´.
 
 3 call calcula_CColumnass
-	call calcula_variable_B
+	call Calcula_puntero_de_impresion				; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
 
-
+	call Pinta_Amadeus_2x2
 
 	jr $
 
@@ -520,153 +520,73 @@ calcula_CColumnass ld a,(Cuad_objeto)
 ; --------------------------------------------------------------------------------------------------------------------
 ;
 ;	
-calcula_variable_B 
-	 					
-	call Prepara_draw					; (Filas)/(Columns) en BC.
 
-	ld a,(Cuad_objeto)
+Calcula_puntero_de_impresion ld a,(Cuad_objeto)
 	cp 2
-	jr c,2F
-	jr z,2F
-
-; El objeto se encuentra en la parte inferior de la pantalla.
-
-	jr $
-
-; El objeto se encuentra en la parte superior de la pantalla.
-
-2 ld a,c
-	and 1
-	jr z,1F
-	
-; El sprite tiene 3 columnas, la variable B será "8".
-
-	exx
-	ld b,8
-	exx
-	jr 3F
-
-; El sprite tiene 2 columnas, la variable B será "16".
-
-1 exx
-	ld b,16
-	exx
-
-3 ret														; Al salir de la rutina tendremos: Variable B de impresión en B´.
-;															;								   (Columnas) en C´.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	ld a,(Coordenada_y)
-	ld d,a
-	inc d
-
-	ld a,b
-	sub d
 	jr c,1F
-	jr nz,3F
-
-; Aparece/desaparece por la parte alta de la pantalla. Nos encontramos en la SEGUNDA (Fila). (Coordenada_Y)="1".
-; Recuerdo que la 1ª (Fila) es la "0".
-
-	jr $
-
-	call Calcula_lineas_a_restar 
-	and a
-	jr z,1F 							; Si nos encontamos en el último scanline, el sprite se pintará entero.
-
-; Si la (Posición_actual) de pantalla no se encuentra en el último scanline, (de la 2ª fila), el objeto no se puede imprimir entero. 
-
-	ld b,a
-	ld a,16
-	sub b 								; AHORA tenemos en "B", el nº total de scanlines que podemos imprimir para una entidad de 2 (Columns).
-	ld b,a 
-
-	ld a,c
+	jr z,1F
 	and 1
+	jr z,3F
+
+; Estamos situados en el 3er cuadrante de pantalla. ----- ----- -----
+
+	call Operandos					; (Posicion_actual) en HL y (Columnas)-1 en B.
+
+9 ld a,l
+	and $1f
+	ret z
+	dec hl
+	djnz 9B
+	jr 7F
+
+; Estamos situados en el 4º cuadrante de pantalla. ----- ----- -----
+
+3 ld hl,(Posicion_actual) 
+	jr 7F
+
+1 jr z,2F
+
+; Estamos situados en el 1er cuadrante de pantalla. ----- ----- -----
+
+	call Operandos					; (Posicion_actual) en HL y (Columnas)-1 en B.
+4 ld a,l
+	and $1f
 	jr z,6F
+	dec hl
+	djnz 4B
+6 ld b,15
+5 call PreviousScan
+	djnz 5B
+	jr 7F
 
+; Estamos situados en el 2º cuadrante de pantalla. ----- ----- -----
 
-
-
-6 ld a,b
-	exx
-	ld b,a
-	exx
-	jr 4F								; Variable de impresión 
-
-
-3 call Calcula_lineas_a_restar
-	ld b,a
-	ld a,16
-	sub b
-	ld b,a
-	call Fija_Puntero_datas
-	jr 4F
-
-; Podemos imprimr todos los scanlines del objeto.
-
-1 ld a,c
-	and 1
-	jr z,5F
-	
-; El sprite tiene 3 columnas, la variable B será "8".
-
-	exx
-	ld b,8
-	exx
-	jr 4F
-
-; El sprite tiene 2 columnas, la variable B será "16".
-
-5 exx
-	ld b,16
-	exx
-
-4 ret														; Al salir de la rutina tendremos: Variable B de impresión en B´.
-;															;								   (Columnas) en C´.
-
-; ----- ----- ----- ----- ----- ----- 					
-
-Calcula_lineas_a_restar ld a,h 								; HL contiene (Posicion_actual).
-	and 7
-	ld b,a 													; B contiene el nº de scanlines que `NO PODEMOS IMPRIMIR´ del sprite.
-	ld a,7
-	sub b
-	ret 
+2 call Operandos					; (Posicion_actual) en HL y (Columnas)-1 en B.
+	ld b,15
+8 call PreviousScan
+	djnz 8B
+7 ret
 
 ; --------------------------------------------------------------------------------------------------------------------
+;
+;	2/1/23
+;
+;	Sub-rutina de [Calcula_puntero_de_impresion].
+;	
+;	Tras esta rutina tenemos:
+;
+;	OUTPUT: HL contiene (Posicion_actual).
+;			B contiene (Columnas)-1. Nota: Este valor `nunca' será "0". El valor mínimo es "1".
+;
+;	DESTRUYE!!!!! HL,B y A.
 
-
-
-
-
-
-
-
-
-
-
-
-
+Operandos ld hl,(Posicion_actual)
+	ld a,(Columnas)
+	dec a
+	jr nz,1F
+	inc a
+1 ld b,a
+	ret
 
 ; --------------------------------------------------------------------------------------------------------------------
 ;
