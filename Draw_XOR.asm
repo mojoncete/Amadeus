@@ -26,13 +26,12 @@ Draw call Prepara_draw
 
 3 call calcula_CColumnass
 	call Calcula_puntero_de_impresion				; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
+	call Define_rutina_de_impresion
 
-	call Pinta_Amadeus_2x2
+	ld a,(Ctrl_0)									; Antes de salir de la rutina REStauramos el bit5 de Ctrl_0 para que nos vuelva_
+	res 5,a											; _a ser de utilidad.
+	ld (Ctrl_0),a
 
-	jr $
-
-	ld hl,Ctrl_0
-	res 5,(hl)
 	ret
 
 ; *******************************************************************************************************************************************************************************************
@@ -519,7 +518,12 @@ calcula_CColumnass ld a,(Cuad_objeto)
 
 ; --------------------------------------------------------------------------------------------------------------------
 ;
-;	
+; 2/12/23
+;
+;	Calcula el puntero de impresión del sprite, (arriba-izquierda).
+;
+;	OUTPUT: HL e IX Contienen el puntero de impresión.
+;	DESTRUYE: HL,B Y A.	
 
 Calcula_puntero_de_impresion ld a,(Cuad_objeto)
 	cp 2
@@ -534,7 +538,7 @@ Calcula_puntero_de_impresion ld a,(Cuad_objeto)
 
 9 ld a,l
 	and $1f
-	ret z
+	jr z,7F
 	dec hl
 	djnz 9B
 	jr 7F
@@ -565,7 +569,10 @@ Calcula_puntero_de_impresion ld a,(Cuad_objeto)
 	ld b,15
 8 call PreviousScan
 	djnz 8B
-7 ret
+
+7 push hl
+	pop ix
+	ret
 
 ; --------------------------------------------------------------------------------------------------------------------
 ;
@@ -587,6 +594,62 @@ Operandos ld hl,(Posicion_actual)
 	inc a
 1 ld b,a
 	ret
+
+; --------------------------------------------------------------------------------------------------------------------
+;
+;	3/1/23
+;
+;	La Rutina entrega en HL la dirección de memoria donde se encuentra la rutina de impresión que debemos ejecutar.
+;
+;	Destruye: A,B,HL y DE.
+
+Define_rutina_de_impresion 
+
+	ld a,(Columns)	
+	ld b,a
+	ld a,(Columnas)
+	cp b
+	jr nz,2f
+
+;	La entidad se imprime entera.
+
+	ld hl, Indice_entidades_completas
+	and 1
+	jr z,1F
+
+	inc hl
+	inc hl
+
+1 call Extrae_address
+	ret		;	ret	
+
+;	La entidad no se imprime entera en pantalla.
+
+2 ld a,(Cuad_objeto) 
+	and 1
+	jr z,3F
+
+; 	La entidad no se imprime entera en pantalla, nos encontramos en el extremo izquierdo de la misma.
+
+	ld hl, Indice_entidades_incompletas_izquierda
+4 ld a,(Columns)
+	and 1
+	jr z,1B					; Sólo imprimimos 1 (Columnas) de un objeto de 2 Columns.
+
+	inc hl
+	inc hl
+
+	ld a,(Columnas)
+	and 1
+	jr nz,1B				; Sólo imprimimos 1 (Columnas) de un objeto de 3 Columns.		
+
+	inc hl
+	inc hl
+
+	jr 1B					; Sólo imprimimos 2 (Columnas) de un objeto de 3 Columns.
+
+3 ld hl, Indice_entidades_incompletas_derecha
+	jr 4B
 
 ; --------------------------------------------------------------------------------------------------------------------
 ;
@@ -683,30 +746,31 @@ PreviousScan ld a,h
 
 ; -----------------------------------------------------------------------------------
 ;
-;	14/11/22
+;	03/1/23
 
-Extrae_foto_registros ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
+Extrae_foto_registros 
+
+;	jr $
+
+	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
 	ld sp,Album_de_fotos
 
-2 exx																		; Extraemos de Album_de_fotos los valores de los registros.
-	pop hl
-	pop bc
-	exx
-
-	ex af,af
-	pop af
-	ex af,af
-
-	pop ix
-	pop de
-	pop bc
-	pop hl
+2 pop hl																	; Puntero de impresión de pantalla en HL.
+	pop de																	; Dirección de la rutina de impresión en HL. 
 
 	ld (Stack_2),sp
 	ld sp,(Stack)
 
-;	call Pintorrejeo														; call Pintorrejeo. Hemos pintado la entidad.
-;																			; Esta dirección ha de ser correcta. Cada vez que modifique 
+	ld a,$cd
+	ld (Imprime),a
+	ex de,hl
+	ld (Imprime+1),hl
+	ex de,hl
+
+Imprime db 0,0,0						
+
+;	
+	jr $																	; Esta dirección ha de ser correcta. Cada vez que modifique 
 	ld (Stack),sp
 	ld a,(Numero_de_malotes)
 	dec a

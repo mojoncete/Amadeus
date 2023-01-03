@@ -1,3 +1,17 @@
+;   índices de Rutinas de impresión.
+
+Indice_entidades_completas defw Pinta_Amadeus_2x2
+    defw Pinta_Amadeus_3x2
+
+Indice_entidades_incompletas_izquierda defw Pinta_enemigo_2x2_izquierda
+    defw Pinta_enemigo_3x2_izquierda_1columna
+    defw Pinta_enemigo_3x2_izquierda_2columnas
+
+Indice_entidades_incompletas_derecha defw Pinta_enemigo_2x2_derecha
+    defw Pinta_enemigo_3x2_derecha_1columna
+    defw Pinta_enemigo_3x2_derecha_2columnas
+
+
 ;   Conjunto de rutinas de impresión de Sprites.
 ;
 ;   12/12/22

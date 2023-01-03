@@ -48,7 +48,7 @@ Album_de_fotos equ $7000								; En (Album_de_fotos) vamos a ir almacenando los
 ;
 
 Filas db 2												; Filas. [DRAW]
-Columns db 2  											; Nº de columnas. [DRAW]
+Columns db 3  											; Nº de columnas. [DRAW]
 Posicion_actual defw $0000								; Dirección actual del Sprite. [DRAW]
 CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos. Si el valor es negativo,_
 ; 														; _ estamos desplazados hacia la izquierda y si es positivo, hacia la derecha.
@@ -69,7 +69,7 @@ Attr db %00000110										; Atributos de la entidad:
 
 Indice_Sprite defw 0
 Puntero_DESPLZ defw 0
-Posicion_inicio defw $53a6								; Dirección de pantalla donde aparece el objeto. [DRAW]
+Posicion_inicio defw $5002								; Dirección de pantalla donde aparece el objeto. [DRAW]
 Cuad_objeto db 3			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
 Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
@@ -129,7 +129,7 @@ Repetimos_db db 0
 
 ; Variables de funcionamiento. [DRAW].
 
-Puntero_objeto defw Amadeus								; Donde están los datos para pintar el Sprite.
+Puntero_objeto defw Amadeus_Fb							; Donde están los datos para pintar el Sprite.
 Puntero_datas defw 0 
 Columnas db 0
 Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado en función del tamaño del Sprite. Si el objeto llega a esta línea se modifica_    
@@ -209,7 +209,7 @@ START ld sp,$ffff
 ;1 push bc  												; Guardo el contador de entidades.
 ; 	call Inicia_sprite
 	call Draw
-;	call Guarda_foto_registros
+	call Guarda_foto_registros
 ;	call Store_Restore_entidades 				    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_entidades) en la siguiente.
 ;	pop bc
 ;	djnz 1B  											; Decremento (CONTANDOR AMADEUS).
@@ -234,9 +234,9 @@ Frame
 
 ;	ld a,7                                      	     
 ;   out ($fe),a  
-;	call Extrae_foto_registros 							; Pintamos el fotograma anterior.
+	call Extrae_foto_registros 							; Pintamos el fotograma anterior.
 
-
+	jr $
 
 ;	ld a,7                                      	     
  ;   out ($fe),a  
@@ -254,32 +254,6 @@ Frame
     out ($fe),a
 
 
-
-;	ld hl,$4000
-;    ld b,8
-;    call Pinta_enemigo_3x2 
-
-;    ld hl,$4041
-;    ld b,8
-;    call Pinta_enemigo_3x2
-
-;	ld hl,$4082
-;    ld b,8
-;    call Pinta_enemigo_3x2 
-
-;    ld hl,$40c3
-;    ld b,8
-;    call Pinta_enemigo_3x2
-
-;    ld hl,$4804
-;    ld b,16
-;    call Pinta_enemigo_2x2 
-
-; -----
-
-;	ld hl,$50df
-;	ld b,8
-;;	call Pinta_enemigo_3x2_derecha_1columna;;
 
 ;    xor a
 ;    out ($fe),a

@@ -1,6 +1,6 @@
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
-;	8/11/22
+;	3/1/23
 ;
 ;	Instrucciones donde interviene el Stack Pointer, (SP).
 
@@ -20,31 +20,27 @@
 
     org $7fa0
 
-Guarda_foto_registros ld (Stack),sp			                      ; Guardo SP en (Stack).
+;   (Stack_snapshot) se sitúa inicialmente en (Album_de_fotos)=$7000.
+;   Almacenaremos los datos/registros necesarios de la siguiente manera:
+;
+;   $7000 / 01 ..... Puntero de impresión de pantalla.
+;   $7002 / 03 ..... Dirección de mem. donde está alojada la correspondiente rutina de impresión.
+
+
+Guarda_foto_registros ld (Stack),sp               ; Guardo SP en (Stack).
     ld sp,Guarda_foto_registros - 1               ; Sitúo el Stack Pointer en la dirección actual -1
 
-    push hl
-    push bc
-    push de
-    push ix
+    push hl                                       ; HL contiene la dirección de la rutina de impresión.
+    push ix                                       ; IX contiene el puntero de impresión.
 
-    ex af,af
-    push af
-    ex af,af
-
-    exx
-    push bc
-    push hl                                        ; Hacemos un SNAPSHOT de los registros.
-    exx
-
-    ld hl,(Stack_snapshot)                         ; Album_de_fotos contiene la imagen de los registros implicados en el_
-    ld b,7                                         ; _correcto funcionamiento de [Pintorrejeo].
+    ld hl,(Stack_snapshot)                        ; Album_de_fotos contiene la imagen de los registros implicados en el_
+    ld b,2                                        ; _correcto funcionamiento de [Pintorrejeo].
 
 1 pop de
     ld (hl),e
     inc hl
     ld (hl),d
-    inc hl                                         ; Volvemos a tener al puntero SP en la posición inicial, (Snapshot)-1.
+    inc hl                                        ; Volvemos a tener al puntero SP en la posición inicial, (Snapshot)-1.
     djnz 1B    
 
     ld (Stack_snapshot),hl
