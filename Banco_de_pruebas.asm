@@ -152,7 +152,7 @@ Indice_restore defw 0
 
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 
-Numero_de_entidades db 5								; Nº de objetos en pantalla, (contando con Amadeus).
+Numero_de_entidades db 1								; Nº de objetos en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -204,7 +204,7 @@ START ld sp,$ffff
 	ld b,(hl)
 
 1 push bc  												; Guardo el contador de entidades.
- 	call Inicia_sprite
+ 	call Inicia_Puntero_objeto
 	call Draw
 	call Guarda_foto_registros
 	call Store_Restore_entidades 				    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_entidades) en la siguiente.
@@ -226,12 +226,10 @@ Frame
 ; He de imprimir sólo el nº de fotos que he hecho. Sólo BORRAMOS/PINTAMOS los objetos que se han desplazado.
 ; Necesito calcular nª de malotes, para ello utilizaré (Stack_snapshot)-(Album_de_fotos).
 
-
-	call Calcula_numero_de_malotes						; Nº de entidades que vamos a imprimir en pantalla.
-
     ld a,7
     out ($fe),a
 
+	call Calcula_numero_de_malotes						; Nº de entidades que vamos a imprimir en pantalla.
 	call Extrae_foto_registros 							; Pintamos el fotograma anterior.
 
     ld a,1
@@ -240,8 +238,8 @@ Frame
 ; ----------------------------------------------------------------------
 
 	ld hl,Album_de_fotos
-    ld (Stack_snapshot),hl								; Nos situamos al principio del álbum de fotos.
- 
+    ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
+;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
     ld a,(Numero_de_entidades)
     ld b,a
 
@@ -271,19 +269,19 @@ Frame
 	ld a,0
 	out ($fe),a  
 
-;	jr $
-
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
 Mov_obj 
 
- 	call Prepara_caja_de_borrado  						; LDIR (Caja_de_DESPLZ) a (Caja_de_BORRADO).
-    call Prepara_var_pintado_borrado                    ; Almaceno las `VARIABLES DE BORRADO´.    
+; En este punto Draw tiene cargado los 50 bytes, (parámetros), de la primera entidad de Indice_de_entidades.
 
-	ld a,1 				 								; (Obj_dibujado)="1". El objeto está impreso en pantalla. En este caso, (Mod_puntero_datas) sitúa_
-	ld (Obj_dibujado),a 								; (Puntero_datas) en la Caja_de_BORRADO.
+ 	call Prepara_caja_de_borrado  						; LDIR (Caja_de_DESPLZ) a (Caja_de_BORRADO).
+    call Prepara_var_pintado_borrado                    ; Almaceno las `VARIABLES DE BORRADO´. de la entidad almacenada en DRAW.  
+
+	ld a,1 				 								; (Obj_dibujado)="1". El objeto está impreso en pantalla. 
+	ld (Obj_dibujado),a 								
 
 ; Movemos Amadeus o enemigos...
 
@@ -295,15 +293,19 @@ Mov_obj
 	bit 6,a	
 	call z,Movimiento									; Desplazamos el objeto. MOVEMOS !!!!!
 
-	ld a,(Ctrl_0) 										; Salimos de la rutina si no ha habido movimiento.
+	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
 	bit 4,a
 	ret z
 
 ; ---------
 
-    call Prepara_var_pintado_borrado	                ; Almaceno las `VARIABLES DE PINTADO´.         
+    call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
     call Repone_borrar                                  
-	call Mod_puntero_datas 								; Al jugar con 2 estados, PINTADO/BORRADO, e ir alternando ambos, llamaremos a [Mod_puntero_datas] antes de PINTAR/BORRAR el objeto.
+
+	jr $
+
+;	call Mod_puntero_datas 								; Al jugar con 2 estados, PINTADO/BORRADO, e ir alternando ambos, llamaremos a [Mod_puntero_datas] antes de PINTAR/BORRAR el objeto.
+
 	call Draw											; Preparamos las variables para borrar.
 	call Guarda_foto_registros
 	ret
@@ -343,27 +345,29 @@ Repone_pintar ld hl,Variables_de_pintado
 	ldir
 	ret	
 
-Prepara_caja_de_borrado ld hl,(Caja_de_DESPLZ)
+Prepara_caja_de_borrado 
+
+	ld hl,(Caja_de_DESPLZ)
 	ld (Caja_de_BORRADO),hl
 	ret	
 
 ; *************************************************************************************************************************************************************
 ;
-; 21/10/22
+; 8/1/23
 ;
-; Sitúa el puntero (Puntero_store_entidades) en la 1ª entidad del índice.
-; Sitúa el puntero (Puntero_restore_entidades) en la 2ª entidad del índice.
+; (Puntero_store_entidades) contendrá la dirección donde se encuentran los parámetros de la 1ª entidad del índice.
+; (Indice_restore) se sitúa en la 2ª entidad del índice. 	
+; (Puntero_restore_entidades) contendrá la dirección donde se encuentran los parámetros de la 2ª entidad del índice.
+
 ; Destruye HL y DE !!!!!
  
 Inicia_punteros_de_entidades ld hl,Indice_de_entidades
     call Extrae_address
     ld (Puntero_store_entidades),hl
-
 	ld hl,Indice_de_entidades+2
 	ld (Indice_restore),hl
 	call Extrae_address
 	ld (Puntero_restore_entidades),hl
-
     ret
 
 ; -------------------------------------------------------------------------------------------------------------
@@ -403,9 +407,9 @@ Extrae_address ld e,(hl)
 ;
 ;	21/9/22
 ;
-;   Destruye HL !!!!!, 
+;   Destruye HL y BC !!!!!, 
 
-Inicia_sprite ld hl,(Indice_Sprite)
+Inicia_Puntero_objeto ld hl,(Indice_Sprite)
 	ld (Puntero_DESPLZ),hl
 	call Extrae_address
 	ld (Puntero_objeto),hl 								
@@ -424,9 +428,15 @@ Inicia_sprite ld hl,(Indice_Sprite)
 
 ; *************************************************************************************************************************************************************
 ;
-;	22/10/22
+;	8/1/23
 ;
-;	Almacena los datos del Sprite que tenemos cargado en DRAW, en su respectiva BASE DE DATOS.
+;	Almacena los datos de la 1ª entidad del Indice_de_entidades, (que tenemos cargado en DRAW), en su respectiva BASE DE DATOS.
+;	Cargamos en DRAW los datos de la 2ª entidad del Indice_de_entidades, (de su BASE DE DATOS).
+
+;	Modifica (Puntero_store_entidades)  y (Puntero_restore_entidades) con las direcciones donde se encuentran los datos_
+;	_de la 2ª y 3ª entidad respectivamente.
+
+
 
 Store_Restore_entidades  
 
@@ -468,7 +478,7 @@ Store_Restore_entidades
 ;
 ;	29/10/22
 ;
-;	Cargamos los datos de la 1º entidad en el `engine'.
+;	Cargamos los datos de la 1º entidad del índice_de_entidades
 
 Restore_Primera_entidad push hl 
 	push de
@@ -480,7 +490,6 @@ Restore_Primera_entidad push hl
 	pop bc
 	pop de
 	pop hl
-
 	ret
 
 ; *************************************************************************************************************************************************************
