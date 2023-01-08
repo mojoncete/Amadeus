@@ -24,7 +24,7 @@ Indice_entidades_incompletas_derecha defw Pinta_enemigo_2x2_derecha
 ;   Modifica: DE y HL. 
 
 Pinta_Amadeus_2x2 ld (Stack),sp
-	ld sp,(Puntero_objeto)
+	ld sp,iy
     ld b,16
 1 pop de
 	ld (hl),e
@@ -54,7 +54,7 @@ Pinta_Amadeus_2x2 ld (Stack),sp
 	ret
 
 Pinta_Amadeus_3x2 ld (Stack),sp
-	ld sp,(Puntero_objeto)
+	ld sp,iy
     ld b,8
 1 pop de
 	ld (hl),e
@@ -108,7 +108,7 @@ Pinta_Amadeus_3x2 ld (Stack),sp
 ; ---------------------------------------------------
 
 Pinta_enemigo_2x2_izquierda ld (Stack),sp
-	ld sp,(Puntero_objeto)
+	ld sp,iy
     ld b,16
 1 pop de
 	ld a,d
@@ -134,7 +134,7 @@ Pinta_enemigo_2x2_izquierda ld (Stack),sp
 	ret
 
 Pinta_enemigo_2x2_derecha ld (Stack),sp
-	ld sp,(Puntero_objeto)
+	ld sp,iy
     ld b,16
 1 pop de
 	ld a,e
@@ -162,7 +162,7 @@ Pinta_enemigo_2x2_derecha ld (Stack),sp
 ; ---------------------------------------------------
 
 Pinta_enemigo_3x2_izquierda_2columnas ld (Stack),sp
-	ld sp,(Puntero_objeto)
+	ld sp,iy
     ld b,8
 1 pop de
 	ld a,d
@@ -216,7 +216,7 @@ Pinta_enemigo_3x2_izquierda_2columnas ld (Stack),sp
 	ret
 
 Pinta_enemigo_3x2_izquierda_1columna ld (Stack),sp
-	ld sp,(Puntero_objeto)
+	ld sp,iy
     ld b,8
 1 pop de
 	pop de
@@ -260,7 +260,7 @@ Pinta_enemigo_3x2_izquierda_1columna ld (Stack),sp
 	ret
 
 Pinta_enemigo_3x2_derecha_2columnas ld (Stack),sp
-	ld sp,(Puntero_objeto)
+	ld sp,iy
     ld b,8
 1 pop de
 	ld a,e
@@ -314,7 +314,7 @@ Pinta_enemigo_3x2_derecha_2columnas ld (Stack),sp
 	ret
 
 Pinta_enemigo_3x2_derecha_1columna ld (Stack),sp
-	ld sp,(Puntero_objeto)
+	ld sp,iy
     ld b,8
 1 pop de
 	ld a,e

@@ -6,9 +6,9 @@
 Indice_de_entidades	
 
 	defw Badsat
-;	defw Badsat2
-;	defw Badsat3
-;	defw Badsat4
+	defw Badsat2
+	defw Badsat3
+	defw Badsat4
 	defw Amadeus_db
 ;	...
 ;	...
@@ -92,7 +92,7 @@ Badsat2 db 2,2		                                  ; Filas/Columns
 	db 0                                              ; CTRL_DESPLZ
 
 	db %00000010
-	defw Indice_Badsat_izq	                          ; Indice_Sprite
+	defw Indice_Badsat_der	                          ; Indice_Sprite
 	defw 0                                            ; Puntero_DESPLZ
 	defw $4761                                        ; Posicion_inicio
 	db 0,0,0

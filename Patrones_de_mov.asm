@@ -32,9 +32,7 @@ Indice_mov_Badsat2 defw Escaloncitos_derecha_arriba
 Indice_mov_Badsat3 defw Escaloncitos_izquierda
 Indice_mov_Badsat4 defw Escaloncitos_izquierda_arriba
 
-Movimiento 
-
-    ld a,(Contador_db_mov)                                      ; Hemos iniciado la cadena de movimiento ?. Si (Contador_db_mov) aún es "0" hay que inicializarlo._
+Movimiento ld a,(Contador_db_mov)                                      ; Hemos iniciado la cadena de movimiento ?. Si (Contador_db_mov) aún es "0" hay que inicializarlo._
     and a                                                       ; _Para hacerlo, hemos de fijar antes (Puntero_mov). 
     jr z,1F
     jr Decoder                                                  ; Saltamos a [Decoder] si ya hemos iniciado la cadena.

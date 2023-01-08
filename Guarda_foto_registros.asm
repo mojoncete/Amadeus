@@ -32,9 +32,10 @@ Guarda_foto_registros ld (Stack),sp               ; Guardo SP en (Stack).
 
     push hl                                       ; HL contiene la dirección de la rutina de impresión.
     push ix                                       ; IX contiene el puntero de impresión.
+    push iy                                       ; IY contiene (Puntero_objeto).
 
     ld hl,(Stack_snapshot)                        ; Album_de_fotos contiene la imagen de los registros implicados en el_
-    ld b,2                                        ; _correcto funcionamiento de [Pintorrejeo].
+    ld b,3                                        ; _correcto funcionamiento de las distintas rutinas de impresión.
 
 1 pop de
     ld (hl),e

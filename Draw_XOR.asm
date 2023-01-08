@@ -443,16 +443,16 @@ Fija_punteros push bc 												; Guardamos en la pila (Filas)*(Columns)*8 y _
 	and a 															; Si (CTRL_DESPLZ)="0", el objeto no está desplazado, en ese caso (Puntero_datas)=(Puntero_objeto).
 	jr z,2F 														; Si (CTRL_DESPLZ)="1", el objeto está desplazado, por lo que tendrá una (Columns) más. En ese caso,_
 	ld hl,(Caja_de_BORRADO) 										; _(Puntero_datas)=Caja_de_BORRADO. 
-	ld (Puntero_datas),hl
+	ld (Puntero_objeto),hl
 	jr 3F
 1 ld a,(CTRL_DESPLZ) 												; Pintamos el objeto.								 
 	and a 															; Si (CTRL_DESPLZ)="0", el objeto no está desplazado, en ese caso (Puntero_datas)=(Puntero_objeto).
 	jr z,2F 														; Si (CTRL_DESPLZ)="1", el objeto está desplazado, por lo que tendrá una (Columns) más. En ese caso,_
 	ld hl,(Caja_de_DESPLZ) 											; _(Puntero_datas)=Caja_de_DESPLZ.		
-	ld (Puntero_datas),hl 								
+	ld (Puntero_objeto),hl 								
 	jr 3F
 2 ld hl,(Puntero_objeto) 											; (Puntero_datas)=(Puntero_objeto). 
-	ld (Puntero_datas),hl	 										; Fijamos el puntero de atributos y salimos.
+	ld (Puntero_objeto),hl	 										; Fijamos el puntero de atributos y salimos.
 3 pop de
 	pop bc
 	ret	
@@ -518,9 +518,10 @@ calcula_CColumnass ld a,(Cuad_objeto)
 
 ; --------------------------------------------------------------------------------------------------------------------
 ;
-; 2/12/23
+; 7/1/23
 ;
 ;	Calcula el puntero de impresión del sprite, (arriba-izquierda).
+;	Almacena en IY (Puntero_objeto). La rutina de impresión requiere de esta dirección para situar el SP a la hora de pintar.
 ;
 ;	OUTPUT: HL e IX Contienen el puntero de impresión.
 ;	DESTRUYE: HL,B Y A.	
@@ -572,6 +573,11 @@ Calcula_puntero_de_impresion ld a,(Cuad_objeto)
 
 7 push hl
 	pop ix
+
+	ld hl,(Puntero_objeto)
+	push hl
+	pop iy
+
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------------
@@ -746,21 +752,16 @@ PreviousScan ld a,h
 
 ; -----------------------------------------------------------------------------------
 ;
-;	03/1/23
+;	07/01/23
 
-Extrae_foto_registros 
-
-;	jr $
-
-	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
+Extrae_foto_registros ld (Stack),sp											; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
 	ld sp,Album_de_fotos
-
-2 pop hl																	; Puntero de impresión de pantalla en HL.
-	pop de																	; Dirección de la rutina de impresión en HL. 
+2 pop iy																	; (Puntero_objeto) en IY.
+	pop hl																	; Puntero de impresión de pantalla en HL.
+	pop de																	; Dirección de la rutina de impresión en DE. 
 
 	ld (Stack_2),sp
 	ld sp,(Stack)
-
 	ld a,$cd
 	ld (Imprime),a
 	ex de,hl
@@ -768,17 +769,12 @@ Extrae_foto_registros
 	ex de,hl
 
 Imprime db 0,0,0						
-
-;	
-	jr $																	; Esta dirección ha de ser correcta. Cada vez que modifique 
-	ld (Stack),sp
+	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
 	ld a,(Numero_de_malotes)
 	dec a
 	jr z,1F
  	ld (Numero_de_malotes),a	 
 	ld sp,(Stack_2)
 	jr 2B
-
-1 ld sp,(Stack)
-
-	ret
+1 ret
+	

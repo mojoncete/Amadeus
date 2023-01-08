@@ -48,7 +48,7 @@ Album_de_fotos equ $7000								; En (Album_de_fotos) vamos a ir almacenando los
 ;
 
 Filas db 2												; Filas. [DRAW]
-Columns db 3  											; Nº de columnas. [DRAW]
+Columns db 2  											; Nº de columnas. [DRAW]
 Posicion_actual defw $0000								; Dirección actual del Sprite. [DRAW]
 CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos. Si el valor es negativo,_
 ; 														; _ estamos desplazados hacia la izquierda y si es positivo, hacia la derecha.
@@ -67,10 +67,10 @@ Attr db %00000110										; Atributos de la entidad:
 ;			 6 ..... AMARILLO
 ; 			 7 ..... BLANCO
 
-Indice_Sprite defw 0
+Indice_Sprite defw Indice_Badsat_der
 Puntero_DESPLZ defw 0
-Posicion_inicio defw $5002								; Dirección de pantalla donde aparece el objeto. [DRAW]
-Cuad_objeto db 3			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+Posicion_inicio defw $47a1								; Dirección de pantalla donde aparece el objeto. [DRAW]
+Cuad_objeto db 0			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
 Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 
@@ -79,7 +79,7 @@ Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 Vel_left db 1 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
 Vel_right db 1 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
 Vel_up db 1 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
-Vel_down db 3 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
+Vel_down db 2 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
 
 Variables_de_borrado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
 	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
@@ -120,7 +120,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
-Puntero_indice_mov defw 0
+Puntero_indice_mov defw Indice_mov_Badsat
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0
@@ -129,7 +129,7 @@ Repetimos_db db 0
 
 ; Variables de funcionamiento. [DRAW].
 
-Puntero_objeto defw Amadeus_Fb							; Donde están los datos para pintar el Sprite.
+Puntero_objeto defw 0									; Donde están los datos para pintar el Sprite.
 Puntero_datas defw 0 
 Columnas db 0
 Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado en función del tamaño del Sprite. Si el objeto llega a esta línea se modifica_    
@@ -152,12 +152,12 @@ Indice_restore defw 0
 
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 
-Numero_de_entidades db 2								; Nº de objetos en pantalla, (contando con Amadeus).
+Numero_de_entidades db 5								; Nº de objetos en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
 ;														; _ (Numero_de_malotes)="0".
-Stack defw 0 											; La rutina de pintado, [Pintorrejeo], utiliza esta_
+Stack defw 0 											; La rutinas de pintado, utilizan esta_
 ;														; _variable para almacenar lo posición del puntero_
 ; 														; _de pila, SP.
 Stack_2 defw 0											; 2º variable destinada a almacenar el puntero de pila, SP.
@@ -185,9 +185,6 @@ START ld sp,$ffff
 	IM 2 											     ; Habilitamos el modo 2 de INTERRUPCIONES.
 	DI 												 
 
-;	xor a												 ; Borde NEGRO. PAPER CYAN, INK BLACK.
-;	out ($fe),a
-
 	ld a,1
 	out ($fe),a
 
@@ -202,22 +199,22 @@ START ld sp,$ffff
 ;   Inicialmente tengo cargado a Amadeus en el engine.
 ;	Pintamos el resto de entidades:
 
-;	call Inicia_punteros_de_entidades
-;	ld hl,Numero_de_entidades
-;	ld b,(hl)
+	call Inicia_punteros_de_entidades
+	ld hl,Numero_de_entidades
+	ld b,(hl)
 
-;1 push bc  												; Guardo el contador de entidades.
-; 	call Inicia_sprite
+1 push bc  												; Guardo el contador de entidades.
+ 	call Inicia_sprite
 	call Draw
 	call Guarda_foto_registros
-;	call Store_Restore_entidades 				    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_entidades) en la siguiente.
-;	pop bc
-;	djnz 1B  											; Decremento (CONTANDOR AMADEUS).
+	call Store_Restore_entidades 				    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_entidades) en la siguiente.
+	pop bc
+	djnz 1B  											; Decremento el contador de entidades.
 
-; Volvemos a situar los punteros STORE/RESTORE de entidades en AMADEUS y cargamos los datos de nuestra nave en el engine.
+; Volvemos a situar los punteros STORE/RESTORE de entidades en la 1ª entidad.
 
-;    call Inicia_punteros_de_entidades
-;    call Restore_Primera_entidad
+	call Inicia_punteros_de_entidades
+	call Restore_Primera_entidad
 
 4 ei
 	jr 4B
@@ -230,69 +227,49 @@ Frame
 ; Necesito calcular nª de malotes, para ello utilizaré (Stack_snapshot)-(Album_de_fotos).
 
 
-;	call Calcula_numero_de_malotes						; Nº de entidades que vamos a imprimir en pantalla.
+	call Calcula_numero_de_malotes						; Nº de entidades que vamos a imprimir en pantalla.
 
-;	ld a,7                                      	     
-;   out ($fe),a  
+    ld a,7
+    out ($fe),a
+
 	call Extrae_foto_registros 							; Pintamos el fotograma anterior.
-
-	jr $
-
-;	ld a,7                                      	     
- ;   out ($fe),a  
-
-;    call DELAY
-
-;    ld a,7
-;    out ($fe),a
-
-
-;    call DELAY
-
 
     ld a,1
     out ($fe),a
 
-
-
-;    xor a
-;    out ($fe),a
-
-
 ; ----------------------------------------------------------------------
 
-;;	ld a,1
-;;	out ($fe),a  
+	ld hl,Album_de_fotos
+    ld (Stack_snapshot),hl								; Nos situamos al principio del álbum de fotos.
+ 
+    ld a,(Numero_de_entidades)
+    ld b,a
 
-;;	ld hl,Album_de_fotos
-;;    ld (Stack_snapshot),hl								; Nos situamos al principio del álbum de fotos.
-;;    ld a,(Numero_de_entidades)
-;;    ld b,a
+2 push bc
 
-;;2 push bc
+	call Mov_obj										; MOVEMOS y decrementamos (Numero_de_malotes)
 
-;;	call Mov_obj										; MOVEMOS y decrementamos (Numero_de_malotes)
+ 	ld a,(Ctrl_0)
+	bit 4,a
+	jr z,1F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
 
-;; 	ld a,(Ctrl_0)
-;;	bit 4,a
-;;	jr z,1F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
 ; ---------
 
-;    call Borra_Pinta_obj								; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!!!
+    call Borra_Pinta_obj								; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!!!
 	
-;	ld hl,Ctrl_0
-;    res 4,(hl)
+	ld hl,Ctrl_0
+    res 4,(hl)
 
-;1 call Store_Restore_entidades
+1 call Store_Restore_entidades
 
-;	pop bc
-;	djnz 2B
+	pop bc
+	djnz 2B
 
-;	call Inicia_punteros_de_entidades
-;	call Restore_Primera_entidad
+	call Inicia_punteros_de_entidades
+	call Restore_Primera_entidad
 
-;	ld a,0
-;	out ($fe),a  
+	ld a,0
+	out ($fe),a  
 
 ;	jr $
 
@@ -321,6 +298,7 @@ Mov_obj
 	ld a,(Ctrl_0) 										; Salimos de la rutina si no ha habido movimiento.
 	bit 4,a
 	ret z
+
 ; ---------
 
     call Prepara_var_pintado_borrado	                ; Almaceno las `VARIABLES DE PINTADO´.         
@@ -328,7 +306,6 @@ Mov_obj
 	call Mod_puntero_datas 								; Al jugar con 2 estados, PINTADO/BORRADO, e ir alternando ambos, llamaremos a [Mod_puntero_datas] antes de PINTAR/BORRAR el objeto.
 	call Draw											; Preparamos las variables para borrar.
 	call Guarda_foto_registros
-
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -375,7 +352,7 @@ Prepara_caja_de_borrado ld hl,(Caja_de_DESPLZ)
 ; 21/10/22
 ;
 ; Sitúa el puntero (Puntero_store_entidades) en la 1ª entidad del índice.
-; Sitúa el puntero (Puntero_restore_entidades) en el 1er `enemigo', (2º entidad del índice).
+; Sitúa el puntero (Puntero_restore_entidades) en la 2ª entidad del índice.
 ; Destruye HL y DE !!!!!
  
 Inicia_punteros_de_entidades ld hl,Indice_de_entidades
@@ -391,13 +368,14 @@ Inicia_punteros_de_entidades ld hl,Indice_de_entidades
 
 ; -------------------------------------------------------------------------------------------------------------
 ;
-; 16/11/22 
+; 7/1/23 
+;
 
 Calcula_numero_de_malotes ld hl,(Stack_snapshot)
 	xor a
 	ld h,a
 	ld a,l
-1 sub 14
+1 sub 6
 	jr z,2F
 	inc h
 	jr 1B
@@ -495,12 +473,10 @@ Store_Restore_entidades
 Restore_Primera_entidad push hl 
 	push de
  	push bc
-
-	ld hl,(Puntero_store_entidades)						; (Puntero_store_entidades) apunta a la dbase de Amadeus. 
+	ld hl,(Puntero_store_entidades)						; (Puntero_store_entidades) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
 	ld bc,50
 	ldir
-
 	pop bc
 	pop de
 	pop hl
