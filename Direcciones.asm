@@ -207,7 +207,10 @@ Desplaza_derecha ld a,(Vel_right)
 	djnz 1B 														; (Vel_right) indica cuantas posiciones desplazaremos el (Puntero_DESPLZ)_
 	ld (Puntero_DESPLZ),hl 											; _por el índice del Sprite.
 	call Extrae_address
-	ld (Caja_de_DESPLZ),hl 											
+
+;	ld (Caja_de_DESPLZ),hl 											
+	ld (Puntero_objeto),hl
+
 	ret
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -389,7 +389,8 @@ cuarcuad ld a,4
 	ld (hl),$0d
 	ex af,af
 	jr 1F
-tercuad	call Fija_punteros
+tercuad	
+;	call Fija_punteros
 	ld a,3
 	ld (Cuad_objeto),a 
 	ld hl,$4820
@@ -400,7 +401,8 @@ tercuad	call Fija_punteros
 	jr 1F
 primit call column 													
 	jr c, primcuad 													
-segcuad call Fija_punteros
+segcuad 
+;	call Fija_punteros
 	ld a,2
 	ld (Cuad_objeto),a
 	ld hl,$4fc0
@@ -409,7 +411,8 @@ segcuad call Fija_punteros
 	ld (hl),$0d
 	ex af,af
 	jr 1F
-primcuad call Fija_punteros
+primcuad 
+;	call Fija_punteros
 	ld a,1
 	ld (Cuad_objeto),a 
 	ld hl,$4fc0
@@ -434,28 +437,28 @@ primcuad call Fija_punteros
 ;	
 ;	HL apuntará a (Puntero_de_objeto), Caja_de_DESPLZ o Caja_de_BORRADO en función de si estamos PINTANDO/BORRANDO el objeto o de si este, ha sido o no, DESPLAZADO.
 
-Fija_punteros push bc 												; Guardamos en la pila (Filas)*(Columns)*8 y _
-	push de 														; _(Filas)*(Columns). BC y DE respectivamente.
-	ld a,(Obj_dibujado) 											; Pintamos o borramos???. (Obj_dibujado)="0" PINTAMOS.
-	and a
-	jr z,1F 	
-	ld a,(CTRL_DESPLZ)		 										; Borramos el objeto.
-	and a 															; Si (CTRL_DESPLZ)="0", el objeto no está desplazado, en ese caso (Puntero_datas)=(Puntero_objeto).
-	jr z,2F 														; Si (CTRL_DESPLZ)="1", el objeto está desplazado, por lo que tendrá una (Columns) más. En ese caso,_
-	ld hl,(Caja_de_BORRADO) 										; _(Puntero_datas)=Caja_de_BORRADO. 
-	ld (Puntero_objeto),hl
-	jr 3F
-1 ld a,(CTRL_DESPLZ) 												; Pintamos el objeto.								 
-	and a 															; Si (CTRL_DESPLZ)="0", el objeto no está desplazado, en ese caso (Puntero_datas)=(Puntero_objeto).
-	jr z,2F 														; Si (CTRL_DESPLZ)="1", el objeto está desplazado, por lo que tendrá una (Columns) más. En ese caso,_
-	ld hl,(Caja_de_DESPLZ) 											; _(Puntero_datas)=Caja_de_DESPLZ.		
-	ld (Puntero_objeto),hl 								
-	jr 3F
-2 ld hl,(Puntero_objeto) 											; (Puntero_datas)=(Puntero_objeto). 
-	ld (Puntero_objeto),hl	 										; Fijamos el puntero de atributos y salimos.
-3 pop de
-	pop bc
-	ret	
+;Fija_punteros push bc 												; Guardamos en la pila (Filas)*(Columns)*8 y _
+;	push de 														; _(Filas)*(Columns). BC y DE respectivamente.
+;	ld a,(Obj_dibujado) 											; Pintamos o borramos???. (Obj_dibujado)="0" PINTAMOS.
+;	and a
+;	jr z,1F 	
+;	ld a,(CTRL_DESPLZ)		 										; Borramos el objeto.
+;	and a 															; Si (CTRL_DESPLZ)="0", el objeto no está desplazado, en ese caso (Puntero_datas)=(Puntero_objeto).
+;	jr z,2F 														; Si (CTRL_DESPLZ)="1", el objeto está desplazado, por lo que tendrá una (Columns) más. En ese caso,_
+;	ld hl,(Caja_de_BORRADO) 										; _(Puntero_datas)=Caja_de_BORRADO. 
+;	ld (Puntero_objeto),hl
+;	jr 3F
+;1 ld a,(CTRL_DESPLZ) 												; Pintamos el objeto.								 
+;	and a 															; Si (CTRL_DESPLZ)="0", el objeto no está desplazado, en ese caso (Puntero_datas)=(Puntero_objeto).
+;	jr z,2F 														; Si (CTRL_DESPLZ)="1", el objeto está desplazado, por lo que tendrá una (Columns) más. En ese caso,_
+;	ld hl,(Caja_de_DESPLZ) 											; _(Puntero_datas)=Caja_de_DESPLZ.		
+;	ld (Puntero_objeto),hl 								
+;	jr 3F
+;2 ld hl,(Puntero_objeto) 											; (Puntero_datas)=(Puntero_objeto). 
+;	ld (Puntero_objeto),hl	 										; Fijamos el puntero de atributos y salimos.
+;3 pop de
+;	pop bc
+;	ret	
 
 ; ------------------------------------------------------------------------------------------------------------------
 

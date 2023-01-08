@@ -50,6 +50,7 @@ Album_de_fotos equ $7000								; En (Album_de_fotos) vamos a ir almacenando los
 Filas db 2												; Filas. [DRAW]
 Columns db 2  											; Nº de columnas. [DRAW]
 Posicion_actual defw $0000								; Dirección actual del Sprite. [DRAW]
+Puntero_objeto defw 0									; Donde están los datos para pintar el Sprite.
 CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos. Si el valor es negativo,_
 ; 														; _ estamos desplazados hacia la izquierda y si es positivo, hacia la derecha.
 ; 														; El hecho de que este byte sea distinto de "0", indica que se ha modificado el nº de columnas del objeto.
@@ -83,8 +84,10 @@ Vel_down db 2 											; Velocidad bajada. Nº de píxeles que desplazamos el 
 
 Variables_de_borrado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
 	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
+	defw 0
 	db 0
 Variables_de_pintado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
+	defw 0
 	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
 	db 0
 
@@ -129,8 +132,7 @@ Repetimos_db db 0
 
 ; Variables de funcionamiento. [DRAW].
 
-Puntero_objeto defw 0									; Donde están los datos para pintar el Sprite.
-Puntero_datas defw 0 
+Puntero_datas defw 0 									;! Borraremos esta merda !!!!!
 Columnas db 0
 Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado en función del tamaño del Sprite. Si el objeto llega a esta línea se modifica_    
 ; 														; _(Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
@@ -277,7 +279,7 @@ Mov_obj
 
 ; En este punto Draw tiene cargado los 50 bytes, (parámetros), de la primera entidad de Indice_de_entidades.
 
- 	call Prepara_caja_de_borrado  						; LDIR (Caja_de_DESPLZ) a (Caja_de_BORRADO).
+; 	call Prepara_caja_de_borrado  						; LDIR (Caja_de_DESPLZ) a (Caja_de_BORRADO).
     call Prepara_var_pintado_borrado                    ; Almaceno las `VARIABLES DE BORRADO´. de la entidad almacenada en DRAW.  
 
 	ld a,1 				 								; (Obj_dibujado)="1". El objeto está impreso en pantalla. 
@@ -301,13 +303,17 @@ Mov_obj
 
     call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
     call Repone_borrar                                  
+;	call Draw											; Preparamos las variables para borrar.
+
+	call Prepara_draw
+	call calcula_CColumnass
+	call Calcula_puntero_de_impresion					; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
+	call Define_rutina_de_impresion
+
+	call Guarda_foto_registros
 
 	jr $
 
-;	call Mod_puntero_datas 								; Al jugar con 2 estados, PINTADO/BORRADO, e ir alternando ambos, llamaremos a [Mod_puntero_datas] antes de PINTAR/BORRAR el objeto.
-
-	call Draw											; Preparamos las variables para borrar.
-	call Guarda_foto_registros
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -315,7 +321,10 @@ Mov_obj
 Borra_Pinta_obj xor a
 	ld (Obj_dibujado),a 								; (Obj_dibujado)="0". El objeto está borrado. En este caso, (Mod_puntero_datas) sitúa (Puntero_datas) en_
 	call Repone_pintar
-	call Mod_puntero_datas 								; Al jugar con 2 estados, PINTADO/BORRADO, e ir alternando ambos, llamaremos a [Mod_puntero_datas] antes de PINTAR/BORRAR el objeto.	
+;	call Mod_puntero_datas 								; Al jugar con 2 estados, PINTADO/BORRADO, e ir alternando ambos, llamaremos a [Mod_puntero_datas] antes de PINTAR/BORRAR el objeto.	
+
+	jr $
+
 	call Draw 											
 	call Guarda_foto_registros
 	ret
@@ -329,27 +338,25 @@ Prepara_var_pintado_borrado	ld hl,Filas
 	ld de,Variables_de_pintado
 	jr 2F
 1 ld de,Variables_de_borrado
-2 ld bc,5
+2 ld bc,7
 	ldir
 	ret
 
 Repone_borrar ld hl,Variables_de_borrado
 	ld de,Filas
-	ld bc,5
+	ld bc,7
 	ldir
 	ret
 
 Repone_pintar ld hl,Variables_de_pintado
 	ld de,Filas
-	ld bc,5
+	ld bc,7
 	ldir
 	ret	
 
-Prepara_caja_de_borrado 
-
-	ld hl,(Caja_de_DESPLZ)
-	ld (Caja_de_BORRADO),hl
-	ret	
+;Prepara_caja_de_borrado ld hl,(Caja_de_DESPLZ)
+;	ld (Caja_de_BORRADO),hl
+;	ret	
 
 ; *************************************************************************************************************************************************************
 ;
@@ -448,7 +455,7 @@ Store_Restore_entidades
 
 	ld hl,Filas
 	ld de,(Puntero_store_entidades) 					; Puntero que se desplaza por las distintas entidades.
-	ld bc,50
+	ld bc,54
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
 ;	Incrementa STORE y ejecuta RESTORE !!!!! 
@@ -456,7 +463,7 @@ Store_Restore_entidades
 	ld hl,(Puntero_restore_entidades)
 	ld (Puntero_store_entidades),hl 					; Situamos (Puntero_store_entidades) en la 2ª entidad.
 	ld de,Filas 										; Hemos RECUPERADO los parámetros de la 2ª entidad de su base de datos.
-	ld bc,50
+	ld bc,54
 	ldir
 
 ;	Incrementa RESTORE !!!!! 
@@ -485,7 +492,7 @@ Restore_Primera_entidad push hl
  	push bc
 	ld hl,(Puntero_store_entidades)						; (Puntero_store_entidades) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,50
+	ld bc,54
 	ldir
 	pop bc
 	pop de
