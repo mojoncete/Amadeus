@@ -707,9 +707,7 @@ NextScan inc h          ; Incrementamos el scanline.
     and 7
     ret nz              ; Salimos de la rutina si el scanline se encuentra entre (1-7).
 
-	call Genera_coordenadas
-
-    ld a,l              ; Scanlines a "0", cambiamos de tercio. (Siempre que estemos en la última línea, LLL).
+	ld a,l              ; Scanlines a "0", cambiamos de tercio. (Siempre que estemos en la última línea, LLL).
     add a,$20           ; Vamos a comprobarlo...
     ld l,a
     ret c               ; Salimos si se produce el cambio de tercio.
@@ -741,8 +739,6 @@ PreviousScan ld a,h
     and 7
     ret nz              ; Salimos de la rutina si el scanline se encuentra entre (1-7).
 
-	call Genera_coordenadas
-
     ld a,l              ; Estabamos en el scanline "0" y al decrementar nos situamos en el "7" y cambiamos de tercio.
     sub $20             ; Vamos a comprobarlo...
     ld l,a
@@ -757,7 +753,9 @@ PreviousScan ld a,h
 ;
 ;	07/01/23
 
-Extrae_foto_registros ld (Stack),sp											; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
+Extrae_foto_registros 
+
+	ld (Stack),sp											; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
 	ld sp,Album_de_fotos
 2 pop iy																	; (Puntero_objeto) en IY.
 	pop hl																	; Puntero de impresión de pantalla en HL.

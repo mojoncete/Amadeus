@@ -218,8 +218,8 @@ START ld sp,$ffff
 	call Inicia_punteros_de_entidades
 	call Restore_Primera_entidad
 
-4 ei
-	jr 4B
+	ld a,(Numero_de_entidades)
+	ld (Numero_de_malotes),a
 
 ; -----------------------------------------------------------------------------------
 
@@ -231,7 +231,6 @@ Frame
     ld a,7
     out ($fe),a
 
-	call Calcula_numero_de_malotes						; Nº de entidades que vamos a imprimir en pantalla.
 	call Extrae_foto_registros 							; Pintamos el fotograma anterior.
 
     ld a,1
@@ -309,10 +308,7 @@ Mov_obj
 	call calcula_CColumnass
 	call Calcula_puntero_de_impresion					; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
 	call Define_rutina_de_impresion
-
 	call Guarda_foto_registros
-
-	jr $
 
 	ret
 
@@ -323,7 +319,7 @@ Borra_Pinta_obj xor a
 	call Repone_pintar
 ;	call Mod_puntero_datas 								; Al jugar con 2 estados, PINTADO/BORRADO, e ir alternando ambos, llamaremos a [Mod_puntero_datas] antes de PINTAR/BORRAR el objeto.	
 
-	jr $
+	jr $	;! Draw no me genera correctamente el puntero de impresión ni la dirección de la rutina de impresión correspondiente !!!
 
 	call Draw 											
 	call Guarda_foto_registros

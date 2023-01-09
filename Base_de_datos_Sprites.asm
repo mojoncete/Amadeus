@@ -21,6 +21,7 @@ Indice_de_entidades
 
 Amadeus_db db 2,2
 	defw 0
+	defw 0
 	db 0
 
 	db %00000101
@@ -54,6 +55,7 @@ Amadeus_db db 2,2
 ; ---------- ---------- ---------- ---------- ----------
 
 Badsat db 2,2
+	defw 0
 	defw 0
 	db 0
 
@@ -89,6 +91,7 @@ Badsat db 2,2
 
 Badsat2 db 2,2		                                  ; Filas/Columns
 	defw 0                                            ; Posicion_actual
+	defw 0
 	db 0                                              ; CTRL_DESPLZ
 
 	db %00000010
@@ -123,6 +126,7 @@ Badsat2 db 2,2		                                  ; Filas/Columns
 
 Badsat3 db 2,2                                 		  ; Filas/Columns
 	defw 0                                            ; Posicion_actual
+	defw 0
 	db 0                                              ; CTRL_DESPLZ
 
 	db %00000100
@@ -157,6 +161,7 @@ Badsat3 db 2,2                                 		  ; Filas/Columns
 
 Badsat4 db 2,2                                  	  ; Filas/Columns
 	defw 0                                            ; Posicion_actual
+	defw 0
 	db 0                                              ; CTRL_DESPLZ
 
 	db %00000001

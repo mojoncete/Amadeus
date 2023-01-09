@@ -33,7 +33,8 @@ Mov_down ld hl,Ctrl_0
 1 call NextScan
 	ld (Posicion_actual),hl
     djnz 2B
-3 ret
+3 call Genera_coordenadas
+	ret
 
 
 ; ******************************************************************************************************************************************************************************************
@@ -72,7 +73,8 @@ Mov_up ld hl,Ctrl_0
 1 call PreviousScan
 	ld (Posicion_actual),hl
     djnz 3B
-2   ret
+2 call Genera_coordenadas
+	ret
 
 ; ******************************************************************************************************************************************************************************************
 ;
@@ -177,11 +179,11 @@ Mov_right ld hl,Ctrl_0
 9 ld hl,(Posicion_actual)
 	inc hl
 	ld (Posicion_actual),hl
-	call Genera_coordenadas
 	jr 2F
 8 ld hl,(Posicion_actual)
 	call DESPLZ_DER
-2 ret
+2 call Genera_coordenadas
+	ret
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
@@ -228,8 +230,10 @@ modifica_parametros_1er_DESPLZ_2 ld a,(CTRL_DESPLZ) 			  ; Incrementamos el nª 
 	jr nz,1F
     sub 9                							              ; Situamos en $f7 el valor de partida de (CTRL_DESPLZ) tras el 1er desplazamiento. 
     ld (CTRL_DESPLZ),a
+
 	ld hl,Columns 												  
 	inc (hl)
+
 	ld a,(Cuad_objeto)
 	and 1
 	jr z,1F
@@ -273,7 +277,7 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 	ld (Puntero_DESPLZ),hl
 	ld hl,0
 	ld (Caja_de_DESPLZ),hl
-	call Genera_coordenadas
+;	call Genera_coordenadas
 3 ret
 
 ; ******************************************************************************************************************************************************************************************
@@ -308,7 +312,7 @@ Mov_left
 	ld (Puntero_DESPLZ),hl 											; _de movimiento es hacia la derecha.
 	ret
 
-10 	ld a,(Ctrl_0)
+10 ld a,(Ctrl_0)
 	bit 7,a
 	jr z,11F														; Consultamos el último movimiento horizontal del SPRITE.
 	ld hl,CTRL_DESPLZ
@@ -346,7 +350,7 @@ Mov_left
 
 ; ---------- ---------- ----------
 
-4 	call Reaparece_derecha 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
+4 call Reaparece_derecha 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
 ;	call Reinicio
 
 ; ---------- ---------- ----------
@@ -383,11 +387,11 @@ Mov_left
 9 ld hl,(Posicion_actual)
 	dec hl
 	ld (Posicion_actual),hl
-	call Genera_coordenadas 
 	jr 2F
 8 ld hl,(Posicion_actual)
 	call DESPLZ_IZQ
-2 ret
+2 call Genera_coordenadas 
+	ret
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
