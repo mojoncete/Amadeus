@@ -19,8 +19,8 @@ Draw call Prepara_draw
 	bit 5,a
 	jr nz,3F										; Si acabamos de inicializar un objeto, NO COMPROBAMOS LÍMITES. 
 
-	call Comprueba_limite_horizontal   				
-	call Comprueba_limite_vertical
+;	call Comprueba_limite_horizontal   				
+;	call Comprueba_limite_vertical
 
 ; Llegados a este punto, tengo Filas/Columnas en BC y (Cuad_objeto) en A´.
 
@@ -777,5 +777,8 @@ Imprime db 0,0,0
  	ld (Numero_de_malotes),a	 
 	ld sp,(Stack_2)
 	jr 2B
-1 ret
+
+1 xor a
+	ld (Stack_2),a
+	ret
 	

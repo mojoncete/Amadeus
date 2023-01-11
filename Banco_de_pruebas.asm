@@ -221,6 +221,9 @@ START ld sp,$ffff
 	ld a,(Numero_de_entidades)
 	ld (Numero_de_malotes),a
 
+2 ei
+	jr 2B
+
 ; -----------------------------------------------------------------------------------
 
 Frame 
@@ -236,6 +239,8 @@ Frame
     ld a,1
     out ($fe),a
 
+;	jr $	
+
 ; ----------------------------------------------------------------------
 
 	ld hl,Album_de_fotos
@@ -245,9 +250,7 @@ Frame
     ld b,a
 
 2 push bc
-
 	call Mov_obj										; MOVEMOS y decrementamos (Numero_de_malotes)
-
  	ld a,(Ctrl_0)
 	bit 4,a
 	jr z,1F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
@@ -255,7 +258,6 @@ Frame
 ; ---------
 
     call Borra_Pinta_obj								; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!!!
-	
 	ld hl,Ctrl_0
     res 4,(hl)
 
@@ -267,8 +269,13 @@ Frame
 	call Inicia_punteros_de_entidades
 	call Restore_Primera_entidad
 
+	ld hl,Album_de_fotos
+    ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
+;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
 	ld a,0
 	out ($fe),a  
+
+;	jr $
 
 	ret
 
@@ -318,9 +325,6 @@ Borra_Pinta_obj xor a
 	ld (Obj_dibujado),a 								; (Obj_dibujado)="0". El objeto está borrado. En este caso, (Mod_puntero_datas) sitúa (Puntero_datas) en_
 	call Repone_pintar
 ;	call Mod_puntero_datas 								; Al jugar con 2 estados, PINTADO/BORRADO, e ir alternando ambos, llamaremos a [Mod_puntero_datas] antes de PINTAR/BORRAR el objeto.	
-
-	jr $	;! Draw no me genera correctamente el puntero de impresión ni la dirección de la rutina de impresión correspondiente !!!
-
 	call Draw 											
 	call Guarda_foto_registros
 	ret
