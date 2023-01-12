@@ -273,11 +273,14 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 	ld hl,(Posicion_actual)                                      ; Incrementamos (Posicion_actual) en los cuadrantes 2º y 4º.
 	inc hl
 	ld (Posicion_actual),hl
+
+	call Genera_coordenadas
+
+
 2 ld hl,(Indice_Sprite)
 	ld (Puntero_DESPLZ),hl
-	ld hl,0
-	ld (Caja_de_DESPLZ),hl
-;	call Genera_coordenadas
+	call Extrae_address
+	ld (Puntero_objeto),hl
 3 ret
 
 ; ******************************************************************************************************************************************************************************************

@@ -198,7 +198,7 @@ START ld sp,$ffff
 	call Pulsa_ENTER
 
 ;	Cada vez que iniciamos una entidad, hay que hacer una llamada a (Inicia_sprite). Sólo al iniciar!!!!!
-;   Inicialmente tengo cargado a Amadeus en el engine.
+;   Inicialmente tengo cargada la 1ª entidad en DRAW.	
 ;	Pintamos el resto de entidades:
 
 	call Inicia_punteros_de_entidades
@@ -239,8 +239,6 @@ Frame
     ld a,1
     out ($fe),a
 
-;	jr $	
-
 ; ----------------------------------------------------------------------
 
 	ld hl,Album_de_fotos
@@ -268,15 +266,13 @@ Frame
 
 	call Inicia_punteros_de_entidades
 	call Restore_Primera_entidad
+	call Calcula_numero_de_malotes 
 
 	ld hl,Album_de_fotos
     ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
 ;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
 	ld a,0
 	out ($fe),a  
-
-;	jr $
-
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -324,7 +320,6 @@ Mov_obj
 Borra_Pinta_obj xor a
 	ld (Obj_dibujado),a 								; (Obj_dibujado)="0". El objeto está borrado. En este caso, (Mod_puntero_datas) sitúa (Puntero_datas) en_
 	call Repone_pintar
-;	call Mod_puntero_datas 								; Al jugar con 2 estados, PINTADO/BORRADO, e ir alternando ambos, llamaremos a [Mod_puntero_datas] antes de PINTAR/BORRAR el objeto.	
 	call Draw 											
 	call Guarda_foto_registros
 	ret
