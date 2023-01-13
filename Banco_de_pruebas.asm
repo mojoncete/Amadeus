@@ -71,7 +71,7 @@ Attr db %00000110										; Atributos de la entidad:
 Indice_Sprite defw Indice_Badsat_der
 Puntero_DESPLZ defw 0
 Posicion_inicio defw $47a1								; Dirección de pantalla donde aparece el objeto. [DRAW]
-Cuad_objeto db 0			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+Cuad_objeto db 1			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
 Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 
@@ -312,7 +312,6 @@ Mov_obj
 	call Calcula_puntero_de_impresion					; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
 	call Define_rutina_de_impresion
 	call Guarda_foto_registros
-
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------

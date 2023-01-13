@@ -273,14 +273,17 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 	ld hl,(Posicion_actual)                                      ; Incrementamos (Posicion_actual) en los cuadrantes 2º y 4º.
 	inc hl
 	ld (Posicion_actual),hl
-
 	call Genera_coordenadas
 
+; Inicia el puntero de Sprite.
 
 2 ld hl,(Indice_Sprite)
 	ld (Puntero_DESPLZ),hl
 	call Extrae_address
 	ld (Puntero_objeto),hl
+
+;	jr $
+
 3 ret
 
 ; ******************************************************************************************************************************************************************************************
@@ -460,51 +463,6 @@ Ciclo_completo_2 ld a,(CTRL_DESPLZ)
 	ld (Posicion_actual),hl
 2 call Genera_coordenadas
 3 ret
-
-; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-Mod_puntero_datas call Prepara_draw									; Recabamos los datos de la entidad, (Filas) y (Columns).
-;	call Calcula_dbs_totales	 									; (Filas * Columnas)*8 en BC´.
-;																	; Filas * Columnas en DE´.
-	ld a,(Cuad_objeto)
-	cp 2
-	jr c,2F
-	jr z,2F
-	and 1
-	jr z,1F 														; Necesitamos saber en que cuadrante de pantalla se encuentra_
-; 																	; _la entidad para poder calcular su puntero de .db´s, (Puntero_datas).
-;	call puntero_cuarcuad 											; Nos encontramos en el 3º cuadrante. 
-	push bc
-	push hl
-	ld b,0 															; BC = $00xx, (nº de columnas-1) que tiene el objeto.
-	dec c
-	ld hl,(Puntero_datas)
-	and a
-	adc hl,bc
-	ld (Puntero_datas),hl
-	pop hl
-	pop bc
-	jr 4F
-1 
-;	call puntero_cuarcuad 											; 4º CUADRANTE !!!!!!!!!!
-	jr 4F
-2 and 1 															
-	jr z,3F
-;	call puntero_primcuad 											; 1er CUADRANTE !!!!!!!!!!!!!
-	jr 4F
-3
-;	call puntero_primcuad 											; 2º CUADRANTE !!!!!!!!!!!!!!		
-	push bc
-	push hl
-	ld b,0 															; BC = $00xx, (nº de columnas-1) que tiene el objeto.
-	dec c
-	ld hl,(Puntero_datas)
-	and a
-	sbc hl,bc
-	ld (Puntero_datas),hl
-	pop hl
-	pop bc
-4 ret
 
 ; ---------- ---------- ---------- ---------- ---------- ----------
 ;

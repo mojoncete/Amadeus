@@ -755,7 +755,7 @@ PreviousScan ld a,h
 
 Extrae_foto_registros 
 
-	ld (Stack),sp											; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
+	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
 	ld sp,Album_de_fotos
 2 pop iy																	; (Puntero_objeto) en IY.
 	pop hl																	; Puntero de impresión de pantalla en HL.
@@ -770,7 +770,9 @@ Extrae_foto_registros
 	ex de,hl
 
 Imprime db 0,0,0						
+
 	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
+
 	ld a,(Numero_de_malotes)
 	dec a
 	jr z,1F
