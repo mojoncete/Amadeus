@@ -248,6 +248,7 @@ Frame
     ld b,a
 
 2 push bc
+
 	call Mov_obj										; MOVEMOS y decrementamos (Numero_de_malotes)
  	ld a,(Ctrl_0)
 	bit 4,a
@@ -266,6 +267,7 @@ Frame
 
 	call Inicia_punteros_de_entidades
 	call Restore_Primera_entidad
+
 	call Calcula_numero_de_malotes 
 
 	ld hl,Album_de_fotos
@@ -273,6 +275,7 @@ Frame
 ;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
 	ld a,0
 	out ($fe),a  
+
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -316,7 +319,9 @@ Mov_obj
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-Borra_Pinta_obj xor a
+Borra_Pinta_obj 
+
+	xor a
 	ld (Obj_dibujado),a 								; (Obj_dibujado)="0". El objeto está borrado. En este caso, (Mod_puntero_datas) sitúa (Puntero_datas) en_
 	call Repone_pintar
 	call Draw 											
