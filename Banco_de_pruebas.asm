@@ -70,7 +70,7 @@ Attr db %00000110										; Atributos de la entidad:
 
 Indice_Sprite defw Indice_Badsat_der
 Puntero_DESPLZ defw 0
-Posicion_inicio defw $47a1								; Dirección de pantalla donde aparece el objeto. [DRAW]
+Posicion_inicio defw $4721								; Dirección de pantalla donde aparece el objeto. [DRAW]
 Cuad_objeto db 1			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
 Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
@@ -250,15 +250,15 @@ Frame
 2 push bc
 
 	call Mov_obj										; MOVEMOS y decrementamos (Numero_de_malotes)
+
  	ld a,(Ctrl_0)
 	bit 4,a
 	jr z,1F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
 
-; ---------
-
     call Borra_Pinta_obj								; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!!!
+
 	ld hl,Ctrl_0
-    res 4,(hl)
+    res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
 
 1 call Store_Restore_entidades
 
@@ -267,12 +267,8 @@ Frame
 
 	call Inicia_punteros_de_entidades
 	call Restore_Primera_entidad
-
 	call Calcula_numero_de_malotes 
 
-	ld hl,Album_de_fotos
-    ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
-;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
 	ld a,0
 	out ($fe),a  
 
@@ -284,12 +280,10 @@ Mov_obj
 
 ; En este punto Draw tiene cargado los 50 bytes, (parámetros), de la primera entidad de Indice_de_entidades.
 
-; 	call Prepara_caja_de_borrado  						; LDIR (Caja_de_DESPLZ) a (Caja_de_BORRADO).
-    call Prepara_var_pintado_borrado                    ; Almaceno las `VARIABLES DE BORRADO´. de la entidad almacenada en DRAW.  
-
-	ld a,1 				 								; (Obj_dibujado)="1". El objeto está impreso en pantalla. 
-	ld (Obj_dibujado),a 								
-
+	xor a
+	ld (Obj_dibujado),a
+    call Prepara_var_pintado_borrado                    ; Almaceno las `VARIABLES DE BORRADO´. de la entidad almacenada en DRAW en (Variables_de_borrado).
+;														; Obj_dibujado="0".
 ; Movemos Amadeus o enemigos...
 
 	ld a,(Ctrl_0) 										; Detectamos si el Sprite que vamos a desplazar es AMADEUS,_
@@ -306,26 +300,27 @@ Mov_obj
 
 ; ---------
 
+	ld a,1 				 								; Cambiamos (Obj_dibujado) a "1" para poder almacenar el contenido de DRAW en_  
+	ld (Obj_dibujado),a 								; _(Variables_de_pintado).					
     call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
+
     call Repone_borrar                                  
-;	call Draw											; Preparamos las variables para borrar.
+
+; Si ha habido movimiento de la entidad, borraremos el FRAME anterior.
 
 	call Prepara_draw
 	call calcula_CColumnass
 	call Calcula_puntero_de_impresion					; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
 	call Define_rutina_de_impresion
-	call Guarda_foto_registros
+	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
+
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-Borra_Pinta_obj 
-
-	xor a
-	ld (Obj_dibujado),a 								; (Obj_dibujado)="0". El objeto está borrado. En este caso, (Mod_puntero_datas) sitúa (Puntero_datas) en_
-	call Repone_pintar
+Borra_Pinta_obj call Repone_pintar
 	call Draw 											
-	call Guarda_foto_registros
+	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------

@@ -751,23 +751,27 @@ PreviousScan ld a,h
 
 ; -----------------------------------------------------------------------------------
 ;
-;	07/01/23
+;	15/1/23
 
-Extrae_foto_registros 
-
-	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
+Extrae_foto_registros ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
 	ld sp,Album_de_fotos
+
 2 pop iy																	; (Puntero_objeto) en IY.
 	pop hl																	; Puntero de impresión de pantalla en HL.
 	pop de																	; Dirección de la rutina de impresión en DE. 
 
 	ld (Stack_2),sp
 	ld sp,(Stack)
+
+; Fabrica la llamada a la correspondiente rutina de impresión.
+
 	ld a,$cd
 	ld (Imprime),a
 	ex de,hl
 	ld (Imprime+1),hl
 	ex de,hl
+
+; Ejecuta la llamada:	CALL $xx,xx
 
 Imprime db 0,0,0						
 
