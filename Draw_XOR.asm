@@ -40,11 +40,9 @@ Draw call Prepara_draw
 ; 	Comprueba_limite_horizontal.
 ;
 
-Comprueba_limite_horizontal ld a,(Obj_dibujado)
-	and a
-	ret nz   										; Salimos de la rutina si estamos borrando el objeto, (Obj_dibujado)="1". 
+Comprueba_limite_horizontal 
 
-	ld a,(Ctrl_0)          							; Si no hemos desaparecido por arriba o por abajo, saltamos a ^14F^ para comprobar_ 
+	ld a,(Ctrl_0)          							; Si no hemos desaparecido por arriba o por abajo, saltamos a ^1F^ para comprobar_ 
 	bit 2,a                                         ; _si hemos llegado o sobrepasado el (Limite_horizontal), (seguimos con la rutina).
 	jr z,1F                                         ; Si por el contrario hemos desaparecido por arriba o por abajo, (bit2/bit3 de (Ctrl_0)="1"))_
 
@@ -55,10 +53,13 @@ Comprueba_limite_horizontal ld a,(Obj_dibujado)
     jr z,2F
     and $f7
     ld (Ctrl_0),a
+
 6 call Inicializacion
-    push af	 										; Antes de nada, guardo (Cuad_objeto) en A´ para acceder a él más rapido, (me va a hacer falta en la rutina calcolum).
-	ex af,af
-	pop af 											; Ahora tengo (Cuad_objeto) en A y A´.
+
+;    push af	 										; Antes de nada, guardo (Cuad_objeto) en A´ para acceder a él más rapido, (me va a hacer falta en la rutina calcolum).
+;	ex af,af
+;	pop af 											; Ahora tengo (Cuad_objeto) en A y A´.
+
     jr 5F
 2 push HL						        			; Guardo el puntero de pantalla, HL en la pila.
 

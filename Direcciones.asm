@@ -91,31 +91,33 @@ Mov_right ld hl,Ctrl_0
 ; 																	; _ en el caso de que no lo haya.
 	ld a,(CTRL_DESPLZ)
 	and a
-	jr z,10F
+	jr z,9F
 
 	ld a,(Ctrl_0)
 	bit 7,a
-	jr nz,10F														; Consultamos el último movimiento horizontal del SPRITE.
+	jr nz,9F														; Consultamos el último movimiento horizontal del SPRITE.
 	ld hl,CTRL_DESPLZ
 	dec (hl) 														; El último mov. horizontal ha sido a IZQUIERDA, corregimos (CTRL_DESPLZ).
 
-10 ld a,(Ctrl_0)
+9 ld a,(Ctrl_0)
 	bit 6,a
-	jr z,11F 														; Estamos moviendo Amadeus???????. Si es así hemos de comprobar que que no hemos llegado al char.30 de la línea, [Stop_Amadeus].
+	jr z,10F 														; Estamos moviendo Amadeus???????. Si es así hemos de comprobar que no hemos llegado al char.30 de la línea, [Stop_Amadeus].
 
 	call Stop_Amadeus_right
 	ret z 															; Salimos de Mov_right si hemos llegado al char.30.
-	jr 3F
+	jr 8F
 
-11 ld a,(Coordenada_X)	 	  										; Estamos en el char. 31?								
+10 ld a,(Coordenada_X)	 	  										; Estamos en el char. 31?								
 	cp 31															; Si no es así, saltamos a [3] para seguir con el desplazamiento progrmado.
-	jr nz,3F
+	jr nz,8F
 
 	ld a,(CTRL_DESPLZ) 		 										; Estamos en el último char. de la línea. Si (CTRL_DESPLZ)="0" saltamos a_	 									
 	and a 															; _[3] para continuar con el DESPLZ.
-	jr z,3F 														 														
+	jr z,8F 														 														
 
 ; ---------- ---------- ----------
+;
+;	Estamos en el último char. de la fila y (CTRL_DESPLZ) es distinto de "0".
 
 	ld a,(Vel_right) 												; En función del factor de velocidad, iniciaremos la salida de la pantalla,_									;
 	cp 2 															; _(Reaparece_izquierda), cuando (CTRL_DESPLZ) alcance un valor determinado.
@@ -131,22 +133,24 @@ Mov_right ld hl,Ctrl_0
 ;
 6 ld a,(CTRL_DESPLZ) 												; Velocidad 1
 	cp $fe 															
-	jr nz,3F
-	jr 4F
+	jr nz,8F
+	jr 3F
 1 ld a,(CTRL_DESPLZ) 												; Velocidad 2
 	cp $fd
-	jr nz,3F
-	jr 4F
+	jr nz,8F
+	jr 3F
 7 ld a,(CTRL_DESPLZ) 												; Velocidad 4
 	cp $fb
-	jr nz,3F
+	jr nz,8F
 
 ; ---------- ---------- ----------
 
-4 call Reaparece_izquierda 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
+3 call Reaparece_izquierda 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
 ;	call Reinicio
 
 ; ---------- ---------- ----------
+;
+;	Esta parte de la rutina se encarga de hacer que el Sprite aparezca pixel a pixel por la izquierda.
 
 	ld b,2 															; Para hacer que el objeto aparezca poco a poco, hemos de desplazarlo 2 veces: El primer desplazamiento_
 5 push bc 															; _pone (CTRL_DESPLZ) a "0" y el segundo a "$ff". Con esto hacemos que el Sprite tenga espacio en blanco delante_
@@ -156,34 +160,14 @@ Mov_right ld hl,Ctrl_0
 	ld hl,(Posicion_actual) 										; Decrementamos su posición actual, pués al desplazarlo a la derecha, volvemos a incrementar el nº de (Columns) y _
 	dec hl 															; _ (Posicion_actual) ha pasado de $00 a $01.
 	ld (Posicion_actual),hl
+	call Genera_coordenadas
 	jr 2F 															; Salimos para pintar la nueva posición.
 
 ; ---------- ---------- ----------
 
-3 ld a,(Vel_right) 													; El objeto aún no ha llegado al último char. de la línea, (31).
-	cp 8 															; Consultamos el perfil de velocidad. Si es distinto de "8" saltamos a [8] para seguir con el desplazamiento y actualizar coordenadas.
-	jr nz,8F
-	ld hl,(Posicion_actual) 										; (Vel_right)="8". Si no hemos llegado al último char. incrementamos HL, actualizamos coordenadas y salimos.
-	ld a,l
-	and $1f
-	cp 31
-	jr nz,9F
-
-; ---------- ---------- ----------
-
-	call Reaparece_izquierda
-	
-; ---------- ---------- ----------	
-	
-	jr 2F
-9 ld hl,(Posicion_actual)
-	inc hl
-	ld (Posicion_actual),hl
-	jr 2F
 8 ld hl,(Posicion_actual)
 	call DESPLZ_DER
-2 call Genera_coordenadas
-	ret
+2 ret
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
@@ -209,10 +193,7 @@ Desplaza_derecha ld a,(Vel_right)
 	djnz 1B 														; (Vel_right) indica cuantas posiciones desplazaremos el (Puntero_DESPLZ)_
 	ld (Puntero_DESPLZ),hl 											; _por el índice del Sprite.
 	call Extrae_address
-
-;	ld (Caja_de_DESPLZ),hl 											
 	ld (Puntero_objeto),hl
-
 	ret
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -230,16 +211,15 @@ modifica_parametros_1er_DESPLZ_2 ld a,(CTRL_DESPLZ) 			  ; Incrementamos el nª 
 	jr nz,1F
     sub 9                							              ; Situamos en $f7 el valor de partida de (CTRL_DESPLZ) tras el 1er desplazamiento. 
     ld (CTRL_DESPLZ),a
-
 	ld hl,Columns 												  
 	inc (hl)
-
 	ld a,(Cuad_objeto)
 	and 1
 	jr z,1F
 	ld hl,(Posicion_actual) 									  ; Incrementamos 1 char. el valor de (Posicion_actual), la primera vez que desplazamos el objeto y se encuentra en los _	
 	inc hl 														  ; _ cuadrantes 1 y 3 de pantalla.
 	ld (Posicion_actual),hl
+	call Genera_coordenadas
 	call Inc_CTRL_DESPLZ
 	jr 2F
 1 call Inc_CTRL_DESPLZ
