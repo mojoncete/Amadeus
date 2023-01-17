@@ -108,8 +108,12 @@ Mov_right ld hl,Ctrl_0
 	jr 8F
 
 10 ld a,(Coordenada_X)	 	  										; Estamos en el char. 31?								
-	cp 31															; Si no es así, saltamos a [3] para seguir con el desplazamiento progrmado.
+	cp 30															; Si no es así, saltamos a [3] para seguir con el desplazamiento progrmado.
 	jr nz,8F
+
+
+	jr $	;! Quiero que se pare en el último char. de la línea !!!!!!!!!!
+
 
 	ld a,(CTRL_DESPLZ) 		 										; Estamos en el último char. de la línea. Si (CTRL_DESPLZ)="0" saltamos a_	 									
 	and a 															; _[3] para continuar con el DESPLZ.

@@ -1,6 +1,6 @@
 ; ******************************************************************************************************************************************************************************************
 ;
-; 17/08/22
+; 01/23
 ;
 ; DRAW. ************************************************************************************************************************************************************************************
 
@@ -19,8 +19,8 @@ Draw call Prepara_draw
 	bit 5,a
 	jr nz,3F										; Si acabamos de inicializar un objeto, NO COMPROBAMOS LÍMITES. 
 
-;	call Comprueba_limite_horizontal   				
-;	call Comprueba_limite_vertical
+	call Comprueba_limite_horizontal   				
+	call Comprueba_limite_vertical
 
 ; Llegados a este punto, tengo Filas/Columnas en BC y (Cuad_objeto) en A´.
 
@@ -35,7 +35,7 @@ Draw call Prepara_draw
 	ret
 
 ; *******************************************************************************************************************************************************************************************
-;	23/8/22
+;	17/1/23
 ;
 ; 	Comprueba_limite_horizontal.
 ;
@@ -56,10 +56,6 @@ Comprueba_limite_horizontal
 
 6 call Inicializacion
 
-;    push af	 										; Antes de nada, guardo (Cuad_objeto) en A´ para acceder a él más rapido, (me va a hacer falta en la rutina calcolum).
-;	ex af,af
-;	pop af 											; Ahora tengo (Cuad_objeto) en A y A´.
-
     jr 5F
 2 push HL						        			; Guardo el puntero de pantalla, HL en la pila.
 
@@ -74,9 +70,10 @@ Comprueba_limite_horizontal
 	call calcula_tercio                             ; ABAJO a ARRIBA .......... E="1" cuando ( Z y C ).
 	ld h,a 											 
 	and a 											
-	sbc hl,de 										; Posicíon - Límite.
+	sbc hl,de 										; Posicíon <"menos"> Límite.
+	ex af,af 										; Guardo el registro F con los flags resultantes de la operación SBC.
 
-	ex af,af 										; Averiguamos de que mitad de la pantalla partimos.
+	ld a,(Cuad_objeto)
 	cp 2
 	jr c,3F
 	jr z,3F
@@ -116,12 +113,11 @@ Comprueba_limite_horizontal
 ; _para indicar con E="2" en caso necesario.
 
 4 push hl
-    push bc
+    push bc											; Guardamos (Posicion_actual) y (Filas/Columns) en la pila.
 
 	call calcula_tercio
 	cp 1
 	jr nz,8F										; Sólo comprobamos la línea centro cuando nos encontramos en el 2º tercio de pantalla.
-
     call Comprueba_centro 							; ARRIBA a ABAJO .......... E="2" cuando ( Z y NC ).
     jr z,9F
     jr nc,9F
@@ -159,24 +155,29 @@ Comprueba_centro call calcula_tercio
 ;	Dependiendo del cuadrante en el que nos encontremos, sumaremos o restaremos, (Columnas-1) a L. 
 ;	
 
-Comprueba_limite_vertical ld a,(Obj_dibujado)
-	and a
-	ret nz   										; Salimos de la rutina si estamos borrando el objeto, (Obj_dibujado)="1".  
+Comprueba_limite_vertical 
+
+;	ld a,(Obj_dibujado)
+;	and a
+;	ret nz   										; Salimos de la rutina si estamos borrando el objeto, (Obj_dibujado)="1".  
+
+;	jr $
 
 	ld a,l
 	and $1F
 	ld d,a 											 
 	ld a,(Limite_vertical)
 	cp d 											; Límite - Posición.
+	ex af,af 										; Resultado de CP d en F'.
 
-	ex af,af 										; Consultamos el cuadrante en el que estamos, (A´).
+	ld a,(Cuad_objeto)								; Averiguamos en que cuadrante estamos.
 	bit 0,a
 	jr z,1F 										; Si A´es PAR, estamos en el 2º o 4º cuadrante. Saltamos a [3F], (cuadrantes 2º y 4º).
 
 ; Hemos comparado la posición Y de la entidad con (Limite_vertical) y estamos en la mitad IZQUIERDA de la pantalla.
 
 	ex af,af 										; LADO IZQUIERDO !!!!!!!!!!
-	jr c,4F 										; Superamos (lIMITE_VERTICAL) cuando C. 
+	jr c,4F 										; Superamos (lIMITE_VERTICAL) cuando hay "acarreo".
 
  ; No hay cambio de cuadrante!!!!! Estamos en el lado izquierdo de la pantalla y no hemos sobrepasado (Limite_vertical).
 ; Lo primero que haremos será comprobar si hemos llegado o superado el centro de la pantalla.
@@ -191,7 +192,7 @@ Comprueba_limite_vertical ld a,(Obj_dibujado)
 ;                                                    ; _salimos sin modificar nada.
     jr 2F
 
-1 ex af,af 											 ; LADO DERECHO !!!!!!!!!!
+1 ex af,af 											 ; LADO DERECHO de la pantalla !!!!!!!!!!!
 	jr nc,4F 										 ; Superamos (lIMITE_VERTICAL) cuando NC.
 
 ; No hay cambio de cuadrante!!!!! Estamos en el lado derecho de la pantalla y no hemos sobrepasado (Limite_vertical).
@@ -314,6 +315,7 @@ Comprueba_limite_vertical ld a,(Obj_dibujado)
 Modifica_Pos_actual 
 
 ;	call Calcula_scanlines_totales  ; Ahora tenemos el nº total de scanlines en B, DE y DE´.
+
     dec B                                           ; Scanlines-1 en B.
 1 call PreviousScan
     djnz 1B
@@ -326,6 +328,7 @@ Modifica_Pos_actual
 Modifica_Pos_actual2 
 
 ;	call Calcula_scanlines_totales ; Ahora tenemos el nº total de scanlines en B, DE y DE´.
+
     dec B                                           ; Scanlines-1 en B.
 1 call NextScan
     djnz 1B
@@ -425,41 +428,6 @@ primcuad
 	ld hl,Ctrl_0
 	set 5,(hl)
 	ret
-
-; -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;
-;	14/9/22
-;
-;	Fija_punteros ..... (Subrutina de [Inicialización]).
-;
-;	La rutina fija el puntero de dibujado/borrado.
-;	
-;	Función:	
-;	
-;	HL apuntará a (Puntero_de_objeto), Caja_de_DESPLZ o Caja_de_BORRADO en función de si estamos PINTANDO/BORRANDO el objeto o de si este, ha sido o no, DESPLAZADO.
-
-;Fija_punteros push bc 												; Guardamos en la pila (Filas)*(Columns)*8 y _
-;	push de 														; _(Filas)*(Columns). BC y DE respectivamente.
-;	ld a,(Obj_dibujado) 											; Pintamos o borramos???. (Obj_dibujado)="0" PINTAMOS.
-;	and a
-;	jr z,1F 	
-;	ld a,(CTRL_DESPLZ)		 										; Borramos el objeto.
-;	and a 															; Si (CTRL_DESPLZ)="0", el objeto no está desplazado, en ese caso (Puntero_datas)=(Puntero_objeto).
-;	jr z,2F 														; Si (CTRL_DESPLZ)="1", el objeto está desplazado, por lo que tendrá una (Columns) más. En ese caso,_
-;	ld hl,(Caja_de_BORRADO) 										; _(Puntero_datas)=Caja_de_BORRADO. 
-;	ld (Puntero_objeto),hl
-;	jr 3F
-;1 ld a,(CTRL_DESPLZ) 												; Pintamos el objeto.								 
-;	and a 															; Si (CTRL_DESPLZ)="0", el objeto no está desplazado, en ese caso (Puntero_datas)=(Puntero_objeto).
-;	jr z,2F 														; Si (CTRL_DESPLZ)="1", el objeto está desplazado, por lo que tendrá una (Columns) más. En ese caso,_
-;	ld hl,(Caja_de_DESPLZ) 											; _(Puntero_datas)=Caja_de_DESPLZ.		
-;	ld (Puntero_objeto),hl 								
-;	jr 3F
-;2 ld hl,(Puntero_objeto) 											; (Puntero_datas)=(Puntero_objeto). 
-;	ld (Puntero_objeto),hl	 										; Fijamos el puntero de atributos y salimos.
-;3 pop de
-;	pop bc
-;	ret	
 
 ; ------------------------------------------------------------------------------------------------------------------
 
