@@ -77,8 +77,8 @@ Attr db %00000110										; Atributos de la entidad:
 
 Indice_Sprite defw Indice_Badsat_der
 Puntero_DESPLZ defw 0
-Posicion_inicio defw $4729								; Dirección de pantalla donde aparece el objeto. [DRAW]
-Cuad_objeto db 1			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+Posicion_inicio defw $48e3								; Dirección de pantalla donde aparece el objeto. [DRAW]
+Cuad_objeto db 3			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
 ; Variables de objeto. (Características).
 
