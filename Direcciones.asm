@@ -551,11 +551,6 @@ Reaparece_arriba ld bc,$17e0
 
 Reinicio 
 
-	ld hl,0
+	ld hl,(Posicion_inicio)
 	ld (Posicion_actual),hl
-	ld a,2
-	ld (Columns),a
-	xor a
-	ld (CTRL_DESPLZ),a
-	call Inicia_Puntero_objeto
 	ret	
