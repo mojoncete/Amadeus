@@ -46,6 +46,7 @@ Album_de_fotos equ $7000								; En (Album_de_fotos) vamos a ir almacenando los
 ;
 ; Variables de DRAW. (Motor principal).
 ;
+; (Variables_de_borrado) *** (Variables_de_pintado).
 
 Filas db 2												; Filas. [DRAW]
 Columns db 2  											; Nº de columnas. [DRAW]
@@ -55,6 +56,12 @@ CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprit
 ; 														; _ estamos desplazados hacia la izquierda y si es positivo, hacia la derecha.
 ; 														; El hecho de que este byte sea distinto de "0", indica que se ha modificado el nº de columnas del objeto.
 ; 														; Cuando vamos a imprimir un Sprite en pantalla, la rutina de pintado consultará este byte para situar (Puntero_objeto). [Mov_left]. 
+Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
+Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
+
+; ---------- ---------- ---------- 
+
+
 Attr db %00000110										; Atributos de la entidad:
 
 ;	El formato: FBPPPIII (Flash, Brillo, Papel, Tinta).
@@ -70,10 +77,8 @@ Attr db %00000110										; Atributos de la entidad:
 
 Indice_Sprite defw Indice_Badsat_der
 Puntero_DESPLZ defw 0
-Posicion_inicio defw $4721								; Dirección de pantalla donde aparece el objeto. [DRAW]
+Posicion_inicio defw $4729								; Dirección de pantalla donde aparece el objeto. [DRAW]
 Cuad_objeto db 1			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
-Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
-Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 
 ; Variables de objeto. (Características).
 
@@ -85,11 +90,12 @@ Vel_down db 2 											; Velocidad bajada. Nº de píxeles que desplazamos el 
 Variables_de_borrado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
 	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
 	defw 0
-	db 0
+	db 0,0,0
+
 Variables_de_pintado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
 	defw 0
 	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
-	db 0
+	db 0,0,0
 
 ; Variables de funcionamiento de las rutinas de movimiento. (Mov_left), (Mov_right), (Mov_up), (Mov_down).
 
@@ -332,19 +338,19 @@ Prepara_var_pintado_borrado	ld hl,Filas
 	ld de,Variables_de_pintado
 	jr 2F
 1 ld de,Variables_de_borrado
-2 ld bc,7
+2 ld bc,9
 	ldir
 	ret
 
 Repone_borrar ld hl,Variables_de_borrado
 	ld de,Filas
-	ld bc,7
+	ld bc,9
 	ldir
 	ret
 
 Repone_pintar ld hl,Variables_de_pintado
 	ld de,Filas
-	ld bc,7
+	ld bc,9
 	ldir
 	ret	
 
