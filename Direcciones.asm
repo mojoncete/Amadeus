@@ -396,7 +396,7 @@ Desplaza_izquierda ld a,(Vel_left)
 	djnz 1B 														; Seleccionamos FRAME en función de la velocidad del Sprite.
 	ld (Puntero_DESPLZ),hl
 	call Extrae_address
-	ld (Caja_de_DESPLZ),hl 											
+;	ld (Caja_de_DESPLZ),hl 		 	;!!!!!!!!!!!!!!!!!!!!!!!!!									
 	ret
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

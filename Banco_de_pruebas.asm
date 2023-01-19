@@ -44,7 +44,7 @@ Album_de_fotos equ $7000								; En (Album_de_fotos) vamos a ir almacenando los
 ;
 ; 10/11/22
 ;
-; Variables de DRAW. (Motor principal).
+; Variables de DRAW. (Motor principal).				
 ;
 ; (Variables_de_borrado) *** (Variables_de_pintado).
 
@@ -138,17 +138,11 @@ Repetimos_db db 0
 
 ; Variables de funcionamiento. [DRAW].
 
-Puntero_datas defw 0 									;! Borraremos esta merda !!!!!
 Columnas db 0
 Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado en función del tamaño del Sprite. Si el objeto llega a esta línea se modifica_    
 ; 														; _(Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
 Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta columna se modifica (Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
 
-
-; Cajas. Almacenes.
-
-Caja_de_DESPLZ defw 0								   	; Caja de memoria donde almacenaremos los bytes del Sprite una vez desplazado. 3x4, (Filas/Columnas).(12*8). [DRAW]/[Mov_left]    
-Caja_de_BORRADO defw 0 									; Caja de memoria donde tendremos una copia de respaldo de Caja_de_DESPLZ. Se utiliza para borrar la entidad, (función XOR). [DRAW]/[Mov_left] 
 
 ; Variables de funcionamiento, (No incluidas en base de datos de entidades), a partir de aquí!!!!!
 
@@ -158,6 +152,7 @@ Puntero_store_entidades defw 0
 Puntero_restore_entidades defw 0
 Indice_restore defw 0
 
+; 58 Bytes por entidad.
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 
 Numero_de_entidades db 1								; Nº de objetos en pantalla, (contando con Amadeus).
@@ -455,7 +450,7 @@ Store_Restore_entidades
 
 	ld hl,Filas
 	ld de,(Puntero_store_entidades) 					; Puntero que se desplaza por las distintas entidades.
-	ld bc,54
+	ld bc,58
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
 ;	Incrementa STORE y ejecuta RESTORE !!!!! 
@@ -463,7 +458,7 @@ Store_Restore_entidades
 	ld hl,(Puntero_restore_entidades)
 	ld (Puntero_store_entidades),hl 					; Situamos (Puntero_store_entidades) en la 2ª entidad.
 	ld de,Filas 										; Hemos RECUPERADO los parámetros de la 2ª entidad de su base de datos.
-	ld bc,54
+	ld bc,58
 	ldir
 
 ;	Incrementa RESTORE !!!!! 
@@ -492,7 +487,7 @@ Restore_Primera_entidad push hl
  	push bc
 	ld hl,(Puntero_store_entidades)						; (Puntero_store_entidades) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,54
+	ld bc,58
 	ldir
 	pop bc
 	pop de
