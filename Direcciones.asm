@@ -266,7 +266,7 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 
 ; ******************************************************************************************************************************************************************************************
 ;
-;	19/10/22
+;	21/01/23
 ;
 ;	Mov_left.
 ;
@@ -287,10 +287,10 @@ Mov_left
 
 	ld a,(Ctrl_0)
 	bit 6,a
-	jr z,3F 														; Estamos moviendo Amadeus???????. Si es así hemos de comprobar que que no hemos llegado al char.1 de la línea, [Stop_Amadeus].
+	jr z,8F 														; Estamos moviendo Amadeus???????. Si es así hemos de comprobar que que no hemos llegado al char.1 de la línea, [Stop_Amadeus].
 
 	call Stop_Amadeus_left
-	jr nz,3F
+	jr nz,8F
 
 	ld hl,(Indice_Sprite) 											; Hemos llegado al char.1, volvemos a situar (Puntero_DESPLZ) al principio del índice del sprite, pues la única posibilidad_ 
 	ld (Puntero_DESPLZ),hl 											; _de movimiento es hacia la derecha.
@@ -304,10 +304,10 @@ Mov_left
 	
 11 ld a,(Coordenada_X)	 	 								
 	and a 															
-	jr nz,3F
+	jr nz,8F
 	ld a,(CTRL_DESPLZ) 			 									; Si el Sprite no está en el 1er char de la línea, (desaparece por la izquierda), o estando en este, _
 	and a 															; _ (CTRL_DESPLZ)="0", cargamos HL con la (Posicion_actual) y ejecutamos la rutina de desplazamiento, _
-	jr z,3F 														; _ pués aún podemos desplazarlo antes de desaparecer.
+	jr z,8F 														; _ pués aún podemos desplazarlo antes de desaparecer.
 
 ; ---------- ---------- ----------
 
@@ -322,15 +322,15 @@ Mov_left
 
 6 ld a,(CTRL_DESPLZ)
 	cp $f9 															
-	jr nz,3F
+	jr nz,8F
 	jr 4F
 1 ld a,(CTRL_DESPLZ) 												
 	cp $fa
-	jr nz,3F
+	jr nz,8F
 	jr 4F
 7 ld a,(CTRL_DESPLZ)
 	cp $fc
-	jr nz,3F
+	jr nz,8F
 
 ; ---------- ---------- ----------
 
@@ -349,39 +349,22 @@ Mov_left
 	ld hl,(Posicion_actual) 										; Incrementamos su posición actual, pués al desplazarlo a la izquierda, volvemos a incrementar el nº de (Columns) y _
 	inc hl 															; _ (Posicion_actual) ha pasado de $1f a $1e.
 	ld (Posicion_actual),hl
+	call Genera_coordenadas
 	jr 2F 															; Salimos para pintar la nueva posición.
 
 ; ---------- ---------- ----------
 
-3 ld a,(Vel_left)
-	cp 8
-	jr nz,8F
-	ld hl,(Posicion_actual)
-	ld a,l
-	and $1f
-	jr nz,9F
-
-; ---------- ---------- ----------
-
-	call Reaparece_derecha
-
-; ---------- ---------- ----------
-
-	jr 2F
-9 ld hl,(Posicion_actual)
-	dec hl
-	ld (Posicion_actual),hl
-	jr 2F
 8 ld hl,(Posicion_actual)
 	call DESPLZ_IZQ
-2 call Genera_coordenadas 
-	ret
+2 ret
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
 ;	22/9/22
 
-DESPLZ_IZQ call Desplaza_izquierda
+DESPLZ_IZQ 
+
+	call Desplaza_izquierda
     call modifica_parametros_1er_DESPLZ
 	call Ciclo_completo_2
 	ld hl,Ctrl_0 													; Indica que nos hemos desplazado a la izquierda
@@ -396,7 +379,7 @@ Desplaza_izquierda ld a,(Vel_left)
 	djnz 1B 														; Seleccionamos FRAME en función de la velocidad del Sprite.
 	ld (Puntero_DESPLZ),hl
 	call Extrae_address
-;	ld (Caja_de_DESPLZ),hl 		 	;!!!!!!!!!!!!!!!!!!!!!!!!!									
+	ld (Puntero_objeto),hl							
 	ret
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -418,6 +401,7 @@ modifica_parametros_1er_DESPLZ ld a,(CTRL_DESPLZ) 				  ; Incrementamos el nª d
 	ld hl,(Posicion_actual) 									  ; Decrementamos 1 char. el valor de (Posicion_actual), la primera vez que desplazamos el objeto y se encuentra en los _	
 	dec hl 														  ; _ cuadrantes 2 y 4 de pantalla.
 	ld (Posicion_actual),hl
+	call Genera_coordenadas
 	call Dec_CTRL_DESPLZ
 	jr 2F
 1 call Dec_CTRL_DESPLZ
@@ -439,7 +423,14 @@ Ciclo_completo_2 ld a,(CTRL_DESPLZ)
 	ld hl,(Posicion_actual)                                         ; Decrementamos (Posicion_actual) en los cuadrantes 2º y 4º.
 	dec hl
 	ld (Posicion_actual),hl
-2 call Genera_coordenadas
+	call Genera_coordenadas
+
+; Inicia el puntero de Sprite.
+
+2 ld hl,(Indice_Sprite)
+	ld (Puntero_DESPLZ),hl
+	call Extrae_address
+	ld (Puntero_objeto),hl
 3 ret
 
 ; ---------- ---------- ---------- ---------- ---------- ----------

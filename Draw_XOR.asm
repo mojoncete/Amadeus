@@ -35,17 +35,25 @@ Draw call Prepara_draw
 	ret
 
 ; *******************************************************************************************************************************************************************************************
-;	17/1/23
+;	21/01/23
 ;
 ; 	Comprueba_limite_horizontal.
 ;
+;	La rutina comprueba si hemos sobrepasado el (Limite_horizontal) definido en la rutina [Inicializacion]. Este será:_
+;	_ $4fc0 si partimos de los cuadrantes 1 o 2 de pantalla o $4820 si partimos de los cuadrantes 3 o 4.
+; 
+;	Si sobrepasamos o alcanzamos el límite horizontal establecido, la rutina cargará el registro E con un "1".
+;	Si NO HEMOS SOBREPASADO (Limite_horizontal), E="0".
+;	E="1" indica que HEMOS SOBREPASADO el (Limite_horizontal).
+;	E="2" indica que NO HEMOS SOBREPASADO el (Limite_horizontal) pero hemos alcanzado o superado EL CENTRO DE PANTALLA.
+
+
 
 Comprueba_limite_horizontal 
 
-	ld a,(Ctrl_0)          							; Si no hemos desaparecido por arriba o por abajo, saltamos a ^1F^ para comprobar_ 
-	bit 2,a                                         ; _si hemos llegado o sobrepasado el (Limite_horizontal), (seguimos con la rutina).
+	ld a,(Ctrl_0)          							; Si no hemos desaparecido por arriba o por abajo, saltamos a 1F para comprobar_ 
+	bit 2,a                                         ; _si hemos llegado o sobrepasado (Limite_horizontal). Seguimos con la rutina.
 	jr z,1F                                         ; Si por el contrario hemos desaparecido por arriba o por abajo, (bit2/bit3 de (Ctrl_0)="1"))_
-
 	and $fb 										; _hay que modificar el puntero de posición. (E="1" y salimos de la rutina). Antes inicializaremos los_ 
 	ld (Ctrl_0),a 									; _ bits 2 y 3 de (Ctrl_0).
     jr 6F
@@ -53,11 +61,9 @@ Comprueba_limite_horizontal
     jr z,2F
     and $f7
     ld (Ctrl_0),a
-
 6 call Inicializacion
-
     jr 5F
-2 push HL						        			; Guardo el puntero de pantalla, HL en la pila.
+2 push HL						        			; Guardo (Posicion_actual), HL en la pila.
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- 
 ; Comprobamos si hemos llegado al (Limite_horizontal). E="0".
@@ -72,16 +78,14 @@ Comprueba_limite_horizontal
 	and a 											
 	sbc hl,de 										; Posicíon <"menos"> Límite.
 	ex af,af 										; Guardo el registro F con los flags resultantes de la operación SBC.
-
 	ld a,(Cuad_objeto)
 	cp 2
 	jr c,3F
 	jr z,3F
-
 	ex af,af 										; Partimos de LA MITAD INFERIOR. Recupero resultado de (Posicíon - Límite) en AF.
     jr z,7F
-    jr c,7F 										; ABAJO a ARRIBA .......... E="1" cuando ( Z y C ).
-;	ld e,0
+    jr c,7F 										; ABAJO a ARRIBA .......... E="1" cuando ( Z y C ). HEMOS SOBREPASADO_
+ 	ld e,0											; _ (Limite_horizontal), saltamos a 7F.
 	pop hl
 
 ; Partimos de la mitad INFERIOR de pantalla y `NO HEMOS´ superado (Limite_horizontal). Tenemos que averiguar si hemos superado el centro de pantalla_
@@ -89,17 +93,14 @@ Comprueba_limite_horizontal
 
     push hl
     push bc
-
 	call calcula_tercio
 	cp 1
 	jr nz,11F 										; Sólo comprobamos la línea centro cuando nos encontramos en el 2º tercio de pantalla.
-
     call Comprueba_centro 							; ABAJO A ARRIBA .......... E="2" cuando ( Z y C ).
     jr z,9F
     jr c,9F
 11 ld e,0
     jr 8F
-
 3 ex af,af 											; Partimos de LA MITAD SUPERIOR. Recupero resultado de (Posicíon - Límite) en AF.
 	jr z, 7F
 	jr nc, 7F										; E="1" cuando ( Z y NC ).
@@ -114,7 +115,6 @@ Comprueba_limite_horizontal
 
 4 push hl
     push bc											; Guardamos (Posicion_actual) y (Filas/Columns) en la pila.
-
 	call calcula_tercio
 	cp 1
 	jr nz,8F										; Sólo comprobamos la línea centro cuando nos encontramos en el 2º tercio de pantalla.
@@ -137,7 +137,7 @@ Comprueba_centro call calcula_tercio
 	cp 2
 	jr c,1F 				
 	jr z,1F
-	ld bc,$01a0 								  	 ; !!!!! CENTRO DE PANTALLA cuando estamos en la mitad inferior de la misma. !!!!!
+	ld bc,$01a0 								  	 ; ¡¡¡¡¡ CENTRO DE PANTALLA cuando estamos en la mitad inferior de la misma. !!!!!
 	jr 2F
 1 ld bc,$0160                                     	 ; ¡¡¡¡¡ CENTRO DE PANTALLA cuando estamos en la mitad superior de la misma. !!!!!
 2 ex af,af
@@ -155,21 +155,12 @@ Comprueba_centro call calcula_tercio
 ;	Dependiendo del cuadrante en el que nos encontremos, sumaremos o restaremos, (Columnas-1) a L. 
 ;	
 
-Comprueba_limite_vertical 
-
-;	ld a,(Obj_dibujado)
-;	and a
-;	ret nz   										; Salimos de la rutina si estamos borrando el objeto, (Obj_dibujado)="1".  
-
-;	jr $
-
-	ld a,l
+Comprueba_limite_vertical ld a,l
 	and $1F
 	ld d,a 											 
 	ld a,(Limite_vertical)
 	cp d 											; Límite - Posición.
 	ex af,af 										; Resultado de CP d en F'.
-
 	ld a,(Cuad_objeto)								; Averiguamos en que cuadrante estamos.
 	bit 0,a
 	jr z,1F 										; Si A´es PAR, estamos en el 2º o 4º cuadrante. Saltamos a [3F], (cuadrantes 2º y 4º).
@@ -179,19 +170,17 @@ Comprueba_limite_vertical
 	ex af,af 										; LADO IZQUIERDO !!!!!!!!!!
 	jr c,4F 										; Superamos (lIMITE_VERTICAL) cuando hay "acarreo".
 
- ; No hay cambio de cuadrante!!!!! Estamos en el lado izquierdo de la pantalla y no hemos sobrepasado (Limite_vertical).
+; No hay cambio de cuadrante!!!!! Estamos en el lado izquierdo de la pantalla y no hemos sobrepasado (Limite_vertical).
 ; Lo primero que haremos será comprobar si hemos llegado o superado el centro de la pantalla.
  
     ld a,(Coordenada_X)
     ld d,Centro_izquierda
     and a
     sub d 											 ; Posición - Centro_izquierda.
-
     jr z,3F
     jr nc,3F                                         ; Si no hemos superado (Limite_vertical) pero si hemos superado el centro de la pantalla,_
 ;                                                    ; _salimos sin modificar nada.
     jr 2F
-
 1 ex af,af 											 ; LADO DERECHO de la pantalla !!!!!!!!!!!
 	jr nc,4F 										 ; Superamos (lIMITE_VERTICAL) cuando NC.
 
@@ -202,7 +191,6 @@ Comprueba_limite_vertical
     ld d,Centro_derecha
     and a
     sub d
-
     jr z,3F
     jr c,3F                                          ; Si no hemos superado (Limite_vertical) pero si hemos superado el centro de la pantalla,_
 ;                                                    ; _salimos sin modificar nada.
@@ -249,19 +237,16 @@ Comprueba_limite_vertical
     ld l,a	 										 ; _de la pantalla, E="0" modificamos L, Inicializamos el objeto y salimos.
 	ld (Posicion_actual),hl
 13 jr 9F                                           
-
 12 bit 0,e
     jr nz,14F                                        ; Si hemos sobrepasado (Limite_vertical) y hemos llegado o superado_
 ;                                                    ; _el centro horizontal de la pantalla, E="2", salimos sin modificar nada.
 	pop bc
 	jr 3B
-
 14 add b
     ld l,a
 	ld (Posicion_actual),hl
     call Modificaccionne                             ; Si hemos sobrepasado (Limite_vertical) y (Limite_horizontal), E="1". Modificamos HL,L,_
     jr 9F 											 ; _inicializamos y salimos.
-
 6 and $fd 											 ; Cambio de cuadrante por desaparecer por la derecha!!!. Reinicializo el bit 1 de (Ctrl_0).
     ld (Ctrl_0),a
 	pop af
@@ -280,7 +265,6 @@ Comprueba_limite_vertical
 	inc e
     dec e
     jr nz,10F
-
 	sub b 																						
     ld l,a
 	ld (Posicion_actual),hl
@@ -291,19 +275,16 @@ Comprueba_limite_vertical
 ;                                                   ; _el centro horizontal de la pantalla, E="2", salimos sin modificar nada.
 	pop bc
 	jr 3B
-
 16 sub b
     ld l,a
 	ld (Posicion_actual),hl
     call Modificaccionne                            ; Si hemos sobrepasado (Limite_vertical) y (Limite_horizontal), E="1". Modificamos HL,L,_
     jr 9F
-
 8 and $fe 											; ; Cambio de cuadrante por desaparecer por la izquierda !!!!!. Reinicializo el bit 0 de (Ctrl_0).
     ld (Ctrl_0),a
 	pop af
- 
 9 pop bc
-;	ld e,0
+	ld e,0
     call Inicializacion
     push af	 										; Antes de nada, guardo (Cuad_objeto) en A´ para acceder a él más rapido, (me va a hacer falta en la rutina calcolum).
 	ex af,af

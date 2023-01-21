@@ -62,7 +62,7 @@ Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 ; ---------- ---------- ---------- 
 
 
-Attr db %00000110										; Atributos de la entidad:
+Attr db %00000100										; Atributos de la entidad:
 
 ;	El formato: FBPPPIII (Flash, Brillo, Papel, Tinta).
 ;
@@ -75,17 +75,17 @@ Attr db %00000110										; Atributos de la entidad:
 ;			 6 ..... AMARILLO
 ; 			 7 ..... BLANCO
 
-Indice_Sprite defw Indice_Badsat_der
+Indice_Sprite defw Indice_Badsat_izq
 Puntero_DESPLZ defw 0
-Posicion_inicio defw $48e3								; Dirección de pantalla donde aparece el objeto. [DRAW]
-Cuad_objeto db 3			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+Posicion_inicio defw $473e								; Dirección de pantalla donde aparece el objeto. [DRAW]
+Cuad_objeto db 2			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
 ; Variables de objeto. (Características).
 
-Vel_left db 1 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
+Vel_left db 4 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
 Vel_right db 1 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
 Vel_up db 1 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
-Vel_down db 2 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
+Vel_down db 1 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
 
 Variables_de_borrado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
 	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
@@ -129,7 +129,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
-Puntero_indice_mov defw Indice_mov_Badsat
+Puntero_indice_mov defw Indice_mov_Izquierda
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0

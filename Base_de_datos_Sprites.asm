@@ -79,7 +79,7 @@ Badsat db 2,2										; (Filas) / (Columns).
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 
-	defw Indice_mov_Badsat,0 						; (Puntero_indice_mov) / (Puntero_mov).
+	defw Indice_mov_Derecha,0 						; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
 
 	db 0 											; (Columnas).									

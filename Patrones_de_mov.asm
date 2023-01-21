@@ -27,7 +27,8 @@ Onda_senoidal db 44,%01000100,%01100000,%01000010,%01100000,%01000010,%01100000,
     db %00100101,%01100000,%00100010,%01100011,%01000000,%01100000,%01000010,%01100000
     db %01000010,%01100000,%01000100,0
 
-Indice_mov_Badsat defw Derecha
+Indice_mov_Izquierda defw Izquierda
+Indice_mov_Derecha defw Derecha
 Indice_mov_Badsat2 defw Escaloncitos_derecha_arriba
 Indice_mov_Badsat3 defw Escaloncitos_izquierda
 Indice_mov_Badsat4 defw Escaloncitos_izquierda_arriba
