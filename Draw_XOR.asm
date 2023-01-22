@@ -59,6 +59,10 @@ Comprueba_limite_horizontal
     jr 6F
 1 bit 3,a
     jr z,2F
+
+
+    jr $
+
     and $f7
     ld (Ctrl_0),a
 6 call Inicializacion

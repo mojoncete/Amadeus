@@ -537,7 +537,11 @@ Reaparece_abajo inc h
 
 ; ---------- ---------- ---------- ---------- ---------- ----------
 
-Reaparece_arriba ld bc,$17e0
+Reaparece_arriba 
+
+	jr $
+
+	ld bc,$17e0
 	and a
 	sbc hl,bc
 	ld (Posicion_actual),hl
