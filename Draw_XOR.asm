@@ -49,9 +49,7 @@ Draw call Prepara_draw
 
 
 
-Comprueba_limite_horizontal 
-
-	ld a,(Ctrl_0)          							; Si no hemos desaparecido por arriba o por abajo, saltamos a 1F para comprobar_ 
+Comprueba_limite_horizontal ld a,(Ctrl_0)          	; Si no hemos desaparecido por arriba o por abajo, saltamos a 1F para comprobar_ 
 	bit 2,a                                         ; _si hemos llegado o sobrepasado (Limite_horizontal). Seguimos con la rutina.
 	jr z,1F                                         ; Si por el contrario hemos desaparecido por arriba o por abajo, (bit2/bit3 de (Ctrl_0)="1"))_
 	and $fb 										; _hay que modificar el puntero de posición. (E="1" y salimos de la rutina). Antes inicializaremos los_ 
@@ -59,10 +57,6 @@ Comprueba_limite_horizontal
     jr 6F
 1 bit 3,a
     jr z,2F
-
-
-    jr $
-
     and $f7
     ld (Ctrl_0),a
 6 call Inicializacion
@@ -159,12 +153,12 @@ Comprueba_centro call calcula_tercio
 ;	Dependiendo del cuadrante en el que nos encontremos, sumaremos o restaremos, (Columnas-1) a L. 
 ;	
 
-Comprueba_limite_vertical ld a,l
+Comprueba_limite_vertical ld hl,(Posicion_actual)
+	ld a,l
 	and $1F
 	ld d,a 											 
 	ld a,(Limite_vertical)
 	cp d 											; Límite - Posición.
-
 	ex af,af 										; Resultado de CP d en F'.
 	ld a,(Cuad_objeto)								; Averiguamos en que cuadrante estamos.
 	bit 0,a

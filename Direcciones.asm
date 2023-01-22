@@ -28,8 +28,8 @@ Mov_down ld hl,Ctrl_0
 	add $20
 	jr nc,1F 														
 ; ------------------------------
-	call Reaparece_arriba
-;	call Reinicio
+;	call Reaparece_arriba
+	call Reinicio
 ; ------------------------------
 	jr 3F
 1 call NextScan
@@ -537,11 +537,7 @@ Reaparece_abajo inc h
 
 ; ---------- ---------- ---------- ---------- ---------- ----------
 
-Reaparece_arriba 
-
-	jr $
-
-	ld bc,$17e0
+Reaparece_arriba ld bc,$17e0
 	and a
 	sbc hl,bc
 	ld (Posicion_actual),hl
