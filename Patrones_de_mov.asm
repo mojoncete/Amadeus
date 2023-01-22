@@ -12,10 +12,12 @@
 ;   Codificación:
 ;
 ;   % abajo,arriba,derecha,izquierda ..... nº de repeticiones del movimiento.
-;
 
 Izquierda db 2,%00010000,0
 Derecha db 2,%00100000,0
+Abajo db 2,%10000000,0
+Arriba db 2,%01000000,0
+
 Escaloncitos_izquierda_arriba db 3,%00010100,%01000100,0
 Escaloncitos_derecha_arriba db 3,%00100100,%01000100,0
 Escaloncitos_derecha_abajo db 3,%00100100,%10000100,0
@@ -29,6 +31,8 @@ Onda_senoidal db 44,%01000100,%01100000,%01000010,%01100000,%01000010,%01100000,
 
 Indice_mov_Izquierda defw Izquierda
 Indice_mov_Derecha defw Derecha
+Indice_mov_Abajo defw Abajo
+Indice_mov_Arriba defw Arriba
 Indice_mov_Badsat2 defw Escaloncitos_derecha_arriba
 Indice_mov_Badsat3 defw Escaloncitos_izquierda
 Indice_mov_Badsat4 defw Escaloncitos_izquierda_arriba

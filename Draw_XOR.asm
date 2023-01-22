@@ -63,7 +63,7 @@ Comprueba_limite_horizontal
     ld (Ctrl_0),a
 6 call Inicializacion
     jr 5F
-2 push HL						        			; Guardo (Posicion_actual), HL en la pila.
+2 push hl						        			; Guardo (Posicion_actual), HL en la pila.
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- 
 ; Comprobamos si hemos llegado al (Limite_horizontal). E="0".
@@ -160,6 +160,7 @@ Comprueba_limite_vertical ld a,l
 	ld d,a 											 
 	ld a,(Limite_vertical)
 	cp d 											; Límite - Posición.
+
 	ex af,af 										; Resultado de CP d en F'.
 	ld a,(Cuad_objeto)								; Averiguamos en que cuadrante estamos.
 	bit 0,a
@@ -196,13 +197,10 @@ Comprueba_limite_vertical ld a,l
 ;                                                    ; _salimos sin modificar nada.
 2 bit 0,e
     jr z,3F 										 ; No hemos sobrepasado (Centro_izquierda). Si E="0", salimos sin modificar posición.
-	push bc
+	push bc 										 ; Reservo (Filas) / (Columns) en la pila.
     call Modificaccionne
 	pop bc
     call Inicializacion
-    push af	 										 ; Antes de nada, guardo (Cuad_objeto) en A´ para acceder a él más rapido, (me va a hacer falta en la rutina calcolum).
-	ex af,af
-	pop af 											 ; Ahora tengo (Cuad_objeto) en A y A´.
 3 ret 				 								 ; Salimos de la rutina.
 
 ; ----- ----- ----- Cambio de cuadrante ----- ----- -----
@@ -293,11 +291,7 @@ Comprueba_limite_vertical ld a,l
 
 ; --------------------
 
-Modifica_Pos_actual 
-
-;	call Calcula_scanlines_totales  ; Ahora tenemos el nº total de scanlines en B, DE y DE´.
-
-    dec B                                           ; Scanlines-1 en B.
+Modifica_Pos_actual ld b,15                                         ; Scanlines-1 en B.
 1 call PreviousScan
     djnz 1B
 	ld (Posicion_actual),hl
@@ -306,11 +300,7 @@ Modifica_Pos_actual
 
 ; --------------------
 
-Modifica_Pos_actual2 
-
-;	call Calcula_scanlines_totales ; Ahora tenemos el nº total de scanlines en B, DE y DE´.
-
-    dec B                                           ; Scanlines-1 en B.
+Modifica_Pos_actual2 ld b,15                                         ; Scanlines-1 en B.
 1 call NextScan
     djnz 1B
 	ld (Posicion_actual),hl
@@ -318,15 +308,18 @@ Modifica_Pos_actual2
 	ret
 
 ; --------------------
+;
+;	22/01/23
+;
+;	E="1". Hemos cambiado de cuadrante. 
+;	Si estamos en la mitad superior de pantalla: CALL [Modifica_Pos_actual].
+;	Si estamos en la mitad inferior de pantalla: CALL [Modifica_Pos_actual2].
 
-; [Calcula_scanlines_totales] DESTRUYE !!!!! BC, DE y DE´.
-; [PreviousScan] y [NextScan] DESTRUYE !!!!! AF y HL.
 
-Modificaccionne ex af,af 
-    cp 2
-    push af                                         ; Guardo el resultado de la comparación.
-    ex af,af                                        ; Vuelvo a guardar (Cuad_objeto) en A´.
-    pop af                                          ; Resultado de la comparación en AF. Si estamos en la mitad superior de la pantalla, call Modifica_Pos_actual.
+Modificaccionne 
+	
+	ld a,(Cuad_objeto)
+	cp 2
     call z,Modifica_Pos_actual                      ; Si por el contrario estamos en la mitad inferior, call Modifica_Pos_actual2.
     call c,Modifica_Pos_actual
 	ret z

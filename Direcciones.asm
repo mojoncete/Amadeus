@@ -1,6 +1,6 @@
 ; ******************************************************************************************************************************************************************************************
 ;
-;   19/10/22
+;   22/01/23
 ;
 ;	Mov_down
 ;
@@ -17,18 +17,20 @@ Mov_down ld hl,Ctrl_0
 2 call calcula_tercio 												; Averiguamos el tercio de pantalla en el que nos encontramos.
 	and 2
 	jr z,1F
+
+; Nos encontramos en el último tercio de pantalla.
+; Averiguamos si estamos en el último scanline de la última línea de pantalla.
+
 	ld a,h
 	cp $57
 	jr nz,1F
 	ld a,l
 	add $20
-	jr nc,1F
-
+	jr nc,1F 														
 ; ------------------------------
 	call Reaparece_arriba
 ;	call Reinicio
 ; ------------------------------
-
 	jr 3F
 1 call NextScan
 	ld (Posicion_actual),hl
@@ -39,7 +41,7 @@ Mov_down ld hl,Ctrl_0
 
 ; ******************************************************************************************************************************************************************************************
 ;
-;   19/10/22
+;   22/01/23
 ;
 ;	Mov_up
 ;
@@ -56,6 +58,10 @@ Mov_up ld hl,Ctrl_0
 3 call calcula_tercio 													; Si no estamos en el 1er tercio de la pantalla no nos preocupamos de la reaparición.
 	and a
 	jr nz,1F
+
+; Nos encontramos en el 1er tercio de pantalla.
+; Averiguamos si estamos en el primer scanline de la primera línea de pantalla.
+
     ld a,h 																; Si estamos en el 1er tercio de pantalla pero no nos encontramos en el 1er scanline_
     cp $40 																; _del mismo, podemos seguir subiendo.
     jr nz,1F
@@ -334,8 +340,9 @@ Mov_left
 
 ; ---------- ---------- ----------
 
-4 call Reaparece_derecha 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
-;	call Reinicio
+4 
+;	call Reaparece_derecha 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
+	call Reinicio
 
 ; ---------- ---------- ----------
 
