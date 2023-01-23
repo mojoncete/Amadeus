@@ -75,9 +75,9 @@ Attr db %00000100										; Atributos de la entidad:
 ;			 6 ..... AMARILLO
 ; 			 7 ..... BLANCO
 
-Indice_Sprite defw Indice_Badsat_izq
+Indice_Sprite defw Indice_Badsat_der
 Puntero_DESPLZ defw 0
-Posicion_inicio defw $4001								; Dirección de pantalla donde aparece el objeto. [DRAW].
+Posicion_inicio defw $4721								; Dirección de pantalla donde aparece el objeto. [DRAW].
 Cuad_objeto db 1			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
 ; Variables de objeto. (Características).
@@ -129,7 +129,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
-Puntero_indice_mov defw Indice_mov_Abajo
+Puntero_indice_mov defw Indice_mov_Derecha
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0
@@ -155,7 +155,7 @@ Indice_restore defw 0
 ; 58 Bytes por entidad.
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 
-Numero_de_entidades db 1								; Nº de objetos en pantalla, (contando con Amadeus).
+Numero_de_entidades db 2								; Nº de objetos en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -212,11 +212,14 @@ START ld sp,$ffff
 	call Guarda_foto_registros
 	call Store_Restore_entidades 				    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_entidades) en la siguiente.
 	pop bc
+
+	jr $
+
 	djnz 1B  											; Decremento el contador de entidades.
 
 ; Volvemos a situar los punteros STORE/RESTORE de entidades en la 1ª entidad.
 
-	call Inicia_punteros_de_entidades
+	call Inicia_punteros_de_entidades 
 	call Restore_Primera_entidad
 
 	ld a,(Numero_de_entidades)

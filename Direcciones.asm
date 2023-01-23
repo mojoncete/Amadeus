@@ -28,8 +28,8 @@ Mov_down ld hl,Ctrl_0
 	add $20
 	jr nc,1F 														
 ; ------------------------------
-;	call Reaparece_arriba
-	call Reinicio
+	call Reaparece_arriba
+;	call Reinicio
 ; ------------------------------
 	jr 3F
 1 call NextScan
@@ -341,8 +341,8 @@ Mov_left
 ; ---------- ---------- ----------
 
 4 
-;	call Reaparece_derecha 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
-	call Reinicio
+	call Reaparece_derecha 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
+;	call Reinicio
 
 ; ---------- ---------- ----------
 

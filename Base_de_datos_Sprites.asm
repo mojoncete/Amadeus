@@ -3,12 +3,12 @@
 ;
 ; 05/11/22
 
-Indice_de_entidades									 ; 58 Bytes por entidad.
+Indice_de_entidades									; 58 Bytes por entidad.
 
-	defw Badsat
-	defw Badsat2
-	defw Badsat3
-	defw Badsat4
+	defw Entidad_1
+	defw Entidad_2
+	defw Entidad_3
+	defw Entidad_4
 	defw Amadeus_db
 ;	...
 ;	...
@@ -54,18 +54,18 @@ Amadeus_db db 2,2									; (Filas) / (Columns).
 	
 ; ---------- ---------- ---------- ---------- ----------
 
-Badsat db 2,2										; (Filas) / (Columns).
+Entidad_1 db 0,0									; (Filas) / (Columns).
 	defw 0											; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
 	db 0,0,0 									    ; (CTRL_DESPLZ) / (Coordenada_X) / (Coordenada_Y).
 
-	db %00000110 									; (Attr).
-	defw Indice_Badsat_der							; (Indice_Sprite).
+	db %00000000 									; (Attr).
+	defw 0											; (Indice_Sprite).
 	defw 0											; (Puntero_DESPLZ).
-	defw $47a1										; (Posicion_inicio).
+	defw 0											; (Posicion_inicio).
 	db 0											; (Cuad_objeto).
 
-	db 1,1,1,2										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
 	db 0,0										    ; Variables_de_borrado 
 	defw 0											;	" " " " " " "
@@ -79,7 +79,7 @@ Badsat db 2,2										; (Filas) / (Columns).
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 
-	defw Indice_mov_Derecha,0 						; (Puntero_indice_mov) / (Puntero_mov).
+	defw 0,0					 					; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
 
 	db 0 											; (Columnas).									
@@ -89,16 +89,16 @@ Badsat db 2,2										; (Filas) / (Columns).
 
 ; ---------- ---------- ---------- ---------- ----------	
 
-Badsat2 db 2,2		                                ; (Filas) / (Columns).
+Entidad_2 db 2,2		                            ; (Filas) / (Columns).
 	defw 0                                          ; (Posicion_actual).
 	defw 0											; (Puntero_objeto).
 	db 0,0,0                                        ; (CTRL_DESPLZ) / (Coordenada_X) / (Coordenada_Y).
 
 	db %00000010									; (Attr).
-	defw Indice_Badsat_der	                        ; (Indice_Sprite).
+	defw Indice_Badsat_izq	                        ; (Indice_Sprite).
 	defw 0                                          ; (Puntero_DESPLZ).
-	defw $4761                                      ; (Posicion_inicio).
-	db 0											; (Cuad_objeto).
+	defw $477e                                      ; (Posicion_inicio).
+	db 2											; (Cuad_objeto).
 
 	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
@@ -114,7 +114,7 @@ Badsat2 db 2,2		                                ; (Filas) / (Columns).
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 
-	defw Indice_mov_Badsat2,0                       ; (Puntero_indice_mov) / (Puntero_mov).
+	defw Indice_mov_Izquierda,0                     ; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
 
 	db 0 											; (Columnas).									
@@ -124,7 +124,7 @@ Badsat2 db 2,2		                                ; (Filas) / (Columns).
 
 ; ---------- ---------- ---------- ---------- ----------	
 
-Badsat3 db 2,2                                 		; (Filas) / (Columns).
+Entidad_3 db 2,2                                 	; (Filas) / (Columns).
 	defw 0                                          ; (Posicion_actual).
 	defw 0											; (Puntero_objeto).
 	db 0,0,0                                        ; (CTRL_DESPLZ) / (Coordenada_X) / (Coordenada_Y).
@@ -149,7 +149,7 @@ Badsat3 db 2,2                                 		; (Filas) / (Columns).
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 
-	defw Indice_mov_Badsat3,0                       ; (Puntero_indice_mov) / (Puntero_mov).
+	defw Indice_mov_Izquierda,0                     ; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).								  
 
 	db 0 											; (Columnas).									
@@ -159,7 +159,7 @@ Badsat3 db 2,2                                 		; (Filas) / (Columns).
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Badsat4 db 2,2                                  	; (Filas) / (Columns).
+Entidad_4 db 2,2                                  	; (Filas) / (Columns).
 	defw 0                                          ; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
 	db 0,0,0                                        ; (CTRL_DESPLZ) / (Coordenada_X) / (Coordenada_Y).
@@ -184,7 +184,7 @@ Badsat4 db 2,2                                  	; (Filas) / (Columns).
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 
-	defw Indice_mov_Badsat4,0                       ; (Puntero_indice_mov) / (Puntero_mov).
+	defw Indice_mov_Izquierda,0                     ; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).							  
 
 	db 0 											; (Columnas).									

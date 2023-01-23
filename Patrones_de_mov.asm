@@ -33,9 +33,10 @@ Indice_mov_Izquierda defw Izquierda
 Indice_mov_Derecha defw Derecha
 Indice_mov_Abajo defw Abajo
 Indice_mov_Arriba defw Arriba
-Indice_mov_Badsat2 defw Escaloncitos_derecha_arriba
-Indice_mov_Badsat3 defw Escaloncitos_izquierda
-Indice_mov_Badsat4 defw Escaloncitos_izquierda_arriba
+Indice_mov_Escaloncitos_derecha_arriba defw Escaloncitos_derecha_arriba
+Indice_mov_Escaloncitos_derecha_abajo defw Escaloncitos_derecha_abajo
+Indice_mov_Escaloncitos_izquierda_arriba defw Escaloncitos_izquierda_arriba
+Indice_mov_Onda_senoidal defw Onda_senoidal
 
 Movimiento ld a,(Contador_db_mov)                                      ; Hemos iniciado la cadena de movimiento ?. Si (Contador_db_mov) aún es "0" hay que inicializarlo._
     and a                                                       ; _Para hacerlo, hemos de fijar antes (Puntero_mov). 
