@@ -154,7 +154,7 @@ Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta column
 Puntero_store_entidades defw 0
 Puntero_restore_entidades defw 0
 Indice_restore defw 0
-Numero_de_entidades db 5								; Nº de objetos en pantalla, (contando con Amadeus).
+Numero_de_entidades db 3								; Nº de objetos en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_

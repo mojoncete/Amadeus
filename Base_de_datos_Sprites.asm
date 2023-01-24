@@ -7,8 +7,8 @@ Indice_de_entidades									; 52 Bytes por entidad.
 
 	defw Entidad_1
 	defw Entidad_2
-	defw Entidad_3
-	defw Entidad_4
+;	defw Entidad_3
+;	defw Entidad_4
 	defw Amadeus_db
 ;	...
 ;	...
