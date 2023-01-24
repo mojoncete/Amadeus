@@ -50,7 +50,7 @@ Album_de_fotos equ $7000								; En (Album_de_fotos) vamos a ir almacenando los
 
 Filas db 2												; Filas. [DRAW]
 Columns db 2  											; Nº de columnas. [DRAW]
-Posicion_actual defw $0000								; Dirección actual del Sprite. [DRAW]
+Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
 Puntero_objeto defw 0									; Donde están los datos para pintar el Sprite.
 CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos. Si el valor es negativo,_
 ; 														; _ estamos desplazados hacia la izquierda y si es positivo, hacia la derecha.
@@ -143,19 +143,18 @@ Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado
 ; 														; _(Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
 Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta columna se modifica (Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
 
+; 52 Bytes por entidad.
+; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
+;					         		---------;      ;---------
+
 
 ; Variables de funcionamiento, (No incluidas en base de datos de entidades), a partir de aquí!!!!!
-
 ; Gestión de ENTIDADES.
 
 Puntero_store_entidades defw 0
 Puntero_restore_entidades defw 0
 Indice_restore defw 0
-
-; 58 Bytes por entidad.
-; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
-
-Numero_de_entidades db 2								; Nº de objetos en pantalla, (contando con Amadeus).
+Numero_de_entidades db 5								; Nº de objetos en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -212,9 +211,6 @@ START ld sp,$ffff
 	call Guarda_foto_registros
 	call Store_Restore_entidades 				    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_entidades) en la siguiente.
 	pop bc
-
-	jr $
-
 	djnz 1B  											; Decremento el contador de entidades.
 
 ; Volvemos a situar los punteros STORE/RESTORE de entidades en la 1ª entidad.
@@ -450,18 +446,19 @@ Store_Restore_entidades
  	push bc
 
 ;	STORE !!!!!
+;	Guarda lo que hay en Draw en la correspondiente `Entidad´.
 
 	ld hl,Filas
 	ld de,(Puntero_store_entidades) 					; Puntero que se desplaza por las distintas entidades.
-	ld bc,58
+	ld bc,52
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
-;	Incrementa STORE y ejecuta RESTORE !!!!! 
+;	Incrementa el puntero STORE. Guarda los datos de `Entidad´+1 en Draw, (Puntero RESTORE).
 
 	ld hl,(Puntero_restore_entidades)
 	ld (Puntero_store_entidades),hl 					; Situamos (Puntero_store_entidades) en la 2ª entidad.
 	ld de,Filas 										; Hemos RECUPERADO los parámetros de la 2ª entidad de su base de datos.
-	ld bc,58
+	ld bc,52
 	ldir
 
 ;	Incrementa RESTORE !!!!! 
@@ -490,7 +487,7 @@ Restore_Primera_entidad push hl
  	push bc
 	ld hl,(Puntero_store_entidades)						; (Puntero_store_entidades) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,58
+	ld bc,52
 	ldir
 	pop bc
 	pop de
