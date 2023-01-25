@@ -7,9 +7,8 @@ Indice_de_entidades									; 52 Bytes por entidad.
 
 	defw Entidad_1
 	defw Entidad_2
-;	defw Entidad_3
-;	defw Entidad_4
-	defw Amadeus_db
+	defw Entidad_3
+	defw Entidad_4
 ;	...
 ;	...
 ;	+ entidades ...
@@ -20,7 +19,7 @@ Indice_de_entidades									; 52 Bytes por entidad.
 ; ---------- ---------- ---------- ---------- ----------
 
 Amadeus_db db 2,2									; (Filas) / (Columns).
-	defw 0 											; (Posicion_actual).
+	defw 0	 										; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
 	db 0,0,0										; (CTRL_DESPLZ) / (Coordenada_X) / (Coordenada_Y).
 

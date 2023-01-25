@@ -17,7 +17,7 @@
 ; ----- ----- ----- ----- -----
 
 	include "Sprites_e_indices.asm"
-	include "Base_de_datos_Sprites.asm"
+	include "Entidades.asm"
 
 ; ******************************************************************************************************************************************************************************************
 ; Constantes. 
@@ -197,13 +197,17 @@ START ld sp,$ffff
 
 	call Pulsa_ENTER
 
+	ld hl,Numero_de_entidades
+	ld b,(hl)
+;	inc b
+;	dec b
+;	jr z,3F												; Si no hay entidades, cargamos AMADEUS.
+
 ;	Cada vez que iniciamos una entidad, hay que hacer una llamada a (Inicia_sprite). Sólo al iniciar!!!!!
 ;   Inicialmente tengo cargada la 1ª entidad en DRAW.	
 ;	Pintamos el resto de entidades:
 
 	call Inicia_punteros_de_entidades
-	ld hl,Numero_de_entidades
-	ld b,(hl)
 
 1 push bc  												; Guardo el contador de entidades.
  	call Inicia_Puntero_objeto
@@ -212,6 +216,13 @@ START ld sp,$ffff
 	call Store_Restore_entidades 				    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_entidades) en la siguiente.
 	pop bc
 	djnz 1B  											; Decremento el contador de entidades.
+
+; 	Amadeus.
+
+;3 call Restore_Amadeus
+;	call Draw
+;	jr $		;! No vamos a ejecutar DRAW con Amadeus, No dispone de recolocación!!!!!!!!!!!!!!			 
+
 
 ; Volvemos a situar los punteros STORE/RESTORE de entidades en la 1ª entidad.
 
@@ -492,6 +503,38 @@ Restore_Primera_entidad push hl
 	pop bc
 	pop de
 	pop hl
+	ret
+
+; **************************************************************************************************
+;
+;	25/01/23
+;
+;	Restore_Amadeus
+;
+;	Almacenamos en su base de datos, los parámetros de la entidad contenida en DRAW y cargamos los_
+;	_ parámetros de AMADEUS. 
+
+Restore_Amadeus	push hl 
+	push de
+ 	push bc
+
+;	STORE !!!!!
+;	Guarda lo que hay en Draw en la correspondiente `Entidad´.
+
+	ld hl,Filas
+	ld de,(Puntero_store_entidades) 					; Puntero que se desplaza por las distintas entidades.
+	ld bc,52
+	ldir												; Hemos GUARDADO los parámetros de la entidad cargada en DRAW en su base de datos.
+
+	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
+	ld de,Filas
+	ld bc,52
+	ldir
+
+	pop bc
+	pop de
+	pop hl
+
 	ret
 
 ; *************************************************************************************************************************************************************
