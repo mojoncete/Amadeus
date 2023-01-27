@@ -154,7 +154,7 @@ Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta column
 Puntero_store_entidades defw 0
 Puntero_restore_entidades defw 0
 Indice_restore defw 0
-Numero_de_entidades db 0								; Nº de objetos en pantalla, (contando con Amadeus).
+Numero_de_entidades db 2								; Nº de objetos en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -220,9 +220,11 @@ START ld sp,$ffff
 ; 	Amadeus.
 
 3 call Restore_Amadeus
-	call Draw
-	jr $		;! No vamos a ejecutar DRAW con Amadeus, No dispone de recolocación!!!!!!!!!!!!!!			 
-
+	call Prepara_draw
+	call calcula_CColumnass
+	call Calcula_puntero_de_impresion					; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
+	call Define_rutina_de_impresion
+	call Guarda_foto_registros
 
 ; Volvemos a situar los punteros STORE/RESTORE de entidades en la 1ª entidad.
 
@@ -230,6 +232,7 @@ START ld sp,$ffff
 	call Restore_Primera_entidad
 
 	ld a,(Numero_de_entidades)
+	inc a
 	ld (Numero_de_malotes),a
 
 2 ei
@@ -276,7 +279,20 @@ Frame
 	pop bc
 	djnz 2B
 
-	call Inicia_punteros_de_entidades
+; ----- 27/1/23
+
+	call Restore_Amadeus
+	call Mov_obj
+	ld a,(Ctrl_0)
+	bit 4,a
+	jr z,3F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
+    call Borra_Pinta_obj								; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!!!
+	ld hl,Ctrl_0
+    res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
+
+; -----
+
+3 call Inicia_punteros_de_entidades
 	call Restore_Primera_entidad
 	call Calcula_numero_de_malotes 
 
