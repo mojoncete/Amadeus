@@ -154,7 +154,7 @@ Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta column
 Puntero_store_entidades defw 0
 Puntero_restore_entidades defw 0
 Indice_restore defw 0
-Numero_de_entidades db 3								; Nº de objetos en pantalla, (contando con Amadeus).
+Numero_de_entidades db 0								; Nº de objetos en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -199,9 +199,9 @@ START ld sp,$ffff
 
 	ld hl,Numero_de_entidades
 	ld b,(hl)
-;	inc b
-;	dec b
-;	jr z,3F												; Si no hay entidades, cargamos AMADEUS.
+	inc b
+	dec b
+	jr z,3F												; Si no hay entidades, cargamos AMADEUS.
 
 ;	Cada vez que iniciamos una entidad, hay que hacer una llamada a (Inicia_sprite). Sólo al iniciar!!!!!
 ;   Inicialmente tengo cargada la 1ª entidad en DRAW.	
@@ -219,9 +219,9 @@ START ld sp,$ffff
 
 ; 	Amadeus.
 
-;3 call Restore_Amadeus
-;	call Draw
-;	jr $		;! No vamos a ejecutar DRAW con Amadeus, No dispone de recolocación!!!!!!!!!!!!!!			 
+3 call Restore_Amadeus
+	call Draw
+	jr $		;! No vamos a ejecutar DRAW con Amadeus, No dispone de recolocación!!!!!!!!!!!!!!			 
 
 
 ; Volvemos a situar los punteros STORE/RESTORE de entidades en la 1ª entidad.
@@ -517,14 +517,6 @@ Restore_Primera_entidad push hl
 Restore_Amadeus	push hl 
 	push de
  	push bc
-
-;	STORE !!!!!
-;	Guarda lo que hay en Draw en la correspondiente `Entidad´.
-
-	ld hl,Filas
-	ld de,(Puntero_store_entidades) 					; Puntero que se desplaza por las distintas entidades.
-	ld bc,52
-	ldir												; Hemos GUARDADO los parámetros de la entidad cargada en DRAW en su base de datos.
 
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Filas
