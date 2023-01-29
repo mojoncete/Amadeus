@@ -220,11 +220,10 @@ START ld sp,$ffff
 ; 	Amadeus.
 
 3 call Restore_Amadeus
-	call Prepara_draw
-	call calcula_CColumnass
-	call Calcula_puntero_de_impresion					; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
-	call Define_rutina_de_impresion
+	call Inicia_Puntero_objeto
+	call Draw
 	call Guarda_foto_registros
+	call Store_Amadeus
 
 ; Volvemos a situar los punteros STORE/RESTORE de entidades en la 1ª entidad.
 
@@ -257,6 +256,9 @@ Frame
 ;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
     ld a,(Numero_de_entidades)
     ld b,a
+	and a
+	jr z,4F												; Entidades="0". Saltamos a Amadeus.
+
 2 push bc
 	call Mov_obj										; MOVEMOS y decrementamos (Numero_de_malotes)
 	ld a,(Ctrl_0)
@@ -271,13 +273,14 @@ Frame
 	pop bc
 	djnz 2B
 
-	call Restore_Amadeus
+4 call Restore_Amadeus
 	call Mov_Amadeus
 	ld a,(Ctrl_0)
 	bit 4,a
 	jr z,3F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
  	call Repone_pintar
-	call Guarda_foto_Amadeus
+	call Draw 											
+	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
 
 3 ld hl,Ctrl_0
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
@@ -290,6 +293,7 @@ Frame
 	call Inicia_punteros_de_entidades
 	call Restore_Primera_entidad
 	call Calcula_numero_de_malotes 
+
 	ld a,0
 	out ($fe),a  
 	ret
@@ -418,10 +422,12 @@ Inicia_punteros_de_entidades ld hl,Indice_de_entidades
 
 ; -------------------------------------------------------------------------------------------------------------
 ;
-; 7/1/23 
+; 29/1/23 
 ;
 
-Calcula_numero_de_malotes ld hl,(Stack_snapshot)
+Calcula_numero_de_malotes 
+
+	ld hl,(Stack_snapshot)
 	xor a
 	ld h,a
 	ld a,l

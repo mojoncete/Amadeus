@@ -19,13 +19,13 @@ Indice_de_entidades									; 52 Bytes por entidad.
 ; ---------- ---------- ---------- ---------- ----------
 
 Amadeus_db db 2,2									; (Filas) / (Columns).
-	defw $50d0	 									; (Posicion_actual).
-	defw $8310 										; (Puntero_objeto).
-	db 0,$10,$16									; (CTRL_DESPLZ) / (Coordenada_X) / (Coordenada_Y).
+	defw 0		 									; (Posicion_actual).
+	defw 0	 										; (Puntero_objeto).
+	db 0,0,0										; (CTRL_DESPLZ) / (Coordenada_X) / (Coordenada_Y).
 
 	db %00000101									; (Attr).
 	defw Indice_Amadeus								; (Indice_Sprite).		
-	defw $8300	 									; (Puntero_DESPLZ).
+	defw 0		 									; (Puntero_DESPLZ).
 	defw $50d0										; (Posicion_inicio).
 	db 4 											; (Cuad_objeto).
 
@@ -41,12 +41,12 @@ Amadeus_db db 2,2									; (Filas) / (Columns).
 	defw 0											;	" " " " " " "
 	db 0,0,0										;	" " " " " " "
 
-	db $40,0										; (Ctrl_0) / (Obj_dibujado).
+	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 
-	defw 0,$aff3 									; (Puntero_indice_mov) / (Puntero_mov).
+	defw 0,0	 									; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).
 
-	db 2 											; (Columnas).									
+	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
 	db 0											; (Limite_vertical).
 
