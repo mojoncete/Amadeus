@@ -230,7 +230,6 @@ START ld sp,$ffff
 
 	call Inicia_punteros_de_entidades 
 	call Restore_Primera_entidad
-
 	ld a,(Numero_de_entidades)
 	inc a
 	ld (Numero_de_malotes),a
@@ -247,9 +246,7 @@ Frame
 
     ld a,7
     out ($fe),a
-
 	call Extrae_foto_registros 							; Pintamos el fotograma anterior.
-
     ld a,1
     out ($fe),a
 
@@ -260,67 +257,58 @@ Frame
 ;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
     ld a,(Numero_de_entidades)
     ld b,a
-
 2 push bc
-
 	call Mov_obj										; MOVEMOS y decrementamos (Numero_de_malotes)
-
- 	ld a,(Ctrl_0)
+	ld a,(Ctrl_0)
 	bit 4,a
 	jr z,1F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
-
     call Borra_Pinta_obj								; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!!!
-
-	ld hl,Ctrl_0
+1 ld hl,Ctrl_0
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
-
-1 call Store_Restore_entidades
-
+	xor a
+	ld (Obj_dibujado),a
+	call Store_Restore_entidades
 	pop bc
 	djnz 2B
 
-; ----- 27/1/23
-
 	call Restore_Amadeus
-	call Mov_obj
+	call Mov_Amadeus
 	ld a,(Ctrl_0)
 	bit 4,a
 	jr z,3F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
-    call Borra_Pinta_obj								; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!!!
-	ld hl,Ctrl_0
+ 	call Repone_pintar
+	call Guarda_foto_Amadeus
+
+3 ld hl,Ctrl_0
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
+	xor a
+	ld (Obj_dibujado),a
+	call Store_Amadeus
 
 ; -----
 
-3 call Inicia_punteros_de_entidades
+	call Inicia_punteros_de_entidades
 	call Restore_Primera_entidad
 	call Calcula_numero_de_malotes 
-
 	ld a,0
 	out ($fe),a  
-
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
+;	29/1/23
+
 Mov_obj 
 
-; En este punto Draw tiene cargado los 50 bytes, (parámetros), de la primera entidad de Indice_de_entidades.
+; En este punto Draw tiene cargado los 52 bytes, (parámetros), de la primera entidad de Indice_de_entidades.
 
 	xor a
 	ld (Obj_dibujado),a
     call Prepara_var_pintado_borrado                    ; Almaceno las `VARIABLES DE BORRADO´. de la entidad almacenada en DRAW en (Variables_de_borrado).
 ;														; Obj_dibujado="0".
-; Movemos Amadeus o enemigos...
+; Movemos Entidades malignas.
 
-	ld a,(Ctrl_0) 										; Detectamos si el Sprite que vamos a desplazar es AMADEUS,_
-	bit 6,a 											; _si es así, leeremos el teclado para detectar la dirección.
-	call nz,Movimiento_Amadeus 							; (Mov_right), (Mov_left).
-
-	ld a,(Ctrl_0)
-	bit 6,a	
-	call z,Movimiento									; Desplazamos el objeto. MOVEMOS !!!!!
-
+	call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
 	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
 	bit 4,a
 	ret z
@@ -330,21 +318,51 @@ Mov_obj
 	ld a,1 				 								; Cambiamos (Obj_dibujado) a "1" para poder almacenar el contenido de DRAW en_  
 	ld (Obj_dibujado),a 								; _(Variables_de_pintado).					
     call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
+    call Repone_borrar                                  ; Si ha habido movimiento de la entidad, borraremos el FRAME anterior.
+	call Guarda_foto_Amadeus 							; Guarda la imagen de la "ENTIDAD a borrar", pues ha habido movimiento_
+	ret													; _de la misma.
 
-    call Repone_borrar                                  
+; --------------------------------------------------------------------------------------------------------------
+;
+;	29/1/23
 
-; Si ha habido movimiento de la entidad, borraremos el FRAME anterior.
+Mov_Amadeus 
 
-	call Prepara_draw
+	xor a
+	ld (Obj_dibujado),a
+    call Prepara_var_pintado_borrado                    ; Almaceno las `VARIABLES DE BORRADO´ de Amadeus, (cargadas en DRAW), en (Variables_de_borrado).
+;														; Obj_dibujado="0".
+; Movemos Amadeus.
+
+	call Movimiento_Amadeus 							; MOVEMOS AMADEUS.
+	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
+	bit 4,a
+	ret z
+
+; ---------
+
+	ld a,1 				 								; Cambiamos (Obj_dibujado) a "1" para poder almacenar el contenido de DRAW en_  
+	ld (Obj_dibujado),a 								; _(Variables_de_pintado).					
+    call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
+    call Repone_borrar                                  ; Si ha habido movimiento de la entidad, borraremos el FRAME anterior.
+	call Guarda_foto_Amadeus 							; Guarda la imagen de la "ENTIDAD a borrar", pues ha habido movimiento_
+	ret													; _de la misma.
+
+; --------------------------------------------------------------------------------------------------------------
+;
+;	29/01/23
+;
+;	(Guardo la foto de Amadeus sin ejecutar DRAW, "no RECOLOCACIÓN").
+
+Guarda_foto_Amadeus	call Prepara_draw
 	call calcula_CColumnass
 	call Calcula_puntero_de_impresion					; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
 	call Define_rutina_de_impresion
 	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
-
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
-;
+
 Borra_Pinta_obj call Repone_pintar
 	call Draw 											
 	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
@@ -448,11 +466,9 @@ Inicia_Puntero_objeto ld hl,(Indice_Sprite)
 	ld bc,(Puntero_objeto)
 	sub hl,bc
 	ret nz
-
 	ld hl,Ctrl_0
 	set 6,(hl) 											; Cuando activamos Amadeus lo indicamos alzando el bit6 de (Ctrl_0). Esta información la utilizaremos para limitar los movimientos_
-
- 	ret 												; _de nuestra nave en los extremos.
+	ret 												; _de nuestra nave en los extremos.
 
 ; *************************************************************************************************************************************************************
 ;
@@ -496,11 +512,9 @@ Store_Restore_entidades
 	ld (Indice_restore),hl
     call Extrae_address
     ld (Puntero_restore_entidades),hl
-
 	pop bc
 	pop de
 	pop hl
-
 	ret
 
 ; **************************************************************************************************
@@ -527,26 +541,44 @@ Restore_Primera_entidad push hl
 ;
 ;	Restore_Amadeus
 ;
-;	Almacenamos en su base de datos, los parámetros de la entidad contenida en DRAW y cargamos los_
-;	_ parámetros de AMADEUS. 
+;	Cargamos en DRAW los parámetros de Amadeus.
+;	
 
 Restore_Amadeus	push hl 
 	push de
  	push bc
-
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Filas
 	ld bc,52
 	ldir
-
 	pop bc
 	pop de
 	pop hl
-
 	ret
 
 ; *************************************************************************************************************************************************************
 ;
+;	29/01/23
+;
+;	Store_Amadeus
+;
+;	Almacenamos los parámetros de Amadeus, contenidos en DRAW en su base de datos.
+;	
+
+Store_Amadeus push hl 
+	push de
+ 	push bc
+	ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
+	ld de,Amadeus_db
+	ld bc,52
+	ldir
+	pop bc
+	pop de
+	pop hl
+	ret
+
+; **************************************************************************************************
+
 ; Teclado.
 
 Pulsa_ENTER ld a,$bf 									; Esperamos la pulsación de la tecla "ENTER".
@@ -616,7 +648,6 @@ Pinta_FILAS ld hl,$4010
 ;	pop hl
 ;	inc l 
 ;	djnz 2B
-
 	ld b,3
     ld hl,$4700
 3 call Bucle_1

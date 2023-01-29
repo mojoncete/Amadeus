@@ -137,6 +137,7 @@ Mov_right ld hl,Ctrl_0
 ;
 ; Perfiles de velocidad
 ;
+
 6 ld a,(CTRL_DESPLZ) 												; Velocidad 1
 	cp $fe 															
 	jr nz,8F
@@ -377,7 +378,6 @@ DESPLZ_IZQ
 	ld hl,Ctrl_0 													; Indica que nos hemos desplazado a la izquierda
 	res 7,(hl)
 	ret
-
 Desplaza_izquierda ld a,(Vel_left)
 	ld b,a
 	ld hl,(Puntero_DESPLZ)
@@ -416,6 +416,7 @@ modifica_parametros_1er_DESPLZ ld a,(CTRL_DESPLZ) 				  ; Incrementamos el nª d
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
+
 Ciclo_completo_2 ld a,(CTRL_DESPLZ)
 	cp $f8
 	jr z,1F 												        ; Salimos de la rutina si no hemos completado 8 o más desplazamientos.
