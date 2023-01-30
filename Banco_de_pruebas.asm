@@ -154,7 +154,7 @@ Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta column
 Puntero_store_entidades defw 0
 Puntero_restore_entidades defw 0
 Indice_restore defw 0
-Numero_de_entidades db 2								; Nº de objetos en pantalla, (contando con Amadeus).
+Numero_de_entidades db 1								; Nº de objetos en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -209,6 +209,8 @@ START ld sp,$ffff
 
 	call Inicia_punteros_de_entidades
 
+;	INICIA ENTIDADES!!!!!
+
 1 push bc  												; Guardo el contador de entidades.
  	call Inicia_Puntero_objeto
 	call Draw
@@ -217,7 +219,7 @@ START ld sp,$ffff
 	pop bc
 	djnz 1B  											; Decremento el contador de entidades.
 
-; 	Amadeus.
+; 	INICIA AMADEUS!!!!!
 
 3 call Restore_Amadeus
 	call Inicia_Puntero_objeto
@@ -422,12 +424,13 @@ Inicia_punteros_de_entidades ld hl,Indice_de_entidades
 
 ; -------------------------------------------------------------------------------------------------------------
 ;
-; 29/1/23 
+; 30/1/23 
 ;
 
-Calcula_numero_de_malotes 
-
-	ld hl,(Stack_snapshot)
+Calcula_numero_de_malotes ld hl,(Stack_snapshot)
+	ld a,l
+	and a
+	jr z,3F
 	xor a
 	ld h,a
 	ld a,l
@@ -437,7 +440,7 @@ Calcula_numero_de_malotes
 	jr 1B
 2 inc h
 	ld a,h
-	ld (Numero_de_malotes),a
+3 ld (Numero_de_malotes),a
 	ret
 
 ; *************************************************************************************************************************************************************

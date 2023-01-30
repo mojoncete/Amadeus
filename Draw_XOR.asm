@@ -694,7 +694,14 @@ PreviousScan ld a,h
 ;
 ;	15/1/23
 
-Extrae_foto_registros ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
+Extrae_foto_registros 
+
+	ld a,(Numero_de_malotes)
+	and a
+	ret z
+
+
+	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
 	ld sp,Album_de_fotos
 
 2 pop iy																	; (Puntero_objeto) en IY.
