@@ -1,9 +1,9 @@
 
 ; Base de datos de entidades e Índice.
 ;
-; 05/11/22
+; 31/01/23
 
-Indice_de_entidades									; 52 Bytes por entidad.
+Indice_de_entidades									; 56 Bytes por entidad.
 
 	defw Entidad_1
 	defw Entidad_2
@@ -24,8 +24,12 @@ Amadeus_db db 2,2									; (Filas) / (Columns).
 	db 0,0,0										; (CTRL_DESPLZ) / (Coordenada_X) / (Coordenada_Y).
 
 	db %00000101									; (Attr).
-	defw Indice_Amadeus								; (Indice_Sprite).		
-	defw 0		 									; (Puntero_DESPLZ).
+
+	defw Indice_Amadeus								; (Indice_Sprite_der).		
+	defw Indice_Amadeus								; (Indice_Sprite_izq).
+	defw 0		 									; (Puntero_DESPLZ_der).
+	defw 0											; (Puntero_DESPLZ_izq).
+
 	defw $50d0										; (Posicion_inicio).
 	db 4 											; (Cuad_objeto).
 
@@ -58,8 +62,12 @@ Entidad_1 db 0,0									; (Filas) / (Columns).
 	db 0,0,0 									    ; (CTRL_DESPLZ) / (Coordenada_X) / (Coordenada_Y).
 
 	db %00000000 									; (Attr).
-	defw 0											; (Indice_Sprite).
-	defw 0											; (Puntero_DESPLZ).
+
+	defw 0											; (Indice_Sprite_der).
+	defw 0											; (Indice_Sprite_izq).
+	defw 0											; (Puntero_DESPLZ_der).
+	defw 0											; (Puntero_DESPLZ_izq).
+
 	defw 0											; (Posicion_inicio).
 	db 0											; (Cuad_objeto).
 
@@ -92,8 +100,12 @@ Entidad_2 db 2,2		                            ; (Filas) / (Columns).
 	db 0,0,0                                        ; (CTRL_DESPLZ) / (Coordenada_X) / (Coordenada_Y).
 
 	db %00000010									; (Attr).
-	defw Indice_Badsat_izq	                        ; (Indice_Sprite).
-	defw 0                                          ; (Puntero_DESPLZ).
+
+	defw Indice_Badsat_der							; (Indice_Sprite_der).
+	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
+	defw 0											; (Puntero_DESPLZ_der).
+	defw 0											; (Puntero_DESPLZ_izq).
+
 	defw $477e                                      ; (Posicion_inicio).
 	db 2											; (Cuad_objeto).
 
@@ -126,8 +138,13 @@ Entidad_3 db 2,2                                 	; (Filas) / (Columns).
 	db 0,0,0                                        ; (CTRL_DESPLZ) / (Coordenada_X) / (Coordenada_Y).
 
 	db %00000100									; (Attr).
-	defw Indice_Badsat_der                          ; (Indice_Sprite).
-	defw 0                                          ; (Puntero_DESPLZ).
+
+	defw Indice_Badsat_der							; (Indice_Sprite_der).
+	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
+
+	defw 0											; (Puntero_DESPLZ_der).
+	defw 0											; (Puntero_DESPLZ_izq).
+
 	defw $47a1                                      ; (Posicion_inicio).
 	db 1											; (Cuad_objeto).
 
@@ -160,8 +177,13 @@ Entidad_4 db 2,2                                  	; (Filas) / (Columns).
 	db 0,0,0                                        ; (CTRL_DESPLZ) / (Coordenada_X) / (Coordenada_Y).
 
 	db %00000001									; (Attr).
-	defw Indice_Badsat_izq                          ; (Indice_Sprite).
-	defw 0                                          ; (Puntero_DESPLZ).
+
+	defw Indice_Badsat_der							; (Indice_Sprite_der).
+	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
+	
+	defw 0											; (Puntero_DESPLZ_der).
+	defw 0											; (Puntero_DESPLZ_izq).
+
 	defw $47be                                      ; (Posicion_inicio).
 	db 0											; (Cuad_objeto).
 

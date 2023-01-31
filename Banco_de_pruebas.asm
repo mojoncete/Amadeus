@@ -75,8 +75,11 @@ Attr db %00000100										; Atributos de la entidad:
 ;			 6 ..... AMARILLO
 ; 			 7 ..... BLANCO
 
-Indice_Sprite defw Indice_Badsat_der
-Puntero_DESPLZ defw 0
+Indice_Sprite_der defw Indice_Badsat_der
+Indice_Sprite_izq defw Indice_Badsat_izq
+Puntero_DESPLZ_der defw 0
+Puntero_DESPLZ_izq defw 0
+
 Posicion_inicio defw $4721								; Dirección de pantalla donde aparece el objeto. [DRAW].
 Cuad_objeto db 1			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
@@ -129,7 +132,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
-Puntero_indice_mov defw Indice_mov_Derecha
+Puntero_indice_mov defw Indice_mov_Derecha_e_izquierda
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0
@@ -180,12 +183,12 @@ Temp_Raster defw $ff00
 ;
 ;	14/11/22	
 
-START ld sp,$ffff
+START ld sp,$ffff										 ; Situamos el inicio de Stack.
 
-	ld a,$a0 
+	ld a,$a0 											 ; Habilitamos el modo 2 de interrupciones y fijamos el salto a $a0ff
 	ld i,a 												 ; Byte alto de la dirección donde se encuentra nuestro vector de interrupciones en el registro I. ($90). El byte bajo será siempre $ff.
 	IM 2 											     ; Habilitamos el modo 2 de INTERRUPCIONES.
-	DI 												 
+	DI 													 										 
 
 	ld a,1
 	out ($fe),a
@@ -266,7 +269,7 @@ Frame
 	ld a,(Ctrl_0)
 	bit 4,a
 	jr z,1F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
-    call Borra_Pinta_obj								; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!!!
+    call Guarda_foto_entidad_a_pintar					; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!!!
 1 ld hl,Ctrl_0
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
 	xor a
@@ -280,11 +283,10 @@ Frame
 	ld a,(Ctrl_0)
 	bit 4,a
 	jr z,3F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
- 	call Repone_pintar
-	call Draw 											
-	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
+	call Guarda_foto_entidad_a_pintar
 
-3 ld hl,Ctrl_0
+
+3 ld hl,Ctrl_0	
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
 	xor a
 	ld (Obj_dibujado),a
@@ -325,7 +327,7 @@ Mov_obj
 	ld (Obj_dibujado),a 								; _(Variables_de_pintado).					
     call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
     call Repone_borrar                                  ; Si ha habido movimiento de la entidad, borraremos el FRAME anterior.
-	call Guarda_foto_Amadeus 							; Guarda la imagen de la "ENTIDAD a borrar", pues ha habido movimiento_
+	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la "ENTIDAD a borrar", pues ha habido movimiento_
 	ret													; _de la misma.
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -351,16 +353,18 @@ Mov_Amadeus
 	ld (Obj_dibujado),a 								; _(Variables_de_pintado).					
     call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
     call Repone_borrar                                  ; Si ha habido movimiento de la entidad, borraremos el FRAME anterior.
-	call Guarda_foto_Amadeus 							; Guarda la imagen de la "ENTIDAD a borrar", pues ha habido movimiento_
-	ret													; _de la misma.
+	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen a borrar de Amadeus, pues ha habido movimiento_
+	ret													; _de la nave.
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	29/01/23
+;	31/01/23
 ;
-;	(Guardo la foto de Amadeus sin ejecutar DRAW, "no RECOLOCACIÓN").
+;	(Guardo la foto de Amadeus sin ejecutar DRAW, "no RECOLOCACIÓN"). IMÁGEN DE AMADEUS A BORRAR.
 
-Guarda_foto_Amadeus	call Prepara_draw
+Guarda_foto_entidad_a_borrar 
+
+	call Prepara_draw
 	call calcula_CColumnass
 	call Calcula_puntero_de_impresion					; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
 	call Define_rutina_de_impresion
@@ -368,13 +372,22 @@ Guarda_foto_Amadeus	call Prepara_draw
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
+;
+;	31/01/23
+;
+;	(Guardo la foto de la entidad ejecutando DRAW, pues ha habido movimiento del Sprite y una posible_
+;   _recolocación. Guarda la IMÁGEN DE LA ENTIDAD A PINTAR. 
 
-Borra_Pinta_obj call Repone_pintar
+Guarda_foto_entidad_a_pintar 
+
+	call Repone_pintar
 	call Draw 											
 	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
+;
+;
 
 Prepara_var_pintado_borrado	ld hl,Filas
 	ld a,(Obj_dibujado)
@@ -386,6 +399,8 @@ Prepara_var_pintado_borrado	ld hl,Filas
 2 ld bc,9
 	ldir
 	ret
+
+; --------------------------------------------------------------------------------------------------------------
 
 Repone_borrar ld hl,Variables_de_borrado
 	ld de,Filas
@@ -399,10 +414,6 @@ Repone_pintar ld hl,Variables_de_pintado
 	ldir
 	ret	
 
-;Prepara_caja_de_borrado ld hl,(Caja_de_DESPLZ)
-;	ld (Caja_de_BORRADO),hl
-;	ret	
-
 ; *************************************************************************************************************************************************************
 ;
 ; 8/1/23
@@ -413,7 +424,9 @@ Repone_pintar ld hl,Variables_de_pintado
 
 ; Destruye HL y DE !!!!!
  
-Inicia_punteros_de_entidades ld hl,Indice_de_entidades
+Inicia_punteros_de_entidades 
+
+	ld hl,Indice_de_entidades
     call Extrae_address
     ld (Puntero_store_entidades),hl
 	ld hl,Indice_de_entidades+2
@@ -460,14 +473,27 @@ Extrae_address ld e,(hl)
 
 ; *************************************************************************************************************************************************************
 ;
-;	21/9/22
+;	31/01/23
+;
+;	Iniciamos (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq). 
+;	Estos punteros señalan al Sprite a pintar tras cada movimiento.
 ;
 ;   Destruye HL y BC !!!!!, 
+;
+;	BIT 7 (Ctrl_0). "1" ..... Derecha.
+;					"0" ..... Izquierda.
 
-Inicia_Puntero_objeto ld hl,(Indice_Sprite)
-	ld (Puntero_DESPLZ),hl
+Inicia_Puntero_objeto 
+
+	ld hl,(Indice_Sprite_der)
+	ld (Puntero_DESPLZ_der),hl
 	call Extrae_address
-	ld (Puntero_objeto),hl 								
+	ld (Puntero_objeto),hl
+
+	ld hl,(Indice_Sprite_izq) 								
+	ld (Puntero_DESPLZ_izq),hl
+;	call Extrae_address
+;	ld (Puntero_objeto),hl
 
 ; Tenemos que activar el bit6 de (Ctrl_0) si el Sprite que hemos cargado es AMADEUS.
 
@@ -502,7 +528,7 @@ Store_Restore_entidades
 
 	ld hl,Filas
 	ld de,(Puntero_store_entidades) 					; Puntero que se desplaza por las distintas entidades.
-	ld bc,52
+	ld bc,56
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
 ;	Incrementa el puntero STORE. Guarda los datos de `Entidad´+1 en Draw, (Puntero RESTORE).
@@ -510,7 +536,7 @@ Store_Restore_entidades
 	ld hl,(Puntero_restore_entidades)
 	ld (Puntero_store_entidades),hl 					; Situamos (Puntero_store_entidades) en la 2ª entidad.
 	ld de,Filas 										; Hemos RECUPERADO los parámetros de la 2ª entidad de su base de datos.
-	ld bc,52
+	ld bc,56
 	ldir
 
 ;	Incrementa RESTORE !!!!! 
@@ -537,7 +563,7 @@ Restore_Primera_entidad push hl
  	push bc
 	ld hl,(Puntero_store_entidades)						; (Puntero_store_entidades) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,52
+	ld bc,56
 	ldir
 	pop bc
 	pop de
@@ -558,7 +584,7 @@ Restore_Amadeus	push hl
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Filas
-	ld bc,52
+	ld bc,56
 	ldir
 	pop bc
 	pop de
@@ -579,7 +605,7 @@ Store_Amadeus push hl
  	push bc
 	ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Amadeus_db
-	ld bc,52
+	ld bc,56
 	ldir
 	pop bc
 	pop de
