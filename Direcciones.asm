@@ -103,7 +103,7 @@ Mov_right ld hl,Ctrl_0
 	bit 7,a
 	jr nz,9F														; Consultamos el último movimiento horizontal del SPRITE.
 	ld hl,CTRL_DESPLZ
-	dec (hl) 														; El último mov. horizontal ha sido a IZQUIERDA, corregimos (CTRL_DESPLZ).
+	dec (hl)														; El último mov. horizontal ha sido a IZQUIERDA, corregimos (CTRL_DESPLZ).
 
 9 ld a,(Ctrl_0)
 	bit 6,a
@@ -208,6 +208,7 @@ Desplaza_derecha ld a,(Vel_right)
 	ld a,(Vel_right)
 	ld b,a
 	ld hl,(Puntero_DESPLZ_izq)
+
 1 inc hl
 	inc hl
 	djnz 1B 														; (Vel_right) indica cuantas posiciones desplazaremos el (Puntero_DESPLZ)_
@@ -278,8 +279,12 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 
 2 ld hl,(Indice_Sprite_der)
 	ld (Puntero_DESPLZ_der),hl
+
 	call Extrae_address
 	ld (Puntero_objeto),hl
+
+	ld hl,(Indice_Sprite_izq)
+	ld (Puntero_DESPLZ_izq),hl
 
 3 ret
 
@@ -292,9 +297,6 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 ; 	Desplaza el Sprite (x)Pixels a la izquierda.
 ;
 Mov_left 
-
-
-;	jr $
 
 	ld hl,Ctrl_0
 	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
@@ -321,9 +323,10 @@ Mov_left
 10 ld a,(Ctrl_0)
 	bit 7,a
 	jr z,11F														; Consultamos el último movimiento horizontal del SPRITE.
+
 	ld hl,CTRL_DESPLZ
 	inc (hl) 														; El último mov. horizontal ha sido a IZQUIERDA, corregimos (CTRL_DESPLZ).
-	
+
 11 ld a,(Coordenada_X)	 	 								
 	and a 															
 	jr nz,8F
@@ -466,8 +469,13 @@ Ciclo_completo_2 ld a,(CTRL_DESPLZ)
 
 2 ld hl,(Indice_Sprite_izq)
 	ld (Puntero_DESPLZ_izq),hl
+
 	call Extrae_address
 	ld (Puntero_objeto),hl
+
+	ld hl,(Indice_Sprite_der)
+	ld (Puntero_DESPLZ_der),hl
+
 3 ret
 
 ; ---------- ---------- ---------- ---------- ---------- ----------

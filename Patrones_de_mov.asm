@@ -13,6 +13,8 @@
 ;
 ;   % abajo,arriba,derecha,izquierda ..... nº de repeticiones del movimiento.
 
+
+
 Izquierda db 2,%00010000,0
 Derecha db 2,%00100000,0
 Abajo db 2,%10000000,0
@@ -22,13 +24,13 @@ Escaloncitos_izquierda_arriba db 3,%00010100,%01000100,0
 Escaloncitos_derecha_arriba db 3,%00100100,%01000100,0
 Escaloncitos_derecha_abajo db 3,%00100100,%10000100,0
 Escaloncitos_izquierda_abajo db 3,%00010100,%10000100,0                ; El "0"; último .db indica que ya hemos terminado de ejecutar todas las cadenas de movimiento.
-Onda_senoidal db 44,%01000100,%01100000,%01000010,%01100000,%01000010,%01100000,%01000000,%01100011
+Onda_senoidal db 43,%01000100,%01100000,%01000010,%01100000,%01000010,%01100000,%01000000,%01100011
     db %00100010,%01100000,%00100101,%10100000,%00100010,%10100011,%10000000,%10100000
     db %10000010,%10100000,%10000010,%10100000,%10000100,%10100000,%10000011,%10100000
     db %10000010,%10100000,%10000010,%10100000,%10000000,%10100011,%00100010,%10100000
     db %00100101,%01100000,%00100010,%01100011,%01000000,%01100000,%01000010,%01100000
-    db %01000010,%01100000,%01000100,0
-Derecha_e_izquierda db 6,%00101111,%00101111,%00101111,%00101001,%00011110,0
+    db %01000010,%01100000,%01000100
+Derecha_e_izquierda db 11,%00101111,%00101111,%00101111,%00101111,%00101111,%00011111,%00011111,%00011111,%00011111,%000111110,0
 
 
 Indice_mov_Derecha_e_izquierda defw Derecha_e_izquierda
@@ -42,7 +44,7 @@ Indice_mov_Escaloncitos_izquierda_arriba defw Escaloncitos_izquierda_arriba
 Indice_mov_Escaloncitos_izquierda_abajo defw Escaloncitos_izquierda_abajo
 Indice_mov_Onda_senoidal defw Onda_senoidal
 
-Movimiento ld a,(Contador_db_mov)                                      ; Hemos iniciado la cadena de movimiento ?. Si (Contador_db_mov) aún es "0" hay que inicializarlo._
+Movimiento ld a,(Contador_db_mov)                               ; Hemos iniciado la cadena de movimiento ?. Si (Contador_db_mov) aún es "0" hay que inicializarlo._
     and a                                                       ; _Para hacerlo, hemos de fijar antes (Puntero_mov). 
     jr z,1F
     jr Decoder                                                  ; Saltamos a [Decoder] si ya hemos iniciado la cadena.

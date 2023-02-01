@@ -435,7 +435,7 @@
 123+  8467
 124+  8467 00 00        	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 125+  8469
-126+  8469 72 90 00 00  	defw Indice_mov_Escaloncitos_izquierda_abajo,0  ; (Puntero_indice_mov) / (Puntero_mov).
+126+  8469 82 90 00 00  	defw Indice_mov_Escaloncitos_izquierda_abajo,0  ; (Puntero_indice_mov) / (Puntero_mov).
 127+  846D 00 00 00     	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).
 128+  8470
 129+  8470 00           	db 0 											; (Columnas).
@@ -474,7 +474,7 @@
 162+  849F
 163+  849F 00 00        	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 164+  84A1
-165+  84A1 74 90 00 00  	defw Indice_mov_Onda_senoidal,0					; (Puntero_indice_mov) / (Puntero_mov).
+165+  84A1 84 90 00 00  	defw Indice_mov_Onda_senoidal,0					; (Puntero_indice_mov) / (Puntero_mov).
 166+  84A5 00 00 00     	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).
 167+  84A8
 168+  84A8 00           	db 0 											; (Columnas).
@@ -513,7 +513,7 @@
 201+  84D7
 202+  84D7 00 00        	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 203+  84D9
-204+  84D9 64 90 00 00  	defw Indice_mov_Izquierda,0                     ; (Puntero_indice_mov) / (Puntero_mov).
+204+  84D9 74 90 00 00  	defw Indice_mov_Izquierda,0                     ; (Puntero_indice_mov) / (Puntero_mov).
 205+  84DD 00 00 00     	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).
 206+  84E0
 207+  84E0 00           	db 0 											; (Columnas).
@@ -583,8 +583,8 @@
  80   84F2 00 00        Puntero_DESPLZ_der defw 0
  81   84F4 00 00        Puntero_DESPLZ_izq defw 0
  82   84F6
- 83   84F6 21 47        Posicion_inicio defw $4721								; Dirección de pantalla donde aparece el objeto. [DRAW].
- 84   84F8 01           Cuad_objeto db 1			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+ 83   84F6 3E 47        Posicion_inicio defw $473e								; Dirección de pantalla donde aparece el objeto. [DRAW].
+ 84   84F8 02           Cuad_objeto db 2			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
  85   84F9
  86   84F9              ; Variables de objeto. (Características).
  87   84F9
@@ -635,7 +635,7 @@
 132   8511
 133   8511              ; Movimiento.
 134   8511
-135   8511 62 90        Puntero_indice_mov defw Indice_mov_Derecha_e_izquierda
+135   8511 74 90        Puntero_indice_mov defw Indice_mov_Izquierda
 136   8513 00 00        Puntero_mov defw 0
 137   8515 00           Contador_db_mov db 0
 138   8516 00           Incrementa_puntero db 0
@@ -819,7 +819,7 @@
 316   85E3              ;														; Obj_dibujado="0".
 317   85E3              ; Movemos Entidades malignas.
 318   85E3
-319   85E3 CD 76 90     	call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
+319   85E3 CD 86 90     	call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
 320   85E6 3A 0F 85     	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
 321   85E9 CB 67        	bit 4,a
 322   85EB C8           	ret z
@@ -990,13 +990,13 @@
 487   8696
 488   8696 2A EE 84     	ld hl,(Indice_Sprite_der)
 489   8699 22 F2 84     	ld (Puntero_DESPLZ_der),hl
-490   869C CD 90 86     	call Extrae_address
-491   869F 22 E8 84     	ld (Puntero_objeto),hl
-492   86A2
-493   86A2 2A F0 84     	ld hl,(Indice_Sprite_izq)
-494   86A5 22 F4 84     	ld (Puntero_DESPLZ_izq),hl
-495   86A8              ;	call Extrae_address
-496   86A8              ;	ld (Puntero_objeto),hl
+490   869C              ;	call Extrae_address
+491   869C              ;	ld (Puntero_objeto),hl
+492   869C
+493   869C 2A F0 84     	ld hl,(Indice_Sprite_izq)
+494   869F 22 F4 84     	ld (Puntero_DESPLZ_izq),hl
+495   86A2 CD 90 86     	call Extrae_address
+496   86A5 22 E8 84     	ld (Puntero_objeto),hl
 497   86A8
 498   86A8              ; Tenemos que activar el bit6 de (Ctrl_0) si el Sprite que hemos cargado es AMADEUS.
 499   86A8
@@ -1159,7 +1159,7 @@
 656   8732 3E F7        	ld a,$f7		  										; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
 657   8734 DB FE        	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
 658   8736 E6 01        	and $01													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $01 resulta "0"  llama a la rutina "Mov_izq".
-659   8738 CC 62 8E         call z,Mov_left											;			"			"			"			"			"			"			"			"
+659   8738 CC 68 8E         call z,Mov_left											;			"			"			"			"			"			"			"			"
 660   873B 3E F7        	ld a,$f7
 661   873D DB FE        	in a,($fe)
 662   873F E6 01        	and $01
@@ -1226,7 +1226,7 @@
  14+  8784 22 E6 84     	ld (Posicion_actual),hl							; Indicamos que (Posicion_actual) = (Posicion_inicio) y saltamos a la subrutina [Inicializacion], (donde asignaremos_
  15+  8787 CD 16 89     	call Inicializacion   							; _(Limite_horizontal), (Limite_vertical) y (Cuad_objeto). También asignaremos las coordenadas X e Y. (Posición 0,0)_
  16+  878A              ;													; _la esquina superior izquierda de la pantalla.
- 17+  878A CD F8 90     	call Prepara_Puntero_mov 						; El objeto está inicializado. Antes de salir inicializamos tb el puntero de movimiento del objeto.
+ 17+  878A CD 08 91     	call Prepara_Puntero_mov 						; El objeto está inicializado. Antes de salir inicializamos tb el puntero de movimiento del objeto.
  18+  878D 3A 0F 85     1 ld a,(Ctrl_0)
  19+  8790 CB 6F        	bit 5,a
  20+  8792 20 06        	jr nz,3F										; Si acabamos de inicializar un objeto, NO COMPROBAMOS LÍMITES.
@@ -1608,7 +1608,7 @@
 396+  8974 21 1B 85     	ld hl,Limite_vertical
 397+  8977 36 12        	ld (hl),$12
 398+  8979 08           	ex af,af
-399+  897A CD E5 8F     1 call Genera_coordenadas
+399+  897A CD F1 8F     1 call Genera_coordenadas
 400+  897D 21 0F 85     	ld hl,Ctrl_0
 401+  8980 CB EE        	set 5,(hl)
 402+  8982 C9           	ret
@@ -2486,14 +2486,14 @@
  28+  8D1E C6 20        	add $20
  29+  8D20 30 05        	jr nc,1F
  30+  8D22              ; ------------------------------
- 31+  8D22 CD CF 8F     	call Reaparece_arriba
+ 31+  8D22 CD DB 8F     	call Reaparece_arriba
  32+  8D25              ;	call Reinicio
  33+  8D25              ; ------------------------------
  34+  8D25 18 08        	jr 3F
  35+  8D27 CD 5B 8A     1 call NextScan
  36+  8D2A 22 E6 84     	ld (Posicion_actual),hl
  37+  8D2D 10 E2            djnz 2B
- 38+  8D2F CD E5 8F     3 call Genera_coordenadas
+ 38+  8D2F CD F1 8F     3 call Genera_coordenadas
  39+  8D32 C9           	ret
  40+  8D33
  41+  8D33
@@ -2529,7 +2529,7 @@
  71+  8D4F 25               dec h
  72+  8D50
  73+  8D50              ; -----------------------------
- 74+  8D50 CD BF 8F         call Reaparece_abajo                                                ; El objeto ha desaparecido por la parte superior de la pantalla, H="$3f". Hacemos llamada a _
+ 74+  8D50 CD CB 8F         call Reaparece_abajo                                                ; El objeto ha desaparecido por la parte superior de la pantalla, H="$3f". Hacemos llamada a _
  75+  8D53              ;	call Reinicio
  76+  8D53              ; -----------------------------
  77+  8D53
@@ -2537,7 +2537,7 @@
  79+  8D55 CD 6A 8A     1 call PreviousScan
  80+  8D58 22 E6 84     	ld (Posicion_actual),hl
  81+  8D5B 10 E2            djnz 3B
- 82+  8D5D CD E5 8F     2 call Genera_coordenadas
+ 82+  8D5D CD F1 8F     2 call Genera_coordenadas
  83+  8D60 C9           	ret
  84+  8D61
  85+  8D61              ; ******************************************************************************************************************************************************************************************
@@ -2561,13 +2561,13 @@
 103+  8D6F CB 7F        	bit 7,a
 104+  8D71 20 04        	jr nz,9F														; Consultamos el último movimiento horizontal del SPRITE.
 105+  8D73 21 EA 84     	ld hl,CTRL_DESPLZ
-106+  8D76 35           	dec (hl) 														; El último mov. horizontal ha sido a IZQUIERDA, corregimos (CTRL_DESPLZ).
+106+  8D76 35           	dec (hl)														; El último mov. horizontal ha sido a IZQUIERDA, corregimos (CTRL_DESPLZ).
 107+  8D77
 108+  8D77 3A 0F 85     9 ld a,(Ctrl_0)
 109+  8D7A CB 77        	bit 6,a
 110+  8D7C 28 06        	jr z,10F 														; Estamos moviendo Amadeus???????. Si es así hemos de comprobar que no hemos llegado al char.30 de la línea, [Stop_Amadeus].
 111+  8D7E
-112+  8D7E CD 7E 8F     	call Stop_Amadeus_right
+112+  8D7E CD 8A 8F     	call Stop_Amadeus_right
 113+  8D81 C8           	ret z 															; Salimos de Mov_right si hemos llegado al char.30.
 114+  8D82 18 4D        	jr 8F
 115+  8D84
@@ -2610,7 +2610,7 @@
 152+  8DB9
 153+  8DB9              ; ---------- ---------- ----------
 154+  8DB9
-155+  8DB9 CD AD 8F     3 call Reaparece_izquierda 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
+155+  8DB9 CD B9 8F     3 call Reaparece_izquierda 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
 156+  8DBC              ;	call Reinicio
 157+  8DBC
 158+  8DBC              ; ---------- ---------- ----------
@@ -2625,7 +2625,7 @@
 167+  8DC5 2A E6 84     	ld hl,(Posicion_actual) 										; Decrementamos su posición actual, pués al desplazarlo a la derecha, volvemos a incrementar el nº de (Columns) y _
 168+  8DC8 2B           	dec hl 															; _ (Posicion_actual) ha pasado de $00 a $01.
 169+  8DC9 22 E6 84     	ld (Posicion_actual),hl
-170+  8DCC CD E5 8F     	call Genera_coordenadas
+170+  8DCC CD F1 8F     	call Genera_coordenadas
 171+  8DCF 18 06        	jr 2F 															; Salimos para pintar la nueva posición.
 172+  8DD1
 173+  8DD1              ; ---------- ---------- ----------
@@ -2666,613 +2666,624 @@
 208+  8DFB 3A FA 84     	ld a,(Vel_right)
 209+  8DFE 47           	ld b,a
 210+  8DFF 2A F4 84     	ld hl,(Puntero_DESPLZ_izq)
-211+  8E02 23           1 inc hl
-212+  8E03 23           	inc hl
-213+  8E04 10 FC        	djnz 1B 														; (Vel_right) indica cuantas posiciones desplazaremos el (Puntero_DESPLZ)_
-214+  8E06 22 F4 84     	ld (Puntero_DESPLZ_izq),hl 										; _por el índice del Sprite.
-215+  8E09
-216+  8E09 C9           	ret
-217+  8E0A
-218+  8E0A              ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-219+  8E0A              ;
-220+  8E0A              ;	24/7/22
-221+  8E0A              ;
-222+  8E0A              ;	modifica_parametros_1er_DESPLZ_2
-223+  8E0A              ;
-224+  8E0A              ;	La rutina modifica el nº de columnas del objeto en el 1er desplazamiento.
-225+  8E0A              ; 	También incrementa el byte de control de desplazamiento, (desplz. a derecha) y modifica la posición de (Puntero_datas) en función del cuadrante de pantalla en el que nos encontremos.
-226+  8E0A              ; 	Si el desplazamiento se produce en el 2º o 4º cuadrante, la rutina decrementará (Posicion_actual).
-227+  8E0A
-228+  8E0A 3A EA 84     modifica_parametros_1er_DESPLZ_2 ld a,(CTRL_DESPLZ) 			  ; Incrementamos el nª de (Columns) cuando desplazamos el objeto por 1ª vez.
-229+  8E0D A7           	and a
-230+  8E0E 20 1F        	jr nz,1F
-231+  8E10 D6 09            sub 9                							              ; Situamos en $f7 el valor de partida de (CTRL_DESPLZ) tras el 1er desplazamiento.
-232+  8E12 32 EA 84         ld (CTRL_DESPLZ),a
-233+  8E15 21 E5 84     	ld hl,Columns
-234+  8E18 34           	inc (hl)
-235+  8E19 3A F8 84     	ld a,(Cuad_objeto)
-236+  8E1C E6 01        	and 1
-237+  8E1E 28 0F        	jr z,1F
-238+  8E20 2A E6 84     	ld hl,(Posicion_actual) 									  ; Incrementamos 1 char. el valor de (Posicion_actual), la primera vez que desplazamos el objeto y se encuentra en los _
-239+  8E23 23           	inc hl 														  ; _ cuadrantes 1 y 3 de pantalla.
-240+  8E24 22 E6 84     	ld (Posicion_actual),hl
-241+  8E27 CD E5 8F     	call Genera_coordenadas
-242+  8E2A CD 8A 8F     	call Inc_CTRL_DESPLZ
-243+  8E2D 18 03        	jr 2F
-244+  8E2F CD 8A 8F     1 call Inc_CTRL_DESPLZ
-245+  8E32 C9           2 ret
-246+  8E33
-247+  8E33              ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-248+  8E33              ;
-249+  8E33              ;	24/7/22
-250+  8E33              ;
-251+  8E33              ;	Ciclo_completo.
-252+  8E33              ;
-253+  8E33              ;	FUNCIONAMIENTO: Si (CTRL_DESPLZ)="$ff" significa que nos hemos desplazado 1 char.
-254+  8E33              ;
-255+  8E33              ;	En ese caso, inicializamos (CTRL_DESPLZ). (CTRL_DESPLZ)="0".
-256+  8E33              ; 	Decrementamos (Columns).
-257+  8E33              ;	Modificamos (Posicion_actual) en función del cuadrante en el que nos encontremos.
-258+  8E33              ;	Borramos la caja de desplazamientos, call Limpia_caja_de_DESPLZ.
-259+  8E33
+211+  8E02
+212+  8E02 23           1 inc hl
+213+  8E03 23           	inc hl
+214+  8E04 10 FC        	djnz 1B 														; (Vel_right) indica cuantas posiciones desplazaremos el (Puntero_DESPLZ)_
+215+  8E06 22 F4 84     	ld (Puntero_DESPLZ_izq),hl 										; _por el índice del Sprite.
+216+  8E09
+217+  8E09 C9           	ret
+218+  8E0A
+219+  8E0A              ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+220+  8E0A              ;
+221+  8E0A              ;	24/7/22
+222+  8E0A              ;
+223+  8E0A              ;	modifica_parametros_1er_DESPLZ_2
+224+  8E0A              ;
+225+  8E0A              ;	La rutina modifica el nº de columnas del objeto en el 1er desplazamiento.
+226+  8E0A              ; 	También incrementa el byte de control de desplazamiento, (desplz. a derecha) y modifica la posición de (Puntero_datas) en función del cuadrante de pantalla en el que nos encontremos.
+227+  8E0A              ; 	Si el desplazamiento se produce en el 2º o 4º cuadrante, la rutina decrementará (Posicion_actual).
+228+  8E0A
+229+  8E0A 3A EA 84     modifica_parametros_1er_DESPLZ_2 ld a,(CTRL_DESPLZ) 			  ; Incrementamos el nª de (Columns) cuando desplazamos el objeto por 1ª vez.
+230+  8E0D A7           	and a
+231+  8E0E 20 1F        	jr nz,1F
+232+  8E10 D6 09            sub 9                							              ; Situamos en $f7 el valor de partida de (CTRL_DESPLZ) tras el 1er desplazamiento.
+233+  8E12 32 EA 84         ld (CTRL_DESPLZ),a
+234+  8E15 21 E5 84     	ld hl,Columns
+235+  8E18 34           	inc (hl)
+236+  8E19 3A F8 84     	ld a,(Cuad_objeto)
+237+  8E1C E6 01        	and 1
+238+  8E1E 28 0F        	jr z,1F
+239+  8E20 2A E6 84     	ld hl,(Posicion_actual) 									  ; Incrementamos 1 char. el valor de (Posicion_actual), la primera vez que desplazamos el objeto y se encuentra en los _
+240+  8E23 23           	inc hl 														  ; _ cuadrantes 1 y 3 de pantalla.
+241+  8E24 22 E6 84     	ld (Posicion_actual),hl
+242+  8E27 CD F1 8F     	call Genera_coordenadas
+243+  8E2A CD 96 8F     	call Inc_CTRL_DESPLZ
+244+  8E2D 18 03        	jr 2F
+245+  8E2F CD 96 8F     1 call Inc_CTRL_DESPLZ
+246+  8E32 C9           2 ret
+247+  8E33
+248+  8E33              ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+249+  8E33              ;
+250+  8E33              ;	24/7/22
+251+  8E33              ;
+252+  8E33              ;	Ciclo_completo.
+253+  8E33              ;
+254+  8E33              ;	FUNCIONAMIENTO: Si (CTRL_DESPLZ)="$ff" significa que nos hemos desplazado 1 char.
+255+  8E33              ;
+256+  8E33              ;	En ese caso, inicializamos (CTRL_DESPLZ). (CTRL_DESPLZ)="0".
+257+  8E33              ; 	Decrementamos (Columns).
+258+  8E33              ;	Modificamos (Posicion_actual) en función del cuadrante en el que nos encontremos.
+259+  8E33              ;	Borramos la caja de desplazamientos, call Limpia_caja_de_DESPLZ.
 260+  8E33
-261+  8E33 3A EA 84     Ciclo_completo ld a,(CTRL_DESPLZ)
-262+  8E36 FE FF        	cp $ff
-263+  8E38 28 02        	jr z,1F 												     ; Salimos de la rutina si no hemos completado 8 o más desplazamientos.
-264+  8E3A 18 25        	jr 3f
-265+  8E3C 21 E5 84     1 ld hl,Columns													 ; Tras 8 desplazamientos el objeto desplazado es igual al original.
-266+  8E3F 35           	dec (hl) 													 ; Decrementamos el nº de (Columns).
-267+  8E40 AF           	xor a 														 ; Reiniciamos (CTRL_DESPLZ).
-268+  8E41 32 EA 84     	ld (CTRL_DESPLZ),a
-269+  8E44 3A F8 84     	ld a,(Cuad_objeto) 											 ; Si estamos situados en el cuadrante 1º o 3º de la pantalla no modificamos_
-270+  8E47 E6 01        	and 1 														 ; _(Posicion_actual). Limpiamos la (Caja_de_DESPLZ) y salimos.
-271+  8E49 20 0A        	jr nz,2F
-272+  8E4B 2A E6 84     	ld hl,(Posicion_actual)                                      ; Incrementamos (Posicion_actual) en los cuadrantes 2º y 4º.
-273+  8E4E 23           	inc hl
-274+  8E4F 22 E6 84     	ld (Posicion_actual),hl
-275+  8E52 CD E5 8F     	call Genera_coordenadas
-276+  8E55
-277+  8E55              ; Inicia el puntero de Sprite.
-278+  8E55
-279+  8E55 2A EE 84     2 ld hl,(Indice_Sprite_der)
-280+  8E58 22 F2 84     	ld (Puntero_DESPLZ_der),hl
-281+  8E5B CD 90 86     	call Extrae_address
-282+  8E5E 22 E8 84     	ld (Puntero_objeto),hl
-283+  8E61
-284+  8E61 C9           3 ret
-285+  8E62
-286+  8E62              ; ******************************************************************************************************************************************************************************************
-287+  8E62              ;
-288+  8E62              ;	21/01/23
-289+  8E62              ;
-290+  8E62              ;	Mov_left.
-291+  8E62              ;
-292+  8E62              ; 	Desplaza el Sprite (x)Pixels a la izquierda.
-293+  8E62              ;
-294+  8E62              Mov_left
-295+  8E62
-296+  8E62
-297+  8E62              ;	jr $
-298+  8E62
-299+  8E62 21 0F 85     	ld hl,Ctrl_0
-300+  8E65 CB E6        	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
-301+  8E67              ; 																	; _esta información para evitar que la entidad se vuelva borrar/pintar_
-302+  8E67              ; 																	; _ en el caso de que no lo haya.
-303+  8E67 3A EA 84     	ld a,(CTRL_DESPLZ)
-304+  8E6A A7           	and a
-305+  8E6B 20 19        	jr nz,10F
-306+  8E6D
-307+  8E6D 2A E8 84     	ld hl,(Puntero_objeto)
-308+  8E70 22 F4 84     	ld (Puntero_DESPLZ_izq),hl 										; Cuando nos desplazamos a la izquierda, (Puntero_DESPLZ) se sitúa al final del índice del Sprite. El objeto es simétrico.
-309+  8E73
-310+  8E73 3A 0F 85     	ld a,(Ctrl_0)
-311+  8E76 CB 77        	bit 6,a
-312+  8E78 28 67        	jr z,8F 														; Estamos moviendo Amadeus???????. Si es así hemos de comprobar que que no hemos llegado al char.1 de la línea, [Stop_Amadeus].
-313+  8E7A
-314+  8E7A CD 84 8F     	call Stop_Amadeus_left
-315+  8E7D 20 62        	jr nz,8F
-316+  8E7F
-317+  8E7F 2A F0 84     	ld hl,(Indice_Sprite_izq) 										; Hemos llegado al char.1, volvemos a situar (Puntero_DESPLZ) al principio del índice del sprite, pues la única posibilidad_
-318+  8E82 22 F4 84     	ld (Puntero_DESPLZ_izq),hl 										; _de movimiento es hacia la derecha.
-319+  8E85 C9           	ret
-320+  8E86
-321+  8E86 3A 0F 85     10 ld a,(Ctrl_0)
-322+  8E89 CB 7F        	bit 7,a
-323+  8E8B 28 04        	jr z,11F														; Consultamos el último movimiento horizontal del SPRITE.
-324+  8E8D 21 EA 84     	ld hl,CTRL_DESPLZ
-325+  8E90 34           	inc (hl) 														; El último mov. horizontal ha sido a IZQUIERDA, corregimos (CTRL_DESPLZ).
-326+  8E91
-327+  8E91 3A EB 84     11 ld a,(Coordenada_X)
-328+  8E94 A7           	and a
-329+  8E95 20 4A        	jr nz,8F
-330+  8E97 3A EA 84     	ld a,(CTRL_DESPLZ) 			 									; Si el Sprite no está en el 1er char de la línea, (desaparece por la izquierda), o estando en este, _
-331+  8E9A A7           	and a 															; _ (CTRL_DESPLZ)="0", cargamos HL con la (Posicion_actual) y ejecutamos la rutina de desplazamiento, _
-332+  8E9B 28 44        	jr z,8F 														; _ pués aún podemos desplazarlo antes de desaparecer.
-333+  8E9D
-334+  8E9D              ; ---------- ---------- ----------
-335+  8E9D
-336+  8E9D 3A F9 84     	ld a,(Vel_left)
-337+  8EA0 FE 02        	cp 2
-338+  8EA2 28 0F        	jr z,1F
-339+  8EA4 38 04        	jr c,6F
-340+  8EA6 FE 04        	cp 4
-341+  8EA8 28 12        	jr z,7F
-342+  8EAA
-343+  8EAA              ; ---------- ---------- ----------
-344+  8EAA
-345+  8EAA 3A EA 84     6 ld a,(CTRL_DESPLZ)
-346+  8EAD FE F9        	cp $f9
-347+  8EAF 20 30        	jr nz,8F
-348+  8EB1 18 10        	jr 4F
-349+  8EB3 3A EA 84     1 ld a,(CTRL_DESPLZ)
-350+  8EB6 FE FA        	cp $fa
-351+  8EB8 20 27        	jr nz,8F
-352+  8EBA 18 07        	jr 4F
-353+  8EBC 3A EA 84     7 ld a,(CTRL_DESPLZ)
-354+  8EBF FE FC        	cp $fc
-355+  8EC1 20 1E        	jr nz,8F
-356+  8EC3
-357+  8EC3              ; ---------- ---------- ----------
-358+  8EC3
-359+  8EC3              4
-360+  8EC3 CD 9B 8F     	call Reaparece_derecha 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
-361+  8EC6              ;	call Reinicio
-362+  8EC6
-363+  8EC6              ; ---------- ---------- ----------
-364+  8EC6
-365+  8EC6 06 02        	ld b,2 															; Para hacer que el objeto aparezca poco a poco, hemos de desplazarlo 2 veces: El primer desplazamiento_
-366+  8EC8 C5           5 push bc 															; _pone (CTRL_DESPLZ) a "0" y el segundo a "$ff". Con esto hacemos que el Sprite tenga espacio en blanco delante_
-367+  8EC9 2A E8 84     	ld hl,(Puntero_objeto)
-368+  8ECC 22 F4 84     	ld (Puntero_DESPLZ_izq),hl
-369+  8ECF CD E8 8E     	call DESPLZ_IZQ
-370+  8ED2 C1           	pop bc
-371+  8ED3 10 F3        	djnz 5B
-372+  8ED5 2A E6 84     	ld hl,(Posicion_actual) 										; Incrementamos su posición actual, pués al desplazarlo a la izquierda, volvemos a incrementar el nº de (Columns) y _
-373+  8ED8 23           	inc hl 															; _ (Posicion_actual) ha pasado de $1f a $1e.
-374+  8ED9 22 E6 84     	ld (Posicion_actual),hl
-375+  8EDC CD E5 8F     	call Genera_coordenadas
-376+  8EDF 18 06        	jr 2F 															; Salimos para pintar la nueva posición.
-377+  8EE1
-378+  8EE1              ; ---------- ---------- ----------
-379+  8EE1
-380+  8EE1 2A E6 84     8 ld hl,(Posicion_actual)
-381+  8EE4 CD E8 8E     	call DESPLZ_IZQ
-382+  8EE7 C9           2 ret
-383+  8EE8
-384+  8EE8              ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-385+  8EE8              ;
-386+  8EE8              ;	22/9/22
-387+  8EE8
-388+  8EE8              DESPLZ_IZQ
-389+  8EE8
-390+  8EE8 CD F7 8E     	call Desplaza_izquierda
-391+  8EEB CD 1A 8F         call modifica_parametros_1er_DESPLZ
-392+  8EEE CD 3E 8F     	call Ciclo_completo_2
-393+  8EF1 21 0F 85     	ld hl,Ctrl_0 													; Indica que nos hemos desplazado a la izquierda
-394+  8EF4 CB BE        	res 7,(hl)
-395+  8EF6 C9           	ret
-396+  8EF7
-397+  8EF7 3A F9 84     Desplaza_izquierda ld a,(Vel_left)
-398+  8EFA 47           	ld b,a
-399+  8EFB 2A F4 84     	ld hl,(Puntero_DESPLZ_izq)
-400+  8EFE
-401+  8EFE 2B           1 dec hl
-402+  8EFF 2B           	dec hl
-403+  8F00 10 FC        	djnz 1B 														; Seleccionamos FRAME en función de la velocidad del Sprite.
-404+  8F02 22 F4 84     	ld (Puntero_DESPLZ_izq),hl
-405+  8F05 CD 90 86     	call Extrae_address
-406+  8F08 22 E8 84     	ld (Puntero_objeto),hl
-407+  8F0B
-408+  8F0B              ; Modifica (Puntero_DESPLZ_der).
-409+  8F0B
-410+  8F0B 3A F9 84     	ld a,(Vel_left)
-411+  8F0E 47           	ld b,a
-412+  8F0F 2A F2 84     	ld hl,(Puntero_DESPLZ_der)
-413+  8F12
-414+  8F12 2B           1 dec hl
-415+  8F13 2B           	dec hl
-416+  8F14 10 FC        	djnz 1B 														; Seleccionamos FRAME en función de la velocidad del Sprite.
-417+  8F16 22 F2 84     	ld (Puntero_DESPLZ_der),hl
-418+  8F19
-419+  8F19 C9           	ret
-420+  8F1A
-421+  8F1A              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-422+  8F1A              ;
-423+  8F1A              ;	modifica_parametros_1er_DESPLZ
-424+  8F1A              ;
-425+  8F1A              ;	La rutina modifica el nº de columnas del objeto en el 1er desplazamiento.
-426+  8F1A              ; 	También decrementa el byte de control de desplazamiento, (desplz. a izq) y modifica la posición de (Puntero_datas) en función del cuadrante de pantalla en el que nos encontremos.
-427+  8F1A              ; 	Si el desplazamiento se produce en el 2º o 4º cuadrante, la rutina decrementará (Posicion_actual).
-428+  8F1A
-429+  8F1A 3A EA 84     modifica_parametros_1er_DESPLZ ld a,(CTRL_DESPLZ) 				    ; Incrementamos el nª de (Columns) cuando desplazamos el objeto por 1ª vez.
-430+  8F1D A7           	and a
-431+  8F1E 20 1A        	jr nz,1F
-432+  8F20 21 E5 84     	ld hl,Columns
-433+  8F23 34           	inc (hl)
-434+  8F24 3A F8 84     	ld a,(Cuad_objeto)
-435+  8F27 E6 01        	and 1
-436+  8F29 20 0F        	jr nz,1F
-437+  8F2B 2A E6 84     	ld hl,(Posicion_actual) 									    ; Decrementamos 1 char. el valor de (Posicion_actual), la primera vez que desplazamos el objeto y se encuentra en los _
-438+  8F2E 2B           	dec hl 														    ; _ cuadrantes 2 y 4 de pantalla.
-439+  8F2F 22 E6 84     	ld (Posicion_actual),hl
-440+  8F32 CD E5 8F     	call Genera_coordenadas
-441+  8F35 CD 6D 8F     	call Dec_CTRL_DESPLZ
-442+  8F38 18 03        	jr 2F
-443+  8F3A CD 6D 8F     1 call Dec_CTRL_DESPLZ
-444+  8F3D C9           2 ret
-445+  8F3E
-446+  8F3E              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-447+  8F3E              ;
-448+  8F3E
-449+  8F3E 3A EA 84     Ciclo_completo_2 ld a,(CTRL_DESPLZ)
-450+  8F41 FE F8        	cp $f8
-451+  8F43 28 02        	jr z,1F 												        ; Salimos de la rutina si no hemos completado 8 o más desplazamientos.
-452+  8F45 18 25        	jr 3f
-453+  8F47 21 E5 84     1 ld hl,Columns
-454+  8F4A 35           	dec (hl)
-455+  8F4B AF           	xor a
-456+  8F4C 32 EA 84     	ld (CTRL_DESPLZ),a
-457+  8F4F 3A F8 84     	ld a,(Cuad_objeto)
-458+  8F52 E6 01        	and 1
-459+  8F54 28 0A        	jr z,2F
-460+  8F56 2A E6 84     	ld hl,(Posicion_actual)                                         ; Decrementamos (Posicion_actual) en los cuadrantes 2º y 4º.
-461+  8F59 2B           	dec hl
-462+  8F5A 22 E6 84     	ld (Posicion_actual),hl
-463+  8F5D CD E5 8F     	call Genera_coordenadas
-464+  8F60
-465+  8F60              ; Inicia el puntero de Sprite.
-466+  8F60
-467+  8F60 2A F0 84     2 ld hl,(Indice_Sprite_izq)
-468+  8F63 22 F4 84     	ld (Puntero_DESPLZ_izq),hl
-469+  8F66 CD 90 86     	call Extrae_address
-470+  8F69 22 E8 84     	ld (Puntero_objeto),hl
-471+  8F6C C9           3 ret
-472+  8F6D
-473+  8F6D              ; ---------- ---------- ---------- ---------- ---------- ----------
-474+  8F6D              ;
-475+  8F6D              ;	Dec_CTRL_DESPLZ
-476+  8F6D              ;
-477+  8F6D              ;	Subrutina de [modifica_punteros].
-478+  8F6D              ;
-479+  8F6D              ;	Decrementa el valor del byte de control, (CTRL_DESPLZ) en función del nº de veces que hayamos desplazado el objeto, (Vel_left).
-480+  8F6D
-481+  8F6D 21 EA 84     Dec_CTRL_DESPLZ ld hl,CTRL_DESPLZ
-482+  8F70 3A F9 84     	ld a,(Vel_left)
-483+  8F73 A7           	and a
-484+  8F74 28 06        	jr z,1F
-485+  8F76 47           	ld b,a
-486+  8F77 35           3 dec (hl)
-487+  8F78 10 FD        	djnz 3B
-488+  8F7A 18 01        	jr 2F
-489+  8F7C 35           1 dec (hl)
-490+  8F7D C9           2 ret
-491+  8F7E
-492+  8F7E              ; ---------- ---------- ---------- ---------- ---------- ----------
-493+  8F7E              ;
-494+  8F7E              ;	19/10/22
-495+  8F7E              ;
-496+  8F7E              ;	(cp 29) para un Amadeus de 3 Columns.
-497+  8F7E              ;	(cp 30)   ""  ""    ""     2 Columns.
-498+  8F7E
-499+  8F7E 3A EB 84     Stop_Amadeus_right ld a,(Coordenada_X)	 	  										 ; Posición horizontal de Amadeus.
-500+  8F81 FE 1E        	cp 30																			 ; Hemos llegado al límite derecho de la pantalla??.
-501+  8F83 C9           	ret
-502+  8F84
-503+  8F84              ; ---------- ---------- ---------- ---------- ---------- ----------
-504+  8F84              ;
-505+  8F84              ;	19/10/22
-506+  8F84              ;
-507+  8F84              ;	(cp 2) para un Amadeus de 3 Columns.
-508+  8F84              ;	(cp 1)   ""  ""    ""     2 Columns.
-509+  8F84
-510+  8F84 3A EB 84     Stop_Amadeus_left ld a,(Coordenada_X)	 	  										 ; Posición horizontal de Amadeus.
-511+  8F87 FE 01        	cp 1																			 ; Hemos llegado al límite izquierdo de la pantalla??.
-512+  8F89 C9           	ret
-513+  8F8A
-514+  8F8A              ; ---------- ---------- ---------- ---------- ---------- ----------
-515+  8F8A              ;
-516+  8F8A              ;	24/7/22
-517+  8F8A              ;
-518+  8F8A              ;	Inc_CTRL_DESPLZ
-519+  8F8A              ;
-520+  8F8A              ;	Subrutina de [modifica_punteros].
-521+  8F8A              ;
-522+  8F8A              ;   Incrementa el valor del byte de control, (CTRL_DESPLZ) en función del nº de veces que hayamos desplazado el objeto, (Vel_right).
-523+  8F8A
-524+  8F8A 21 EA 84     Inc_CTRL_DESPLZ ld hl,CTRL_DESPLZ
-525+  8F8D 3A FA 84     	ld a,(Vel_right)
-526+  8F90 A7           	and a
-527+  8F91 28 06        	jr z,1F
-528+  8F93 47           	ld b,a
-529+  8F94 34           3 inc (hl)
-530+  8F95 10 FD        	djnz 3B
-531+  8F97 18 01        	jr 2F
-532+  8F99 34           1 inc (hl)
-533+  8F9A C9           2 ret
-534+  8F9B
-535+  8F9B              ; ---------- ---------- ---------- ---------- ---------- ----------
-536+  8F9B
-537+  8F9B 2A E6 84     Reaparece_derecha ld hl,(Posicion_actual)
-538+  8F9E 01 1F 00     	ld bc,31
-539+  8FA1 A7           	and a
-540+  8FA2 ED 4A        	adc hl,bc
-541+  8FA4 22 E6 84     	ld (Posicion_actual),hl
-542+  8FA7 21 0F 85     	ld hl,Ctrl_0														; $xxx1
-543+  8FAA CB C6        	set 0,(hl)
-544+  8FAC C9           	ret
-545+  8FAD
-546+  8FAD              ; ---------- ---------- ---------- ---------- ---------- ----------
-547+  8FAD
-548+  8FAD 2A E6 84     Reaparece_izquierda ld hl,(Posicion_actual)
-549+  8FB0 01 1F 00     	ld bc,31
-550+  8FB3 A7           	and a
-551+  8FB4 ED 42        	sbc hl,bc
-552+  8FB6 22 E6 84     	ld (Posicion_actual),hl 											; $xx1x
-553+  8FB9 21 0F 85     	ld hl,Ctrl_0
-554+  8FBC CB CE        	set 1,(hl)
-555+  8FBE C9           	ret
-556+  8FBF
-557+  8FBF              ; ---------- ---------- ---------- ---------- ---------- ----------
-558+  8FBF
-559+  8FBF 24           Reaparece_abajo inc h
-560+  8FC0 01 E0 17     	ld bc,$17e0
-561+  8FC3 A7           	and a
-562+  8FC4 ED 4A        	adc hl,bc
-563+  8FC6 22 E6 84     	ld (Posicion_actual),hl
-564+  8FC9 21 0F 85     	ld hl,Ctrl_0
-565+  8FCC CB D6        	set 2,(hl)
-566+  8FCE C9           	ret
-567+  8FCF
-568+  8FCF              ; ---------- ---------- ---------- ---------- ---------- ----------
-569+  8FCF
-570+  8FCF 01 E0 17     Reaparece_arriba ld bc,$17e0
-571+  8FD2 A7           	and a
-572+  8FD3 ED 42        	sbc hl,bc
-573+  8FD5 22 E6 84     	ld (Posicion_actual),hl
-574+  8FD8 21 0F 85     	ld hl,Ctrl_0
-575+  8FDB CB DE        	set 3,(hl)
-576+  8FDD C9           	ret
-577+  8FDE
-578+  8FDE              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-579+  8FDE
-580+  8FDE 2A F6 84     Reinicio ld hl,(Posicion_inicio)
+261+  8E33
+262+  8E33 3A EA 84     Ciclo_completo ld a,(CTRL_DESPLZ)
+263+  8E36 FE FF        	cp $ff
+264+  8E38 28 02        	jr z,1F 												     ; Salimos de la rutina si no hemos completado 8 o más desplazamientos.
+265+  8E3A 18 2B        	jr 3f
+266+  8E3C 21 E5 84     1 ld hl,Columns													 ; Tras 8 desplazamientos el objeto desplazado es igual al original.
+267+  8E3F 35           	dec (hl) 													 ; Decrementamos el nº de (Columns).
+268+  8E40 AF           	xor a 														 ; Reiniciamos (CTRL_DESPLZ).
+269+  8E41 32 EA 84     	ld (CTRL_DESPLZ),a
+270+  8E44 3A F8 84     	ld a,(Cuad_objeto) 											 ; Si estamos situados en el cuadrante 1º o 3º de la pantalla no modificamos_
+271+  8E47 E6 01        	and 1 														 ; _(Posicion_actual). Limpiamos la (Caja_de_DESPLZ) y salimos.
+272+  8E49 20 0A        	jr nz,2F
+273+  8E4B 2A E6 84     	ld hl,(Posicion_actual)                                      ; Incrementamos (Posicion_actual) en los cuadrantes 2º y 4º.
+274+  8E4E 23           	inc hl
+275+  8E4F 22 E6 84     	ld (Posicion_actual),hl
+276+  8E52 CD F1 8F     	call Genera_coordenadas
+277+  8E55
+278+  8E55              ; Inicia el puntero de Sprite.
+279+  8E55
+280+  8E55 2A EE 84     2 ld hl,(Indice_Sprite_der)
+281+  8E58 22 F2 84     	ld (Puntero_DESPLZ_der),hl
+282+  8E5B
+283+  8E5B CD 90 86     	call Extrae_address
+284+  8E5E 22 E8 84     	ld (Puntero_objeto),hl
+285+  8E61
+286+  8E61 2A F0 84     	ld hl,(Indice_Sprite_izq)
+287+  8E64 22 F4 84     	ld (Puntero_DESPLZ_izq),hl
+288+  8E67
+289+  8E67 C9           3 ret
+290+  8E68
+291+  8E68              ; ******************************************************************************************************************************************************************************************
+292+  8E68              ;
+293+  8E68              ;	21/01/23
+294+  8E68              ;
+295+  8E68              ;	Mov_left.
+296+  8E68              ;
+297+  8E68              ; 	Desplaza el Sprite (x)Pixels a la izquierda.
+298+  8E68              ;
+299+  8E68              Mov_left
+300+  8E68
+301+  8E68 21 0F 85     	ld hl,Ctrl_0
+302+  8E6B CB E6        	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
+303+  8E6D              ; 																	; _esta información para evitar que la entidad se vuelva borrar/pintar_
+304+  8E6D              ; 																	; _ en el caso de que no lo haya.
+305+  8E6D 3A EA 84     	ld a,(CTRL_DESPLZ)
+306+  8E70 A7           	and a
+307+  8E71 20 19        	jr nz,10F
+308+  8E73
+309+  8E73 2A E8 84     	ld hl,(Puntero_objeto)
+310+  8E76 22 F4 84     	ld (Puntero_DESPLZ_izq),hl 										; Cuando nos desplazamos a la izquierda, (Puntero_DESPLZ) se sitúa al final del índice del Sprite. El objeto es simétrico.
+311+  8E79
+312+  8E79 3A 0F 85     	ld a,(Ctrl_0)
+313+  8E7C CB 77        	bit 6,a
+314+  8E7E 28 67        	jr z,8F 														; Estamos moviendo Amadeus???????. Si es así hemos de comprobar que que no hemos llegado al char.1 de la línea, [Stop_Amadeus].
+315+  8E80
+316+  8E80 CD 90 8F     	call Stop_Amadeus_left
+317+  8E83 20 62        	jr nz,8F
+318+  8E85
+319+  8E85 2A F0 84     	ld hl,(Indice_Sprite_izq) 										; Hemos llegado al char.1, volvemos a situar (Puntero_DESPLZ) al principio del índice del sprite, pues la única posibilidad_
+320+  8E88 22 F4 84     	ld (Puntero_DESPLZ_izq),hl 										; _de movimiento es hacia la derecha.
+321+  8E8B C9           	ret
+322+  8E8C
+323+  8E8C 3A 0F 85     10 ld a,(Ctrl_0)
+324+  8E8F CB 7F        	bit 7,a
+325+  8E91 28 04        	jr z,11F														; Consultamos el último movimiento horizontal del SPRITE.
+326+  8E93
+327+  8E93 21 EA 84     	ld hl,CTRL_DESPLZ
+328+  8E96 34           	inc (hl) 														; El último mov. horizontal ha sido a IZQUIERDA, corregimos (CTRL_DESPLZ).
+329+  8E97
+330+  8E97 3A EB 84     11 ld a,(Coordenada_X)
+331+  8E9A A7           	and a
+332+  8E9B 20 4A        	jr nz,8F
+333+  8E9D 3A EA 84     	ld a,(CTRL_DESPLZ) 			 									; Si el Sprite no está en el 1er char de la línea, (desaparece por la izquierda), o estando en este, _
+334+  8EA0 A7           	and a 															; _ (CTRL_DESPLZ)="0", cargamos HL con la (Posicion_actual) y ejecutamos la rutina de desplazamiento, _
+335+  8EA1 28 44        	jr z,8F 														; _ pués aún podemos desplazarlo antes de desaparecer.
+336+  8EA3
+337+  8EA3              ; ---------- ---------- ----------
+338+  8EA3
+339+  8EA3 3A F9 84     	ld a,(Vel_left)
+340+  8EA6 FE 02        	cp 2
+341+  8EA8 28 0F        	jr z,1F
+342+  8EAA 38 04        	jr c,6F
+343+  8EAC FE 04        	cp 4
+344+  8EAE 28 12        	jr z,7F
+345+  8EB0
+346+  8EB0              ; ---------- ---------- ----------
+347+  8EB0
+348+  8EB0 3A EA 84     6 ld a,(CTRL_DESPLZ)
+349+  8EB3 FE F9        	cp $f9
+350+  8EB5 20 30        	jr nz,8F
+351+  8EB7 18 10        	jr 4F
+352+  8EB9 3A EA 84     1 ld a,(CTRL_DESPLZ)
+353+  8EBC FE FA        	cp $fa
+354+  8EBE 20 27        	jr nz,8F
+355+  8EC0 18 07        	jr 4F
+356+  8EC2 3A EA 84     7 ld a,(CTRL_DESPLZ)
+357+  8EC5 FE FC        	cp $fc
+358+  8EC7 20 1E        	jr nz,8F
+359+  8EC9
+360+  8EC9              ; ---------- ---------- ----------
+361+  8EC9
+362+  8EC9              4
+363+  8EC9 CD A7 8F     	call Reaparece_derecha 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
+364+  8ECC              ;	call Reinicio
+365+  8ECC
+366+  8ECC              ; ---------- ---------- ----------
+367+  8ECC
+368+  8ECC 06 02        	ld b,2 															; Para hacer que el objeto aparezca poco a poco, hemos de desplazarlo 2 veces: El primer desplazamiento_
+369+  8ECE C5           5 push bc 															; _pone (CTRL_DESPLZ) a "0" y el segundo a "$ff". Con esto hacemos que el Sprite tenga espacio en blanco delante_
+370+  8ECF 2A E8 84     	ld hl,(Puntero_objeto)
+371+  8ED2 22 F4 84     	ld (Puntero_DESPLZ_izq),hl
+372+  8ED5 CD EE 8E     	call DESPLZ_IZQ
+373+  8ED8 C1           	pop bc
+374+  8ED9 10 F3        	djnz 5B
+375+  8EDB 2A E6 84     	ld hl,(Posicion_actual) 										; Incrementamos su posición actual, pués al desplazarlo a la izquierda, volvemos a incrementar el nº de (Columns) y _
+376+  8EDE 23           	inc hl 															; _ (Posicion_actual) ha pasado de $1f a $1e.
+377+  8EDF 22 E6 84     	ld (Posicion_actual),hl
+378+  8EE2 CD F1 8F     	call Genera_coordenadas
+379+  8EE5 18 06        	jr 2F 															; Salimos para pintar la nueva posición.
+380+  8EE7
+381+  8EE7              ; ---------- ---------- ----------
+382+  8EE7
+383+  8EE7 2A E6 84     8 ld hl,(Posicion_actual)
+384+  8EEA CD EE 8E     	call DESPLZ_IZQ
+385+  8EED C9           2 ret
+386+  8EEE
+387+  8EEE              ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+388+  8EEE              ;
+389+  8EEE              ;	22/9/22
+390+  8EEE
+391+  8EEE              DESPLZ_IZQ
+392+  8EEE
+393+  8EEE CD FD 8E     	call Desplaza_izquierda
+394+  8EF1 CD 20 8F         call modifica_parametros_1er_DESPLZ
+395+  8EF4 CD 44 8F     	call Ciclo_completo_2
+396+  8EF7 21 0F 85     	ld hl,Ctrl_0 													; Indica que nos hemos desplazado a la izquierda
+397+  8EFA CB BE        	res 7,(hl)
+398+  8EFC C9           	ret
+399+  8EFD
+400+  8EFD 3A F9 84     Desplaza_izquierda ld a,(Vel_left)
+401+  8F00 47           	ld b,a
+402+  8F01 2A F4 84     	ld hl,(Puntero_DESPLZ_izq)
+403+  8F04
+404+  8F04 2B           1 dec hl
+405+  8F05 2B           	dec hl
+406+  8F06 10 FC        	djnz 1B 														; Seleccionamos FRAME en función de la velocidad del Sprite.
+407+  8F08 22 F4 84     	ld (Puntero_DESPLZ_izq),hl
+408+  8F0B CD 90 86     	call Extrae_address
+409+  8F0E 22 E8 84     	ld (Puntero_objeto),hl
+410+  8F11
+411+  8F11              ; Modifica (Puntero_DESPLZ_der).
+412+  8F11
+413+  8F11 3A F9 84     	ld a,(Vel_left)
+414+  8F14 47           	ld b,a
+415+  8F15 2A F2 84     	ld hl,(Puntero_DESPLZ_der)
+416+  8F18
+417+  8F18 2B           1 dec hl
+418+  8F19 2B           	dec hl
+419+  8F1A 10 FC        	djnz 1B 														; Seleccionamos FRAME en función de la velocidad del Sprite.
+420+  8F1C 22 F2 84     	ld (Puntero_DESPLZ_der),hl
+421+  8F1F
+422+  8F1F C9           	ret
+423+  8F20
+424+  8F20              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+425+  8F20              ;
+426+  8F20              ;	modifica_parametros_1er_DESPLZ
+427+  8F20              ;
+428+  8F20              ;	La rutina modifica el nº de columnas del objeto en el 1er desplazamiento.
+429+  8F20              ; 	También decrementa el byte de control de desplazamiento, (desplz. a izq) y modifica la posición de (Puntero_datas) en función del cuadrante de pantalla en el que nos encontremos.
+430+  8F20              ; 	Si el desplazamiento se produce en el 2º o 4º cuadrante, la rutina decrementará (Posicion_actual).
+431+  8F20
+432+  8F20 3A EA 84     modifica_parametros_1er_DESPLZ ld a,(CTRL_DESPLZ) 				    ; Incrementamos el nª de (Columns) cuando desplazamos el objeto por 1ª vez.
+433+  8F23 A7           	and a
+434+  8F24 20 1A        	jr nz,1F
+435+  8F26 21 E5 84     	ld hl,Columns
+436+  8F29 34           	inc (hl)
+437+  8F2A 3A F8 84     	ld a,(Cuad_objeto)
+438+  8F2D E6 01        	and 1
+439+  8F2F 20 0F        	jr nz,1F
+440+  8F31 2A E6 84     	ld hl,(Posicion_actual) 									    ; Decrementamos 1 char. el valor de (Posicion_actual), la primera vez que desplazamos el objeto y se encuentra en los _
+441+  8F34 2B           	dec hl 														    ; _ cuadrantes 2 y 4 de pantalla.
+442+  8F35 22 E6 84     	ld (Posicion_actual),hl
+443+  8F38 CD F1 8F     	call Genera_coordenadas
+444+  8F3B CD 79 8F     	call Dec_CTRL_DESPLZ
+445+  8F3E 18 03        	jr 2F
+446+  8F40 CD 79 8F     1 call Dec_CTRL_DESPLZ
+447+  8F43 C9           2 ret
+448+  8F44
+449+  8F44              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+450+  8F44              ;
+451+  8F44
+452+  8F44 3A EA 84     Ciclo_completo_2 ld a,(CTRL_DESPLZ)
+453+  8F47 FE F8        	cp $f8
+454+  8F49 28 02        	jr z,1F 												        ; Salimos de la rutina si no hemos completado 8 o más desplazamientos.
+455+  8F4B 18 2B        	jr 3f
+456+  8F4D 21 E5 84     1 ld hl,Columns
+457+  8F50 35           	dec (hl)
+458+  8F51 AF           	xor a
+459+  8F52 32 EA 84     	ld (CTRL_DESPLZ),a
+460+  8F55 3A F8 84     	ld a,(Cuad_objeto)
+461+  8F58 E6 01        	and 1
+462+  8F5A 28 0A        	jr z,2F
+463+  8F5C 2A E6 84     	ld hl,(Posicion_actual)                                         ; Decrementamos (Posicion_actual) en los cuadrantes 2º y 4º.
+464+  8F5F 2B           	dec hl
+465+  8F60 22 E6 84     	ld (Posicion_actual),hl
+466+  8F63 CD F1 8F     	call Genera_coordenadas
+467+  8F66
+468+  8F66              ; Inicia el puntero de Sprite.
+469+  8F66
+470+  8F66 2A F0 84     2 ld hl,(Indice_Sprite_izq)
+471+  8F69 22 F4 84     	ld (Puntero_DESPLZ_izq),hl
+472+  8F6C
+473+  8F6C CD 90 86     	call Extrae_address
+474+  8F6F 22 E8 84     	ld (Puntero_objeto),hl
+475+  8F72
+476+  8F72 2A EE 84     	ld hl,(Indice_Sprite_der)
+477+  8F75 22 F2 84     	ld (Puntero_DESPLZ_der),hl
+478+  8F78
+479+  8F78 C9           3 ret
+480+  8F79
+481+  8F79              ; ---------- ---------- ---------- ---------- ---------- ----------
+482+  8F79              ;
+483+  8F79              ;	Dec_CTRL_DESPLZ
+484+  8F79              ;
+485+  8F79              ;	Subrutina de [modifica_punteros].
+486+  8F79              ;
+487+  8F79              ;	Decrementa el valor del byte de control, (CTRL_DESPLZ) en función del nº de veces que hayamos desplazado el objeto, (Vel_left).
+488+  8F79
+489+  8F79 21 EA 84     Dec_CTRL_DESPLZ ld hl,CTRL_DESPLZ
+490+  8F7C 3A F9 84     	ld a,(Vel_left)
+491+  8F7F A7           	and a
+492+  8F80 28 06        	jr z,1F
+493+  8F82 47           	ld b,a
+494+  8F83 35           3 dec (hl)
+495+  8F84 10 FD        	djnz 3B
+496+  8F86 18 01        	jr 2F
+497+  8F88 35           1 dec (hl)
+498+  8F89 C9           2 ret
+499+  8F8A
+500+  8F8A              ; ---------- ---------- ---------- ---------- ---------- ----------
+501+  8F8A              ;
+502+  8F8A              ;	19/10/22
+503+  8F8A              ;
+504+  8F8A              ;	(cp 29) para un Amadeus de 3 Columns.
+505+  8F8A              ;	(cp 30)   ""  ""    ""     2 Columns.
+506+  8F8A
+507+  8F8A 3A EB 84     Stop_Amadeus_right ld a,(Coordenada_X)	 	  										 ; Posición horizontal de Amadeus.
+508+  8F8D FE 1E        	cp 30																			 ; Hemos llegado al límite derecho de la pantalla??.
+509+  8F8F C9           	ret
+510+  8F90
+511+  8F90              ; ---------- ---------- ---------- ---------- ---------- ----------
+512+  8F90              ;
+513+  8F90              ;	19/10/22
+514+  8F90              ;
+515+  8F90              ;	(cp 2) para un Amadeus de 3 Columns.
+516+  8F90              ;	(cp 1)   ""  ""    ""     2 Columns.
+517+  8F90
+518+  8F90 3A EB 84     Stop_Amadeus_left ld a,(Coordenada_X)	 	  										 ; Posición horizontal de Amadeus.
+519+  8F93 FE 01        	cp 1																			 ; Hemos llegado al límite izquierdo de la pantalla??.
+520+  8F95 C9           	ret
+521+  8F96
+522+  8F96              ; ---------- ---------- ---------- ---------- ---------- ----------
+523+  8F96              ;
+524+  8F96              ;	24/7/22
+525+  8F96              ;
+526+  8F96              ;	Inc_CTRL_DESPLZ
+527+  8F96              ;
+528+  8F96              ;	Subrutina de [modifica_punteros].
+529+  8F96              ;
+530+  8F96              ;   Incrementa el valor del byte de control, (CTRL_DESPLZ) en función del nº de veces que hayamos desplazado el objeto, (Vel_right).
+531+  8F96
+532+  8F96 21 EA 84     Inc_CTRL_DESPLZ ld hl,CTRL_DESPLZ
+533+  8F99 3A FA 84     	ld a,(Vel_right)
+534+  8F9C A7           	and a
+535+  8F9D 28 06        	jr z,1F
+536+  8F9F 47           	ld b,a
+537+  8FA0 34           3 inc (hl)
+538+  8FA1 10 FD        	djnz 3B
+539+  8FA3 18 01        	jr 2F
+540+  8FA5 34           1 inc (hl)
+541+  8FA6 C9           2 ret
+542+  8FA7
+543+  8FA7              ; ---------- ---------- ---------- ---------- ---------- ----------
+544+  8FA7
+545+  8FA7 2A E6 84     Reaparece_derecha ld hl,(Posicion_actual)
+546+  8FAA 01 1F 00     	ld bc,31
+547+  8FAD A7           	and a
+548+  8FAE ED 4A        	adc hl,bc
+549+  8FB0 22 E6 84     	ld (Posicion_actual),hl
+550+  8FB3 21 0F 85     	ld hl,Ctrl_0														; $xxx1
+551+  8FB6 CB C6        	set 0,(hl)
+552+  8FB8 C9           	ret
+553+  8FB9
+554+  8FB9              ; ---------- ---------- ---------- ---------- ---------- ----------
+555+  8FB9
+556+  8FB9 2A E6 84     Reaparece_izquierda ld hl,(Posicion_actual)
+557+  8FBC 01 1F 00     	ld bc,31
+558+  8FBF A7           	and a
+559+  8FC0 ED 42        	sbc hl,bc
+560+  8FC2 22 E6 84     	ld (Posicion_actual),hl 											; $xx1x
+561+  8FC5 21 0F 85     	ld hl,Ctrl_0
+562+  8FC8 CB CE        	set 1,(hl)
+563+  8FCA C9           	ret
+564+  8FCB
+565+  8FCB              ; ---------- ---------- ---------- ---------- ---------- ----------
+566+  8FCB
+567+  8FCB 24           Reaparece_abajo inc h
+568+  8FCC 01 E0 17     	ld bc,$17e0
+569+  8FCF A7           	and a
+570+  8FD0 ED 4A        	adc hl,bc
+571+  8FD2 22 E6 84     	ld (Posicion_actual),hl
+572+  8FD5 21 0F 85     	ld hl,Ctrl_0
+573+  8FD8 CB D6        	set 2,(hl)
+574+  8FDA C9           	ret
+575+  8FDB
+576+  8FDB              ; ---------- ---------- ---------- ---------- ---------- ----------
+577+  8FDB
+578+  8FDB 01 E0 17     Reaparece_arriba ld bc,$17e0
+579+  8FDE A7           	and a
+580+  8FDF ED 42        	sbc hl,bc
 581+  8FE1 22 E6 84     	ld (Posicion_actual),hl
-582+  8FE4 C9           	ret
+582+  8FE4 21 0F 85     	ld hl,Ctrl_0
+583+  8FE7 CB DE        	set 3,(hl)
+584+  8FE9 C9           	ret
+585+  8FEA
+586+  8FEA              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+587+  8FEA
+588+  8FEA 2A F6 84     Reinicio ld hl,(Posicion_inicio)
+589+  8FED 22 E6 84     	ld (Posicion_actual),hl
+590+  8FF0 C9           	ret
 # file closed: Direcciones.asm
-715   8FE5              	include "Genera_coordenadas.asm"
+715   8FF1              	include "Genera_coordenadas.asm"
 # file opened: Genera_coordenadas.asm
-  1+  8FE5              ;	12/12/22
-  2+  8FE5              ;
-  3+  8FE5              ;	Proporciona las coordenadas del objeto a imprimir.
-  4+  8FE5              ;	Fila superior "0", Columna izquierda "0".
-  5+  8FE5              ;
-  6+  8FE5              ;	Input: HL contendrá la (Posicion_actual) del Sprite.
-  7+  8FE5              ;
-  8+  8FE5              ;	Modifica: A
-  9+  8FE5
- 10+  8FE5 C5           Genera_coordenadas push bc
- 11+  8FE6 E5           	push hl
- 12+  8FE7 2A E6 84     	ld hl,(Posicion_actual)
- 13+  8FEA 7D           	ld a,l
- 14+  8FEB E6 1F        	and $1f
- 15+  8FED 32 EB 84     	ld (Coordenada_X),a 								; Coordenada X del sprite, (0-$1f).
- 16+  8FF0 CD B9 8C     	call calcula_tercio
- 17+  8FF3 47           	ld b,a
- 18+  8FF4 04           	inc b												; Tercio de pantalla+1 en B, (1,2 o 3).
- 19+  8FF5 0E 00        	ld c,0 												; Contador de filas a "0".
- 20+  8FF7 7D           	ld a,l
- 21+  8FF8 E6 E0        	and $e0 											; Ahora (A) apunta al 1er char. de la fila en la que se encuentra el objeto.
- 22+  8FFA 28 05        	jr z,2F
- 23+  8FFC 0C           1 inc c
- 24+  8FFD D6 20        	sub 32
- 25+  8FFF 20 FB        	jr nz,1B
- 26+  9001 0C           2 inc c
- 27+  9002 04           	inc b
- 28+  9003 05           	dec b
- 29+  9004 28 04        	jr z,3F
- 30+  9006 3E E0        	ld a,$e0
- 31+  9008 10 F2        	djnz 1B
- 32+  900A 79           3 ld a,c
- 33+  900B 3D           	dec a
- 34+  900C 32 EC 84     	ld (Coordenada_y),a
- 35+  900F E1           	pop hl
- 36+  9010 C1           	pop bc
- 37+  9011 C9           	ret
+  1+  8FF1              ;	12/12/22
+  2+  8FF1              ;
+  3+  8FF1              ;	Proporciona las coordenadas del objeto a imprimir.
+  4+  8FF1              ;	Fila superior "0", Columna izquierda "0".
+  5+  8FF1              ;
+  6+  8FF1              ;	Input: HL contendrá la (Posicion_actual) del Sprite.
+  7+  8FF1              ;
+  8+  8FF1              ;	Modifica: A
+  9+  8FF1
+ 10+  8FF1 C5           Genera_coordenadas push bc
+ 11+  8FF2 E5           	push hl
+ 12+  8FF3 2A E6 84     	ld hl,(Posicion_actual)
+ 13+  8FF6 7D           	ld a,l
+ 14+  8FF7 E6 1F        	and $1f
+ 15+  8FF9 32 EB 84     	ld (Coordenada_X),a 								; Coordenada X del sprite, (0-$1f).
+ 16+  8FFC CD B9 8C     	call calcula_tercio
+ 17+  8FFF 47           	ld b,a
+ 18+  9000 04           	inc b												; Tercio de pantalla+1 en B, (1,2 o 3).
+ 19+  9001 0E 00        	ld c,0 												; Contador de filas a "0".
+ 20+  9003 7D           	ld a,l
+ 21+  9004 E6 E0        	and $e0 											; Ahora (A) apunta al 1er char. de la fila en la que se encuentra el objeto.
+ 22+  9006 28 05        	jr z,2F
+ 23+  9008 0C           1 inc c
+ 24+  9009 D6 20        	sub 32
+ 25+  900B 20 FB        	jr nz,1B
+ 26+  900D 0C           2 inc c
+ 27+  900E 04           	inc b
+ 28+  900F 05           	dec b
+ 29+  9010 28 04        	jr z,3F
+ 30+  9012 3E E0        	ld a,$e0
+ 31+  9014 10 F2        	djnz 1B
+ 32+  9016 79           3 ld a,c
+ 33+  9017 3D           	dec a
+ 34+  9018 32 EC 84     	ld (Coordenada_y),a
+ 35+  901B E1           	pop hl
+ 36+  901C C1           	pop bc
+ 37+  901D C9           	ret
 # file closed: Genera_coordenadas.asm
-716   9012              	include "Patrones_de_mov.asm"
+716   901E              	include "Patrones_de_mov.asm"
 # file opened: Patrones_de_mov.asm
-  1+  9012
-  2+  9012
-  3+  9012              ;   11/8/22
-  4+  9012              ;
-  5+  9012              ;   Base de datos. PATRONES DE MOVIMIENTO.
-  6+  9012              ;
-  7+  9012              ;   Mov_obj.asm
-  8+  9012              ;
-  9+  9012              ;   Coordenada_X db 0 									    	; Coordenada X del objeto. (En chars.)
- 10+  9012              ;   Coordenada_y db 0 									    	; Coordenada Y del objeto. (En chars.)
- 11+  9012              ;
- 12+  9012              ;   Codificación:
- 13+  9012              ;
- 14+  9012              ;   % abajo,arriba,derecha,izquierda ..... nº de repeticiones del movimiento.
- 15+  9012
- 16+  9012 02 10 00     Izquierda db 2,%00010000,0
- 17+  9015 02 20 00     Derecha db 2,%00100000,0
- 18+  9018 02 80 00     Abajo db 2,%10000000,0
- 19+  901B 02 40 00     Arriba db 2,%01000000,0
- 20+  901E
- 21+  901E 03 14 44 00  Escaloncitos_izquierda_arriba db 3,%00010100,%01000100,0
- 22+  9022 03 24 44 00  Escaloncitos_derecha_arriba db 3,%00100100,%01000100,0
- 23+  9026 03 24 84 00  Escaloncitos_derecha_abajo db 3,%00100100,%10000100,0
- 24+  902A 03 14 84 00  Escaloncitos_izquierda_abajo db 3,%00010100,%10000100,0                ; El "0"; último .db indica que ya hemos terminado de ejecutar todas las cadenas de movimiento.
- 25+  902E 2C 44 60 42  Onda_senoidal db 44,%01000100,%01100000,%01000010,%01100000,%01000010,%01100000,%01000000,%01100011
- 25+  9032 60 42 60 40
- 25+  9036 63
- 26+  9037 22 60 25 A0      db %00100010,%01100000,%00100101,%10100000,%00100010,%10100011,%10000000,%10100000
- 26+  903B 22 A3 80 A0
- 27+  903F 82 A0 82 A0      db %10000010,%10100000,%10000010,%10100000,%10000100,%10100000,%10000011,%10100000
- 27+  9043 84 A0 83 A0
- 28+  9047 82 A0 82 A0      db %10000010,%10100000,%10000010,%10100000,%10000000,%10100011,%00100010,%10100000
- 28+  904B 80 A3 22 A0
- 29+  904F 25 60 22 63      db %00100101,%01100000,%00100010,%01100011,%01000000,%01100000,%01000010,%01100000
- 29+  9053 40 60 42 60
- 30+  9057 42 60 44 00      db %01000010,%01100000,%01000100,0
- 31+  905B 06 2F 2F 2F  Derecha_e_izquierda db 6,%00101111,%00101111,%00101111,%00101001,%00011110,0
- 31+  905F 29 1E 00
- 32+  9062
- 33+  9062
- 34+  9062 5B 90        Indice_mov_Derecha_e_izquierda defw Derecha_e_izquierda
- 35+  9064 12 90        Indice_mov_Izquierda defw Izquierda
- 36+  9066 15 90        Indice_mov_Derecha defw Derecha
- 37+  9068 18 90        Indice_mov_Abajo defw Abajo
- 38+  906A 1B 90        Indice_mov_Arriba defw Arriba
- 39+  906C 22 90        Indice_mov_Escaloncitos_derecha_arriba defw Escaloncitos_derecha_arriba
- 40+  906E 26 90        Indice_mov_Escaloncitos_derecha_abajo defw Escaloncitos_derecha_abajo
- 41+  9070 1E 90        Indice_mov_Escaloncitos_izquierda_arriba defw Escaloncitos_izquierda_arriba
- 42+  9072 2A 90        Indice_mov_Escaloncitos_izquierda_abajo defw Escaloncitos_izquierda_abajo
- 43+  9074 2E 90        Indice_mov_Onda_senoidal defw Onda_senoidal
- 44+  9076
- 45+  9076 3A 15 85     Movimiento ld a,(Contador_db_mov)                                      ; Hemos iniciado la cadena de movimiento ?. Si (Contador_db_mov) aún es "0" hay que inicializarlo._
- 46+  9079 A7               and a                                                       ; _Para hacerlo, hemos de fijar antes (Puntero_mov).
- 47+  907A 28 02            jr z,1F
- 48+  907C 18 13            jr Decoder                                                  ; Saltamos a [Decoder] si ya hemos iniciado la cadena.
- 49+  907E 3A 16 85     1 ld a,(Incrementa_puntero)                                     ; Vamos a inicializar las variables de movimiento. El contador (Incrementa_puntero) es un byte que inicialmente está a "0"._
- 50+  9081 C6 02            add 2                                                       ; _va incrementando su valor en 2 unidades cada vez que iniciamos una cadena. Se utiliza para ir incrementando (Puntero_mov)_
- 51+  9083 32 16 85         ld (Incrementa_puntero),a                                   ; _ por el índice de cadenas de movimiento correspondiente. Su valor se restablecerá a "0" cuando encontremos
- 52+  9086              ;                                                               ; _ el .db0. (Indica que hemos terminado de leer la secuencia de movimiento completa de la entidad).
- 53+  9086 2A 13 85         ld hl,(Puntero_mov)
- 54+  9089 7E               ld a,(hl)
- 55+  908A 32 15 85         ld (Contador_db_mov),a                                      ; Contador de bytes de la cadena inicializado. (El 1er byte de cada cadena de mov. indica el nº de bytes de_
- 56+  908D 23               inc hl                                                      ; _movimiento que hemos de ejecutar).
- 57+  908E 22 13 85         ld (Puntero_mov),hl                                         ; Situamos (Puntero_mov) en el 1er byte de instrucciones.
- 58+  9091
- 59+  9091 3A 17 85     Decoder ld a,(Repetimos_db)
- 60+  9094 A7               and a
- 61+  9095 20 0C            jr nz,12F
- 62+  9097 2A 13 85         ld hl,(Puntero_mov)
- 63+  909A 7E               ld a,(hl)
- 64+  909B A7               and a
- 65+  909C 28 69            jr z, Reinicia_el_movimiento                              ; Hemos terminado de ejecutar todas las cadenas de movimiento. Llamamos a [Fin_de_movimiento].
- 66+  909E E6 0F             and $0f
- 67+  90A0 32 17 85         ld (Repetimos_db),a                                         ; Si la variable de repetición de .db es "0" hemos de inicializar dicha variable antes de empezar con la decodificación del .db de_
- 68+  90A3              ;                                                               ; _movimiento. Este valor lo proporciona el nibble `bajo´ del byte.
- 69+  90A3 2A 13 85     12 ld hl,(Puntero_mov)
- 70+  90A6 CB 7E            bit 7,(hl)
- 71+  90A8 28 03            jr z,2F
- 72+  90AA CD 05 8D         call Mov_down
- 73+  90AD 2A 13 85     2 ld hl, (Puntero_mov)
- 74+  90B0 CB 76            bit 6,(hl)
- 75+  90B2 28 03            jr z,3F
- 76+  90B4 CD 33 8D         call Mov_up
- 77+  90B7 2A 13 85     3 ld hl, (Puntero_mov)
- 78+  90BA CB 6E            bit 5,(hl)
- 79+  90BC 28 03            jr z,4F
- 80+  90BE CD 61 8D         call Mov_right
- 81+  90C1 2A 13 85     4 ld hl, (Puntero_mov)
- 82+  90C4 CB 66            bit 4,(hl)
- 83+  90C6 28 03            jr z,5F
- 84+  90C8 CD 62 8E         call Mov_left
- 85+  90CB
- 86+  90CB              ; ---------- --------- --------- ---------- ----------
- 87+  90CB
- 88+  90CB 3A 17 85     5 ld a,(Repetimos_db)
- 89+  90CE A7               and a
- 90+  90CF 28 07            jr z,6F
- 91+  90D1 3D               dec a
- 92+  90D2 32 17 85         ld (Repetimos_db),a
- 93+  90D5 28 01            jr z,6f
- 94+  90D7 C9           11 ret
- 95+  90D8 21 15 85     6 ld hl,Contador_db_mov
- 96+  90DB 35               dec (hl)                                                       ; Decrementamos el contador de .db de la cadena, (pués ya hemos ejecutado un byte de la misma).
- 97+  90DC 2A 13 85         ld hl,(Puntero_mov)                                            ; No repetimos el mismo byte. Incrementamos (Puntero_mov) y salimos.
- 98+  90DF 23               inc hl
- 99+  90E0 22 13 85         ld (Puntero_mov),hl
-100+  90E3 18 F2            jr 11B
-101+  90E5 2A 11 85     7 ld hl,(Puntero_indice_mov)                                       ; PASAMOS A LA CADENA SIGUIENTE !!!!!!
-102+  90E8 3A 16 85         ld a,(Incrementa_puntero)
-103+  90EB 47               ld b,a
-104+  90EC 23           8 inc hl
-105+  90ED 10 FD            djnz 8B                                                        ; Indice_patrones_coracao +2, +4, +6, etc...
-106+  90EF 5E               ld e,(hl)
-107+  90F0 23               inc hl
-108+  90F1 56               ld d,(hl)
-109+  90F2 EB               ex de,hl
-110+  90F3 22 13 85         ld (Puntero_mov),hl                                            ; (Puntero_mov) situado el el 1er .db de la siguiente cadena de movimiento.
-111+  90F6 18 DF            jr 11B
-112+  90F8
-113+  90F8              ; ---------- --------- --------- ---------- ----------
-114+  90F8              ;
-115+  90F8              ;   11/8/22
-116+  90F8              ;
-117+  90F8              ;   Prepara_Puntero_mov
-118+  90F8
-119+  90F8 E5           Prepara_Puntero_mov push hl
-120+  90F9 D5               push de
-121+  90FA 2A 11 85         ld hl,(Puntero_indice_mov)
-122+  90FD 5E               ld e,(hl)
-123+  90FE 23               inc hl
-124+  90FF 56               ld d,(hl)
-125+  9100 EB               ex de,hl
-126+  9101 22 13 85         ld (Puntero_mov),hl
-127+  9104 D1               pop de
-128+  9105 E1               pop hl
-129+  9106 C9               ret
-130+  9107
-131+  9107              ; ---------- --------- --------- ---------- ----------
-132+  9107              ;
-133+  9107              ;   11/8/22
-134+  9107              ;
-135+  9107              ;   Reinicia_el_movimiento
-136+  9107
-137+  9107 CD F8 90     Reinicia_el_movimiento call Prepara_Puntero_mov
-138+  910A AF               xor a
-139+  910B 32 15 85         ld (Contador_db_mov),a
-140+  910E 32 16 85         ld (Incrementa_puntero),a
-141+  9111 C3 76 90         jp Movimiento
-142+  9114
-143+  9114              ; ---------- --------- --------- ---------- ----------
-144+  9114
-145+  9114
-146+  9114
-147+  9114
-148+  9114
-149+  9114
-150+  9114
-151+  9114
-152+  9114
-153+  9114
-154+  9114
-155+  9114
-156+  9114
-157+  9114
-158+  9114
-159+  9114
-160+  9114
-161+  9114
+  1+  901E
+  2+  901E
+  3+  901E              ;   11/8/22
+  4+  901E              ;
+  5+  901E              ;   Base de datos. PATRONES DE MOVIMIENTO.
+  6+  901E              ;
+  7+  901E              ;   Mov_obj.asm
+  8+  901E              ;
+  9+  901E              ;   Coordenada_X db 0 									    	; Coordenada X del objeto. (En chars.)
+ 10+  901E              ;   Coordenada_y db 0 									    	; Coordenada Y del objeto. (En chars.)
+ 11+  901E              ;
+ 12+  901E              ;   Codificación:
+ 13+  901E              ;
+ 14+  901E              ;   % abajo,arriba,derecha,izquierda ..... nº de repeticiones del movimiento.
+ 15+  901E
+ 16+  901E
+ 17+  901E
+ 18+  901E 02 10 00     Izquierda db 2,%00010000,0
+ 19+  9021 02 20 00     Derecha db 2,%00100000,0
+ 20+  9024 02 80 00     Abajo db 2,%10000000,0
+ 21+  9027 02 40 00     Arriba db 2,%01000000,0
+ 22+  902A
+ 23+  902A 03 14 44 00  Escaloncitos_izquierda_arriba db 3,%00010100,%01000100,0
+ 24+  902E 03 24 44 00  Escaloncitos_derecha_arriba db 3,%00100100,%01000100,0
+ 25+  9032 03 24 84 00  Escaloncitos_derecha_abajo db 3,%00100100,%10000100,0
+ 26+  9036 03 14 84 00  Escaloncitos_izquierda_abajo db 3,%00010100,%10000100,0                ; El "0"; último .db indica que ya hemos terminado de ejecutar todas las cadenas de movimiento.
+ 27+  903A 2B 44 60 42  Onda_senoidal db 43,%01000100,%01100000,%01000010,%01100000,%01000010,%01100000,%01000000,%01100011
+ 27+  903E 60 42 60 40
+ 27+  9042 63
+ 28+  9043 22 60 25 A0      db %00100010,%01100000,%00100101,%10100000,%00100010,%10100011,%10000000,%10100000
+ 28+  9047 22 A3 80 A0
+ 29+  904B 82 A0 82 A0      db %10000010,%10100000,%10000010,%10100000,%10000100,%10100000,%10000011,%10100000
+ 29+  904F 84 A0 83 A0
+ 30+  9053 82 A0 82 A0      db %10000010,%10100000,%10000010,%10100000,%10000000,%10100011,%00100010,%10100000
+ 30+  9057 80 A3 22 A0
+ 31+  905B 25 60 22 63      db %00100101,%01100000,%00100010,%01100011,%01000000,%01100000,%01000010,%01100000
+ 31+  905F 40 60 42 60
+ 32+  9063 42 60 44         db %01000010,%01100000,%01000100
+ 33+  9066 0B 2F 2F 2F  Derecha_e_izquierda db 11,%00101111,%00101111,%00101111,%00101111,%00101111,%00011111,%00011111,%00011111,%00011111,%000111110,0
+ 33+  906A 2F 2F 1F 1F
+ 33+  906E 1F 1F 3E 00
+ 34+  9072
+ 35+  9072
+ 36+  9072 66 90        Indice_mov_Derecha_e_izquierda defw Derecha_e_izquierda
+ 37+  9074 1E 90        Indice_mov_Izquierda defw Izquierda
+ 38+  9076 21 90        Indice_mov_Derecha defw Derecha
+ 39+  9078 24 90        Indice_mov_Abajo defw Abajo
+ 40+  907A 27 90        Indice_mov_Arriba defw Arriba
+ 41+  907C 2E 90        Indice_mov_Escaloncitos_derecha_arriba defw Escaloncitos_derecha_arriba
+ 42+  907E 32 90        Indice_mov_Escaloncitos_derecha_abajo defw Escaloncitos_derecha_abajo
+ 43+  9080 2A 90        Indice_mov_Escaloncitos_izquierda_arriba defw Escaloncitos_izquierda_arriba
+ 44+  9082 36 90        Indice_mov_Escaloncitos_izquierda_abajo defw Escaloncitos_izquierda_abajo
+ 45+  9084 3A 90        Indice_mov_Onda_senoidal defw Onda_senoidal
+ 46+  9086
+ 47+  9086 3A 15 85     Movimiento ld a,(Contador_db_mov)                               ; Hemos iniciado la cadena de movimiento ?. Si (Contador_db_mov) aún es "0" hay que inicializarlo._
+ 48+  9089 A7               and a                                                       ; _Para hacerlo, hemos de fijar antes (Puntero_mov).
+ 49+  908A 28 02            jr z,1F
+ 50+  908C 18 13            jr Decoder                                                  ; Saltamos a [Decoder] si ya hemos iniciado la cadena.
+ 51+  908E 3A 16 85     1 ld a,(Incrementa_puntero)                                     ; Vamos a inicializar las variables de movimiento. El contador (Incrementa_puntero) es un byte que inicialmente está a "0"._
+ 52+  9091 C6 02            add 2                                                       ; _va incrementando su valor en 2 unidades cada vez que iniciamos una cadena. Se utiliza para ir incrementando (Puntero_mov)_
+ 53+  9093 32 16 85         ld (Incrementa_puntero),a                                   ; _ por el índice de cadenas de movimiento correspondiente. Su valor se restablecerá a "0" cuando encontremos
+ 54+  9096              ;                                                               ; _ el .db0. (Indica que hemos terminado de leer la secuencia de movimiento completa de la entidad).
+ 55+  9096 2A 13 85         ld hl,(Puntero_mov)
+ 56+  9099 7E               ld a,(hl)
+ 57+  909A 32 15 85         ld (Contador_db_mov),a                                      ; Contador de bytes de la cadena inicializado. (El 1er byte de cada cadena de mov. indica el nº de bytes de_
+ 58+  909D 23               inc hl                                                      ; _movimiento que hemos de ejecutar).
+ 59+  909E 22 13 85         ld (Puntero_mov),hl                                         ; Situamos (Puntero_mov) en el 1er byte de instrucciones.
+ 60+  90A1
+ 61+  90A1 3A 17 85     Decoder ld a,(Repetimos_db)
+ 62+  90A4 A7               and a
+ 63+  90A5 20 0C            jr nz,12F
+ 64+  90A7 2A 13 85         ld hl,(Puntero_mov)
+ 65+  90AA 7E               ld a,(hl)
+ 66+  90AB A7               and a
+ 67+  90AC 28 69            jr z, Reinicia_el_movimiento                              ; Hemos terminado de ejecutar todas las cadenas de movimiento. Llamamos a [Fin_de_movimiento].
+ 68+  90AE E6 0F             and $0f
+ 69+  90B0 32 17 85         ld (Repetimos_db),a                                         ; Si la variable de repetición de .db es "0" hemos de inicializar dicha variable antes de empezar con la decodificación del .db de_
+ 70+  90B3              ;                                                               ; _movimiento. Este valor lo proporciona el nibble `bajo´ del byte.
+ 71+  90B3 2A 13 85     12 ld hl,(Puntero_mov)
+ 72+  90B6 CB 7E            bit 7,(hl)
+ 73+  90B8 28 03            jr z,2F
+ 74+  90BA CD 05 8D         call Mov_down
+ 75+  90BD 2A 13 85     2 ld hl, (Puntero_mov)
+ 76+  90C0 CB 76            bit 6,(hl)
+ 77+  90C2 28 03            jr z,3F
+ 78+  90C4 CD 33 8D         call Mov_up
+ 79+  90C7 2A 13 85     3 ld hl, (Puntero_mov)
+ 80+  90CA CB 6E            bit 5,(hl)
+ 81+  90CC 28 03            jr z,4F
+ 82+  90CE CD 61 8D         call Mov_right
+ 83+  90D1 2A 13 85     4 ld hl, (Puntero_mov)
+ 84+  90D4 CB 66            bit 4,(hl)
+ 85+  90D6 28 03            jr z,5F
+ 86+  90D8 CD 68 8E         call Mov_left
+ 87+  90DB
+ 88+  90DB              ; ---------- --------- --------- ---------- ----------
+ 89+  90DB
+ 90+  90DB 3A 17 85     5 ld a,(Repetimos_db)
+ 91+  90DE A7               and a
+ 92+  90DF 28 07            jr z,6F
+ 93+  90E1 3D               dec a
+ 94+  90E2 32 17 85         ld (Repetimos_db),a
+ 95+  90E5 28 01            jr z,6f
+ 96+  90E7 C9           11 ret
+ 97+  90E8 21 15 85     6 ld hl,Contador_db_mov
+ 98+  90EB 35               dec (hl)                                                       ; Decrementamos el contador de .db de la cadena, (pués ya hemos ejecutado un byte de la misma).
+ 99+  90EC 2A 13 85         ld hl,(Puntero_mov)                                            ; No repetimos el mismo byte. Incrementamos (Puntero_mov) y salimos.
+100+  90EF 23               inc hl
+101+  90F0 22 13 85         ld (Puntero_mov),hl
+102+  90F3 18 F2            jr 11B
+103+  90F5 2A 11 85     7 ld hl,(Puntero_indice_mov)                                       ; PASAMOS A LA CADENA SIGUIENTE !!!!!!
+104+  90F8 3A 16 85         ld a,(Incrementa_puntero)
+105+  90FB 47               ld b,a
+106+  90FC 23           8 inc hl
+107+  90FD 10 FD            djnz 8B                                                        ; Indice_patrones_coracao +2, +4, +6, etc...
+108+  90FF 5E               ld e,(hl)
+109+  9100 23               inc hl
+110+  9101 56               ld d,(hl)
+111+  9102 EB               ex de,hl
+112+  9103 22 13 85         ld (Puntero_mov),hl                                            ; (Puntero_mov) situado el el 1er .db de la siguiente cadena de movimiento.
+113+  9106 18 DF            jr 11B
+114+  9108
+115+  9108              ; ---------- --------- --------- ---------- ----------
+116+  9108              ;
+117+  9108              ;   11/8/22
+118+  9108              ;
+119+  9108              ;   Prepara_Puntero_mov
+120+  9108
+121+  9108 E5           Prepara_Puntero_mov push hl
+122+  9109 D5               push de
+123+  910A 2A 11 85         ld hl,(Puntero_indice_mov)
+124+  910D 5E               ld e,(hl)
+125+  910E 23               inc hl
+126+  910F 56               ld d,(hl)
+127+  9110 EB               ex de,hl
+128+  9111 22 13 85         ld (Puntero_mov),hl
+129+  9114 D1               pop de
+130+  9115 E1               pop hl
+131+  9116 C9               ret
+132+  9117
+133+  9117              ; ---------- --------- --------- ---------- ----------
+134+  9117              ;
+135+  9117              ;   11/8/22
+136+  9117              ;
+137+  9117              ;   Reinicia_el_movimiento
+138+  9117
+139+  9117 CD 08 91     Reinicia_el_movimiento call Prepara_Puntero_mov
+140+  911A AF               xor a
+141+  911B 32 15 85         ld (Contador_db_mov),a
+142+  911E 32 16 85         ld (Incrementa_puntero),a
+143+  9121 C3 86 90         jp Movimiento
+144+  9124
+145+  9124              ; ---------- --------- --------- ---------- ----------
+146+  9124
+147+  9124
+148+  9124
+149+  9124
+150+  9124
+151+  9124
+152+  9124
+153+  9124
+154+  9124
+155+  9124
+156+  9124
+157+  9124
+158+  9124
+159+  9124
+160+  9124
+161+  9124
+162+  9124
+163+  9124
 # file closed: Patrones_de_mov.asm
-717   9114              	include "Guarda_foto_registros.asm"
+717   9124              	include "Guarda_foto_registros.asm"
 # file opened: Guarda_foto_registros.asm
-  1+  9114              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  2+  9114              ;
-  3+  9114              ;	3/1/23
-  4+  9114              ;
-  5+  9114              ;	Instrucciones donde interviene el Stack Pointer, (SP).
-  6+  9114
-  7+  9114              ;	ADC HL,SP	LD (addr),SP
-  8+  9114              ;	ADD HL,SP	LD SP,(addr)
-  9+  9114              ;	ADD IX,SP	LD SP,nn
- 10+  9114              ; 	ADD IY,SP	LD SP,HL
- 11+  9114              ;				LD SP,IX
- 12+  9114              ;	DEC SP		LD SP,IY
- 13+  9114
- 14+  9114              ;	EX (SP),HL
- 15+  9114              ;	EX (SP),IX
- 16+  9114              ;	EX (SP),IY
- 17+  9114
- 18+  9114              ;	INC SP
- 19+  9114
- 20+  9114
- 21+  9114                  org $7fa0
+  1+  9124              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  2+  9124              ;
+  3+  9124              ;	3/1/23
+  4+  9124              ;
+  5+  9124              ;	Instrucciones donde interviene el Stack Pointer, (SP).
+  6+  9124
+  7+  9124              ;	ADC HL,SP	LD (addr),SP
+  8+  9124              ;	ADD HL,SP	LD SP,(addr)
+  9+  9124              ;	ADD IX,SP	LD SP,nn
+ 10+  9124              ; 	ADD IY,SP	LD SP,HL
+ 11+  9124              ;				LD SP,IX
+ 12+  9124              ;	DEC SP		LD SP,IY
+ 13+  9124
+ 14+  9124              ;	EX (SP),HL
+ 15+  9124              ;	EX (SP),IX
+ 16+  9124              ;	EX (SP),IY
+ 17+  9124
+ 18+  9124              ;	INC SP
+ 19+  9124
+ 20+  9124
+ 21+  9124                  org $7fa0
  22+  7FA0
  23+  7FA0              ;   (Stack_snapshot) se sitúa inicialmente en (Album_de_fotos)=$7000.
  24+  7FA0              ;   Almacenaremos los datos/registros necesarios de la siguiente manera:
