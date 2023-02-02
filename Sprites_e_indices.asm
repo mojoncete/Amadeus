@@ -6,16 +6,16 @@
 
 	org $8000
 
-; Badsat_der. 2x2.
+; Badsat_izq. 2x2.
 
 Indice_Badsat_izq defw Badsat_izquierda
-	defw Badsat_izq_f8
-	defw Badsat_izq_f9
-	defw Badsat_izq_fa
-	defw Badsat_izq_fb
-	defw Badsat_izq_fc
-	defw Badsat_izq_fd
 	defw Badsat_izq_fe
+	defw Badsat_izq_fd
+	defw Badsat_izq_fc
+	defw Badsat_izq_fb
+	defw Badsat_izq_fa
+	defw Badsat_izq_f9
+	defw Badsat_izq_f8
 
 Badsat_izquierda DEFB $00,$08,$02,$14,$02,$2A,$02,$55
 	DEFB	$02,$AA,$02,$54,$7F,$E8,$03,$60

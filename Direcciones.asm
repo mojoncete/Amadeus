@@ -99,11 +99,11 @@ Mov_right ld hl,Ctrl_0
 	and a
 	jr z,9F
 
-	ld a,(Ctrl_0)
-	bit 7,a
-	jr nz,9F														; Consultamos el último movimiento horizontal del SPRITE.
-	ld hl,CTRL_DESPLZ
-	dec (hl)														; El último mov. horizontal ha sido a IZQUIERDA, corregimos (CTRL_DESPLZ).
+;	ld a,(Ctrl_0)
+;	bit 7,a
+;	jr nz,9F														; Consultamos el último movimiento horizontal del SPRITE.
+;	ld hl,CTRL_DESPLZ
+;	dec (hl)														; El último mov. horizontal ha sido a IZQUIERDA, corregimos (CTRL_DESPLZ).
 
 9 ld a,(Ctrl_0)
 	bit 6,a
@@ -189,7 +189,7 @@ DESPLZ_DER call Desplaza_derecha
 	ret
 
 ; ******************************************************************************************************************************************************************************************
-;	14/9/22
+;	2/2/23
 ;
 
 Desplaza_derecha ld a,(Vel_right)
@@ -208,12 +208,10 @@ Desplaza_derecha ld a,(Vel_right)
 	ld a,(Vel_right)
 	ld b,a
 	ld hl,(Puntero_DESPLZ_izq)
-
-1 inc hl
-	inc hl
+1 dec hl
+	dec hl
 	djnz 1B 														; (Vel_right) indica cuantas posiciones desplazaremos el (Puntero_DESPLZ)_
 	ld (Puntero_DESPLZ_izq),hl 										; _por el índice del Sprite.
-
 	ret
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -277,13 +275,16 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 
 ; Inicia el puntero de Sprite.
 
-2 ld hl,(Indice_Sprite_der)
+2 
+	ld hl,(Indice_Sprite_der)			
 	ld (Puntero_DESPLZ_der),hl
-
 	call Extrae_address
 	ld (Puntero_objeto),hl
 
-	ld hl,(Indice_Sprite_izq)
+	ld hl,(Indice_Sprite_izq)							; Cuando "Iniciamos el Sprite a derecha",_					
+	call Extrae_address									; _situamos (Puntero_DESPLZ_der) en el último defw_
+	dec hl 												; _del índice.
+	dec hl
 	ld (Puntero_DESPLZ_izq),hl
 
 3 ret
@@ -306,8 +307,8 @@ Mov_left
 	and a
 	jr nz,10F
 
-	ld hl,(Puntero_objeto)
-	ld (Puntero_DESPLZ_izq),hl 										; Cuando nos desplazamos a la izquierda, (Puntero_DESPLZ) se sitúa al final del índice del Sprite. El objeto es simétrico.
+;	ld hl,(Indice_Sprite_izq) 										; Inicio a Izquierda.					
+;	ld (Puntero_DESPLZ_izq),hl
 
 	ld a,(Ctrl_0)
 	bit 6,a
@@ -316,16 +317,15 @@ Mov_left
 	call Stop_Amadeus_left
 	jr nz,8F
 
-	ld hl,(Indice_Sprite_izq) 										; Hemos llegado al char.1, volvemos a situar (Puntero_DESPLZ) al principio del índice del sprite, pues la única posibilidad_ 
-	ld (Puntero_DESPLZ_izq),hl 										; _de movimiento es hacia la derecha.
-	ret
-
-10 ld a,(Ctrl_0)
-	bit 7,a
-	jr z,11F														; Consultamos el último movimiento horizontal del SPRITE.
-
-	ld hl,CTRL_DESPLZ
-	inc (hl) 														; El último mov. horizontal ha sido a IZQUIERDA, corregimos (CTRL_DESPLZ).
+;	ld hl,(Indice_Sprite_izq) 										; Hemos llegado al char.1, volvemos a situar (Puntero_DESPLZ) al principio del índice del sprite, pues la única posibilidad_ 
+;	ld (Puntero_DESPLZ_izq),hl 										; _de movimiento es hacia la derecha.
+	
+10 
+;	ld a,(Ctrl_0)
+;	bit 7,a
+;	jr z,11F														; Consultamos el último movimiento horizontal del SPRITE.
+;	ld hl,CTRL_DESPLZ
+;	inc (hl) 														; El último mov. horizontal ha sido a IZQUIERDA, corregimos (CTRL_DESPLZ).
 
 11 ld a,(Coordenada_X)	 	 								
 	and a 															
@@ -367,8 +367,14 @@ Mov_left
 
 	ld b,2 															; Para hacer que el objeto aparezca poco a poco, hemos de desplazarlo 2 veces: El primer desplazamiento_
 5 push bc 															; _pone (CTRL_DESPLZ) a "0" y el segundo a "$ff". Con esto hacemos que el Sprite tenga espacio en blanco delante_
-	ld hl,(Puntero_objeto)
+
+;	ld hl,(Puntero_objeto)
+;	ld (Puntero_DESPLZ_izq),hl
+
+	ld hl,(Indice_Sprite_izq)			
 	ld (Puntero_DESPLZ_izq),hl
+
+
 	call DESPLZ_IZQ
 	pop bc
 	djnz 5B
@@ -382,6 +388,11 @@ Mov_left
 
 8 ld hl,(Posicion_actual)
 	call DESPLZ_IZQ
+
+
+	jr $
+
+
 2 ret
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -397,12 +408,13 @@ DESPLZ_IZQ
 	res 7,(hl)
 	ret
 
-Desplaza_izquierda ld a,(Vel_left)
+Desplaza_izquierda 
+
+	ld a,(Vel_left)
 	ld b,a
 	ld hl,(Puntero_DESPLZ_izq)
-
-1 dec hl
-	dec hl
+1 inc hl
+	inc hl
 	djnz 1B 														; Seleccionamos FRAME en función de la velocidad del Sprite.
 	ld (Puntero_DESPLZ_izq),hl
 	call Extrae_address
@@ -413,7 +425,6 @@ Desplaza_izquierda ld a,(Vel_left)
 	ld a,(Vel_left)
 	ld b,a
 	ld hl,(Puntero_DESPLZ_der)
-
 1 dec hl
 	dec hl
 	djnz 1B 														; Seleccionamos FRAME en función de la velocidad del Sprite.
@@ -467,15 +478,21 @@ Ciclo_completo_2 ld a,(CTRL_DESPLZ)
 
 ; Inicia el puntero de Sprite.
 
-2 ld hl,(Indice_Sprite_izq)
-	ld (Puntero_DESPLZ_izq),hl
+2 
 
+;	call Inicia_Puntero_objeto
+
+	ld hl,(Indice_Sprite_izq) 							 				
+	ld (Puntero_DESPLZ_izq),hl
 	call Extrae_address
 	ld (Puntero_objeto),hl
 
-	ld hl,(Indice_Sprite_der)
+	ld hl,(Indice_Sprite_der)										; Cuando "Iniciamos el Sprite a Izquierdas",_					
+	call Extrae_address												; _situamos (Puntero_DESPLZ_der) en el último defw_
+	dec hl 															; _del índice.
+	dec hl
 	ld (Puntero_DESPLZ_der),hl
-
+	
 3 ret
 
 ; ---------- ---------- ---------- ---------- ---------- ----------
@@ -486,7 +503,9 @@ Ciclo_completo_2 ld a,(CTRL_DESPLZ)
 ;
 ;	Decrementa el valor del byte de control, (CTRL_DESPLZ) en función del nº de veces que hayamos desplazado el objeto, (Vel_left).	
 
-Dec_CTRL_DESPLZ ld hl,CTRL_DESPLZ 													
+Dec_CTRL_DESPLZ 
+
+	ld hl,CTRL_DESPLZ 													
 	ld a,(Vel_left)
 	and a
 	jr z,1F
