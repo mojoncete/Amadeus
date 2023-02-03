@@ -132,7 +132,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
-Puntero_indice_mov defw Indice_mov_Derecha
+Puntero_indice_mov defw Indice_mov_Escaloncitos_derecha_abajo
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0
@@ -472,7 +472,7 @@ Extrae_address ld e,(hl)
 
 ; *************************************************************************************************************************************************************
 ;
-;	31/01/23
+;	3/2/23
 ;
 ;	Iniciamos (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq). 
 ;	Estos punteros señalan al Sprite a pintar tras cada movimiento.
@@ -484,35 +484,42 @@ Extrae_address ld e,(hl)
 
 Inicia_Puntero_objeto 
 
-; 2/2/23
+	ld a,(Cuad_objeto)
+	and 1
+	push af
+	call z,Inicia_puntero_objeto_izq
+	pop af
+	ret z
+	call Inicia_puntero_objeto_der
+	ret
 
 ; Arrancamos desde la parte izquierda de la pantalla.
 ; Iniciamos (Indice_Sprite_der).  
 
-	ld hl,(Indice_Sprite_der)			
+Inicia_puntero_objeto_der ld hl,(Indice_Sprite_der)			
 	ld (Puntero_DESPLZ_der),hl
 	call Extrae_address
 	ld (Puntero_objeto),hl
-
 	ld hl,(Indice_Sprite_izq)							; Cuando "Iniciamos el Sprite a derecha",_					
 	call Extrae_address									; _situamos (Puntero_DESPLZ_der) en el último defw_
 	dec hl 												; _del índice.
 	dec hl
 	ld (Puntero_DESPLZ_izq),hl
+	ret
 
 ; Arrancamos desde la parte derecha de la pantalla.
 ; Iniciamos (Indice_Sprite_izq).  
 
-;	ld hl,(Indice_Sprite_izq)			
-;	ld (Puntero_DESPLZ_izq),hl
-;	call Extrae_address
-;	ld (Puntero_objeto),hl
-
-;	ld hl,(Indice_Sprite_der)							; Cuando "Iniciamos el Sprite a izquierda",_					
-;	call Extrae_address									; _situamos (Puntero_DESPLZ_der) en el último defw_
-;	dec hl 												; _del índice.
-;	dec hl
-;	ld (Puntero_DESPLZ_der),hl
+Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)			
+	ld (Puntero_DESPLZ_izq),hl
+	call Extrae_address
+	ld (Puntero_objeto),hl
+	ld hl,(Indice_Sprite_der)							; Cuando "Iniciamos el Sprite a izquierda",_					
+	call Extrae_address									; _situamos (Puntero_DESPLZ_der) en el último defw_
+	dec hl 												; _del índice.
+	dec hl
+	ld (Puntero_DESPLZ_der),hl
+	ret
 
 ; Tenemos que activar el bit6 de (Ctrl_0) si el Sprite que hemos cargado es AMADEUS.
 
