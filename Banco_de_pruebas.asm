@@ -52,7 +52,8 @@ Filas db 2												; Filas. [DRAW]
 Columns db 2  											; Nº de columnas. [DRAW]
 Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
 Puntero_objeto defw 0									; Donde están los datos para pintar el Sprite.
-CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos. Si el valor es negativo,_
+CTRL_DESPLZ_DER db 0									; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos a DERECHA.
+CTRL_DESPLZ_IZQ db 0									; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos a IZQUIERDA.
 ; 														; _ estamos desplazados hacia la izquierda y si es positivo, hacia la derecha.
 ; 														; El hecho de que este byte sea distinto de "0", indica que se ha modificado el nº de columnas del objeto.
 ; 														; Cuando vamos a imprimir un Sprite en pantalla, la rutina de pintado consultará este byte para situar (Puntero_objeto). [Mov_left]. 
@@ -93,12 +94,12 @@ Vel_down db 1 											; Velocidad bajada. Nº de píxeles que desplazamos el 
 Variables_de_borrado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
 	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
 	defw 0
-	db 0,0,0
+	db 0,0,0,0
 
 Variables_de_pintado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
 	defw 0
 	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
-	db 0,0,0
+	db 0,0,0,0
 
 ; Variables de funcionamiento de las rutinas de movimiento. (Mov_left), (Mov_right), (Mov_up), (Mov_down).
 
@@ -395,7 +396,7 @@ Prepara_var_pintado_borrado	ld hl,Filas
 	ld de,Variables_de_pintado
 	jr 2F
 1 ld de,Variables_de_borrado
-2 ld bc,9
+2 ld bc,10
 	ldir
 	ret
 
@@ -403,13 +404,13 @@ Prepara_var_pintado_borrado	ld hl,Filas
 
 Repone_borrar ld hl,Variables_de_borrado
 	ld de,Filas
-	ld bc,9
+	ld bc,10
 	ldir
 	ret
 
 Repone_pintar ld hl,Variables_de_pintado
 	ld de,Filas
-	ld bc,9
+	ld bc,10
 	ldir
 	ret	
 
@@ -554,7 +555,7 @@ Store_Restore_entidades
 
 	ld hl,Filas
 	ld de,(Puntero_store_entidades) 					; Puntero que se desplaza por las distintas entidades.
-	ld bc,56
+	ld bc,57
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
 ;	Incrementa el puntero STORE. Guarda los datos de `Entidad´+1 en Draw, (Puntero RESTORE).
@@ -562,7 +563,7 @@ Store_Restore_entidades
 	ld hl,(Puntero_restore_entidades)
 	ld (Puntero_store_entidades),hl 					; Situamos (Puntero_store_entidades) en la 2ª entidad.
 	ld de,Filas 										; Hemos RECUPERADO los parámetros de la 2ª entidad de su base de datos.
-	ld bc,56
+	ld bc,57
 	ldir
 
 ;	Incrementa RESTORE !!!!! 
@@ -589,7 +590,7 @@ Restore_Primera_entidad push hl
  	push bc
 	ld hl,(Puntero_store_entidades)						; (Puntero_store_entidades) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,56
+	ld bc,57
 	ldir
 	pop bc
 	pop de
@@ -610,7 +611,7 @@ Restore_Amadeus	push hl
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Filas
-	ld bc,56
+	ld bc,57
 	ldir
 	pop bc
 	pop de
@@ -631,7 +632,7 @@ Store_Amadeus push hl
  	push bc
 	ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Amadeus_db
-	ld bc,56
+	ld bc,57
 	ldir
 	pop bc
 	pop de
