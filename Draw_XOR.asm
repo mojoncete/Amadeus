@@ -8,6 +8,7 @@ Draw call Prepara_draw
 	ld a,h 						 					; El objeto existe, o se está iniciando?. Si se está iniciando, (Posicion_inicio = Posicion_actual) y saltamos_
 	and a 											; _a la subrutina [Inicializacion] donde asignaremos cuadrante y límites.
 	jr z,2F
+
 	ld a,(Cuad_objeto)			 					; El objeto ya se inició. Cargamos en A el cuadrante de pantalla en el que lo hizo y saltamos a 1F.
 	jr 1F
 2 ld hl,(Posicion_inicio) 							; No hay (Posicion_actual), por lo que el objeto se está iniciando.
@@ -366,7 +367,6 @@ cuarcuad ld a,4
 	ex af,af
 	jr 1F
 tercuad	
-;	call Fija_punteros
 	ld a,3
 	ld (Cuad_objeto),a 
 	ld hl,$4820
@@ -378,7 +378,6 @@ tercuad
 primit call column 													
 	jr c, primcuad 													
 segcuad 
-;	call Fija_punteros
 	ld a,2
 	ld (Cuad_objeto),a
 	ld hl,$4fc0
@@ -388,7 +387,6 @@ segcuad
 	ex af,af
 	jr 1F
 primcuad 
-;	call Fija_punteros
 	ld a,1
 	ld (Cuad_objeto),a 
 	ld hl,$4fc0

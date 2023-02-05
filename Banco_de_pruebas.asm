@@ -52,9 +52,7 @@ Filas db 2												; Filas. [DRAW]
 Columns db 2  											; Nº de columnas. [DRAW]
 Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
 Puntero_objeto defw 0									; Donde están los datos para pintar el Sprite.
-CTRL_DESPLZ_DER db 0									; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos a DERECHA.
-CTRL_DESPLZ_IZQ db 0									; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos a IZQUIERDA.
-; 														; _ estamos desplazados hacia la izquierda y si es positivo, hacia la derecha.
+CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos.
 ; 														; El hecho de que este byte sea distinto de "0", indica que se ha modificado el nº de columnas del objeto.
 ; 														; Cuando vamos a imprimir un Sprite en pantalla, la rutina de pintado consultará este byte para situar (Puntero_objeto). [Mov_left]. 
 Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
@@ -81,8 +79,8 @@ Indice_Sprite_izq defw Indice_Badsat_izq
 Puntero_DESPLZ_der defw 0
 Puntero_DESPLZ_izq defw 0
 
-Posicion_inicio defw $4721								; Dirección de pantalla donde aparece el objeto. [DRAW].
-Cuad_objeto db 1			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+Posicion_inicio defw $473e								; Dirección de pantalla donde aparece el objeto. [DRAW].
+Cuad_objeto db 2			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
 ; Variables de objeto. (Características).
 
@@ -133,7 +131,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
-Puntero_indice_mov defw Indice_mov_Escaloncitos_derecha_abajo
+Puntero_indice_mov defw Indice_mov_Izquierda
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0
@@ -147,7 +145,7 @@ Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado
 ; 														; _(Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
 Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta columna se modifica (Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
 
-; 52 Bytes por entidad.
+; 59 Bytes por entidad.
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 ;					         		---------;      ;---------
 
@@ -235,6 +233,7 @@ START ld sp,$ffff										 ; Situamos el inicio de Stack.
 
 	call Inicia_punteros_de_entidades 
 	call Restore_Primera_entidad
+
 	ld a,(Numero_de_entidades)
 	inc a
 	ld (Numero_de_malotes),a
@@ -254,6 +253,9 @@ Frame
 	call Extrae_foto_registros 							; Pintamos el fotograma anterior.
     ld a,1
     out ($fe),a
+
+
+;	jr $
 
 ; ----------------------------------------------------------------------
 
@@ -396,7 +398,7 @@ Prepara_var_pintado_borrado	ld hl,Filas
 	ld de,Variables_de_pintado
 	jr 2F
 1 ld de,Variables_de_borrado
-2 ld bc,10
+2 ld bc,9
 	ldir
 	ret
 
@@ -404,13 +406,13 @@ Prepara_var_pintado_borrado	ld hl,Filas
 
 Repone_borrar ld hl,Variables_de_borrado
 	ld de,Filas
-	ld bc,10
+	ld bc,9
 	ldir
 	ret
 
 Repone_pintar ld hl,Variables_de_pintado
 	ld de,Filas
-	ld bc,10
+	ld bc,9
 	ldir
 	ret	
 
@@ -501,10 +503,9 @@ Inicia_puntero_objeto_der ld hl,(Indice_Sprite_der)
 	ld (Puntero_DESPLZ_der),hl
 	call Extrae_address
 	ld (Puntero_objeto),hl
+
 	ld hl,(Indice_Sprite_izq)							; Cuando "Iniciamos el Sprite a derecha",_					
-	call Extrae_address									; _situamos (Puntero_DESPLZ_der) en el último defw_
-	dec hl 												; _del índice.
-	dec hl
+	call Extrae_address
 	ld (Puntero_DESPLZ_izq),hl
 	ret
 
@@ -515,10 +516,9 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 	ld (Puntero_DESPLZ_izq),hl
 	call Extrae_address
 	ld (Puntero_objeto),hl
+
 	ld hl,(Indice_Sprite_der)							; Cuando "Iniciamos el Sprite a izquierda",_					
 	call Extrae_address									; _situamos (Puntero_DESPLZ_der) en el último defw_
-	dec hl 												; _del índice.
-	dec hl
 	ld (Puntero_DESPLZ_der),hl
 	ret
 
@@ -555,7 +555,7 @@ Store_Restore_entidades
 
 	ld hl,Filas
 	ld de,(Puntero_store_entidades) 					; Puntero que se desplaza por las distintas entidades.
-	ld bc,57
+	ld bc,58
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
 ;	Incrementa el puntero STORE. Guarda los datos de `Entidad´+1 en Draw, (Puntero RESTORE).
@@ -563,7 +563,7 @@ Store_Restore_entidades
 	ld hl,(Puntero_restore_entidades)
 	ld (Puntero_store_entidades),hl 					; Situamos (Puntero_store_entidades) en la 2ª entidad.
 	ld de,Filas 										; Hemos RECUPERADO los parámetros de la 2ª entidad de su base de datos.
-	ld bc,57
+	ld bc,58
 	ldir
 
 ;	Incrementa RESTORE !!!!! 
@@ -590,7 +590,7 @@ Restore_Primera_entidad push hl
  	push bc
 	ld hl,(Puntero_store_entidades)						; (Puntero_store_entidades) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,57
+	ld bc,58
 	ldir
 	pop bc
 	pop de
@@ -611,7 +611,7 @@ Restore_Amadeus	push hl
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Filas
-	ld bc,57
+	ld bc,58
 	ldir
 	pop bc
 	pop de
@@ -632,7 +632,7 @@ Store_Amadeus push hl
  	push bc
 	ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Amadeus_db
-	ld bc,57
+	ld bc,58
 	ldir
 	pop bc
 	pop de
