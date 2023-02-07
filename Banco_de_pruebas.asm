@@ -46,21 +46,20 @@ Album_de_fotos equ $7000								; En (Album_de_fotos) vamos a ir almacenando los
 ;
 ; Variables de DRAW. (Motor principal).				
 ;
-; (Variables_de_borrado) *** (Variables_de_pintado).
+; (Variables_de_borrado) *** (Variables_de_pintado).	8 Bytes.
 
 Filas db 2												; Filas. [DRAW]
 Columns db 2  											; Nº de columnas. [DRAW]
 Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
 Puntero_objeto defw 0									; Donde están los datos para pintar el Sprite.
-CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos.
-; 														; El hecho de que este byte sea distinto de "0", indica que se ha modificado el nº de columnas del objeto.
-; 														; Cuando vamos a imprimir un Sprite en pantalla, la rutina de pintado consultará este byte para situar (Puntero_objeto). [Mov_left]. 
 Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
 Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 
 ; ---------- ---------- ---------- 
 
-
+CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos.
+; 														; El hecho de que este byte sea distinto de "0", indica que se ha modificado el nº de columnas del objeto.
+; 														; Cuando vamos a imprimir un Sprite en pantalla, la rutina de pintado consultará este byte para situar (Puntero_objeto). [Mov_left]. 
 Attr db %00000100										; Atributos de la entidad:
 
 ;	El formato: FBPPPIII (Flash, Brillo, Papel, Tinta).
@@ -131,12 +130,11 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
-Puntero_indice_mov defw Indice_mov_Izquierda
+Puntero_indice_mov defw Indice_mov_Izquierda_y_derecha
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0
 Repetimos_db db 0
-
 
 ; Variables de funcionamiento. [DRAW].
 
@@ -253,7 +251,6 @@ Frame
 	call Extrae_foto_registros 							; Pintamos el fotograma anterior.
     ld a,1
     out ($fe),a
-
 
 ;	jr $
 
@@ -398,7 +395,7 @@ Prepara_var_pintado_borrado	ld hl,Filas
 	ld de,Variables_de_pintado
 	jr 2F
 1 ld de,Variables_de_borrado
-2 ld bc,9
+2 ld bc,8
 	ldir
 	ret
 
@@ -406,13 +403,13 @@ Prepara_var_pintado_borrado	ld hl,Filas
 
 Repone_borrar ld hl,Variables_de_borrado
 	ld de,Filas
-	ld bc,9
+	ld bc,8
 	ldir
 	ret
 
 Repone_pintar ld hl,Variables_de_pintado
 	ld de,Filas
-	ld bc,9
+	ld bc,8
 	ldir
 	ret	
 
@@ -475,7 +472,7 @@ Extrae_address ld e,(hl)
 
 ; *************************************************************************************************************************************************************
 ;
-;	3/2/23
+;	7/2/23
 ;
 ;	Iniciamos (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq). 
 ;	Estos punteros señalan al Sprite a pintar tras cada movimiento.
@@ -505,7 +502,7 @@ Inicia_puntero_objeto_der ld hl,(Indice_Sprite_der)
 	ld (Puntero_objeto),hl
 
 	ld hl,(Indice_Sprite_izq)							; Cuando "Iniciamos el Sprite a derecha",_					
-	call Extrae_address
+;	call Extrae_address
 	ld (Puntero_DESPLZ_izq),hl
 	ret
 
@@ -518,7 +515,7 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 	ld (Puntero_objeto),hl
 
 	ld hl,(Indice_Sprite_der)							; Cuando "Iniciamos el Sprite a izquierda",_					
-	call Extrae_address									; _situamos (Puntero_DESPLZ_der) en el último defw_
+;	call Extrae_address									; _situamos (Puntero_DESPLZ_der) en el último defw_
 	ld (Puntero_DESPLZ_der),hl
 	ret
 

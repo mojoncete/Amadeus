@@ -189,6 +189,7 @@ Desplaza_derecha ld a,(Vel_right)
 1 inc hl
 	inc hl
 	djnz 1B 														; (Vel_right) indica cuantas posiciones desplazaremos el (Puntero_DESPLZ)_
+
 	ld (Puntero_DESPLZ_der),hl 										; _por el índice del Sprite.
 	call Extrae_address
 	ld (Puntero_objeto),hl
@@ -197,12 +198,20 @@ Desplaza_derecha ld a,(Vel_right)
 
 	ld a,(Vel_right)
 	ld b,a
-	ld hl,(Puntero_DESPLZ_izq)
-1 dec hl
-	dec hl
-	djnz 1B 														; (Vel_right) indica cuantas posiciones desplazaremos el (Puntero_DESPLZ)_
+
+;	ld a,(CTRL_DESPLZ)
+;	cp $f8
+;	jr nz,3F
+;	ld hl,(Indice_Sprite_izq)
+;	ld (Puntero_DESPLZ_izq),hl
+;	ret
+
+3 ld hl,(Puntero_DESPLZ_izq)
+2 inc hl
+	inc hl
+	djnz 2B 														; (Vel_right) indica cuantas posiciones desplazaremos el (Puntero_DESPLZ)_
 	ld (Puntero_DESPLZ_izq),hl 										; _por el índice del Sprite.
-	ret
+4 ret
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
@@ -370,9 +379,11 @@ DESPLZ_IZQ
 Desplaza_izquierda ld a,(Vel_left)
 	ld b,a
 	ld hl,(Puntero_DESPLZ_izq)
+
 1 inc hl
 	inc hl
 	djnz 1B 														; Seleccionamos FRAME en función de la velocidad del Sprite.
+
 	ld (Puntero_DESPLZ_izq),hl
 	call Extrae_address
 	ld (Puntero_objeto),hl							
@@ -381,10 +392,18 @@ Desplaza_izquierda ld a,(Vel_left)
 
 	ld a,(Vel_left)
 	ld b,a
-	ld hl,(Puntero_DESPLZ_der)
-1 dec hl
-	dec hl
-	djnz 1B 													 	; Seleccionamos FRAME en función de la velocidad del Sprite.
+
+;	ld a,(CTRL_DESPLZ)
+;	cp $fe
+;	jr nz,3F
+;	ld hl,(Indice_Sprite_der)
+;	ld (Puntero_DESPLZ_der),hl
+;	ret
+
+3 ld hl,(Puntero_DESPLZ_der)
+2 inc hl
+	inc hl
+	djnz 2B 													 	; Seleccionamos FRAME en función de la velocidad del Sprite.
 	ld (Puntero_DESPLZ_der),hl
 	ret
 

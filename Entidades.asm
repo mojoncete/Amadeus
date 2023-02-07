@@ -21,7 +21,7 @@ Indice_de_entidades									; 58 Bytes por entidad.
 Amadeus_db db 2,2									; (Filas) / (Columns).
 	defw 0		 									; (Posicion_actual).
 	defw 0	 										; (Puntero_objeto).
-	db 0,0,0										; (CTRL_DESPLZ) / (Coordenada_X) / (Coordenada_Y).
+	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
 
 	db %00000101									; (Attr).
 
@@ -59,7 +59,7 @@ Amadeus_db db 2,2									; (Filas) / (Columns).
 Entidad_1 db 0,0									; (Filas) / (Columns).
 	defw 0											; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
-	db 0,0,0										; (CTRL_DESPLZ) / (Coordenada_X) / (Coordenada_Y).
+	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
 
 	db %00000000 									; (Attr).
 
@@ -97,7 +97,7 @@ Entidad_1 db 0,0									; (Filas) / (Columns).
 Entidad_2 db 2,2		                            ; (Filas) / (Columns).
 	defw 0                                          ; (Posicion_actual).
 	defw 0											; (Puntero_objeto).
-	db 0,0,0										; (CTRL_DESPLZ) / (Coordenada_X) / (Coordenada_Y).
+	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
 
 	db %00000010									; (Attr).
 
@@ -135,7 +135,7 @@ Entidad_2 db 2,2		                            ; (Filas) / (Columns).
 Entidad_3 db 2,2                                 	; (Filas) / (Columns).
 	defw 0                                          ; (Posicion_actual).
 	defw 0											; (Puntero_objeto).
-	db 0,0,0										; (CTRL_DESPLZ) / (Coordenada_X) / (Coordenada_Y).
+	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
 
 	db %00000100									; (Attr).
 
@@ -174,7 +174,7 @@ Entidad_3 db 2,2                                 	; (Filas) / (Columns).
 Entidad_4 db 2,2                                  	; (Filas) / (Columns).
 	defw 0                                          ; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
-	db 0,0,0										; (CTRL_DESPLZ) / (Coordenada_X) / (Coordenada_Y).
+	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
 
 	db %00000001									; (Attr).
 

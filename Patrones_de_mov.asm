@@ -22,16 +22,17 @@ Arriba db 2,%01000000,0
 
 Escaloncitos_izquierda_arriba db 3,%00010100,%01000100,0
 Escaloncitos_derecha_arriba db 3,%00100100,%01000100,0
-Escaloncitos_derecha_abajo db 3,%00100100,%10000100,0
 Escaloncitos_izquierda_abajo db 3,%00010100,%10000100,0                ; El "0"; último .db indica que ya hemos terminado de ejecutar todas las cadenas de movimiento.
-Onda_senoidal db 43,%01000100,%01100000,%01000010,%01100000,%01000010,%01100000,%01000000,%01100011
+Escaloncitos_derecha_abajo db 3,%00100100,%10000100,0
+Onda_senoidal db 44,%01000100,%01100000,%01000010,%01100000,%01000010,%01100000,%01000000,%01100011
     db %00100010,%01100000,%00100101,%10100000,%00100010,%10100011,%10000000,%10100000
     db %10000010,%10100000,%10000010,%10100000,%10000100,%10100000,%10000011,%10100000
     db %10000010,%10100000,%10000010,%10100000,%10000000,%10100011,%00100010,%10100000
     db %00100101,%01100000,%00100010,%01100011,%01000000,%01100000,%01000010,%01100000
-    db %01000010,%01100000,%01000100
-Derecha_e_izquierda db 11,%00101111,%00011111,0
-Izquierda_y_derecha db 9,%00011111,%00011111,%00011111,%00011111,%00101111,%00101111,%00101111,%00101111,0
+    db %01000010,%01100000,%01000100,0
+
+Derecha_e_izquierda db 3,%00100100,%00010100,0
+Izquierda_y_derecha db 3,%00010100,%00100100,0
 
 Indice_mov_Izquierda_y_derecha defw Izquierda_y_derecha 
 Indice_mov_Derecha_e_izquierda defw Derecha_e_izquierda
@@ -66,7 +67,7 @@ Decoder ld a,(Repetimos_db)
     ld a,(hl)
     and a
     jr z, Reinicia_el_movimiento                              ; Hemos terminado de ejecutar todas las cadenas de movimiento. Llamamos a [Fin_de_movimiento].
-     and $0f
+    and $0f
     ld (Repetimos_db),a                                         ; Si la variable de repetición de .db es "0" hemos de inicializar dicha variable antes de empezar con la decodificación del .db de_                                      
 ;                                                               ; _movimiento. Este valor lo proporciona el nibble `bajo´ del byte.
 12 ld hl,(Puntero_mov)
