@@ -32,7 +32,7 @@ Onda_senoidal db 44,%01000100,%01100000,%01000010,%01100000,%01000010,%01100000,
     db %01000010,%01100000,%01000100,0
 
 Derecha_e_izquierda db 3,%00100100,%00010100,0
-Izquierda_y_derecha db 3,%00010100,%00100100,0
+Izquierda_y_derecha db 3,%00011111,%00101111,0
 
 Indice_mov_Izquierda_y_derecha defw Izquierda_y_derecha 
 Indice_mov_Derecha_e_izquierda defw Derecha_e_izquierda

@@ -27,6 +27,7 @@ Mov_down ld hl,Ctrl_0
 	ld a,l
 	add $20
 	jr nc,1F 														
+
 ; ------------------------------
 	call Reaparece_arriba
 ;	call Reinicio
@@ -185,11 +186,9 @@ DESPLZ_DER call Desplaza_derecha
 Desplaza_derecha ld a,(Vel_right)
 	ld b,a
 	ld hl,(Puntero_DESPLZ_der)
-
 1 inc hl
 	inc hl
 	djnz 1B 														; (Vel_right) indica cuantas posiciones desplazaremos el (Puntero_DESPLZ)_
-
 	ld (Puntero_DESPLZ_der),hl 										; _por el índice del Sprite.
 	call Extrae_address
 	ld (Puntero_objeto),hl
@@ -198,15 +197,7 @@ Desplaza_derecha ld a,(Vel_right)
 
 	ld a,(Vel_right)
 	ld b,a
-
-;	ld a,(CTRL_DESPLZ)
-;	cp $f8
-;	jr nz,3F
-;	ld hl,(Indice_Sprite_izq)
-;	ld (Puntero_DESPLZ_izq),hl
-;	ret
-
-3 ld hl,(Puntero_DESPLZ_izq)
+	ld hl,(Puntero_DESPLZ_izq)
 2 inc hl
 	inc hl
 	djnz 2B 														; (Vel_right) indica cuantas posiciones desplazaremos el (Puntero_DESPLZ)_
@@ -379,31 +370,32 @@ DESPLZ_IZQ
 Desplaza_izquierda ld a,(Vel_left)
 	ld b,a
 	ld hl,(Puntero_DESPLZ_izq)
-
 1 inc hl
 	inc hl
 	djnz 1B 														; Seleccionamos FRAME en función de la velocidad del Sprite.
-
 	ld (Puntero_DESPLZ_izq),hl
 	call Extrae_address
 	ld (Puntero_objeto),hl							
 
 ; Modifica (Puntero_DESPLZ_der).
 
-	ld a,(Vel_left)
+; Vamos a descontar a "8" el nº de movimientos que hemos efectuado a la izq.
+; Cuántos movimientos hemos hecho ??
+; DE contiene (Puntero_DESPLZ_izq).
+;	jr $
+
+	ld hl,(Indice_Sprite_izq)
+	ex de,hl
+	sbc hl,de
+	srl l
+	ld a,8
+	sub l
+	
 	ld b,a
-
-;	ld a,(CTRL_DESPLZ)
-;	cp $fe
-;	jr nz,3F
-;	ld hl,(Indice_Sprite_der)
-;	ld (Puntero_DESPLZ_der),hl
-;	ret
-
-3 ld hl,(Puntero_DESPLZ_der)
+	ld hl,(Indice_Sprite_der)
 2 inc hl
 	inc hl
-	djnz 2B 													 	; Seleccionamos FRAME en función de la velocidad del Sprite.
+	djnz 2B 													 	
 	ld (Puntero_DESPLZ_der),hl
 	ret
 
@@ -437,7 +429,7 @@ modifica_parametros_1er_DESPLZ ld a,(CTRL_DESPLZ) 				    ; Incrementamos el nª
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Ciclo_completo_2 ld a,(CTRL_DESPLZ)
-	cp $f8
+	cp $f7
 	jr z,1F 												   		; Salimos de la rutina si no hemos completado 8 o más desplazamientos.
 	jr 3f
 
