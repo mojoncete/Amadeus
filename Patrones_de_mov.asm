@@ -17,13 +17,14 @@
 
 Izquierda db 2,%00010000,0
 Derecha db 2,%00100000,0
-Abajo db 2,%10000000,0
 Arriba db 2,%01000000,0
+Abajo db 2,%10001111,0
 
+Escaloncitos_izquierda_abajo db 3,%00010100,%10000100,0    ; El "0"; último .db indica que ya hemos terminado de ejecutar todas las cadenas de movimiento.     
 Escaloncitos_izquierda_arriba db 3,%00010100,%01000100,0
 Escaloncitos_derecha_arriba db 3,%00100100,%01000100,0
-Escaloncitos_izquierda_abajo db 3,%00010100,%10000100,0                ; El "0"; último .db indica que ya hemos terminado de ejecutar todas las cadenas de movimiento.
 Escaloncitos_derecha_abajo db 3,%00100100,%10000100,0
+
 Onda_senoidal db 44,%01000100,%01100000,%01000010,%01100000,%01000010,%01100000,%01000000,%01100011
     db %00100010,%01100000,%00100101,%10100000,%00100010,%10100011,%10000000,%10100000
     db %10000010,%10100000,%10000010,%10100000,%10000100,%10100000,%10000011,%10100000
@@ -31,8 +32,8 @@ Onda_senoidal db 44,%01000100,%01100000,%01000010,%01100000,%01000010,%01100000,
     db %00100101,%01100000,%00100010,%01100011,%01000000,%01100000,%01000010,%01100000
     db %01000010,%01100000,%01000100,0
 
-Derecha_e_izquierda db 3,%00100100,%00010100,0
-Izquierda_y_derecha db 3,%00011111,%00101111,0
+Derecha_e_izquierda db 9,%00101111,%00101111,%00101111,%00101111,%00011111,%00011111,%00011111,%00011111,0
+Izquierda_y_derecha db 9,%00011111,%00011111,%00011111,%00011111,%00101111,%00101111,%00101111,%00101111,0
 
 Indice_mov_Izquierda_y_derecha defw Izquierda_y_derecha 
 Indice_mov_Derecha_e_izquierda defw Derecha_e_izquierda

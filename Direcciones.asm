@@ -193,16 +193,27 @@ Desplaza_derecha ld a,(Vel_right)
 	call Extrae_address
 	ld (Puntero_objeto),hl
 
-; Modifica (Puntero_DESPLZ_izq).
+; Vamos a descontar a "8" el nº de movimientos que hemos efectuado a la derecha.
+; Cuántos movimientos hemos hecho ??
+; DE contiene (Puntero_DESPLZ_der).
+	
+;	jr $
 
-	ld a,(Vel_right)
+	and a
+	ld hl,(Indice_Sprite_der)
+	ex de,hl
+	sbc hl,de
+	srl l
+	ld a,8
+	sub l
+	
 	ld b,a
-	ld hl,(Puntero_DESPLZ_izq)
+	ld hl,(Indice_Sprite_izq)
 2 inc hl
 	inc hl
-	djnz 2B 														; (Vel_right) indica cuantas posiciones desplazaremos el (Puntero_DESPLZ)_
-	ld (Puntero_DESPLZ_izq),hl 										; _por el índice del Sprite.
-4 ret
+	djnz 2B 													 	
+	ld (Puntero_DESPLZ_izq),hl
+	ret
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
@@ -384,6 +395,7 @@ Desplaza_izquierda ld a,(Vel_left)
 ; DE contiene (Puntero_DESPLZ_izq).
 ;	jr $
 
+	and a
 	ld hl,(Indice_Sprite_izq)
 	ex de,hl
 	sbc hl,de
