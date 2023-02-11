@@ -193,21 +193,44 @@ Desplaza_derecha ld a,(Vel_right)
 	call Extrae_address
 	ld (Puntero_objeto),hl
 
+; Modifica (Puntero_DESPLZ_izq).
+
 ; Vamos a descontar a "8" el nº de movimientos que hemos efectuado a la derecha.
 ; Cuántos movimientos hemos hecho ??
 ; DE contiene (Puntero_DESPLZ_der).
-	
-;	jr $
 
-	and a
 	ld hl,(Indice_Sprite_der)
 	ex de,hl
+	and a
 	sbc hl,de
 	srl l
-	ld a,8
+6 ld a,8
 	sub l
+	jr nc,3F	
+
+; Hemos salido del índice. Hay que ajustar (Puntero_DESPLZ_der) dentro del mismo.
+; B="0".
+
+4 inc b
+	inc a
+	jr nz,4B
+	ld a,b
+	ex af,af
+	ld hl,(Indice_Sprite_der)
+5 inc hl
+	inc hl
+	djnz 5B
+	ld (Puntero_DESPLZ_der),hl
+	call Extrae_address
+	ld (Puntero_objeto),hl			
+	ex af,af
+	ld l,a
+	jr 6B	
+
+
+; Permanecemos en el índice. No hay que reajustar (Puntero_DESPLZ_izq).
 	
-	ld b,a
+3 ld b,a
 	ld hl,(Indice_Sprite_izq)
 2 inc hl
 	inc hl
@@ -262,7 +285,18 @@ modifica_parametros_1er_DESPLZ_2 ld a,(CTRL_DESPLZ)		 		  ; Incrementamos el nª
 Ciclo_completo ld a,(CTRL_DESPLZ)
 	cp $ff
 	jr z,1F 												     ; Salimos de la rutina si no hemos completado 8 o más desplazamientos.
-	jr 3f
+	and $f0
+	jr nz,3F
+
+; (CTRL_DESPLZ) fuera de rango, (por encima de $ff), hay que reajustar.	
+
+	ld a,(CTRL_DESPLZ)
+	ld b,a
+	ld a,$f8
+	add b
+	ld (CTRL_DESPLZ),a 
+	jr 3F
+
 1 ld hl,Columns													 ; Tras 8 desplazamientos el objeto desplazado es igual al original.
 	dec (hl) 													 ; Decrementamos el nº de (Columns).
 	xor a 														 ; Reiniciamos (CTRL_DESPLZ).
@@ -387,23 +421,44 @@ Desplaza_izquierda ld a,(Vel_left)
 	ld (Puntero_DESPLZ_izq),hl
 	call Extrae_address
 	ld (Puntero_objeto),hl							
-
+	
 ; Modifica (Puntero_DESPLZ_der).
 
 ; Vamos a descontar a "8" el nº de movimientos que hemos efectuado a la izq.
 ; Cuántos movimientos hemos hecho ??
 ; DE contiene (Puntero_DESPLZ_izq).
-;	jr $
 
-	and a
 	ld hl,(Indice_Sprite_izq)
 	ex de,hl
+	and a
 	sbc hl,de
 	srl l
-	ld a,8
+6 ld a,8
 	sub l
-	
-	ld b,a
+	jr nc,3F	
+
+; Hemos salido del índice. Hay que ajustar (Puntero_DESPLZ_izq) dentro del mismo.
+; B="0".
+
+4 inc b
+	inc a
+	jr nz,4B
+	ld a,b
+	ex af,af
+	ld hl,(Indice_Sprite_izq)
+5 inc hl
+	inc hl
+	djnz 5B
+	ld (Puntero_DESPLZ_izq),hl
+	call Extrae_address
+	ld (Puntero_objeto),hl			
+	ex af,af
+	ld l,a
+	jr 6B
+
+; Permanecemos en el índice. No hay que reajustar (Puntero_DESPLZ_izq).
+
+3 ld b,a
 	ld hl,(Indice_Sprite_der)
 2 inc hl
 	inc hl
@@ -443,7 +498,21 @@ modifica_parametros_1er_DESPLZ ld a,(CTRL_DESPLZ) 				    ; Incrementamos el nª
 Ciclo_completo_2 ld a,(CTRL_DESPLZ)
 	cp $f7
 	jr z,1F 												   		; Salimos de la rutina si no hemos completado 8 o más desplazamientos.
-	jr 3f
+	jr nc,3F
+
+; (CTRL_DESPLZ) fuera de rango, (por debajo de $f7), hay que reajustar.
+
+	ld b,0
+4 inc b
+	inc a
+	cp $f7
+	jr nz,4B
+	ld a,$ff
+	sub b
+	ld (CTRL_DESPLZ),a
+	jr 3F
+
+; Se completa el ciclo de movimiento. (CTRL_DESPLZ)="0", se generan coordenadas y se corrige (Posicion_actual).
 
 1 ld hl,Columns
 	dec (hl)

@@ -78,7 +78,7 @@ Indice_Sprite_izq defw Indice_Badsat_izq
 Puntero_DESPLZ_der defw 0
 Puntero_DESPLZ_izq defw 0
 
-Posicion_inicio defw $4721								; Dirección de pantalla donde aparece el objeto. [DRAW].
+Posicion_inicio defw $4001								; Dirección de pantalla donde aparece el objeto. [DRAW].
 Cuad_objeto db 1			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
 ; Variables de objeto. (Características).
@@ -130,7 +130,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
-Puntero_indice_mov defw Indice_mov_Derecha_e_izquierda
+Puntero_indice_mov defw Indice_mov_Escaloncitos_derecha_abajo
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0
