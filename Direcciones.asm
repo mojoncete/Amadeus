@@ -143,8 +143,9 @@ Mov_right ld hl,Ctrl_0
 
 ; ---------- ---------- ----------
 
-3 call Reaparece_izquierda 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
-;	call Reinicio
+3 
+;	call Reaparece_izquierda 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
+	call Reinicio
 
 ; ---------- ---------- ----------
 ;
@@ -296,7 +297,6 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 	add b
 	ld (CTRL_DESPLZ),a 
 	jr 3F
-
 1 ld hl,Columns													 ; Tras 8 desplazamientos el objeto desplazado es igual al original.
 	dec (hl) 													 ; Decrementamos el nº de (Columns).
 	xor a 														 ; Reiniciamos (CTRL_DESPLZ).
@@ -372,8 +372,8 @@ Mov_left
 ; ---------- ---------- ----------
 
 4 
-	call Reaparece_derecha 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
-;	call Reinicio
+;	call Reaparece_derecha 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
+	call Reinicio
 
 ; ---------- ---------- ----------
 
