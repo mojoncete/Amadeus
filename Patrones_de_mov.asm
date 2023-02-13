@@ -29,11 +29,11 @@ Escaloncitos_izquierda_arriba db 3,%00010100,%01000100,0
 Escaloncitos_derecha_arriba db 3,%00100100,%01000100,0
 Escaloncitos_derecha_abajo db 4,%00100100,%10000100,%00100100,%10000100
 Escaloncitos_izquierda_abajo db 5,%00010100,%10000100,%00010100,%10000100,0
-Derecha_e_izquierda db 3,%00101111,%00011000,0
-Izquierda_y_derecha db 3,%00011111,%00101000,0
-
+Derecha_e_izquierda db 3,%00101111,%00011111,0
+Izquierda_y_derecha db 3,%00011111,%00101111,0
 
 ; ----- ----- ----- ----- -----
+
 Indice_mov_Izquierda_y_derecha defw Izquierda_y_derecha 
 Indice_mov_Derecha_e_izquierda defw Derecha_e_izquierda
 Indice_mov_Izquierda defw Izquierda

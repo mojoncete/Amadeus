@@ -144,8 +144,8 @@ Mov_right ld hl,Ctrl_0
 ; ---------- ---------- ----------
 
 3 
-;	call Reaparece_izquierda 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
-	call Reinicio
+	call Reaparece_izquierda 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
+;	call Reinicio
 
 ; ---------- ---------- ----------
 ;
@@ -181,7 +181,7 @@ DESPLZ_DER call Desplaza_derecha
 	ret
 
 ; ******************************************************************************************************************************************************************************************
-;	2/2/23
+;	13/2/23
 ;
 
 Desplaza_derecha ld a,(Vel_right)
@@ -224,10 +224,15 @@ Desplaza_derecha ld a,(Vel_right)
 	ld (Puntero_DESPLZ_der),hl
 	call Extrae_address
 	ld (Puntero_objeto),hl			
-	ex af,af
+
+; Si nos hemos salido del índice es porque hemos completado un ciclo completo. Habrá que actualizar_
+; _(Posicion_actual).
+
+	ld hl,Posicion_actual
+	inc (hl)
+    ex af,af
 	ld l,a
 	jr 6B	
-
 
 ; Permanecemos en el índice. No hay que reajustar (Puntero_DESPLZ_izq).
 	
@@ -372,8 +377,8 @@ Mov_left
 ; ---------- ---------- ----------
 
 4 
-;	call Reaparece_derecha 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
-	call Reinicio
+	call Reaparece_derecha 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
+;	call Reinicio
 
 ; ---------- ---------- ----------
 
@@ -452,6 +457,12 @@ Desplaza_izquierda ld a,(Vel_left)
 	ld (Puntero_DESPLZ_izq),hl
 	call Extrae_address
 	ld (Puntero_objeto),hl			
+
+; Si nos hemos salido del índice es porque hemos completado un ciclo completo. Habrá que actualizar_
+; _(Posicion_actual).
+
+	ld hl,Posicion_actual
+	dec (hl)
 	ex af,af
 	ld l,a
 	jr 6B
