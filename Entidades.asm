@@ -25,8 +25,8 @@ Amadeus_db db 2,2									; (Filas) / (Columns).
 
 	db %00000101									; (Attr).
 
-	defw Indice_Amadeus								; (Indice_Sprite_der).		
-	defw Indice_Amadeus								; (Indice_Sprite_izq).
+	defw Indice_Amadeus_der							; (Indice_Sprite_der).		
+	defw Indice_Amadeus_izq							; (Indice_Sprite_izq).
 	defw 0		 									; (Puntero_DESPLZ_der).
 	defw 0											; (Puntero_DESPLZ_izq).
 

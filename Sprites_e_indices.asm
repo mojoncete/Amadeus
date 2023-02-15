@@ -138,13 +138,22 @@ Badsat_der_fe DEFB $00,$20,$00,$00,$50,$80,$00,$A8
 
 ; Amadeus. 2x2.
 
-Indice_Amadeus defw Amadeus
+Indice_Amadeus_der defw Amadeus
 	defw 0	
 	defw Amadeus_F9							; [$F9] right - [$FA] left 
 	defw 0	
 	defw Amadeus_Fb     					; [$FB] right - [$FC] left                     
 	defw 0	
 	defw Amadeus_Fd							; [$FD] right - [$FE] left 
+	defw 0	 								; (Fín de índice).
+
+Indice_Amadeus_izq defw Amadeus
+	defw 0	
+	defw Amadeus_Fd							; [$F9] right - [$FA] left 
+	defw 0	
+	defw Amadeus_Fb     					; [$FB] right - [$FC] left                     
+	defw 0	
+	defw Amadeus_F9							; [$FD] right - [$FE] left 
 	defw 0	 								; (Fín de índice).
 
 Amadeus DEFB $01,$80,$23,$C4,$26,$64,$24,$24

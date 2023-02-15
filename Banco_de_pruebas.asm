@@ -55,7 +55,7 @@ Puntero_objeto defw 0									; Donde están los datos para pintar el Sprite.
 Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
 Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 
-; ---------- ---------- ---------- 
+; ---------- ---------- ---------- ---------;      ;---------
 
 CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos.
 ; 														; El hecho de que este byte sea distinto de "0", indica que se ha modificado el nº de columnas del objeto.
@@ -154,7 +154,7 @@ Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta column
 Puntero_store_entidades defw 0
 Puntero_restore_entidades defw 0
 Indice_restore defw 0
-Numero_de_entidades db 0								; Nº de objetos en pantalla, (contando con Amadeus).
+Numero_de_entidades db 2								; Nº de objetos en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -489,9 +489,9 @@ Inicia_Puntero_objeto
 	push af
 	call z,Inicia_puntero_objeto_izq
 	pop af
-	ret z
+	jr z,1F
 	call Inicia_puntero_objeto_der
-	ret
+	jr 1F
 
 ; Arrancamos desde la parte izquierda de la pantalla.
 ; Iniciamos (Indice_Sprite_der).  
@@ -521,7 +521,7 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 
 ; Tenemos que activar el bit6 de (Ctrl_0) si el Sprite que hemos cargado es AMADEUS.
 
-	ld hl,Amadeus
+1 ld hl,Amadeus
 	ld bc,(Puntero_objeto)
 	sub hl,bc
 	ret nz

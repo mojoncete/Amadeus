@@ -181,7 +181,7 @@ DESPLZ_DER call Desplaza_derecha
 	ret
 
 ; ******************************************************************************************************************************************************************************************
-;	13/2/23
+;	15/02/23
 ;
 
 Desplaza_derecha ld a,(Vel_right)
@@ -200,7 +200,7 @@ Desplaza_derecha ld a,(Vel_right)
 ; Cuántos movimientos hemos hecho ??
 ; DE contiene (Puntero_DESPLZ_der).
 
-	ld hl,(Indice_Sprite_der)
+7 ld hl,(Indice_Sprite_der)
 	ex de,hl
 	and a
 	sbc hl,de
@@ -242,7 +242,7 @@ Desplaza_derecha ld a,(Vel_right)
 	inc hl
 	djnz 2B 													 	
 	ld (Puntero_DESPLZ_izq),hl
-	ret
+8 ret
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
@@ -321,7 +321,7 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 
 ; ******************************************************************************************************************************************************************************************
 ;
-;	21/01/23
+;	15/02/23
 ;
 ;	Mov_left.
 ;
@@ -333,20 +333,18 @@ Mov_left
 	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
 ; 																	; _esta información para evitar que la entidad se vuelva borrar/pintar_
 ; 																	; _ en el caso de que no lo haya.
-	ld a,(CTRL_DESPLZ)
-	and a
-	jr nz,11F
-
 	ld a,(Ctrl_0)
 	bit 6,a
-	jr z,8F 														; Estamos moviendo Amadeus???????. Si es así hemos de comprobar que que no hemos llegado al char.1 de la línea, [Stop_Amadeus].
+	jr z,11F 														; Estamos moviendo Amadeus???????. Si es así hemos de comprobar que que no hemos llegado al char.1 de la línea, [Stop_Amadeus].
 
 	call Stop_Amadeus_left
+	ret z
 	jr nz,8F
 
 11 ld a,(Coordenada_X)	 	 								
 	and a 															
 	jr nz,8F
+
 	ld a,(CTRL_DESPLZ) 			 									; Si el Sprite no está en el 1er char de la línea, (desaparece por la izquierda), o estando en este, _
 	and a 															; _ (CTRL_DESPLZ)="0", cargamos HL con la (Posicion_actual) y ejecutamos la rutina de desplazamiento, _
 	jr z,8F 														; _ pués aún podemos desplazarlo antes de desaparecer.
@@ -417,7 +415,9 @@ DESPLZ_IZQ
 	res 7,(hl)
 	ret
 
-Desplaza_izquierda ld a,(Vel_left)
+Desplaza_izquierda 
+
+	ld a,(Vel_left)
 	ld b,a
 	ld hl,(Puntero_DESPLZ_izq)
 1 inc hl
@@ -425,15 +425,15 @@ Desplaza_izquierda ld a,(Vel_left)
 	djnz 1B 														; Seleccionamos FRAME en función de la velocidad del Sprite.
 	ld (Puntero_DESPLZ_izq),hl
 	call Extrae_address
-	ld (Puntero_objeto),hl							
-	
+	ld (Puntero_objeto),hl		
+
 ; Modifica (Puntero_DESPLZ_der).
 
 ; Vamos a descontar a "8" el nº de movimientos que hemos efectuado a la izq.
 ; Cuántos movimientos hemos hecho ??
 ; DE contiene (Puntero_DESPLZ_izq).
 
-	ld hl,(Indice_Sprite_izq)
+7 ld hl,(Indice_Sprite_izq)
 	ex de,hl
 	and a
 	sbc hl,de
@@ -475,7 +475,7 @@ Desplaza_izquierda ld a,(Vel_left)
 	inc hl
 	djnz 2B 													 	
 	ld (Puntero_DESPLZ_der),hl
-	ret
+8 ret
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
