@@ -154,7 +154,7 @@ Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta column
 Puntero_store_entidades defw 0
 Puntero_restore_entidades defw 0
 Indice_restore defw 0
-Numero_de_entidades db 2								; Nº de objetos en pantalla, (contando con Amadeus).
+Numero_de_entidades db 1								; Nº de objetos en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -252,8 +252,6 @@ Frame
     ld a,1
     out ($fe),a
 
-;	jr $
-
 ; ----------------------------------------------------------------------
 
 	ld hl,Album_de_fotos
@@ -270,7 +268,15 @@ Frame
 	bit 4,a
 	jr z,1F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
     call Guarda_foto_entidad_a_pintar					; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!!!
-1 ld hl,Ctrl_0
+
+; Voy a utilizar una rutina de lectura de teclado para disparar con cualquier entidad.
+; 16/02/23.
+; [[[
+1 call Detecta_disparo_entidad
+; ]]]
+
+;1
+	ld hl,Ctrl_0
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
 	xor a
 	ld (Obj_dibujado),a
@@ -673,7 +679,7 @@ wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: 
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
-;	21/4/22	
+;	16/02/23
 
 Movimiento_Amadeus 
 
@@ -685,13 +691,29 @@ Movimiento_Amadeus
 	in a,($fe)
 	and $01
 	ret z
+
 	ld a,$f7
 	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
 	and $02													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $02 resulta "0"  llama a la rutina "Mov_der".
 	call z,Mov_right										;			"			"			"			"			"			"			"			"
+
+; Disparo.
+
+	ld a,$f7												; "5" para disparar.
+	in a,($fe)
+	and $10
+	call z,Calcula_punto_de_disparo_inicial
     ret
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;
+Detecta_disparo_entidad
+
+	ld a,$7f
+	in a,($fe)
+	and 1
+	ret nz
+	call Calcula_punto_de_disparo_inicial
 
 ; Pinta indicadores de FILAS. ------------------------------------------------------
 
@@ -729,11 +751,10 @@ Bucle_1 push bc
 
 ; ---------------------------------------------------------------
 
+	include "Disparo.asm"
 	include "Draw_XOR.asm"
 	include "Rutinas_de_impresion_sprites.asm" 
 	include "calcula_tercio.asm"
-	include "Calcula_direccion_atributos.asm"
-	include "Define_atributos.asm"
 	include "Cls.asm"
 	include "Direcciones.asm"
 	include "Genera_coordenadas.asm"

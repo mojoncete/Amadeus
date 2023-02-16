@@ -444,7 +444,7 @@
 123+  847D
 124+  847D 00 00        	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 125+  847F
-126+  847F ED 90 00 00  	defw Indice_mov_Escaloncitos_izquierda_abajo,0  ; (Puntero_indice_mov) / (Puntero_mov).
+126+  847F 0B 91 00 00  	defw Indice_mov_Escaloncitos_izquierda_abajo,0  ; (Puntero_indice_mov) / (Puntero_mov).
 127+  8483 00 00 00     	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).
 128+  8486
 129+  8486 00           	db 0 											; (Columnas).
@@ -483,7 +483,7 @@
 162+  84B7
 163+  84B7 00 00        	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 164+  84B9
-165+  84B9 EF 90 00 00  	defw Indice_mov_Onda_senoidal,0					; (Puntero_indice_mov) / (Puntero_mov).
+165+  84B9 0D 91 00 00  	defw Indice_mov_Onda_senoidal,0					; (Puntero_indice_mov) / (Puntero_mov).
 166+  84BD 00 00 00     	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).
 167+  84C0
 168+  84C0 00           	db 0 											; (Columnas).
@@ -522,7 +522,7 @@
 201+  84F1
 202+  84F1 00 00        	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 203+  84F3
-204+  84F3 DF 90 00 00  	defw Indice_mov_Izquierda,0                     ; (Puntero_indice_mov) / (Puntero_mov).
+204+  84F3 FD 90 00 00  	defw Indice_mov_Izquierda,0                     ; (Puntero_indice_mov) / (Puntero_mov).
 205+  84F7 00 00 00     	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).
 206+  84FA
 207+  84FA 00           	db 0 											; (Columnas).
@@ -642,7 +642,7 @@
 130   852D
 131   852D              ; Movimiento.
 132   852D
-133   852D DB 90        Puntero_indice_mov defw Indice_mov_Izquierda_y_derecha
+133   852D F9 90        Puntero_indice_mov defw Indice_mov_Izquierda_y_derecha
 134   852F 00 00        Puntero_mov defw 0
 135   8531 00           Contador_db_mov db 0
 136   8532 00           Incrementa_puntero db 0
@@ -666,7 +666,7 @@
 154   8538 00 00        Puntero_store_entidades defw 0
 155   853A 00 00        Puntero_restore_entidades defw 0
 156   853C 00 00        Indice_restore defw 0
-157   853E 02           Numero_de_entidades db 2								; Nº de objetos en pantalla, (contando con Amadeus).
+157   853E 01           Numero_de_entidades db 1								; Nº de objetos en pantalla, (contando con Amadeus).
 158   853F 00           Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 159   8540              ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 160   8540              ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -707,7 +707,7 @@
 195   855C
 196   855C              ;	call Pinta_FILAS
 197   855C
-198   855C CD 5F 87     	call Pulsa_ENTER
+198   855C CD 62 87     	call Pulsa_ENTER
 199   855F
 200   855F 21 3E 85     	ld hl,Numero_de_entidades
 201   8562 46           	ld b,(hl)
@@ -719,30 +719,30 @@
 207   8567              ;   Inicialmente tengo cargada la 1ª entidad en DRAW.
 208   8567              ;	Pintamos el resto de entidades:
 209   8567
-210   8567 CD 7F 86     	call Inicia_punteros_de_entidades
+210   8567 CD 82 86     	call Inicia_punteros_de_entidades
 211   856A
 212   856A              ;	INICIA ENTIDADES!!!!!
 213   856A
 214   856A C5           1 push bc  												; Guardo el contador de entidades.
-215   856B CD B2 86      	call Inicia_Puntero_objeto
-216   856E CD B6 87     	call Draw
+215   856B CD B5 86      	call Inicia_Puntero_objeto
+216   856E CD E4 87     	call Draw
 217   8571 CD A0 7F     	call Guarda_foto_registros
-218   8574 CD FA 86     	call Store_Restore_entidades 				    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_entidades) en la siguiente.
+218   8574 CD FD 86     	call Store_Restore_entidades 				    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_entidades) en la siguiente.
 219   8577 C1           	pop bc
 220   8578 10 F0        	djnz 1B  											; Decremento el contador de entidades.
 221   857A
 222   857A              ; 	INICIA AMADEUS!!!!!
 223   857A
-224   857A CD 3B 87     3 call Restore_Amadeus
-225   857D CD B2 86     	call Inicia_Puntero_objeto
-226   8580 CD B6 87     	call Draw
+224   857A CD 3E 87     3 call Restore_Amadeus
+225   857D CD B5 86     	call Inicia_Puntero_objeto
+226   8580 CD E4 87     	call Draw
 227   8583 CD A0 7F     	call Guarda_foto_registros
-228   8586 CD 4D 87     	call Store_Amadeus
+228   8586 CD 50 87     	call Store_Amadeus
 229   8589
 230   8589              ; Volvemos a situar los punteros STORE/RESTORE de entidades en la 1ª entidad.
 231   8589
-232   8589 CD 7F 86     	call Inicia_punteros_de_entidades
-233   858C CD 29 87     	call Restore_Primera_entidad
+232   8589 CD 82 86     	call Inicia_punteros_de_entidades
+233   858C CD 2C 87     	call Restore_Primera_entidad
 234   858F
 235   858F 3A 3E 85     	ld a,(Numero_de_entidades)
 236   8592 3C           	inc a
@@ -760,1697 +760,1689 @@
 248   8599
 249   8599 3E 07            ld a,7
 250   859B D3 FE            out ($fe),a
-251   859D CD BA 8A     	call Extrae_foto_registros 							; Pintamos el fotograma anterior.
+251   859D CD E8 8A     	call Extrae_foto_registros 							; Pintamos el fotograma anterior.
 252   85A0 3E 01            ld a,1
 253   85A2 D3 FE            out ($fe),a
 254   85A4
-255   85A4              ;	jr $
+255   85A4              ; ----------------------------------------------------------------------
 256   85A4
-257   85A4              ; ----------------------------------------------------------------------
-258   85A4
-259   85A4 21 00 70     	ld hl,Album_de_fotos
-260   85A7 22 44 85         ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
-261   85AA              ;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
-262   85AA 3A 3E 85         ld a,(Numero_de_entidades)
-263   85AD 47               ld b,a
-264   85AE A7           	and a
-265   85AF 28 1D        	jr z,4F												; Entidades="0". Saltamos a Amadeus.
-266   85B1
-267   85B1 C5           2 push bc
-268   85B2 CD F8 85     	call Mov_obj										; MOVEMOS y decrementamos (Numero_de_malotes)
-269   85B5 3A 2B 85     	ld a,(Ctrl_0)
-270   85B8 CB 67        	bit 4,a
-271   85BA 28 03        	jr z,1F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
-272   85BC CD 46 86         call Guarda_foto_entidad_a_pintar					; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!!!
-273   85BF 21 2B 85     1 ld hl,Ctrl_0
-274   85C2 CB A6            res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
-275   85C4 AF           	xor a
-276   85C5 32 2C 85     	ld (Obj_dibujado),a
-277   85C8 CD FA 86     	call Store_Restore_entidades
-278   85CB C1           	pop bc
-279   85CC 10 E3        	djnz 2B
-280   85CE
-281   85CE CD 3B 87     4 call Restore_Amadeus
-282   85D1 CD 17 86     	call Mov_Amadeus
-283   85D4 3A 2B 85     	ld a,(Ctrl_0)
-284   85D7 CB 67        	bit 4,a
-285   85D9 28 03        	jr z,3F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
-286   85DB CD 46 86     	call Guarda_foto_entidad_a_pintar
-287   85DE
-288   85DE 21 2B 85     3 ld hl,Ctrl_0
-289   85E1 CB A6            res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
-290   85E3 AF           	xor a
-291   85E4 32 2C 85     	ld (Obj_dibujado),a
-292   85E7 CD 4D 87     	call Store_Amadeus
-293   85EA
-294   85EA              ; -----
-295   85EA
-296   85EA CD 7F 86     	call Inicia_punteros_de_entidades
-297   85ED CD 29 87     	call Restore_Primera_entidad
-298   85F0 CD 95 86     	call Calcula_numero_de_malotes
-299   85F3
-300   85F3 3E 00        	ld a,0
-301   85F5 D3 FE        	out ($fe),a
-302   85F7 C9           	ret
-303   85F8
-304   85F8              ; --------------------------------------------------------------------------------------------------------------
-305   85F8              ;
-306   85F8              ;	29/1/23
-307   85F8
-308   85F8              Mov_obj
-309   85F8
-310   85F8              ; En este punto Draw tiene cargado los 52 bytes, (parámetros), de la primera entidad de Indice_de_entidades.
-311   85F8
-312   85F8 AF           	xor a
-313   85F9 32 2C 85     	ld (Obj_dibujado),a
-314   85FC CD 50 86         call Prepara_var_pintado_borrado                    ; Almaceno las `VARIABLES DE BORRADO´. de la entidad almacenada en DRAW en (Variables_de_borrado).
-315   85FF              ;														; Obj_dibujado="0".
-316   85FF              ; Movemos Entidades malignas.
-317   85FF
-318   85FF CD F1 90     	call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
-319   8602 3A 2B 85     	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
-320   8605 CB 67        	bit 4,a
-321   8607 C8           	ret z
-322   8608
-323   8608              ; ---------
-324   8608
-325   8608 3E 01        	ld a,1 				 								; Cambiamos (Obj_dibujado) a "1" para poder almacenar el contenido de DRAW en_
-326   860A 32 2C 85     	ld (Obj_dibujado),a 								; _(Variables_de_pintado).
-327   860D CD 50 86         call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.
-328   8610 CD 67 86         call Repone_borrar                                  ; Si ha habido movimiento de la entidad, borraremos el FRAME anterior.
-329   8613 CD 36 86     	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la "ENTIDAD a borrar", pues ha habido movimiento_
-330   8616 C9           	ret													; _de la misma.
-331   8617
-332   8617              ; --------------------------------------------------------------------------------------------------------------
-333   8617              ;
-334   8617              ;	29/1/23
-335   8617
-336   8617              Mov_Amadeus
-337   8617
-338   8617 AF           	xor a
-339   8618 32 2C 85     	ld (Obj_dibujado),a
-340   861B CD 50 86         call Prepara_var_pintado_borrado                    ; Almaceno las `VARIABLES DE BORRADO´ de Amadeus, (cargadas en DRAW), en (Variables_de_borrado).
-341   861E              ;														; Obj_dibujado="0".
-342   861E              ; Movemos Amadeus.
-343   861E
-344   861E CD 73 87     	call Movimiento_Amadeus 							; MOVEMOS AMADEUS.
-345   8621 3A 2B 85     	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
-346   8624 CB 67        	bit 4,a
-347   8626 C8           	ret z
-348   8627
-349   8627              ; ---------
-350   8627
-351   8627 3E 01        	ld a,1 				 								; Cambiamos (Obj_dibujado) a "1" para poder almacenar el contenido de DRAW en_
-352   8629 32 2C 85     	ld (Obj_dibujado),a 								; _(Variables_de_pintado).
-353   862C CD 50 86         call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.
-354   862F CD 67 86         call Repone_borrar                                  ; Si ha habido movimiento de la entidad, borraremos el FRAME anterior.
-355   8632 CD 36 86     	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen a borrar de Amadeus, pues ha habido movimiento_
-356   8635 C9           	ret													; _de la nave.
-357   8636
-358   8636              ; --------------------------------------------------------------------------------------------------------------
-359   8636              ;
-360   8636              ;	31/01/23
-361   8636              ;
-362   8636              ;	(Guardo la foto de Amadeus sin ejecutar DRAW, "no RECOLOCACIÓN"). IMÁGEN DE AMADEUS A BORRAR.
-363   8636
-364   8636              Guarda_foto_entidad_a_borrar
-365   8636
-366   8636 CD 90 8A     	call Prepara_draw
-367   8639 CD CA 89     	call calcula_CColumnass
-368   863C CD 01 8A     	call Calcula_puntero_de_impresion					; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
-369   863F CD 56 8A     	call Define_rutina_de_impresion
-370   8642 CD A0 7F     	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
-371   8645 C9           	ret
-372   8646
-373   8646              ; --------------------------------------------------------------------------------------------------------------
-374   8646              ;
-375   8646              ;	31/01/23
-376   8646              ;
-377   8646              ;	(Guardo la foto de la entidad ejecutando DRAW, pues ha habido movimiento del Sprite y una posible_
-378   8646              ;   _recolocación. Guarda la IMÁGEN DE LA ENTIDAD A PINTAR.
-379   8646
-380   8646              Guarda_foto_entidad_a_pintar
-381   8646
-382   8646 CD 73 86     	call Repone_pintar
-383   8649 CD B6 87     	call Draw
-384   864C CD A0 7F     	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
-385   864F C9           	ret
-386   8650
-387   8650              ; --------------------------------------------------------------------------------------------------------------
-388   8650              ;
-389   8650              ;
-390   8650
-391   8650 21 FE 84     Prepara_var_pintado_borrado	ld hl,Filas
-392   8653 3A 2C 85     	ld a,(Obj_dibujado)
-393   8656 A7           	and a
-394   8657 28 05        	jr z,1F
-395   8659 11 21 85     	ld de,Variables_de_pintado
-396   865C 18 03        	jr 2F
-397   865E 11 17 85     1 ld de,Variables_de_borrado
-398   8661 01 08 00     2 ld bc,8
-399   8664 ED B0        	ldir
-400   8666 C9           	ret
-401   8667
-402   8667              ; --------------------------------------------------------------------------------------------------------------
-403   8667
-404   8667 21 17 85     Repone_borrar ld hl,Variables_de_borrado
-405   866A 11 FE 84     	ld de,Filas
-406   866D 01 08 00     	ld bc,8
-407   8670 ED B0        	ldir
-408   8672 C9           	ret
-409   8673
-410   8673 21 21 85     Repone_pintar ld hl,Variables_de_pintado
-411   8676 11 FE 84     	ld de,Filas
-412   8679 01 08 00     	ld bc,8
-413   867C ED B0        	ldir
-414   867E C9           	ret
-415   867F
-416   867F              ; *************************************************************************************************************************************************************
-417   867F              ;
-418   867F              ; 8/1/23
-419   867F              ;
-420   867F              ; (Puntero_store_entidades) contendrá la dirección donde se encuentran los parámetros de la 1ª entidad del índice.
-421   867F              ; (Indice_restore) se sitúa en la 2ª entidad del índice.
-422   867F              ; (Puntero_restore_entidades) contendrá la dirección donde se encuentran los parámetros de la 2ª entidad del índice.
-423   867F
-424   867F              ; Destruye HL y DE !!!!!
-425   867F
-426   867F              Inicia_punteros_de_entidades
-427   867F
-428   867F 21 D0 83     	ld hl,Indice_de_entidades
-429   8682 CD AC 86         call Extrae_address
-430   8685 22 38 85         ld (Puntero_store_entidades),hl
-431   8688 21 D2 83     	ld hl,Indice_de_entidades+2
-432   868B 22 3C 85     	ld (Indice_restore),hl
-433   868E CD AC 86     	call Extrae_address
-434   8691 22 3A 85     	ld (Puntero_restore_entidades),hl
-435   8694 C9               ret
-436   8695
-437   8695              ; -------------------------------------------------------------------------------------------------------------
-438   8695              ;
-439   8695              ; 30/1/23
-440   8695              ;
-441   8695
-442   8695 2A 44 85     Calcula_numero_de_malotes ld hl,(Stack_snapshot)
-443   8698 7D           	ld a,l
-444   8699 A7           	and a
-445   869A 28 0C        	jr z,3F
-446   869C AF           	xor a
-447   869D 67           	ld h,a
-448   869E 7D           	ld a,l
-449   869F D6 06        1 sub 6
-450   86A1 28 03        	jr z,2F
-451   86A3 24           	inc h
-452   86A4 18 F9        	jr 1B
-453   86A6 24           2 inc h
-454   86A7 7C           	ld a,h
-455   86A8 32 3F 85     3 ld (Numero_de_malotes),a
-456   86AB C9           	ret
-457   86AC
-458   86AC              ; *************************************************************************************************************************************************************
-459   86AC              ;
-460   86AC              ; 20/10/22
-461   86AC              ;
-462   86AC              ; Extrae la direccioń que contiene un puntero, (HL), también en HL.
-463   86AC              ;
-464   86AC              ; Destruye el puntero y DE !!!!!
-465   86AC
-466   86AC 5E           Extrae_address ld e,(hl)
-467   86AD 23           	inc hl
-468   86AE 56           	ld d,(hl)
-469   86AF 2B           	dec hl
-470   86B0 EB           	ex de,hl
-471   86B1 C9           	ret
-472   86B2
-473   86B2              ; *************************************************************************************************************************************************************
-474   86B2              ;
-475   86B2              ;	7/2/23
-476   86B2              ;
-477   86B2              ;	Iniciamos (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
-478   86B2              ;	Estos punteros señalan al Sprite a pintar tras cada movimiento.
-479   86B2              ;
-480   86B2              ;   Destruye HL y BC !!!!!,
-481   86B2              ;
-482   86B2              ;	BIT 7 (Ctrl_0). "1" ..... Derecha.
-483   86B2              ;					"0" ..... Izquierda.
-484   86B2
-485   86B2              Inicia_Puntero_objeto
-486   86B2
-487   86B2 3A 12 85     	ld a,(Cuad_objeto)
-488   86B5 E6 01        	and 1
-489   86B7 F5           	push af
-490   86B8 CC D6 86     	call z,Inicia_puntero_objeto_izq
-491   86BB F1           	pop af
-492   86BC 28 2B        	jr z,1F
-493   86BE CD C3 86     	call Inicia_puntero_objeto_der
-494   86C1 18 26        	jr 1F
-495   86C3
-496   86C3              ; Arrancamos desde la parte izquierda de la pantalla.
-497   86C3              ; Iniciamos (Indice_Sprite_der).
-498   86C3
-499   86C3 2A 08 85     Inicia_puntero_objeto_der ld hl,(Indice_Sprite_der)
-500   86C6 22 0C 85     	ld (Puntero_DESPLZ_der),hl
-501   86C9 CD AC 86     	call Extrae_address
-502   86CC 22 02 85     	ld (Puntero_objeto),hl
-503   86CF
-504   86CF 2A 0A 85     	ld hl,(Indice_Sprite_izq)							; Cuando "Iniciamos el Sprite a derecha",_
-505   86D2              ;	call Extrae_address
-506   86D2 22 0E 85     	ld (Puntero_DESPLZ_izq),hl
-507   86D5 C9           	ret
-508   86D6
-509   86D6              ; Arrancamos desde la parte derecha de la pantalla.
-510   86D6              ; Iniciamos (Indice_Sprite_izq).
-511   86D6
-512   86D6 2A 0A 85     Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
-513   86D9 22 0E 85     	ld (Puntero_DESPLZ_izq),hl
-514   86DC CD AC 86     	call Extrae_address
-515   86DF 22 02 85     	ld (Puntero_objeto),hl
-516   86E2
-517   86E2 2A 08 85     	ld hl,(Indice_Sprite_der)							; Cuando "Iniciamos el Sprite a izquierda",_
-518   86E5              ;	call Extrae_address									; _situamos (Puntero_DESPLZ_der) en el último defw_
-519   86E5 22 0C 85     	ld (Puntero_DESPLZ_der),hl
-520   86E8 C9           	ret
-521   86E9
-522   86E9              ; Tenemos que activar el bit6 de (Ctrl_0) si el Sprite que hemos cargado es AMADEUS.
-523   86E9
-524   86E9 21 20 83     1 ld hl,Amadeus
-525   86EC ED 4B 02 85  	ld bc,(Puntero_objeto)
-526   86F0 B7 ED 42     	sub hl,bc
-527   86F3 C0           	ret nz
-528   86F4 21 2B 85     	ld hl,Ctrl_0
-529   86F7 CB F6        	set 6,(hl) 											; Cuando activamos Amadeus lo indicamos alzando el bit6 de (Ctrl_0). Esta información la utilizaremos para limitar los movimientos_
-530   86F9 C9           	ret 												; _de nuestra nave en los extremos.
-531   86FA
-532   86FA              ; *************************************************************************************************************************************************************
-533   86FA              ;
-534   86FA              ;	8/1/23
-535   86FA              ;
-536   86FA              ;	Almacena los datos de la 1ª entidad del Indice_de_entidades, (que tenemos cargado en DRAW), en su respectiva BASE DE DATOS.
-537   86FA              ;	Cargamos en DRAW los datos de la 2ª entidad del Indice_de_entidades, (de su BASE DE DATOS).
-538   86FA
-539   86FA              ;	Modifica (Puntero_store_entidades)  y (Puntero_restore_entidades) con las direcciones donde se encuentran los datos_
-540   86FA              ;	_de la 2ª y 3ª entidad respectivamente.
-541   86FA
-542   86FA
-543   86FA
-544   86FA              Store_Restore_entidades
-545   86FA
-546   86FA E5           	push hl
-547   86FB D5           	push de
-548   86FC C5            	push bc
+257   85A4 21 00 70     	ld hl,Album_de_fotos
+258   85A7 22 44 85         ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
+259   85AA              ;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
+260   85AA 3A 3E 85         ld a,(Numero_de_entidades)
+261   85AD 47               ld b,a
+262   85AE A7           	and a
+263   85AF 28 20        	jr z,4F												; Entidades="0". Saltamos a Amadeus.
+264   85B1
+265   85B1 C5           2 push bc
+266   85B2 CD FB 85     	call Mov_obj										; MOVEMOS y decrementamos (Numero_de_malotes)
+267   85B5 3A 2B 85     	ld a,(Ctrl_0)
+268   85B8 CB 67        	bit 4,a
+269   85BA 28 03        	jr z,1F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
+270   85BC CD 49 86         call Guarda_foto_entidad_a_pintar					; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!!!
+271   85BF
+272   85BF              ; Voy a utilizar una rutina de lectura de teclado para disparar con cualquier entidad.
+273   85BF              ; 16/02/23.
+274   85BF              ; [[[
+275   85BF CD 99 87     1 call Detecta_disparo_entidad
+276   85C2              ; ]]]
+277   85C2
+278   85C2              ;1
+279   85C2 21 2B 85     	ld hl,Ctrl_0
+280   85C5 CB A6            res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
+281   85C7 AF           	xor a
+282   85C8 32 2C 85     	ld (Obj_dibujado),a
+283   85CB CD FD 86     	call Store_Restore_entidades
+284   85CE C1           	pop bc
+285   85CF 10 E0        	djnz 2B
+286   85D1
+287   85D1 CD 3E 87     4 call Restore_Amadeus
+288   85D4 CD 1A 86     	call Mov_Amadeus
+289   85D7 3A 2B 85     	ld a,(Ctrl_0)
+290   85DA CB 67        	bit 4,a
+291   85DC 28 03        	jr z,3F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
+292   85DE CD 49 86     	call Guarda_foto_entidad_a_pintar
+293   85E1
+294   85E1 21 2B 85     3 ld hl,Ctrl_0
+295   85E4 CB A6            res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
+296   85E6 AF           	xor a
+297   85E7 32 2C 85     	ld (Obj_dibujado),a
+298   85EA CD 50 87     	call Store_Amadeus
+299   85ED
+300   85ED              ; -----
+301   85ED
+302   85ED CD 82 86     	call Inicia_punteros_de_entidades
+303   85F0 CD 2C 87     	call Restore_Primera_entidad
+304   85F3 CD 98 86     	call Calcula_numero_de_malotes
+305   85F6
+306   85F6 3E 00        	ld a,0
+307   85F8 D3 FE        	out ($fe),a
+308   85FA C9           	ret
+309   85FB
+310   85FB              ; --------------------------------------------------------------------------------------------------------------
+311   85FB              ;
+312   85FB              ;	29/1/23
+313   85FB
+314   85FB              Mov_obj
+315   85FB
+316   85FB              ; En este punto Draw tiene cargado los 52 bytes, (parámetros), de la primera entidad de Indice_de_entidades.
+317   85FB
+318   85FB AF           	xor a
+319   85FC 32 2C 85     	ld (Obj_dibujado),a
+320   85FF CD 53 86         call Prepara_var_pintado_borrado                    ; Almaceno las `VARIABLES DE BORRADO´. de la entidad almacenada en DRAW en (Variables_de_borrado).
+321   8602              ;														; Obj_dibujado="0".
+322   8602              ; Movemos Entidades malignas.
+323   8602
+324   8602 CD 0F 91     	call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
+325   8605 3A 2B 85     	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
+326   8608 CB 67        	bit 4,a
+327   860A C8           	ret z
+328   860B
+329   860B              ; ---------
+330   860B
+331   860B 3E 01        	ld a,1 				 								; Cambiamos (Obj_dibujado) a "1" para poder almacenar el contenido de DRAW en_
+332   860D 32 2C 85     	ld (Obj_dibujado),a 								; _(Variables_de_pintado).
+333   8610 CD 53 86         call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.
+334   8613 CD 6A 86         call Repone_borrar                                  ; Si ha habido movimiento de la entidad, borraremos el FRAME anterior.
+335   8616 CD 39 86     	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la "ENTIDAD a borrar", pues ha habido movimiento_
+336   8619 C9           	ret													; _de la misma.
+337   861A
+338   861A              ; --------------------------------------------------------------------------------------------------------------
+339   861A              ;
+340   861A              ;	29/1/23
+341   861A
+342   861A              Mov_Amadeus
+343   861A
+344   861A AF           	xor a
+345   861B 32 2C 85     	ld (Obj_dibujado),a
+346   861E CD 53 86         call Prepara_var_pintado_borrado                    ; Almaceno las `VARIABLES DE BORRADO´ de Amadeus, (cargadas en DRAW), en (Variables_de_borrado).
+347   8621              ;														; Obj_dibujado="0".
+348   8621              ; Movemos Amadeus.
+349   8621
+350   8621 CD 76 87     	call Movimiento_Amadeus 							; MOVEMOS AMADEUS.
+351   8624 3A 2B 85     	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
+352   8627 CB 67        	bit 4,a
+353   8629 C8           	ret z
+354   862A
+355   862A              ; ---------
+356   862A
+357   862A 3E 01        	ld a,1 				 								; Cambiamos (Obj_dibujado) a "1" para poder almacenar el contenido de DRAW en_
+358   862C 32 2C 85     	ld (Obj_dibujado),a 								; _(Variables_de_pintado).
+359   862F CD 53 86         call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.
+360   8632 CD 6A 86         call Repone_borrar                                  ; Si ha habido movimiento de la entidad, borraremos el FRAME anterior.
+361   8635 CD 39 86     	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen a borrar de Amadeus, pues ha habido movimiento_
+362   8638 C9           	ret													; _de la nave.
+363   8639
+364   8639              ; --------------------------------------------------------------------------------------------------------------
+365   8639              ;
+366   8639              ;	31/01/23
+367   8639              ;
+368   8639              ;	(Guardo la foto de Amadeus sin ejecutar DRAW, "no RECOLOCACIÓN"). IMÁGEN DE AMADEUS A BORRAR.
+369   8639
+370   8639              Guarda_foto_entidad_a_borrar
+371   8639
+372   8639 CD BE 8A     	call Prepara_draw
+373   863C CD F8 89     	call calcula_CColumnass
+374   863F CD 2F 8A     	call Calcula_puntero_de_impresion					; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
+375   8642 CD 84 8A     	call Define_rutina_de_impresion
+376   8645 CD A0 7F     	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
+377   8648 C9           	ret
+378   8649
+379   8649              ; --------------------------------------------------------------------------------------------------------------
+380   8649              ;
+381   8649              ;	31/01/23
+382   8649              ;
+383   8649              ;	(Guardo la foto de la entidad ejecutando DRAW, pues ha habido movimiento del Sprite y una posible_
+384   8649              ;   _recolocación. Guarda la IMÁGEN DE LA ENTIDAD A PINTAR.
+385   8649
+386   8649              Guarda_foto_entidad_a_pintar
+387   8649
+388   8649 CD 76 86     	call Repone_pintar
+389   864C CD E4 87     	call Draw
+390   864F CD A0 7F     	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
+391   8652 C9           	ret
+392   8653
+393   8653              ; --------------------------------------------------------------------------------------------------------------
+394   8653              ;
+395   8653              ;
+396   8653
+397   8653 21 FE 84     Prepara_var_pintado_borrado	ld hl,Filas
+398   8656 3A 2C 85     	ld a,(Obj_dibujado)
+399   8659 A7           	and a
+400   865A 28 05        	jr z,1F
+401   865C 11 21 85     	ld de,Variables_de_pintado
+402   865F 18 03        	jr 2F
+403   8661 11 17 85     1 ld de,Variables_de_borrado
+404   8664 01 08 00     2 ld bc,8
+405   8667 ED B0        	ldir
+406   8669 C9           	ret
+407   866A
+408   866A              ; --------------------------------------------------------------------------------------------------------------
+409   866A
+410   866A 21 17 85     Repone_borrar ld hl,Variables_de_borrado
+411   866D 11 FE 84     	ld de,Filas
+412   8670 01 08 00     	ld bc,8
+413   8673 ED B0        	ldir
+414   8675 C9           	ret
+415   8676
+416   8676 21 21 85     Repone_pintar ld hl,Variables_de_pintado
+417   8679 11 FE 84     	ld de,Filas
+418   867C 01 08 00     	ld bc,8
+419   867F ED B0        	ldir
+420   8681 C9           	ret
+421   8682
+422   8682              ; *************************************************************************************************************************************************************
+423   8682              ;
+424   8682              ; 8/1/23
+425   8682              ;
+426   8682              ; (Puntero_store_entidades) contendrá la dirección donde se encuentran los parámetros de la 1ª entidad del índice.
+427   8682              ; (Indice_restore) se sitúa en la 2ª entidad del índice.
+428   8682              ; (Puntero_restore_entidades) contendrá la dirección donde se encuentran los parámetros de la 2ª entidad del índice.
+429   8682
+430   8682              ; Destruye HL y DE !!!!!
+431   8682
+432   8682              Inicia_punteros_de_entidades
+433   8682
+434   8682 21 D0 83     	ld hl,Indice_de_entidades
+435   8685 CD AF 86         call Extrae_address
+436   8688 22 38 85         ld (Puntero_store_entidades),hl
+437   868B 21 D2 83     	ld hl,Indice_de_entidades+2
+438   868E 22 3C 85     	ld (Indice_restore),hl
+439   8691 CD AF 86     	call Extrae_address
+440   8694 22 3A 85     	ld (Puntero_restore_entidades),hl
+441   8697 C9               ret
+442   8698
+443   8698              ; -------------------------------------------------------------------------------------------------------------
+444   8698              ;
+445   8698              ; 30/1/23
+446   8698              ;
+447   8698
+448   8698 2A 44 85     Calcula_numero_de_malotes ld hl,(Stack_snapshot)
+449   869B 7D           	ld a,l
+450   869C A7           	and a
+451   869D 28 0C        	jr z,3F
+452   869F AF           	xor a
+453   86A0 67           	ld h,a
+454   86A1 7D           	ld a,l
+455   86A2 D6 06        1 sub 6
+456   86A4 28 03        	jr z,2F
+457   86A6 24           	inc h
+458   86A7 18 F9        	jr 1B
+459   86A9 24           2 inc h
+460   86AA 7C           	ld a,h
+461   86AB 32 3F 85     3 ld (Numero_de_malotes),a
+462   86AE C9           	ret
+463   86AF
+464   86AF              ; *************************************************************************************************************************************************************
+465   86AF              ;
+466   86AF              ; 20/10/22
+467   86AF              ;
+468   86AF              ; Extrae la direccioń que contiene un puntero, (HL), también en HL.
+469   86AF              ;
+470   86AF              ; Destruye el puntero y DE !!!!!
+471   86AF
+472   86AF 5E           Extrae_address ld e,(hl)
+473   86B0 23           	inc hl
+474   86B1 56           	ld d,(hl)
+475   86B2 2B           	dec hl
+476   86B3 EB           	ex de,hl
+477   86B4 C9           	ret
+478   86B5
+479   86B5              ; *************************************************************************************************************************************************************
+480   86B5              ;
+481   86B5              ;	7/2/23
+482   86B5              ;
+483   86B5              ;	Iniciamos (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
+484   86B5              ;	Estos punteros señalan al Sprite a pintar tras cada movimiento.
+485   86B5              ;
+486   86B5              ;   Destruye HL y BC !!!!!,
+487   86B5              ;
+488   86B5              ;	BIT 7 (Ctrl_0). "1" ..... Derecha.
+489   86B5              ;					"0" ..... Izquierda.
+490   86B5
+491   86B5              Inicia_Puntero_objeto
+492   86B5
+493   86B5 3A 12 85     	ld a,(Cuad_objeto)
+494   86B8 E6 01        	and 1
+495   86BA F5           	push af
+496   86BB CC D9 86     	call z,Inicia_puntero_objeto_izq
+497   86BE F1           	pop af
+498   86BF 28 2B        	jr z,1F
+499   86C1 CD C6 86     	call Inicia_puntero_objeto_der
+500   86C4 18 26        	jr 1F
+501   86C6
+502   86C6              ; Arrancamos desde la parte izquierda de la pantalla.
+503   86C6              ; Iniciamos (Indice_Sprite_der).
+504   86C6
+505   86C6 2A 08 85     Inicia_puntero_objeto_der ld hl,(Indice_Sprite_der)
+506   86C9 22 0C 85     	ld (Puntero_DESPLZ_der),hl
+507   86CC CD AF 86     	call Extrae_address
+508   86CF 22 02 85     	ld (Puntero_objeto),hl
+509   86D2
+510   86D2 2A 0A 85     	ld hl,(Indice_Sprite_izq)							; Cuando "Iniciamos el Sprite a derecha",_
+511   86D5              ;	call Extrae_address
+512   86D5 22 0E 85     	ld (Puntero_DESPLZ_izq),hl
+513   86D8 C9           	ret
+514   86D9
+515   86D9              ; Arrancamos desde la parte derecha de la pantalla.
+516   86D9              ; Iniciamos (Indice_Sprite_izq).
+517   86D9
+518   86D9 2A 0A 85     Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
+519   86DC 22 0E 85     	ld (Puntero_DESPLZ_izq),hl
+520   86DF CD AF 86     	call Extrae_address
+521   86E2 22 02 85     	ld (Puntero_objeto),hl
+522   86E5
+523   86E5 2A 08 85     	ld hl,(Indice_Sprite_der)							; Cuando "Iniciamos el Sprite a izquierda",_
+524   86E8              ;	call Extrae_address									; _situamos (Puntero_DESPLZ_der) en el último defw_
+525   86E8 22 0C 85     	ld (Puntero_DESPLZ_der),hl
+526   86EB C9           	ret
+527   86EC
+528   86EC              ; Tenemos que activar el bit6 de (Ctrl_0) si el Sprite que hemos cargado es AMADEUS.
+529   86EC
+530   86EC 21 20 83     1 ld hl,Amadeus
+531   86EF ED 4B 02 85  	ld bc,(Puntero_objeto)
+532   86F3 B7 ED 42     	sub hl,bc
+533   86F6 C0           	ret nz
+534   86F7 21 2B 85     	ld hl,Ctrl_0
+535   86FA CB F6        	set 6,(hl) 											; Cuando activamos Amadeus lo indicamos alzando el bit6 de (Ctrl_0). Esta información la utilizaremos para limitar los movimientos_
+536   86FC C9           	ret 												; _de nuestra nave en los extremos.
+537   86FD
+538   86FD              ; *************************************************************************************************************************************************************
+539   86FD              ;
+540   86FD              ;	8/1/23
+541   86FD              ;
+542   86FD              ;	Almacena los datos de la 1ª entidad del Indice_de_entidades, (que tenemos cargado en DRAW), en su respectiva BASE DE DATOS.
+543   86FD              ;	Cargamos en DRAW los datos de la 2ª entidad del Indice_de_entidades, (de su BASE DE DATOS).
+544   86FD
+545   86FD              ;	Modifica (Puntero_store_entidades)  y (Puntero_restore_entidades) con las direcciones donde se encuentran los datos_
+546   86FD              ;	_de la 2ª y 3ª entidad respectivamente.
+547   86FD
+548   86FD
 549   86FD
-550   86FD              ;	STORE !!!!!
-551   86FD              ;	Guarda lo que hay en Draw en la correspondiente `Entidad´.
-552   86FD
-553   86FD 21 FE 84     	ld hl,Filas
-554   8700 ED 5B 38 85  	ld de,(Puntero_store_entidades) 					; Puntero que se desplaza por las distintas entidades.
-555   8704 01 3A 00     	ld bc,58
-556   8707 ED B0        	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
-557   8709
-558   8709              ;	Incrementa el puntero STORE. Guarda los datos de `Entidad´+1 en Draw, (Puntero RESTORE).
-559   8709
-560   8709 2A 3A 85     	ld hl,(Puntero_restore_entidades)
-561   870C 22 38 85     	ld (Puntero_store_entidades),hl 					; Situamos (Puntero_store_entidades) en la 2ª entidad.
-562   870F 11 FE 84     	ld de,Filas 										; Hemos RECUPERADO los parámetros de la 2ª entidad de su base de datos.
-563   8712 01 3A 00     	ld bc,58
-564   8715 ED B0        	ldir
-565   8717
-566   8717              ;	Incrementa RESTORE !!!!!
-567   8717
-568   8717 2A 3C 85         ld hl,(Indice_restore)
-569   871A 23           	inc hl
-570   871B 23           	inc hl
-571   871C 22 3C 85     	ld (Indice_restore),hl
-572   871F CD AC 86         call Extrae_address
-573   8722 22 3A 85         ld (Puntero_restore_entidades),hl
-574   8725 C1           	pop bc
-575   8726 D1           	pop de
-576   8727 E1           	pop hl
-577   8728 C9           	ret
-578   8729
-579   8729              ; **************************************************************************************************
-580   8729              ;
-581   8729              ;	29/10/22
-582   8729              ;
-583   8729              ;	Cargamos los datos de la 1º entidad del índice_de_entidades
-584   8729
-585   8729 E5           Restore_Primera_entidad push hl
-586   872A D5           	push de
-587   872B C5            	push bc
-588   872C 2A 38 85     	ld hl,(Puntero_store_entidades)						; (Puntero_store_entidades) apunta a la dbase de la 1ª entidad.
-589   872F 11 FE 84     	ld de,Filas
-590   8732 01 3A 00     	ld bc,58
-591   8735 ED B0        	ldir
-592   8737 C1           	pop bc
-593   8738 D1           	pop de
-594   8739 E1           	pop hl
-595   873A C9           	ret
-596   873B
-597   873B              ; **************************************************************************************************
-598   873B              ;
-599   873B              ;	25/01/23
-600   873B              ;
-601   873B              ;	Restore_Amadeus
-602   873B              ;
-603   873B              ;	Cargamos en DRAW los parámetros de Amadeus.
-604   873B              ;
-605   873B
-606   873B E5           Restore_Amadeus	push hl
-607   873C D5           	push de
-608   873D C5            	push bc
-609   873E 21 DC 83     	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
-610   8741 11 FE 84     	ld de,Filas
-611   8744 01 3A 00     	ld bc,58
-612   8747 ED B0        	ldir
-613   8749 C1           	pop bc
-614   874A D1           	pop de
-615   874B E1           	pop hl
-616   874C C9           	ret
-617   874D
-618   874D              ; *************************************************************************************************************************************************************
-619   874D              ;
-620   874D              ;	29/01/23
-621   874D              ;
-622   874D              ;	Store_Amadeus
-623   874D              ;
-624   874D              ;	Almacenamos los parámetros de Amadeus, contenidos en DRAW en su base de datos.
-625   874D              ;
-626   874D
-627   874D E5           Store_Amadeus push hl
-628   874E D5           	push de
-629   874F C5            	push bc
-630   8750 21 FE 84     	ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
-631   8753 11 DC 83     	ld de,Amadeus_db
-632   8756 01 3A 00     	ld bc,58
-633   8759 ED B0        	ldir
-634   875B C1           	pop bc
-635   875C D1           	pop de
-636   875D E1           	pop hl
-637   875E C9           	ret
-638   875F
-639   875F              ; **************************************************************************************************
-640   875F
-641   875F              ; Teclado.
-642   875F
-643   875F 3E BF        Pulsa_ENTER ld a,$bf 									; Esperamos la pulsación de la tecla "ENTER".
-644   8761 DB FE        	in a,($fe)
-645   8763 E6 01        	and $01
-646   8765 28 02        	jr z,1f
-647   8767 18 F6        	jr Pulsa_ENTER
-648   8769 C9           1 ret
-649   876A
-650   876A              ; **************************************************************************************************
-651   876A              ;
-652   876A              ; Temporización.
-653   876A
-654   876A              ; $0320 ..... El RASTER va a empezar a pintar el 1er scanline de la primera FILA de la pantalla.
-655   876A              ;       ..... (14175 T/States) + 71 es lo que tarda el RASTER en llegar al 1er SCANLINE de la 1ª FILA.
-656   876A              ; $00ff ..... Es lo que tarda el RASTER en pintar 1 SCANLINE. (31 T/States) + 71. ..... 102 T/States aprox.
-657   876A              ;		..... 224 T/States es lo que tarda el raster en pintar 1 scanline.
-658   876A
-659   876A              ; $0045 ..... Es lo que tardamos en pintar 1 FILA completa, (8 Scanlines). (1794 T/States) + 71 ..... 1 FILA.
-660   876A              ;       ..... (14920 T/States) + 71  ..... Es lo que tarda el RASTER en pintar 1 TERCIO.
-661   876A              ; $0365 ..... Llegamos al final de la 1ª FILA, (8 Scanlines).
-662   876A
-663   876A              ; A partir de $4f61 no hace falta DELAY.
-664   876A
-665   876A              ;	!!!!!!!! DESTRUYE BC !!!!!!!!!!!
-666   876A
-667   876A 01 20 03     DELAY LD BC,$0320							;$0320 ..... Delay mínimo
-668   876D 0B           wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: si el Sprite ocupa la 1ª y 2ª_
-669   876E 78           	LD A,B
-670   876F A7           	AND A
-671   8770 20 FB        	JR NZ,wait
-672   8772 C9           	RET
-673   8773
-674   8773              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-675   8773              ;
-676   8773              ;	21/4/22
-677   8773
-678   8773              Movimiento_Amadeus
-679   8773
-680   8773 3E F7        	ld a,$f7		  										; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
-681   8775 DB FE        	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
-682   8777 E6 01        	and $01													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $01 resulta "0"  llama a la rutina "Mov_izq".
-683   8779 CC C0 8E         call z,Mov_left											;			"			"			"			"			"			"			"			"
-684   877C 3E F7        	ld a,$f7
-685   877E DB FE        	in a,($fe)
-686   8780 E6 01        	and $01
-687   8782 C8           	ret z
-688   8783 3E F7        	ld a,$f7
-689   8785 DB FE        	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
-690   8787 E6 02        	and $02													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $02 resulta "0"  llama a la rutina "Mov_der".
-691   8789 CC A2 8D     	call z,Mov_right										;			"			"			"			"			"			"			"			"
-692   878C C9               ret
-693   878D
-694   878D              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-695   878D
-696   878D              ; Pinta indicadores de FILAS. ------------------------------------------------------
-697   878D
-698   878D 21 10 40     Pinta_FILAS ld hl,$4010
-699   8790              ;	ld b,9
-700   8790              ;2 push hl
-701   8790              ;	push bc
-702   8790 06 BF        	ld b,$bf
-703   8792 36 80        1 ld (hl),%10000000
-704   8794 CD 9C 8A     	call NextScan
-705   8797 10 F9        	djnz 1B
-706   8799              ;	pop bc
-707   8799              ;	pop hl
-708   8799              ;	inc l
-709   8799              ;	djnz 2B
-710   8799 06 03        	ld b,3
-711   879B 21 00 47         ld hl,$4700
-712   879E CD A4 87     3 call Bucle_1
-713   87A1 10 FB            djnz 3B
-714   87A3 C9               ret
-715   87A4
-716   87A4 C5           Bucle_1 push bc
-717   87A5 E5                   push hl
-718   87A6 D1                   pop de
-719   87A7 13                   inc de
-720   87A8 01 FF 00             ld bc,255
-721   87AB 36 FF                ld (hl),255
-722   87AD ED B0                ldir
-723   87AF 23                   inc hl
-724   87B0 3E 07                ld a,7
-725   87B2 84                   add a,h
-726   87B3 67                   ld h,a
-727   87B4 C1                   pop bc
-728   87B5 C9                   ret
-729   87B6
-730   87B6              ; ---------------------------------------------------------------
-731   87B6
-732   87B6              	include "Draw_XOR.asm"
-# file opened: Draw_XOR.asm
-  1+  87B6              ; ******************************************************************************************************************************************************************************************
-  2+  87B6              ;
-  3+  87B6              ; 01/23
-  4+  87B6              ;
-  5+  87B6              ; DRAW. ************************************************************************************************************************************************************************************
-  6+  87B6
-  7+  87B6 CD 90 8A     Draw call Prepara_draw
-  8+  87B9 7C           	ld a,h 						 					; El objeto existe, o se está iniciando?. Si se está iniciando, (Posicion_inicio = Posicion_actual) y saltamos_
-  9+  87BA A7           	and a 											; _a la subrutina [Inicializacion] donde asignaremos cuadrante y límites.
- 10+  87BB 28 05        	jr z,2F
- 11+  87BD
- 12+  87BD 3A 12 85     	ld a,(Cuad_objeto)			 					; El objeto ya se inició. Cargamos en A el cuadrante de pantalla en el que lo hizo y saltamos a 1F.
- 13+  87C0 18 0C        	jr 1F
- 14+  87C2 2A 10 85     2 ld hl,(Posicion_inicio) 							; No hay (Posicion_actual), por lo que el objeto se está iniciando.
- 15+  87C5 22 00 85     	ld (Posicion_actual),hl							; Indicamos que (Posicion_actual) = (Posicion_inicio) y saltamos a la subrutina [Inicializacion], (donde asignaremos_
- 16+  87C8 CD 57 89     	call Inicializacion   							; _(Limite_horizontal), (Limite_vertical) y (Cuad_objeto). También asignaremos las coordenadas X e Y. (Posición 0,0)_
- 17+  87CB              ;													; _la esquina superior izquierda de la pantalla.
- 18+  87CB CD 73 91     	call Prepara_Puntero_mov 						; El objeto está inicializado. Antes de salir inicializamos tb el puntero de movimiento del objeto.
- 19+  87CE 3A 2B 85     1 ld a,(Ctrl_0)
- 20+  87D1 CB 6F        	bit 5,a
- 21+  87D3 20 06        	jr nz,3F										; Si acabamos de inicializar un objeto, NO COMPROBAMOS LÍMITES.
- 22+  87D5
- 23+  87D5 CD ED 87     	call Comprueba_limite_horizontal
- 24+  87D8 CD 7D 88     	call Comprueba_limite_vertical
+550   86FD              Store_Restore_entidades
+551   86FD
+552   86FD E5           	push hl
+553   86FE D5           	push de
+554   86FF C5            	push bc
+555   8700
+556   8700              ;	STORE !!!!!
+557   8700              ;	Guarda lo que hay en Draw en la correspondiente `Entidad´.
+558   8700
+559   8700 21 FE 84     	ld hl,Filas
+560   8703 ED 5B 38 85  	ld de,(Puntero_store_entidades) 					; Puntero que se desplaza por las distintas entidades.
+561   8707 01 3A 00     	ld bc,58
+562   870A ED B0        	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
+563   870C
+564   870C              ;	Incrementa el puntero STORE. Guarda los datos de `Entidad´+1 en Draw, (Puntero RESTORE).
+565   870C
+566   870C 2A 3A 85     	ld hl,(Puntero_restore_entidades)
+567   870F 22 38 85     	ld (Puntero_store_entidades),hl 					; Situamos (Puntero_store_entidades) en la 2ª entidad.
+568   8712 11 FE 84     	ld de,Filas 										; Hemos RECUPERADO los parámetros de la 2ª entidad de su base de datos.
+569   8715 01 3A 00     	ld bc,58
+570   8718 ED B0        	ldir
+571   871A
+572   871A              ;	Incrementa RESTORE !!!!!
+573   871A
+574   871A 2A 3C 85         ld hl,(Indice_restore)
+575   871D 23           	inc hl
+576   871E 23           	inc hl
+577   871F 22 3C 85     	ld (Indice_restore),hl
+578   8722 CD AF 86         call Extrae_address
+579   8725 22 3A 85         ld (Puntero_restore_entidades),hl
+580   8728 C1           	pop bc
+581   8729 D1           	pop de
+582   872A E1           	pop hl
+583   872B C9           	ret
+584   872C
+585   872C              ; **************************************************************************************************
+586   872C              ;
+587   872C              ;	29/10/22
+588   872C              ;
+589   872C              ;	Cargamos los datos de la 1º entidad del índice_de_entidades
+590   872C
+591   872C E5           Restore_Primera_entidad push hl
+592   872D D5           	push de
+593   872E C5            	push bc
+594   872F 2A 38 85     	ld hl,(Puntero_store_entidades)						; (Puntero_store_entidades) apunta a la dbase de la 1ª entidad.
+595   8732 11 FE 84     	ld de,Filas
+596   8735 01 3A 00     	ld bc,58
+597   8738 ED B0        	ldir
+598   873A C1           	pop bc
+599   873B D1           	pop de
+600   873C E1           	pop hl
+601   873D C9           	ret
+602   873E
+603   873E              ; **************************************************************************************************
+604   873E              ;
+605   873E              ;	25/01/23
+606   873E              ;
+607   873E              ;	Restore_Amadeus
+608   873E              ;
+609   873E              ;	Cargamos en DRAW los parámetros de Amadeus.
+610   873E              ;
+611   873E
+612   873E E5           Restore_Amadeus	push hl
+613   873F D5           	push de
+614   8740 C5            	push bc
+615   8741 21 DC 83     	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
+616   8744 11 FE 84     	ld de,Filas
+617   8747 01 3A 00     	ld bc,58
+618   874A ED B0        	ldir
+619   874C C1           	pop bc
+620   874D D1           	pop de
+621   874E E1           	pop hl
+622   874F C9           	ret
+623   8750
+624   8750              ; *************************************************************************************************************************************************************
+625   8750              ;
+626   8750              ;	29/01/23
+627   8750              ;
+628   8750              ;	Store_Amadeus
+629   8750              ;
+630   8750              ;	Almacenamos los parámetros de Amadeus, contenidos en DRAW en su base de datos.
+631   8750              ;
+632   8750
+633   8750 E5           Store_Amadeus push hl
+634   8751 D5           	push de
+635   8752 C5            	push bc
+636   8753 21 FE 84     	ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
+637   8756 11 DC 83     	ld de,Amadeus_db
+638   8759 01 3A 00     	ld bc,58
+639   875C ED B0        	ldir
+640   875E C1           	pop bc
+641   875F D1           	pop de
+642   8760 E1           	pop hl
+643   8761 C9           	ret
+644   8762
+645   8762              ; **************************************************************************************************
+646   8762
+647   8762              ; Teclado.
+648   8762
+649   8762 3E BF        Pulsa_ENTER ld a,$bf 									; Esperamos la pulsación de la tecla "ENTER".
+650   8764 DB FE        	in a,($fe)
+651   8766 E6 01        	and $01
+652   8768 28 02        	jr z,1f
+653   876A 18 F6        	jr Pulsa_ENTER
+654   876C C9           1 ret
+655   876D
+656   876D              ; **************************************************************************************************
+657   876D              ;
+658   876D              ; Temporización.
+659   876D
+660   876D              ; $0320 ..... El RASTER va a empezar a pintar el 1er scanline de la primera FILA de la pantalla.
+661   876D              ;       ..... (14175 T/States) + 71 es lo que tarda el RASTER en llegar al 1er SCANLINE de la 1ª FILA.
+662   876D              ; $00ff ..... Es lo que tarda el RASTER en pintar 1 SCANLINE. (31 T/States) + 71. ..... 102 T/States aprox.
+663   876D              ;		..... 224 T/States es lo que tarda el raster en pintar 1 scanline.
+664   876D
+665   876D              ; $0045 ..... Es lo que tardamos en pintar 1 FILA completa, (8 Scanlines). (1794 T/States) + 71 ..... 1 FILA.
+666   876D              ;       ..... (14920 T/States) + 71  ..... Es lo que tarda el RASTER en pintar 1 TERCIO.
+667   876D              ; $0365 ..... Llegamos al final de la 1ª FILA, (8 Scanlines).
+668   876D
+669   876D              ; A partir de $4f61 no hace falta DELAY.
+670   876D
+671   876D              ;	!!!!!!!! DESTRUYE BC !!!!!!!!!!!
+672   876D
+673   876D 01 20 03     DELAY LD BC,$0320							;$0320 ..... Delay mínimo
+674   8770 0B           wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: si el Sprite ocupa la 1ª y 2ª_
+675   8771 78           	LD A,B
+676   8772 A7           	AND A
+677   8773 20 FB        	JR NZ,wait
+678   8775 C9           	RET
+679   8776
+680   8776              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+681   8776              ;
+682   8776              ;	16/02/23
+683   8776
+684   8776              Movimiento_Amadeus
+685   8776
+686   8776 3E F7        	ld a,$f7		  										; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
+687   8778 DB FE        	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
+688   877A E6 01        	and $01													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $01 resulta "0"  llama a la rutina "Mov_izq".
+689   877C CC C0 8E         call z,Mov_left											;			"			"			"			"			"			"			"			"
+690   877F 3E F7        	ld a,$f7
+691   8781 DB FE        	in a,($fe)
+692   8783 E6 01        	and $01
+693   8785 C8           	ret z
+694   8786
+695   8786 3E F7        	ld a,$f7
+696   8788 DB FE        	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
+697   878A E6 02        	and $02													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $02 resulta "0"  llama a la rutina "Mov_der".
+698   878C CC A2 8D     	call z,Mov_right										;			"			"			"			"			"			"			"			"
+699   878F
+700   878F              ; Disparo.
+701   878F
+702   878F 3E F7        	ld a,$f7												; "5" para disparar.
+703   8791 DB FE        	in a,($fe)
+704   8793 E6 10        	and $10
+705   8795 CC CC 87     	call z,Calcula_punto_de_disparo_inicial
+706   8798 C9               ret
+707   8799
+708   8799              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+709   8799              ;
+710   8799              Detecta_disparo_entidad
+711   8799
+712   8799 3E 7F        	ld a,$7f
+713   879B DB FE        	in a,($fe)
+714   879D E6 01        	and 1
+715   879F C0           	ret nz
+716   87A0 CD CC 87     	call Calcula_punto_de_disparo_inicial
+717   87A3
+718   87A3              ; Pinta indicadores de FILAS. ------------------------------------------------------
+719   87A3
+720   87A3 21 10 40     Pinta_FILAS ld hl,$4010
+721   87A6              ;	ld b,9
+722   87A6              ;2 push hl
+723   87A6              ;	push bc
+724   87A6 06 BF        	ld b,$bf
+725   87A8 36 80        1 ld (hl),%10000000
+726   87AA CD CA 8A     	call NextScan
+727   87AD 10 F9        	djnz 1B
+728   87AF              ;	pop bc
+729   87AF              ;	pop hl
+730   87AF              ;	inc l
+731   87AF              ;	djnz 2B
+732   87AF 06 03        	ld b,3
+733   87B1 21 00 47         ld hl,$4700
+734   87B4 CD BA 87     3 call Bucle_1
+735   87B7 10 FB            djnz 3B
+736   87B9 C9               ret
+737   87BA
+738   87BA C5           Bucle_1 push bc
+739   87BB E5                   push hl
+740   87BC D1                   pop de
+741   87BD 13                   inc de
+742   87BE 01 FF 00             ld bc,255
+743   87C1 36 FF                ld (hl),255
+744   87C3 ED B0                ldir
+745   87C5 23                   inc hl
+746   87C6 3E 07                ld a,7
+747   87C8 84                   add a,h
+748   87C9 67                   ld h,a
+749   87CA C1                   pop bc
+750   87CB C9                   ret
+751   87CC
+752   87CC              ; ---------------------------------------------------------------
+753   87CC
+754   87CC              	include "Disparo.asm"
+# file opened: Disparo.asm
+  1+  87CC              ; ******************************************************************************************************************************************************************************************
+  2+  87CC              ;
+  3+  87CC              ;   16/02/23
+  4+  87CC              ;
+  5+  87CC              ;
+  6+  87CC              ;
+  7+  87CC              ; 	Calcula la dirección de memoria de pantalla donde se va a iniciar el disparo, (se aplica a_)
+  8+  87CC              ;   _entidades y Amadeus).
+  9+  87CC
+ 10+  87CC              Calcula_punto_de_disparo_inicial
+ 11+  87CC
+ 12+  87CC 3A 12 85         ld a,(Cuad_objeto)
+ 13+  87CF FE 02            cp 2
+ 14+  87D1 38 0A            jr c,1F
+ 15+  87D3 28 08            jr z,1F
+ 16+  87D5
+ 17+  87D5              ; Estamos en mitad inferior de pantalla, (cuadrantes 3 y 4).
+ 18+  87D5
+ 19+  87D5 E6 01            and 1
+ 20+  87D7 28 02            jr z,2F
+ 21+  87D9
+ 22+  87D9              ; Estamos en el 3er cuadrante de pantalla.
+ 23+  87D9
+ 24+  87D9 18 FE            jr $
  25+  87DB
- 26+  87DB              ; Llegados a este punto, tengo Filas/Columnas en BC y (Cuad_objeto) en A´.
+ 26+  87DB              ; Estamos en el 4º cuadrante de pantalla.
  27+  87DB
- 28+  87DB CD CA 89     3 call calcula_CColumnass
- 29+  87DE CD 01 8A     	call Calcula_puntero_de_impresion				; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
- 30+  87E1 CD 56 8A     	call Define_rutina_de_impresion
- 31+  87E4
- 32+  87E4 3A 2B 85     	ld a,(Ctrl_0)									; Antes de salir de la rutina REStauramos el bit5 de Ctrl_0 para que nos vuelva_
- 33+  87E7 CB AF        	res 5,a											; _a ser de utilidad.
- 34+  87E9 32 2B 85     	ld (Ctrl_0),a
- 35+  87EC
- 36+  87EC C9           	ret
- 37+  87ED
- 38+  87ED              ; *******************************************************************************************************************************************************************************************
- 39+  87ED              ;	21/01/23
- 40+  87ED              ;
- 41+  87ED              ; 	Comprueba_limite_horizontal.
- 42+  87ED              ;
- 43+  87ED              ;	La rutina comprueba si hemos sobrepasado el (Limite_horizontal) definido en la rutina [Inicializacion]. Este será:_
- 44+  87ED              ;	_ $4fc0 si partimos de los cuadrantes 1 o 2 de pantalla o $4820 si partimos de los cuadrantes 3 o 4.
- 45+  87ED              ;
- 46+  87ED              ;	Si sobrepasamos o alcanzamos el límite horizontal establecido, la rutina cargará el registro E con un "1".
- 47+  87ED              ;	Si NO HEMOS SOBREPASADO (Limite_horizontal), E="0".
- 48+  87ED              ;	E="1" indica que HEMOS SOBREPASADO el (Limite_horizontal).
- 49+  87ED              ;	E="2" indica que NO HEMOS SOBREPASADO el (Limite_horizontal) pero hemos alcanzado o superado EL CENTRO DE PANTALLA.
- 50+  87ED
- 51+  87ED
- 52+  87ED
- 53+  87ED 3A 2B 85     Comprueba_limite_horizontal ld a,(Ctrl_0)          	; Si no hemos desaparecido por arriba o por abajo, saltamos a 1F para comprobar_
- 54+  87F0 CB 57        	bit 2,a                                         ; _si hemos llegado o sobrepasado (Limite_horizontal). Seguimos con la rutina.
- 55+  87F2 28 07        	jr z,1F                                         ; Si por el contrario hemos desaparecido por arriba o por abajo, (bit2/bit3 de (Ctrl_0)="1"))_
- 56+  87F4 E6 FB        	and $fb 										; _hay que modificar el puntero de posición. (E="1" y salimos de la rutina). Antes inicializaremos los_
- 57+  87F6 32 2B 85     	ld (Ctrl_0),a 									; _ bits 2 y 3 de (Ctrl_0).
- 58+  87F9 18 09            jr 6F
- 59+  87FB CB 5F        1 bit 3,a
- 60+  87FD 28 0A            jr z,2F
- 61+  87FF E6 F7            and $f7
- 62+  8801 32 2B 85         ld (Ctrl_0),a
- 63+  8804 CD 57 89     6 call Inicializacion
- 64+  8807 18 5B            jr 5F
- 65+  8809 E5           2 push hl						        			; Guardo (Posicion_actual), HL en la pila.
- 66+  880A
- 67+  880A              ; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
- 68+  880A              ; Comprobamos si hemos llegado al (Limite_horizontal). E="0".
- 69+  880A
- 70+  880A EB           	ex de,hl 										; Averiguamos si hemos llegado o sobrepasado el (Limite_horizontal). Hemos simplificado la operación SBC_
- 71+  880B 2A 35 85     	ld hl,(Limite_horizontal) 						; _cargando el tercio de pantalla en el byte alto.
- 72+  880E CD FA 8C     	call calcula_tercio 							; (Posicion_actual) - (Limite_horizontal).
- 73+  8811 67           	ld h,a
- 74+  8812 EB           	ex de,hl 										; ARRIBA a ABAJO .......... E="1" cuando ( Z y NC ).
- 75+  8813 CD FA 8C     	call calcula_tercio                             ; ABAJO a ARRIBA .......... E="1" cuando ( Z y C ).
- 76+  8816 67           	ld h,a
- 77+  8817 A7           	and a
- 78+  8818 ED 52        	sbc hl,de 										; Posicíon <"menos"> Límite.
- 79+  881A 08           	ex af,af 										; Guardo el registro F con los flags resultantes de la operación SBC.
- 80+  881B 3A 12 85     	ld a,(Cuad_objeto)
- 81+  881E FE 02        	cp 2
- 82+  8820 38 1E        	jr c,3F
- 83+  8822 28 1C        	jr z,3F
- 84+  8824 08           	ex af,af 										; Partimos de LA MITAD INFERIOR. Recupero resultado de (Posicíon - Límite) en AF.
- 85+  8825 28 23            jr z,7F
- 86+  8827 38 21            jr c,7F 										; ABAJO a ARRIBA .......... E="1" cuando ( Z y C ). HEMOS SOBREPASADO_
- 87+  8829 1E 00         	ld e,0											; _ (Limite_horizontal), saltamos a 7F.
- 88+  882B E1           	pop hl
- 89+  882C
- 90+  882C              ; Partimos de la mitad INFERIOR de pantalla y `NO HEMOS´ superado (Limite_horizontal). Tenemos que averiguar si hemos superado el centro de pantalla_
- 91+  882C              ; _para indicar con E="2" en caso necesario.
- 92+  882C
- 93+  882C E5               push hl
- 94+  882D C5               push bc
- 95+  882E CD FA 8C     	call calcula_tercio
- 96+  8831 FE 01        	cp 1
- 97+  8833 20 07        	jr nz,11F 										; Sólo comprobamos la línea centro cuando nos encontramos en el 2º tercio de pantalla.
- 98+  8835 CD 65 88         call Comprueba_centro 							; ABAJO A ARRIBA .......... E="2" cuando ( Z y C ).
- 99+  8838 28 26            jr z,9F
-100+  883A 38 24            jr c,9F
-101+  883C 1E 00        11 ld e,0
-102+  883E 18 22            jr 8F
-103+  8840 08           3 ex af,af 											; Partimos de LA MITAD SUPERIOR. Recupero resultado de (Posicíon - Límite) en AF.
-104+  8841 28 07        	jr z, 7F
-105+  8843 30 05        	jr nc, 7F										; E="1" cuando ( Z y NC ).
-106+  8845 1E 00         	ld e,0
-107+  8847 E1           	pop hl
-108+  8848 18 04        	jr 4F
-109+  884A 1E 01        7 ld e,1 											; SOBREPASAMOS (Limite_horizontal) !!!. E="1", pop HL y RET.
-110+  884C 18 15            jr 10F
-111+  884E
-112+  884E              ; Partimos de la mitad SUPERIOR de pantalla y `NO HEMOS´ superado (Limite_horizontal). Tenemos que averiguar si hemos superado el centro de pantalla_
-113+  884E              ; _para indicar con E="2" en caso necesario.
-114+  884E
-115+  884E E5           4 push hl
-116+  884F C5               push bc											; Guardamos (Posicion_actual) y (Filas/Columns) en la pila.
-117+  8850 CD FA 8C     	call calcula_tercio
-118+  8853 FE 01        	cp 1
-119+  8855 20 0B        	jr nz,8F										; Sólo comprobamos la línea centro cuando nos encontramos en el 2º tercio de pantalla.
-120+  8857 CD 65 88         call Comprueba_centro 							; ARRIBA a ABAJO .......... E="2" cuando ( Z y NC ).
-121+  885A 28 04            jr z,9F
-122+  885C 30 02            jr nc,9F
-123+  885E 18 02        	jr 8F
-124+  8860 1E 02        9 ld e,2
-125+  8862 C1           8 pop bc
-126+  8863 E1           10 pop hl
-127+  8864 C9           5 ret
-128+  8865
-129+  8865              ; --------------------
-130+  8865              ;
-131+  8865              ; 25/08/22
-132+  8865
-133+  8865 CD FA 8C     Comprueba_centro call calcula_tercio
-134+  8868 67               ld h,a
-135+  8869 08           	ex af,af
-136+  886A FE 02        	cp 2
-137+  886C 38 07        	jr c,1F
-138+  886E 28 05        	jr z,1F
-139+  8870 01 A0 01     	ld bc,$01a0 								  	 ; ¡¡¡¡¡ CENTRO DE PANTALLA cuando estamos en la mitad inferior de la misma. !!!!!
-140+  8873 18 03        	jr 2F
-141+  8875 01 60 01     1 ld bc,$0160                                     	 ; ¡¡¡¡¡ CENTRO DE PANTALLA cuando estamos en la mitad superior de la misma. !!!!!
-142+  8878 08           2 ex af,af
-143+  8879 A7               and a
-144+  887A ED 42            sbc hl,bc
-145+  887C C9               ret
-146+  887D
-147+  887D              ; *********************************************************************************************************************************************************************************************
-148+  887D              ;
-149+  887D              ;   16/8/22
-150+  887D              ;
-151+  887D              ;	Comprueba_limite_vertical
-152+  887D              ;
-153+  887D              ;	Modifica el registro L del puntero de pantalla cuando se sobrepasa la columna límite, (Limite2).
-154+  887D              ;	Dependiendo del cuadrante en el que nos encontremos, sumaremos o restaremos, (Columnas-1) a L.
-155+  887D              ;
-156+  887D
-157+  887D 2A 00 85     Comprueba_limite_vertical ld hl,(Posicion_actual)
-158+  8880 7D           	ld a,l
-159+  8881 E6 1F        	and $1F
-160+  8883 57           	ld d,a
-161+  8884 3A 37 85     	ld a,(Limite_vertical)
-162+  8887 BA           	cp d 											; Límite - Posición.
-163+  8888 08           	ex af,af 										; Resultado de CP d en F'.
-164+  8889 3A 12 85     	ld a,(Cuad_objeto)								; Averiguamos en que cuadrante estamos.
-165+  888C CB 47        	bit 0,a
-166+  888E 28 10        	jr z,1F 										; Si A´es PAR, estamos en el 2º o 4º cuadrante. Saltamos a [3F], (cuadrantes 2º y 4º).
-167+  8890
-168+  8890              ; Hemos comparado la posición Y de la entidad con (Limite_vertical) y estamos en la mitad IZQUIERDA de la pantalla.
-169+  8890
-170+  8890 08           	ex af,af 										; LADO IZQUIERDO !!!!!!!!!!
-171+  8891 38 28        	jr c,4F 										; Superamos (lIMITE_VERTICAL) cuando hay "acarreo".
-172+  8893
-173+  8893              ; No hay cambio de cuadrante!!!!! Estamos en el lado izquierdo de la pantalla y no hemos sobrepasado (Limite_vertical).
-174+  8893              ; Lo primero que haremos será comprobar si hemos llegado o superado el centro de la pantalla.
-175+  8893
-176+  8893 3A 04 85         ld a,(Coordenada_X)
-177+  8896 16 0F            ld d,Centro_izquierda
-178+  8898 A7               and a
-179+  8899 92               sub d 											 ; Posición - Centro_izquierda.
-180+  889A 28 1E            jr z,3F
-181+  889C 30 1C            jr nc,3F                                         ; Si no hemos superado (Limite_vertical) pero si hemos superado el centro de la pantalla,_
-182+  889E              ;                                                    ; _salimos sin modificar nada.
-183+  889E 18 0E            jr 2F
-184+  88A0 08           1 ex af,af 											 ; LADO DERECHO de la pantalla !!!!!!!!!!!
-185+  88A1 30 18        	jr nc,4F 										 ; Superamos (lIMITE_VERTICAL) cuando NC.
-186+  88A3
-187+  88A3              ; No hay cambio de cuadrante!!!!! Estamos en el lado derecho de la pantalla y no hemos sobrepasado (Limite_vertical).
-188+  88A3              ; Lo primero que haremos será comprobar si hemos llegado o superado el centro de la pantalla.
-189+  88A3
-190+  88A3 3A 04 85         ld a,(Coordenada_X)
-191+  88A6 16 10            ld d,Centro_derecha
-192+  88A8 A7               and a
-193+  88A9 92               sub d
-194+  88AA 28 0E            jr z,3F
-195+  88AC 38 0C            jr c,3F                                          ; Si no hemos superado (Limite_vertical) pero si hemos superado el centro de la pantalla,_
-196+  88AE              ;                                                    ; _salimos sin modificar nada.
-197+  88AE CB 43        2 bit 0,e
-198+  88B0 28 08            jr z,3F 										 ; No hemos sobrepasado (Centro_izquierda). Si E="0", salimos sin modificar posición.
-199+  88B2 C5           	push bc 										 ; Reservo (Filas) / (Columns) en la pila.
-200+  88B3 CD 47 89         call Modificaccionne
-201+  88B6 C1           	pop bc
-202+  88B7 CD 57 89         call Inicializacion
-203+  88BA C9           3 ret 				 								 ; Salimos de la rutina.
-204+  88BB
-205+  88BB              ; ----- ----- ----- Cambio de cuadrante ----- ----- -----
-206+  88BB
-207+  88BB C5           4 push bc
-208+  88BC 01 FF 84     	ld bc,Columns 		 	 						 ; Cambio de cuadrante. Sobrepasamos (Limite_vertical).
-209+  88BF 0A           	ld a,(bc)
-210+  88C0 3D           	dec a
-211+  88C1 47           	ld b,a 											 ; Columnas-1 en B.
-212+  88C2 7D           	ld a,l
-213+  88C3 08           	ex af,af                                         ; Cambio de cuadrante, estamos en la parte derecha de la pantalla.
-214+  88C4 CB 47        	bit 0,a
-215+  88C6 28 03        	jr z,5F
-216+  88C8 08           	ex af,af 										 ; Estamos en la parte izquierda de la pantalla, (cuadrantes 1º o 3º). En ese caso, restamos (Columnas-1) a L.
-217+  88C9 18 2E        	jr 7F
-218+  88CB
-219+  88CB              ; Cambio de cuadrante, partimos de la parte DERECHA de la pantalla. Por el centro ?? o desaparecemos ??.
-220+  88CB
-221+  88CB 08           5 ex af,af 											 ; Estamos en la parte derecha de la pantalla, (cuadrantes 2º o 4º). En ese caso, sumamos (Columnas-1) a L.
-222+  88CC F5           	push af                                          ; Guardo la posición, (L), en la pila, (la contiene el acumulador).
-223+  88CD 3A 2B 85     	ld a,(Ctrl_0)
-224+  88D0 CB 4F        	bit 1,a
-225+  88D2 20 1D        	jr nz,6F                                         ; Cambio de cuadrante por desaparecer por la derecha!!!
-226+  88D4 F1           	pop af                                           ; Cambio de cuadrante por desaparecer por el centro!!!
-227+  88D5
-228+  88D5              ; Hemos sobrepasado el (Limite_vertical) de la mitad derecha a la izquierda. Ahora necesitamos saber si E="0".
-229+  88D5
-230+  88D5 1C               inc e
-231+  88D6 1D               dec e
-232+  88D7 20 07            jr nz,12F
-233+  88D9 80           	add b 				 							 ; Si hemos sobrepasado el (Limite_vertical) pero no hemos llegado al centro horizontal_
-234+  88DA 6F               ld l,a	 										 ; _de la pantalla, E="0" modificamos L, Inicializamos el objeto y salimos.
-235+  88DB 22 00 85     	ld (Posicion_actual),hl
-236+  88DE 18 44        13 jr 9F
-237+  88E0 CB 43        12 bit 0,e
-238+  88E2 20 03            jr nz,14F                                        ; Si hemos sobrepasado (Limite_vertical) y hemos llegado o superado_
-239+  88E4              ;                                                    ; _el centro horizontal de la pantalla, E="2", salimos sin modificar nada.
-240+  88E4 C1           	pop bc
-241+  88E5 18 D3        	jr 3B
-242+  88E7 80           14 add b
-243+  88E8 6F               ld l,a
-244+  88E9 22 00 85     	ld (Posicion_actual),hl
-245+  88EC CD 47 89         call Modificaccionne                             ; Si hemos sobrepasado (Limite_vertical) y (Limite_horizontal), E="1". Modificamos HL,L,_
-246+  88EF 18 33            jr 9F 											 ; _inicializamos y salimos.
-247+  88F1 E6 FD        6 and $fd 											 ; Cambio de cuadrante por desaparecer por la derecha!!!. Reinicializo el bit 1 de (Ctrl_0).
-248+  88F3 32 2B 85         ld (Ctrl_0),a
-249+  88F6 F1           	pop af
-250+  88F7 18 2B        	jr 9F
-251+  88F9
-252+  88F9              ; Cambio de cuadrante, partimos de la parte IZQUIERDA de la pantalla. Por el centro ?? o desaparecemos ??.
-253+  88F9
-254+  88F9 F5           7 push af
-255+  88FA 3A 2B 85     	ld a,(Ctrl_0)
-256+  88FD CB 47        	bit 0,a
-257+  88FF 20 1D        	jr nz,8F
-258+  8901 F1           	pop af
-259+  8902
-260+  8902              ; Hemos sobrepasado el (Limite_vertical) de la mitad IZQUIERDA a la DERECHA. Ahora necesitamos saber si E="0".
-261+  8902
-262+  8902 1C           	inc e
-263+  8903 1D               dec e
-264+  8904 20 07            jr nz,10F
-265+  8906 90           	sub b
-266+  8907 6F               ld l,a
-267+  8908 22 00 85     	ld (Posicion_actual),hl
-268+  890B 18 17            jr 9F                                           ; Si hemos sobrepasado el (Limite_vertical) pero no hemos llegado al centro horizontal_
-269+  890D              ;                                                   ; _de la pantalla, E="0" modificamos L, Inicializamos el objeto y salimos.
-270+  890D CB 43        10 bit 0,e
-271+  890F 20 03            jr nz,16F                                       ; Si hemos sobrepasado (Limite_vertical) y hemos llegado o superado_
-272+  8911              ;                                                   ; _el centro horizontal de la pantalla, E="2", salimos sin modificar nada.
-273+  8911 C1           	pop bc
-274+  8912 18 A6        	jr 3B
-275+  8914 90           16 sub b
-276+  8915 6F               ld l,a
-277+  8916 22 00 85     	ld (Posicion_actual),hl
-278+  8919 CD 47 89         call Modificaccionne                            ; Si hemos sobrepasado (Limite_vertical) y (Limite_horizontal), E="1". Modificamos HL,L,_
-279+  891C 18 06            jr 9F
-280+  891E E6 FE        8 and $fe 											; ; Cambio de cuadrante por desaparecer por la izquierda !!!!!. Reinicializo el bit 0 de (Ctrl_0).
-281+  8920 32 2B 85         ld (Ctrl_0),a
-282+  8923 F1           	pop af
-283+  8924 C1           9 pop bc
-284+  8925 1E 00        	ld e,0
-285+  8927 CD 57 89         call Inicializacion
-286+  892A F5               push af	 										; Antes de nada, guardo (Cuad_objeto) en A´ para acceder a él más rapido, (me va a hacer falta en la rutina calcolum).
-287+  892B 08           	ex af,af
-288+  892C F1           	pop af 											; Ahora tengo (Cuad_objeto) en A y A´.
-289+  892D 18 8B            jr 3B
-290+  892F
-291+  892F              ; --------------------
-292+  892F
-293+  892F 06 0F        Modifica_Pos_actual ld b,15                                         ; Scanlines-1 en B.
-294+  8931 CD AB 8A     1 call PreviousScan
-295+  8934 10 FB            djnz 1B
-296+  8936 22 00 85     	ld (Posicion_actual),hl
-297+  8939 AF           	xor a 											; Carry a "0". Evita que vuelva a entrar consecutivamente.
-298+  893A C9           	ret
-299+  893B
-300+  893B              ; --------------------
-301+  893B
-302+  893B 06 0F        Modifica_Pos_actual2 ld b,15                                         ; Scanlines-1 en B.
-303+  893D CD 9C 8A     1 call NextScan
-304+  8940 10 FB            djnz 1B
-305+  8942 22 00 85     	ld (Posicion_actual),hl
-306+  8945 AF           	xor a 											; Fijo el acarreo a "0" para asegurarme de no volver a entrar en la rutina.
-307+  8946 C9           	ret
-308+  8947
-309+  8947              ; --------------------
-310+  8947              ;
-311+  8947              ;	22/01/23
-312+  8947              ;
-313+  8947              ;	E="1". Hemos cambiado de cuadrante.
-314+  8947              ;	Si estamos en la mitad superior de pantalla: CALL [Modifica_Pos_actual].
-315+  8947              ;	Si estamos en la mitad inferior de pantalla: CALL [Modifica_Pos_actual2].
-316+  8947
-317+  8947
-318+  8947              Modificaccionne
-319+  8947
-320+  8947 3A 12 85     	ld a,(Cuad_objeto)
-321+  894A FE 02        	cp 2
-322+  894C CC 2F 89         call z,Modifica_Pos_actual                      ; Si por el contrario estamos en la mitad inferior, call Modifica_Pos_actual2.
-323+  894F DC 2F 89         call c,Modifica_Pos_actual
-324+  8952 C8           	ret z
-325+  8953 CD 3B 89         call Modifica_Pos_actual2
-326+  8956 C9               ret
-327+  8957
-328+  8957              ; *************************************************************************************************************************************************************************************************
-329+  8957              ;
-330+  8957              ;	13/8/22
-331+  8957              ;
-332+  8957              ;	Inicializacion
-333+  8957              ;
-334+  8957              ;	Entrega "1", "2", "3" o "4" en (Cuad_objeto) en función del cuadrante de pantalla en el que nos encontremos.
-335+  8957              ;	Fija los punteros del objeto a pintar, (varían en función del cuadrante en el que nos encontremos).
-336+  8957              ;	También calcula los límites horizontal y vertical. Estos dependen del tamaño del objeto a imprimir.
-337+  8957              ;
-338+  8957              ; 	La rutina se ejecuta cada vez que el objeto supera el (Limite_horizontal) y el (Limite_vertical). Esto sucede_
-339+  8957              ;	_ cada vez que el objeto supera el centro de la pantalla tanto en sentido horizontal como vertical y cuando_
-340+  8957              ;	_ desaparece/aparece.
-341+  8957
-342+  8957              ;	[Puntero_datas]: Dirección de memoria donde se encuentra el 1er byte que pinta el objeto.
-343+  8957              ;	[Puntero_attr_datas]: Dirección de memoria donde se encuentra el byte de atributos del objeto.
-344+  8957              ;
-345+  8957              ;	INPUT: [HL] contendrá la dirección de pantalla a la que queremos asignar cuadrante. HL=(Posicion_inicio).
-346+  8957              ; 		   [BC] contendrá (Filas)/(Columns) del objeto a inicializar.
-347+  8957              ; 		   [E] ="0"
-348+  8957
-349+  8957              ; 	OUTPUT: DESTRUYE [AF] y [D].
-350+  8957
-351+  8957 CD FA 8C     Inicializacion call calcula_tercio
-352+  895A 28 36        	jr z,primit
-353+  895C E6 02        	and 2
-354+  895E 20 07        	jr nz,segmit
-355+  8960 7D           	ld a,l
-356+  8961 FE 7F        	cp $7f
-357+  8963 38 2D        	jr c,primit
-358+  8965 28 2B        	jr z,primit
-359+  8967 CD C4 89     segmit call column
-360+  896A 38 13        	jr c,tercuad
-361+  896C 3E 04        cuarcuad ld a,4
-362+  896E 32 12 85     	ld (Cuad_objeto),a
-363+  8971 21 20 48     	ld hl,$4820
-364+  8974 22 35 85     	ld (Limite_horizontal),hl
-365+  8977 21 37 85     	ld hl,Limite_vertical
-366+  897A 36 0D        	ld (hl),$0d
-367+  897C 08           	ex af,af
-368+  897D 18 3C        	jr 1F
-369+  897F              tercuad
-370+  897F 3E 03        	ld a,3
-371+  8981 32 12 85     	ld (Cuad_objeto),a
-372+  8984 21 20 48     	ld hl,$4820
-373+  8987 22 35 85     	ld (Limite_horizontal),hl
-374+  898A 21 37 85     	ld hl,Limite_vertical
-375+  898D 36 12        	ld (hl),$12
-376+  898F 08           	ex af,af
-377+  8990 18 29        	jr 1F
-378+  8992 CD C4 89     primit call column
-379+  8995 38 13        	jr c, primcuad
-380+  8997              segcuad
-381+  8997 3E 02        	ld a,2
-382+  8999 32 12 85     	ld (Cuad_objeto),a
-383+  899C 21 C0 4F     	ld hl,$4fc0
-384+  899F 22 35 85     	ld (Limite_horizontal),hl
-385+  89A2 21 37 85     	ld hl,Limite_vertical
-386+  89A5 36 0D        	ld (hl),$0d
-387+  89A7 08           	ex af,af
-388+  89A8 18 11        	jr 1F
-389+  89AA              primcuad
-390+  89AA 3E 01        	ld a,1
-391+  89AC 32 12 85     	ld (Cuad_objeto),a
-392+  89AF 21 C0 4F     	ld hl,$4fc0
-393+  89B2 22 35 85     	ld (Limite_horizontal),hl
-394+  89B5 21 37 85     	ld hl,Limite_vertical
-395+  89B8 36 12        	ld (hl),$12
-396+  89BA 08           	ex af,af
-397+  89BB CD 5A 90     1 call Genera_coordenadas
-398+  89BE 21 2B 85     	ld hl,Ctrl_0
-399+  89C1 CB EE        	set 5,(hl)
-400+  89C3 C9           	ret
-401+  89C4
-402+  89C4              ; ------------------------------------------------------------------------------------------------------------------
-403+  89C4
-404+  89C4              ; Esta pequeña subrutina determina el nº de columna en la que nos encontramos, Introducimos en A el valor absoluto de L, (0-31).
-405+  89C4              ;
-406+  89C4              ; OUTPUT: "FLAG C". Si se produce 1, nos encontramos en las primeras 16 columnas de pantalla, (cuadrantes 1 y 3). Si no es así, (cuadrantes 2 y 4).
-407+  89C4
-408+  89C4 7D           column ld a,l
-409+  89C5 E6 1F        	and $1f
-410+  89C7 FE 10         	cp $10
-411+  89C9 C9            	ret
-412+  89CA
-413+  89CA              ; --------------------------------------------------------------------------------------------------------------------
-414+  89CA              ;
-415+  89CA              ; Esta subrutina se encarga de asignar valor a la variable (Columnas), (nº de columnas del objeto que podemos pintar).
-416+  89CA              ;
-417+  89CA              ; 14/12/22
-418+  89CA              ;
-419+  89CA              ;	Modifica: A y BC.
-420+  89CA
-421+  89CA 3A 12 85     calcula_CColumnass ld a,(Cuad_objeto)
-422+  89CD E6 01        	and 1
-423+  89CF 28 17        	jr z,1F
-424+  89D1
-425+  89D1              ; Nos encontramos en la parte izquierda de la pantalla
-426+  89D1
-427+  89D1 3A 04 85     	ld a,(Coordenada_X)
-428+  89D4 47           	ld b,a
-429+  89D5 04           	inc b											; (Coordenada_X)+1 en B.
-430+  89D6 79           	ld a,c
-431+  89D7 90           	sub b											; (Columns)-[(Coordenada_X)+1] en A.
-432+  89D8 38 08        	jr c,2F
-433+  89DA 47           	ld b,a
-434+  89DB 79           	ld a,c
-435+  89DC 90           	sub b
-436+  89DD 32 34 85     	ld (Columnas),a
-437+  89E0 18 1B        	jr 4F
-438+  89E2 79           2 ld a,c
-439+  89E3 32 34 85     	ld (Columnas),a
-440+  89E6 18 15        	jr 4F
-441+  89E8
-442+  89E8              ; Nos encontramos en la parte derecha de la pantalla.
-443+  89E8
-444+  89E8 3A 04 85     1 ld a,(Coordenada_X)
-445+  89EB 81           	add c
-446+  89EC 3D           	dec a
-447+  89ED D6 1F        	sub $1f
-448+  89EF 38 08        	jr c,3F
-449+  89F1 47           	ld b,a
-450+  89F2 79           	ld a,c
-451+  89F3 90           	sub b
-452+  89F4 32 34 85     	ld (Columnas),a
-453+  89F7 18 04        	jr 4F
-454+  89F9 79           3 ld a,c
-455+  89FA 32 34 85     	ld (Columnas),a
-456+  89FD D9           4 exx
-457+  89FE 4F           	ld c,a
-458+  89FF D9           	exx
-459+  8A00 C9            ret
-460+  8A01
-461+  8A01              ; --------------------------------------------------------------------------------------------------------------------
-462+  8A01              ;
-463+  8A01              ; 7/1/23
-464+  8A01              ;
-465+  8A01              ;	Calcula el puntero de impresión del sprite, (arriba-izquierda).
-466+  8A01              ;	Almacena en IY (Puntero_objeto). La rutina de impresión requiere de esta dirección para situar el SP a la hora de pintar.
-467+  8A01              ;
-468+  8A01              ;	OUTPUT: HL e IX Contienen el puntero de impresión.
-469+  8A01              ;	DESTRUYE: HL,B Y A.
-470+  8A01
-471+  8A01 3A 12 85     Calcula_puntero_de_impresion ld a,(Cuad_objeto)
-472+  8A04 FE 02        	cp 2
-473+  8A06 38 18        	jr c,1F
-474+  8A08 28 16        	jr z,1F
-475+  8A0A E6 01        	and 1
-476+  8A0C 28 0D        	jr z,3F
-477+  8A0E
-478+  8A0E              ; Estamos situados en el 3er cuadrante de pantalla. ----- ----- -----
-479+  8A0E
-480+  8A0E CD 4A 8A     	call Operandos					; (Posicion_actual) en HL y (Columnas)-1 en B.
-481+  8A11
-482+  8A11 7D           9 ld a,l
-483+  8A12 E6 1F        	and $1f
-484+  8A14 28 2A        	jr z,7F
-485+  8A16 2B           	dec hl
-486+  8A17 10 F8        	djnz 9B
-487+  8A19 18 25        	jr 7F
-488+  8A1B
-489+  8A1B              ; Estamos situados en el 4º cuadrante de pantalla. ----- ----- -----
-490+  8A1B
-491+  8A1B 2A 00 85     3 ld hl,(Posicion_actual)
-492+  8A1E 18 20        	jr 7F
-493+  8A20
-494+  8A20 28 14        1 jr z,2F
-495+  8A22
-496+  8A22              ; Estamos situados en el 1er cuadrante de pantalla. ----- ----- -----
-497+  8A22
-498+  8A22 CD 4A 8A     	call Operandos					; (Posicion_actual) en HL y (Columnas)-1 en B.
-499+  8A25 7D           4 ld a,l
-500+  8A26 E6 1F        	and $1f
-501+  8A28 28 03        	jr z,6F
-502+  8A2A 2B           	dec hl
-503+  8A2B 10 F8        	djnz 4B
-504+  8A2D 06 0F        6 ld b,15
-505+  8A2F CD AB 8A     5 call PreviousScan
-506+  8A32 10 FB        	djnz 5B
-507+  8A34 18 0A        	jr 7F
-508+  8A36
-509+  8A36              ; Estamos situados en el 2º cuadrante de pantalla. ----- ----- -----
-510+  8A36
-511+  8A36 CD 4A 8A     2 call Operandos					; (Posicion_actual) en HL y (Columnas)-1 en B.
-512+  8A39 06 0F        	ld b,15
-513+  8A3B CD AB 8A     8 call PreviousScan
-514+  8A3E 10 FB        	djnz 8B
-515+  8A40
-516+  8A40 E5           7 push hl
-517+  8A41 DD E1        	pop ix
-518+  8A43
-519+  8A43 2A 02 85     	ld hl,(Puntero_objeto)
-520+  8A46 E5           	push hl
-521+  8A47 FD E1        	pop iy
-522+  8A49
-523+  8A49 C9           	ret
-524+  8A4A
-525+  8A4A              ; --------------------------------------------------------------------------------------------------------------------
-526+  8A4A              ;
-527+  8A4A              ;	2/1/23
-528+  8A4A              ;
-529+  8A4A              ;	Sub-rutina de [Calcula_puntero_de_impresion].
-530+  8A4A              ;
-531+  8A4A              ;	Tras esta rutina tenemos:
-532+  8A4A              ;
-533+  8A4A              ;	OUTPUT: HL contiene (Posicion_actual).
-534+  8A4A              ;			B contiene (Columnas)-1. Nota: Este valor `nunca' será "0". El valor mínimo es "1".
-535+  8A4A              ;
-536+  8A4A              ;	DESTRUYE!!!!! HL,B y A.
-537+  8A4A
-538+  8A4A 2A 00 85     Operandos ld hl,(Posicion_actual)
-539+  8A4D 3A 34 85     	ld a,(Columnas)
-540+  8A50 3D           	dec a
-541+  8A51 20 01        	jr nz,1F
-542+  8A53 3C           	inc a
-543+  8A54 47           1 ld b,a
-544+  8A55 C9           	ret
-545+  8A56
-546+  8A56              ; --------------------------------------------------------------------------------------------------------------------
-547+  8A56              ;
-548+  8A56              ;	3/1/23
-549+  8A56              ;
-550+  8A56              ;	La Rutina entrega en HL la dirección de memoria donde se encuentra la rutina de impresión que debemos ejecutar.
-551+  8A56              ;
-552+  8A56              ;	Destruye: A,B,HL y DE.
-553+  8A56
-554+  8A56              Define_rutina_de_impresion
-555+  8A56
-556+  8A56 3A FF 84     	ld a,(Columns)
-557+  8A59 47           	ld b,a
-558+  8A5A 3A 34 85     	ld a,(Columnas)
-559+  8A5D B8           	cp b
-560+  8A5E 20 0D        	jr nz,2f
-561+  8A60
-562+  8A60              ;	La entidad se imprime entera.
-563+  8A60
-564+  8A60 21 F7 8A     	ld hl, Indice_entidades_completas
-565+  8A63 E6 01        	and 1
-566+  8A65 28 02        	jr z,1F
-567+  8A67
-568+  8A67 23           	inc hl
-569+  8A68 23           	inc hl
-570+  8A69
-571+  8A69 CD AC 86     1 call Extrae_address
-572+  8A6C C9           	ret		;	ret
-573+  8A6D
-574+  8A6D              ;	La entidad no se imprime entera en pantalla.
-575+  8A6D
-576+  8A6D 3A 12 85     2 ld a,(Cuad_objeto)
-577+  8A70 E6 01        	and 1
-578+  8A72 28 17        	jr z,3F
-579+  8A74
-580+  8A74              ; 	La entidad no se imprime entera en pantalla, nos encontramos en el extremo izquierdo de la misma.
-581+  8A74
-582+  8A74 21 FB 8A     	ld hl, Indice_entidades_incompletas_izquierda
-583+  8A77 3A FF 84     4 ld a,(Columns)
-584+  8A7A E6 01        	and 1
-585+  8A7C 28 EB        	jr z,1B					; Sólo imprimimos 1 (Columnas) de un objeto de 2 Columns.
-586+  8A7E
-587+  8A7E 23           	inc hl
-588+  8A7F 23           	inc hl
-589+  8A80
-590+  8A80 3A 34 85     	ld a,(Columnas)
-591+  8A83 E6 01        	and 1
-592+  8A85 20 E2        	jr nz,1B				; Sólo imprimimos 1 (Columnas) de un objeto de 3 Columns.
-593+  8A87
-594+  8A87 23           	inc hl
-595+  8A88 23           	inc hl
-596+  8A89
-597+  8A89 18 DE        	jr 1B					; Sólo imprimimos 2 (Columnas) de un objeto de 3 Columns.
-598+  8A8B
-599+  8A8B 21 01 8B     3 ld hl, Indice_entidades_incompletas_derecha
-600+  8A8E 18 E7        	jr 4B
-601+  8A90
-602+  8A90              ; --------------------------------------------------------------------------------------------------------------------
-603+  8A90              ;
-604+  8A90              ;	Prepara_draw
-605+  8A90              ;
-606+  8A90              ;	Es una rutina de carga.
-607+  8A90              ;	Carga los registros BC,HL y E para posteriormente llamar a la rutina de pintado [DRAW].
-608+  8A90              ;
-609+  8A90              ;	FUNCIONAMIENTO:
-610+  8A90              ;
-611+  8A90              ;	- LD (Filas/Columns) del objeto a pintar en [BC].
-612+  8A90              ;	- LD (Posicion_actual) del objeto en [HL].
-613+  8A90              ;	- LD E,0. (Dígito de control utilizado por Draw para cálculos internos de la rutina. Ha de estar a "0").
-614+  8A90              ;
-615+  8A90              ;	DESTRUYE:
-616+  8A90              ;
-617+  8A90              ;	Logicamente, BC,HL y E quedan destruidos.
-618+  8A90
-619+  8A90 21 FE 84     Prepara_draw ld hl,Filas 		 					 					 ; Prepara los registros BC, E y HL.
-620+  8A93 46           	ld b,(hl) 														     ; Carga Filas/Columns del objeto a pintar o inicializar en BC.
-621+  8A94 23           	inc hl 												 				 ; Carga (Posicion_actual) en HL.
-622+  8A95 4E           	ld c,(hl)
-623+  8A96 2A 00 85     	ld hl,(Posicion_actual)
-624+  8A99 1E 00        	ld e,0 																 ; Byte de control. Ha de estar a "0" cuando llamamos a [DRAW].
-625+  8A9B C9           	ret
-626+  8A9C
-627+  8A9C              ;----------------------------------------------------------------------------------------------------------------
-628+  8A9C              ;
-629+  8A9C              ;	5/08/22
-630+  8A9C              ;
-631+  8A9C              ;   NextScan.
-632+  8A9C              ;
-633+  8A9C              ;   Calcula la dirección de mem. de pantalla donde se sitúa el siguiente scanline. (Inc H, línea abajo).
-634+  8A9C              ;
-635+  8A9C              ;   INPUT: HL contendra la dirección de mem. de video sobre la que queremos calcular el siguiente scanline.
-636+  8A9C              ;
-637+  8A9C              ;   OUTPUT: HL contendrá la nueva dirección de memoria de pantalla.
-638+  8A9C              ;
-639+  8A9C              ;       DESTRUIDOS: AF y HL !!!
-640+  8A9C              ;
-641+  8A9C              ;   010T TSSS LLLC CCCC (Codificación de la memoria de pantalla). $4000 - $57FF, (256 x 192 pixeles).
-642+  8A9C              ;
-643+  8A9C
-644+  8A9C 24           NextScan inc h          ; Incrementamos el scanline.
-645+  8A9D 7C               ld a,h
-646+  8A9E E6 07            and 7
-647+  8AA0 C0               ret nz              ; Salimos de la rutina si el scanline se encuentra entre (1-7).
-648+  8AA1
-649+  8AA1 7D           	ld a,l              ; Scanlines a "0", cambiamos de tercio. (Siempre que estemos en la última línea, LLL).
-650+  8AA2 C6 20            add a,$20           ; Vamos a comprobarlo...
-651+  8AA4 6F               ld l,a
-652+  8AA5 D8               ret c               ; Salimos si se produce el cambio de tercio.
-653+  8AA6
-654+  8AA6 7C               ld a,h              ; No estamos en la última línea del tercio, por lo que inicializamos H restando una_
-655+  8AA7 D6 08            sub 8               ; _unidad a los bits que definen el tercio TT, (sub $08).
-656+  8AA9 67               ld h,a
-657+  8AAA C9               ret
-658+  8AAB
-659+  8AAB              ;----------------------------------------------------------------------------------------------------------------
-660+  8AAB              ;
-661+  8AAB              ;	5/08/22
-662+  8AAB              ;
-663+  8AAB              ;   PreviousScan.
-664+  8AAB              ;
-665+  8AAB              ;   Calcula la dirección de mem. de pantalla donde se sitúa el scanline anterior. (Dec H, línea arriba).
-666+  8AAB              ;
-667+  8AAB              ;   INPUT: HL contendra la dirección de mem. de video sobre la que queremos calcular el scanline anterior.
-668+  8AAB              ;
-669+  8AAB              ;   OUTPUT: HL contendrá la nueva dirección de memoria de pantalla.
-670+  8AAB              ;
-671+  8AAB              ;       DESTRUIDOS: AF y HL !!!
-672+  8AAB              ;
-673+  8AAB              ;   010T TSSS LLLC CCCC (Codificación de la memoria de pantalla). $4000 - $57FF, (256 x 192 pixeles).
-674+  8AAB              ;
-675+  8AAB
-676+  8AAB 7C           PreviousScan ld a,h
-677+  8AAC 25               dec h               ; Dec H.
-678+  8AAD E6 07            and 7
-679+  8AAF C0               ret nz              ; Salimos de la rutina si el scanline se encuentra entre (1-7).
-680+  8AB0
-681+  8AB0 7D               ld a,l              ; Estabamos en el scanline "0" y al decrementar nos situamos en el "7" y cambiamos de tercio.
-682+  8AB1 D6 20            sub $20             ; Vamos a comprobarlo...
-683+  8AB3 6F               ld l,a
-684+  8AB4 D8               ret c               ; Salimos si estábamos en la primera línea y se produce el cambio de tercio.
-685+  8AB5
-686+  8AB5 7C               ld a,h              ; No estamos en la primera línea del tercio, por lo que inicializamos H sumando una_
-687+  8AB6 C6 08            add a,8             ; _unidad a los bits que definen el tercio TT, (add a,$08).
-688+  8AB8 67               ld h,a
-689+  8AB9 C9               ret
-690+  8ABA
-691+  8ABA              ; -----------------------------------------------------------------------------------
-692+  8ABA              ;
-693+  8ABA              ;	15/1/23
-694+  8ABA
-695+  8ABA              Extrae_foto_registros
-696+  8ABA
-697+  8ABA 3A 3F 85     	ld a,(Numero_de_malotes)
-698+  8ABD A7           	and a
-699+  8ABE C8           	ret z
-700+  8ABF
-701+  8ABF
-702+  8ABF ED 73 40 85  	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
-703+  8AC3 31 00 70     	ld sp,Album_de_fotos
-704+  8AC6
-705+  8AC6 FD E1        2 pop iy																	; (Puntero_objeto) en IY.
-706+  8AC8 E1           	pop hl																	; Puntero de impresión de pantalla en HL.
-707+  8AC9 D1           	pop de																	; Dirección de la rutina de impresión en DE.
-708+  8ACA
-709+  8ACA ED 73 42 85  	ld (Stack_2),sp
-710+  8ACE ED 7B 40 85  	ld sp,(Stack)
-711+  8AD2
-712+  8AD2              ; Fabrica la llamada a la correspondiente rutina de impresión.
-713+  8AD2
-714+  8AD2 3E CD        	ld a,$cd
-715+  8AD4 32 DC 8A     	ld (Imprime),a
-716+  8AD7 EB           	ex de,hl
-717+  8AD8 22 DD 8A     	ld (Imprime+1),hl
-718+  8ADB EB           	ex de,hl
-719+  8ADC
-720+  8ADC              ; Ejecuta la llamada:	CALL $xx,xx
-721+  8ADC
-722+  8ADC 00 00 00     Imprime db 0,0,0
-723+  8ADF
-724+  8ADF ED 73 40 85  	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
-725+  8AE3
-726+  8AE3 3A 3F 85     	ld a,(Numero_de_malotes)
-727+  8AE6 3D           	dec a
-728+  8AE7 28 09        	jr z,1F
-729+  8AE9 32 3F 85      	ld (Numero_de_malotes),a
-730+  8AEC ED 7B 42 85  	ld sp,(Stack_2)
-731+  8AF0 18 D4        	jr 2B
-732+  8AF2
-733+  8AF2 AF           1 xor a
-734+  8AF3 32 42 85     	ld (Stack_2),a
-735+  8AF6 C9           	ret
-736+  8AF7
-737+  8AF7
+ 28+  87DB 18 FE        2 jr $
+ 29+  87DD
+ 30+  87DD              ; Estamos en la mitad superior de pantalla, (cuadrantes 1 y 2).
+ 31+  87DD
+ 32+  87DD 28 02        1 jr z,3F
+ 33+  87DF
+ 34+  87DF              ; Estamos en el 1er cuadrante de pantalla.
+ 35+  87DF
+ 36+  87DF 18 FE            jr $
+ 37+  87E1
+ 38+  87E1              ; Estamos en el 2º cuadrante de pantalla.
+ 39+  87E1
+ 40+  87E1 18 FE        3 jr $
+ 41+  87E3
+ 42+  87E3 C9           10 ret
+ 43+  87E4
+# file closed: Disparo.asm
+755   87E4              	include "Draw_XOR.asm"
+# file opened: Draw_XOR.asm
+  1+  87E4              ; ******************************************************************************************************************************************************************************************
+  2+  87E4              ;
+  3+  87E4              ; 01/23
+  4+  87E4              ;
+  5+  87E4              ; DRAW. ************************************************************************************************************************************************************************************
+  6+  87E4
+  7+  87E4 CD BE 8A     Draw call Prepara_draw
+  8+  87E7 7C           	ld a,h 						 					; El objeto existe, o se está iniciando?. Si se está iniciando, (Posicion_inicio = Posicion_actual) y saltamos_
+  9+  87E8 A7           	and a 											; _a la subrutina [Inicializacion] donde asignaremos cuadrante y límites.
+ 10+  87E9 28 05        	jr z,2F
+ 11+  87EB
+ 12+  87EB 3A 12 85     	ld a,(Cuad_objeto)			 					; El objeto ya se inició. Cargamos en A el cuadrante de pantalla en el que lo hizo y saltamos a 1F.
+ 13+  87EE 18 0C        	jr 1F
+ 14+  87F0 2A 10 85     2 ld hl,(Posicion_inicio) 							; No hay (Posicion_actual), por lo que el objeto se está iniciando.
+ 15+  87F3 22 00 85     	ld (Posicion_actual),hl							; Indicamos que (Posicion_actual) = (Posicion_inicio) y saltamos a la subrutina [Inicializacion], (donde asignaremos_
+ 16+  87F6 CD 85 89     	call Inicializacion   							; _(Limite_horizontal), (Limite_vertical) y (Cuad_objeto). También asignaremos las coordenadas X e Y. (Posición 0,0)_
+ 17+  87F9              ;													; _la esquina superior izquierda de la pantalla.
+ 18+  87F9 CD 91 91     	call Prepara_Puntero_mov 						; El objeto está inicializado. Antes de salir inicializamos tb el puntero de movimiento del objeto.
+ 19+  87FC 3A 2B 85     1 ld a,(Ctrl_0)
+ 20+  87FF CB 6F        	bit 5,a
+ 21+  8801 20 06        	jr nz,3F										; Si acabamos de inicializar un objeto, NO COMPROBAMOS LÍMITES.
+ 22+  8803
+ 23+  8803 CD 1B 88     	call Comprueba_limite_horizontal
+ 24+  8806 CD AB 88     	call Comprueba_limite_vertical
+ 25+  8809
+ 26+  8809              ; Llegados a este punto, tengo Filas/Columnas en BC y (Cuad_objeto) en A´.
+ 27+  8809
+ 28+  8809 CD F8 89     3 call calcula_CColumnass
+ 29+  880C CD 2F 8A     	call Calcula_puntero_de_impresion				; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
+ 30+  880F CD 84 8A     	call Define_rutina_de_impresion
+ 31+  8812
+ 32+  8812 3A 2B 85     	ld a,(Ctrl_0)									; Antes de salir de la rutina REStauramos el bit5 de Ctrl_0 para que nos vuelva_
+ 33+  8815 CB AF        	res 5,a											; _a ser de utilidad.
+ 34+  8817 32 2B 85     	ld (Ctrl_0),a
+ 35+  881A
+ 36+  881A C9           	ret
+ 37+  881B
+ 38+  881B              ; *******************************************************************************************************************************************************************************************
+ 39+  881B              ;	21/01/23
+ 40+  881B              ;
+ 41+  881B              ; 	Comprueba_limite_horizontal.
+ 42+  881B              ;
+ 43+  881B              ;	La rutina comprueba si hemos sobrepasado el (Limite_horizontal) definido en la rutina [Inicializacion]. Este será:_
+ 44+  881B              ;	_ $4fc0 si partimos de los cuadrantes 1 o 2 de pantalla o $4820 si partimos de los cuadrantes 3 o 4.
+ 45+  881B              ;
+ 46+  881B              ;	Si sobrepasamos o alcanzamos el límite horizontal establecido, la rutina cargará el registro E con un "1".
+ 47+  881B              ;	Si NO HEMOS SOBREPASADO (Limite_horizontal), E="0".
+ 48+  881B              ;	E="1" indica que HEMOS SOBREPASADO el (Limite_horizontal).
+ 49+  881B              ;	E="2" indica que NO HEMOS SOBREPASADO el (Limite_horizontal) pero hemos alcanzado o superado EL CENTRO DE PANTALLA.
+ 50+  881B
+ 51+  881B
+ 52+  881B
+ 53+  881B 3A 2B 85     Comprueba_limite_horizontal ld a,(Ctrl_0)          	; Si no hemos desaparecido por arriba o por abajo, saltamos a 1F para comprobar_
+ 54+  881E CB 57        	bit 2,a                                         ; _si hemos llegado o sobrepasado (Limite_horizontal). Seguimos con la rutina.
+ 55+  8820 28 07        	jr z,1F                                         ; Si por el contrario hemos desaparecido por arriba o por abajo, (bit2/bit3 de (Ctrl_0)="1"))_
+ 56+  8822 E6 FB        	and $fb 										; _hay que modificar el puntero de posición. (E="1" y salimos de la rutina). Antes inicializaremos los_
+ 57+  8824 32 2B 85     	ld (Ctrl_0),a 									; _ bits 2 y 3 de (Ctrl_0).
+ 58+  8827 18 09            jr 6F
+ 59+  8829 CB 5F        1 bit 3,a
+ 60+  882B 28 0A            jr z,2F
+ 61+  882D E6 F7            and $f7
+ 62+  882F 32 2B 85         ld (Ctrl_0),a
+ 63+  8832 CD 85 89     6 call Inicializacion
+ 64+  8835 18 5B            jr 5F
+ 65+  8837 E5           2 push hl						        			; Guardo (Posicion_actual), HL en la pila.
+ 66+  8838
+ 67+  8838              ; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
+ 68+  8838              ; Comprobamos si hemos llegado al (Limite_horizontal). E="0".
+ 69+  8838
+ 70+  8838 EB           	ex de,hl 										; Averiguamos si hemos llegado o sobrepasado el (Limite_horizontal). Hemos simplificado la operación SBC_
+ 71+  8839 2A 35 85     	ld hl,(Limite_horizontal) 						; _cargando el tercio de pantalla en el byte alto.
+ 72+  883C CD 28 8D     	call calcula_tercio 							; (Posicion_actual) - (Limite_horizontal).
+ 73+  883F 67           	ld h,a
+ 74+  8840 EB           	ex de,hl 										; ARRIBA a ABAJO .......... E="1" cuando ( Z y NC ).
+ 75+  8841 CD 28 8D     	call calcula_tercio                             ; ABAJO a ARRIBA .......... E="1" cuando ( Z y C ).
+ 76+  8844 67           	ld h,a
+ 77+  8845 A7           	and a
+ 78+  8846 ED 52        	sbc hl,de 										; Posicíon <"menos"> Límite.
+ 79+  8848 08           	ex af,af 										; Guardo el registro F con los flags resultantes de la operación SBC.
+ 80+  8849 3A 12 85     	ld a,(Cuad_objeto)
+ 81+  884C FE 02        	cp 2
+ 82+  884E 38 1E        	jr c,3F
+ 83+  8850 28 1C        	jr z,3F
+ 84+  8852 08           	ex af,af 										; Partimos de LA MITAD INFERIOR. Recupero resultado de (Posicíon - Límite) en AF.
+ 85+  8853 28 23            jr z,7F
+ 86+  8855 38 21            jr c,7F 										; ABAJO a ARRIBA .......... E="1" cuando ( Z y C ). HEMOS SOBREPASADO_
+ 87+  8857 1E 00         	ld e,0											; _ (Limite_horizontal), saltamos a 7F.
+ 88+  8859 E1           	pop hl
+ 89+  885A
+ 90+  885A              ; Partimos de la mitad INFERIOR de pantalla y `NO HEMOS´ superado (Limite_horizontal). Tenemos que averiguar si hemos superado el centro de pantalla_
+ 91+  885A              ; _para indicar con E="2" en caso necesario.
+ 92+  885A
+ 93+  885A E5               push hl
+ 94+  885B C5               push bc
+ 95+  885C CD 28 8D     	call calcula_tercio
+ 96+  885F FE 01        	cp 1
+ 97+  8861 20 07        	jr nz,11F 										; Sólo comprobamos la línea centro cuando nos encontramos en el 2º tercio de pantalla.
+ 98+  8863 CD 93 88         call Comprueba_centro 							; ABAJO A ARRIBA .......... E="2" cuando ( Z y C ).
+ 99+  8866 28 26            jr z,9F
+100+  8868 38 24            jr c,9F
+101+  886A 1E 00        11 ld e,0
+102+  886C 18 22            jr 8F
+103+  886E 08           3 ex af,af 											; Partimos de LA MITAD SUPERIOR. Recupero resultado de (Posicíon - Límite) en AF.
+104+  886F 28 07        	jr z, 7F
+105+  8871 30 05        	jr nc, 7F										; E="1" cuando ( Z y NC ).
+106+  8873 1E 00         	ld e,0
+107+  8875 E1           	pop hl
+108+  8876 18 04        	jr 4F
+109+  8878 1E 01        7 ld e,1 											; SOBREPASAMOS (Limite_horizontal) !!!. E="1", pop HL y RET.
+110+  887A 18 15            jr 10F
+111+  887C
+112+  887C              ; Partimos de la mitad SUPERIOR de pantalla y `NO HEMOS´ superado (Limite_horizontal). Tenemos que averiguar si hemos superado el centro de pantalla_
+113+  887C              ; _para indicar con E="2" en caso necesario.
+114+  887C
+115+  887C E5           4 push hl
+116+  887D C5               push bc											; Guardamos (Posicion_actual) y (Filas/Columns) en la pila.
+117+  887E CD 28 8D     	call calcula_tercio
+118+  8881 FE 01        	cp 1
+119+  8883 20 0B        	jr nz,8F										; Sólo comprobamos la línea centro cuando nos encontramos en el 2º tercio de pantalla.
+120+  8885 CD 93 88         call Comprueba_centro 							; ARRIBA a ABAJO .......... E="2" cuando ( Z y NC ).
+121+  8888 28 04            jr z,9F
+122+  888A 30 02            jr nc,9F
+123+  888C 18 02        	jr 8F
+124+  888E 1E 02        9 ld e,2
+125+  8890 C1           8 pop bc
+126+  8891 E1           10 pop hl
+127+  8892 C9           5 ret
+128+  8893
+129+  8893              ; --------------------
+130+  8893              ;
+131+  8893              ; 25/08/22
+132+  8893
+133+  8893 CD 28 8D     Comprueba_centro call calcula_tercio
+134+  8896 67               ld h,a
+135+  8897 08           	ex af,af
+136+  8898 FE 02        	cp 2
+137+  889A 38 07        	jr c,1F
+138+  889C 28 05        	jr z,1F
+139+  889E 01 A0 01     	ld bc,$01a0 								  	 ; ¡¡¡¡¡ CENTRO DE PANTALLA cuando estamos en la mitad inferior de la misma. !!!!!
+140+  88A1 18 03        	jr 2F
+141+  88A3 01 60 01     1 ld bc,$0160                                     	 ; ¡¡¡¡¡ CENTRO DE PANTALLA cuando estamos en la mitad superior de la misma. !!!!!
+142+  88A6 08           2 ex af,af
+143+  88A7 A7               and a
+144+  88A8 ED 42            sbc hl,bc
+145+  88AA C9               ret
+146+  88AB
+147+  88AB              ; *********************************************************************************************************************************************************************************************
+148+  88AB              ;
+149+  88AB              ;   16/8/22
+150+  88AB              ;
+151+  88AB              ;	Comprueba_limite_vertical
+152+  88AB              ;
+153+  88AB              ;	Modifica el registro L del puntero de pantalla cuando se sobrepasa la columna límite, (Limite2).
+154+  88AB              ;	Dependiendo del cuadrante en el que nos encontremos, sumaremos o restaremos, (Columnas-1) a L.
+155+  88AB              ;
+156+  88AB
+157+  88AB 2A 00 85     Comprueba_limite_vertical ld hl,(Posicion_actual)
+158+  88AE 7D           	ld a,l
+159+  88AF E6 1F        	and $1F
+160+  88B1 57           	ld d,a
+161+  88B2 3A 37 85     	ld a,(Limite_vertical)
+162+  88B5 BA           	cp d 											; Límite - Posición.
+163+  88B6 08           	ex af,af 										; Resultado de CP d en F'.
+164+  88B7 3A 12 85     	ld a,(Cuad_objeto)								; Averiguamos en que cuadrante estamos.
+165+  88BA CB 47        	bit 0,a
+166+  88BC 28 10        	jr z,1F 										; Si A´es PAR, estamos en el 2º o 4º cuadrante. Saltamos a [3F], (cuadrantes 2º y 4º).
+167+  88BE
+168+  88BE              ; Hemos comparado la posición Y de la entidad con (Limite_vertical) y estamos en la mitad IZQUIERDA de la pantalla.
+169+  88BE
+170+  88BE 08           	ex af,af 										; LADO IZQUIERDO !!!!!!!!!!
+171+  88BF 38 28        	jr c,4F 										; Superamos (lIMITE_VERTICAL) cuando hay "acarreo".
+172+  88C1
+173+  88C1              ; No hay cambio de cuadrante!!!!! Estamos en el lado izquierdo de la pantalla y no hemos sobrepasado (Limite_vertical).
+174+  88C1              ; Lo primero que haremos será comprobar si hemos llegado o superado el centro de la pantalla.
+175+  88C1
+176+  88C1 3A 04 85         ld a,(Coordenada_X)
+177+  88C4 16 0F            ld d,Centro_izquierda
+178+  88C6 A7               and a
+179+  88C7 92               sub d 											 ; Posición - Centro_izquierda.
+180+  88C8 28 1E            jr z,3F
+181+  88CA 30 1C            jr nc,3F                                         ; Si no hemos superado (Limite_vertical) pero si hemos superado el centro de la pantalla,_
+182+  88CC              ;                                                    ; _salimos sin modificar nada.
+183+  88CC 18 0E            jr 2F
+184+  88CE 08           1 ex af,af 											 ; LADO DERECHO de la pantalla !!!!!!!!!!!
+185+  88CF 30 18        	jr nc,4F 										 ; Superamos (lIMITE_VERTICAL) cuando NC.
+186+  88D1
+187+  88D1              ; No hay cambio de cuadrante!!!!! Estamos en el lado derecho de la pantalla y no hemos sobrepasado (Limite_vertical).
+188+  88D1              ; Lo primero que haremos será comprobar si hemos llegado o superado el centro de la pantalla.
+189+  88D1
+190+  88D1 3A 04 85         ld a,(Coordenada_X)
+191+  88D4 16 10            ld d,Centro_derecha
+192+  88D6 A7               and a
+193+  88D7 92               sub d
+194+  88D8 28 0E            jr z,3F
+195+  88DA 38 0C            jr c,3F                                          ; Si no hemos superado (Limite_vertical) pero si hemos superado el centro de la pantalla,_
+196+  88DC              ;                                                    ; _salimos sin modificar nada.
+197+  88DC CB 43        2 bit 0,e
+198+  88DE 28 08            jr z,3F 										 ; No hemos sobrepasado (Centro_izquierda). Si E="0", salimos sin modificar posición.
+199+  88E0 C5           	push bc 										 ; Reservo (Filas) / (Columns) en la pila.
+200+  88E1 CD 75 89         call Modificaccionne
+201+  88E4 C1           	pop bc
+202+  88E5 CD 85 89         call Inicializacion
+203+  88E8 C9           3 ret 				 								 ; Salimos de la rutina.
+204+  88E9
+205+  88E9              ; ----- ----- ----- Cambio de cuadrante ----- ----- -----
+206+  88E9
+207+  88E9 C5           4 push bc
+208+  88EA 01 FF 84     	ld bc,Columns 		 	 						 ; Cambio de cuadrante. Sobrepasamos (Limite_vertical).
+209+  88ED 0A           	ld a,(bc)
+210+  88EE 3D           	dec a
+211+  88EF 47           	ld b,a 											 ; Columnas-1 en B.
+212+  88F0 7D           	ld a,l
+213+  88F1 08           	ex af,af                                         ; Cambio de cuadrante, estamos en la parte derecha de la pantalla.
+214+  88F2 CB 47        	bit 0,a
+215+  88F4 28 03        	jr z,5F
+216+  88F6 08           	ex af,af 										 ; Estamos en la parte izquierda de la pantalla, (cuadrantes 1º o 3º). En ese caso, restamos (Columnas-1) a L.
+217+  88F7 18 2E        	jr 7F
+218+  88F9
+219+  88F9              ; Cambio de cuadrante, partimos de la parte DERECHA de la pantalla. Por el centro ?? o desaparecemos ??.
+220+  88F9
+221+  88F9 08           5 ex af,af 											 ; Estamos en la parte derecha de la pantalla, (cuadrantes 2º o 4º). En ese caso, sumamos (Columnas-1) a L.
+222+  88FA F5           	push af                                          ; Guardo la posición, (L), en la pila, (la contiene el acumulador).
+223+  88FB 3A 2B 85     	ld a,(Ctrl_0)
+224+  88FE CB 4F        	bit 1,a
+225+  8900 20 1D        	jr nz,6F                                         ; Cambio de cuadrante por desaparecer por la derecha!!!
+226+  8902 F1           	pop af                                           ; Cambio de cuadrante por desaparecer por el centro!!!
+227+  8903
+228+  8903              ; Hemos sobrepasado el (Limite_vertical) de la mitad derecha a la izquierda. Ahora necesitamos saber si E="0".
+229+  8903
+230+  8903 1C               inc e
+231+  8904 1D               dec e
+232+  8905 20 07            jr nz,12F
+233+  8907 80           	add b 				 							 ; Si hemos sobrepasado el (Limite_vertical) pero no hemos llegado al centro horizontal_
+234+  8908 6F               ld l,a	 										 ; _de la pantalla, E="0" modificamos L, Inicializamos el objeto y salimos.
+235+  8909 22 00 85     	ld (Posicion_actual),hl
+236+  890C 18 44        13 jr 9F
+237+  890E CB 43        12 bit 0,e
+238+  8910 20 03            jr nz,14F                                        ; Si hemos sobrepasado (Limite_vertical) y hemos llegado o superado_
+239+  8912              ;                                                    ; _el centro horizontal de la pantalla, E="2", salimos sin modificar nada.
+240+  8912 C1           	pop bc
+241+  8913 18 D3        	jr 3B
+242+  8915 80           14 add b
+243+  8916 6F               ld l,a
+244+  8917 22 00 85     	ld (Posicion_actual),hl
+245+  891A CD 75 89         call Modificaccionne                             ; Si hemos sobrepasado (Limite_vertical) y (Limite_horizontal), E="1". Modificamos HL,L,_
+246+  891D 18 33            jr 9F 											 ; _inicializamos y salimos.
+247+  891F E6 FD        6 and $fd 											 ; Cambio de cuadrante por desaparecer por la derecha!!!. Reinicializo el bit 1 de (Ctrl_0).
+248+  8921 32 2B 85         ld (Ctrl_0),a
+249+  8924 F1           	pop af
+250+  8925 18 2B        	jr 9F
+251+  8927
+252+  8927              ; Cambio de cuadrante, partimos de la parte IZQUIERDA de la pantalla. Por el centro ?? o desaparecemos ??.
+253+  8927
+254+  8927 F5           7 push af
+255+  8928 3A 2B 85     	ld a,(Ctrl_0)
+256+  892B CB 47        	bit 0,a
+257+  892D 20 1D        	jr nz,8F
+258+  892F F1           	pop af
+259+  8930
+260+  8930              ; Hemos sobrepasado el (Limite_vertical) de la mitad IZQUIERDA a la DERECHA. Ahora necesitamos saber si E="0".
+261+  8930
+262+  8930 1C           	inc e
+263+  8931 1D               dec e
+264+  8932 20 07            jr nz,10F
+265+  8934 90           	sub b
+266+  8935 6F               ld l,a
+267+  8936 22 00 85     	ld (Posicion_actual),hl
+268+  8939 18 17            jr 9F                                           ; Si hemos sobrepasado el (Limite_vertical) pero no hemos llegado al centro horizontal_
+269+  893B              ;                                                   ; _de la pantalla, E="0" modificamos L, Inicializamos el objeto y salimos.
+270+  893B CB 43        10 bit 0,e
+271+  893D 20 03            jr nz,16F                                       ; Si hemos sobrepasado (Limite_vertical) y hemos llegado o superado_
+272+  893F              ;                                                   ; _el centro horizontal de la pantalla, E="2", salimos sin modificar nada.
+273+  893F C1           	pop bc
+274+  8940 18 A6        	jr 3B
+275+  8942 90           16 sub b
+276+  8943 6F               ld l,a
+277+  8944 22 00 85     	ld (Posicion_actual),hl
+278+  8947 CD 75 89         call Modificaccionne                            ; Si hemos sobrepasado (Limite_vertical) y (Limite_horizontal), E="1". Modificamos HL,L,_
+279+  894A 18 06            jr 9F
+280+  894C E6 FE        8 and $fe 											; ; Cambio de cuadrante por desaparecer por la izquierda !!!!!. Reinicializo el bit 0 de (Ctrl_0).
+281+  894E 32 2B 85         ld (Ctrl_0),a
+282+  8951 F1           	pop af
+283+  8952 C1           9 pop bc
+284+  8953 1E 00        	ld e,0
+285+  8955 CD 85 89         call Inicializacion
+286+  8958 F5               push af	 										; Antes de nada, guardo (Cuad_objeto) en A´ para acceder a él más rapido, (me va a hacer falta en la rutina calcolum).
+287+  8959 08           	ex af,af
+288+  895A F1           	pop af 											; Ahora tengo (Cuad_objeto) en A y A´.
+289+  895B 18 8B            jr 3B
+290+  895D
+291+  895D              ; --------------------
+292+  895D
+293+  895D 06 0F        Modifica_Pos_actual ld b,15                                         ; Scanlines-1 en B.
+294+  895F CD D9 8A     1 call PreviousScan
+295+  8962 10 FB            djnz 1B
+296+  8964 22 00 85     	ld (Posicion_actual),hl
+297+  8967 AF           	xor a 											; Carry a "0". Evita que vuelva a entrar consecutivamente.
+298+  8968 C9           	ret
+299+  8969
+300+  8969              ; --------------------
+301+  8969
+302+  8969 06 0F        Modifica_Pos_actual2 ld b,15                                         ; Scanlines-1 en B.
+303+  896B CD CA 8A     1 call NextScan
+304+  896E 10 FB            djnz 1B
+305+  8970 22 00 85     	ld (Posicion_actual),hl
+306+  8973 AF           	xor a 											; Fijo el acarreo a "0" para asegurarme de no volver a entrar en la rutina.
+307+  8974 C9           	ret
+308+  8975
+309+  8975              ; --------------------
+310+  8975              ;
+311+  8975              ;	22/01/23
+312+  8975              ;
+313+  8975              ;	E="1". Hemos cambiado de cuadrante.
+314+  8975              ;	Si estamos en la mitad superior de pantalla: CALL [Modifica_Pos_actual].
+315+  8975              ;	Si estamos en la mitad inferior de pantalla: CALL [Modifica_Pos_actual2].
+316+  8975
+317+  8975
+318+  8975              Modificaccionne
+319+  8975
+320+  8975 3A 12 85     	ld a,(Cuad_objeto)
+321+  8978 FE 02        	cp 2
+322+  897A CC 5D 89         call z,Modifica_Pos_actual                      ; Si por el contrario estamos en la mitad inferior, call Modifica_Pos_actual2.
+323+  897D DC 5D 89         call c,Modifica_Pos_actual
+324+  8980 C8           	ret z
+325+  8981 CD 69 89         call Modifica_Pos_actual2
+326+  8984 C9               ret
+327+  8985
+328+  8985              ; *************************************************************************************************************************************************************************************************
+329+  8985              ;
+330+  8985              ;	13/8/22
+331+  8985              ;
+332+  8985              ;	Inicializacion
+333+  8985              ;
+334+  8985              ;	Entrega "1", "2", "3" o "4" en (Cuad_objeto) en función del cuadrante de pantalla en el que nos encontremos.
+335+  8985              ;	Fija los punteros del objeto a pintar, (varían en función del cuadrante en el que nos encontremos).
+336+  8985              ;	También calcula los límites horizontal y vertical. Estos dependen del tamaño del objeto a imprimir.
+337+  8985              ;
+338+  8985              ; 	La rutina se ejecuta cada vez que el objeto supera el (Limite_horizontal) y el (Limite_vertical). Esto sucede_
+339+  8985              ;	_ cada vez que el objeto supera el centro de la pantalla tanto en sentido horizontal como vertical y cuando_
+340+  8985              ;	_ desaparece/aparece.
+341+  8985
+342+  8985              ;	[Puntero_datas]: Dirección de memoria donde se encuentra el 1er byte que pinta el objeto.
+343+  8985              ;	[Puntero_attr_datas]: Dirección de memoria donde se encuentra el byte de atributos del objeto.
+344+  8985              ;
+345+  8985              ;	INPUT: [HL] contendrá la dirección de pantalla a la que queremos asignar cuadrante. HL=(Posicion_inicio).
+346+  8985              ; 		   [BC] contendrá (Filas)/(Columns) del objeto a inicializar.
+347+  8985              ; 		   [E] ="0"
+348+  8985
+349+  8985              ; 	OUTPUT: DESTRUYE [AF] y [D].
+350+  8985
+351+  8985 CD 28 8D     Inicializacion call calcula_tercio
+352+  8988 28 36        	jr z,primit
+353+  898A E6 02        	and 2
+354+  898C 20 07        	jr nz,segmit
+355+  898E 7D           	ld a,l
+356+  898F FE 7F        	cp $7f
+357+  8991 38 2D        	jr c,primit
+358+  8993 28 2B        	jr z,primit
+359+  8995 CD F2 89     segmit call column
+360+  8998 38 13        	jr c,tercuad
+361+  899A 3E 04        cuarcuad ld a,4
+362+  899C 32 12 85     	ld (Cuad_objeto),a
+363+  899F 21 20 48     	ld hl,$4820
+364+  89A2 22 35 85     	ld (Limite_horizontal),hl
+365+  89A5 21 37 85     	ld hl,Limite_vertical
+366+  89A8 36 0D        	ld (hl),$0d
+367+  89AA 08           	ex af,af
+368+  89AB 18 3C        	jr 1F
+369+  89AD              tercuad
+370+  89AD 3E 03        	ld a,3
+371+  89AF 32 12 85     	ld (Cuad_objeto),a
+372+  89B2 21 20 48     	ld hl,$4820
+373+  89B5 22 35 85     	ld (Limite_horizontal),hl
+374+  89B8 21 37 85     	ld hl,Limite_vertical
+375+  89BB 36 12        	ld (hl),$12
+376+  89BD 08           	ex af,af
+377+  89BE 18 29        	jr 1F
+378+  89C0 CD F2 89     primit call column
+379+  89C3 38 13        	jr c, primcuad
+380+  89C5              segcuad
+381+  89C5 3E 02        	ld a,2
+382+  89C7 32 12 85     	ld (Cuad_objeto),a
+383+  89CA 21 C0 4F     	ld hl,$4fc0
+384+  89CD 22 35 85     	ld (Limite_horizontal),hl
+385+  89D0 21 37 85     	ld hl,Limite_vertical
+386+  89D3 36 0D        	ld (hl),$0d
+387+  89D5 08           	ex af,af
+388+  89D6 18 11        	jr 1F
+389+  89D8              primcuad
+390+  89D8 3E 01        	ld a,1
+391+  89DA 32 12 85     	ld (Cuad_objeto),a
+392+  89DD 21 C0 4F     	ld hl,$4fc0
+393+  89E0 22 35 85     	ld (Limite_horizontal),hl
+394+  89E3 21 37 85     	ld hl,Limite_vertical
+395+  89E6 36 12        	ld (hl),$12
+396+  89E8 08           	ex af,af
+397+  89E9 CD 5A 90     1 call Genera_coordenadas
+398+  89EC 21 2B 85     	ld hl,Ctrl_0
+399+  89EF CB EE        	set 5,(hl)
+400+  89F1 C9           	ret
+401+  89F2
+402+  89F2              ; ------------------------------------------------------------------------------------------------------------------
+403+  89F2
+404+  89F2              ; Esta pequeña subrutina determina el nº de columna en la que nos encontramos, Introducimos en A el valor absoluto de L, (0-31).
+405+  89F2              ;
+406+  89F2              ; OUTPUT: "FLAG C". Si se produce 1, nos encontramos en las primeras 16 columnas de pantalla, (cuadrantes 1 y 3). Si no es así, (cuadrantes 2 y 4).
+407+  89F2
+408+  89F2 7D           column ld a,l
+409+  89F3 E6 1F        	and $1f
+410+  89F5 FE 10         	cp $10
+411+  89F7 C9            	ret
+412+  89F8
+413+  89F8              ; --------------------------------------------------------------------------------------------------------------------
+414+  89F8              ;
+415+  89F8              ; Esta subrutina se encarga de asignar valor a la variable (Columnas), (nº de columnas del objeto que podemos pintar).
+416+  89F8              ;
+417+  89F8              ; 14/12/22
+418+  89F8              ;
+419+  89F8              ;	Modifica: A y BC.
+420+  89F8
+421+  89F8 3A 12 85     calcula_CColumnass ld a,(Cuad_objeto)
+422+  89FB E6 01        	and 1
+423+  89FD 28 17        	jr z,1F
+424+  89FF
+425+  89FF              ; Nos encontramos en la parte izquierda de la pantalla
+426+  89FF
+427+  89FF 3A 04 85     	ld a,(Coordenada_X)
+428+  8A02 47           	ld b,a
+429+  8A03 04           	inc b											; (Coordenada_X)+1 en B.
+430+  8A04 79           	ld a,c
+431+  8A05 90           	sub b											; (Columns)-[(Coordenada_X)+1] en A.
+432+  8A06 38 08        	jr c,2F
+433+  8A08 47           	ld b,a
+434+  8A09 79           	ld a,c
+435+  8A0A 90           	sub b
+436+  8A0B 32 34 85     	ld (Columnas),a
+437+  8A0E 18 1B        	jr 4F
+438+  8A10 79           2 ld a,c
+439+  8A11 32 34 85     	ld (Columnas),a
+440+  8A14 18 15        	jr 4F
+441+  8A16
+442+  8A16              ; Nos encontramos en la parte derecha de la pantalla.
+443+  8A16
+444+  8A16 3A 04 85     1 ld a,(Coordenada_X)
+445+  8A19 81           	add c
+446+  8A1A 3D           	dec a
+447+  8A1B D6 1F        	sub $1f
+448+  8A1D 38 08        	jr c,3F
+449+  8A1F 47           	ld b,a
+450+  8A20 79           	ld a,c
+451+  8A21 90           	sub b
+452+  8A22 32 34 85     	ld (Columnas),a
+453+  8A25 18 04        	jr 4F
+454+  8A27 79           3 ld a,c
+455+  8A28 32 34 85     	ld (Columnas),a
+456+  8A2B D9           4 exx
+457+  8A2C 4F           	ld c,a
+458+  8A2D D9           	exx
+459+  8A2E C9            ret
+460+  8A2F
+461+  8A2F              ; --------------------------------------------------------------------------------------------------------------------
+462+  8A2F              ;
+463+  8A2F              ; 7/1/23
+464+  8A2F              ;
+465+  8A2F              ;	Calcula el puntero de impresión del sprite, (arriba-izquierda).
+466+  8A2F              ;	Almacena en IY (Puntero_objeto). La rutina de impresión requiere de esta dirección para situar el SP a la hora de pintar.
+467+  8A2F              ;
+468+  8A2F              ;	OUTPUT: HL e IX Contienen el puntero de impresión.
+469+  8A2F              ;	DESTRUYE: HL,B Y A.
+470+  8A2F
+471+  8A2F 3A 12 85     Calcula_puntero_de_impresion ld a,(Cuad_objeto)
+472+  8A32 FE 02        	cp 2
+473+  8A34 38 18        	jr c,1F
+474+  8A36 28 16        	jr z,1F
+475+  8A38 E6 01        	and 1
+476+  8A3A 28 0D        	jr z,3F
+477+  8A3C
+478+  8A3C              ; Estamos situados en el 3er cuadrante de pantalla. ----- ----- -----
+479+  8A3C
+480+  8A3C CD 78 8A     	call Operandos					; (Posicion_actual) en HL y (Columnas)-1 en B.
+481+  8A3F
+482+  8A3F 7D           9 ld a,l
+483+  8A40 E6 1F        	and $1f
+484+  8A42 28 2A        	jr z,7F
+485+  8A44 2B           	dec hl
+486+  8A45 10 F8        	djnz 9B
+487+  8A47 18 25        	jr 7F
+488+  8A49
+489+  8A49              ; Estamos situados en el 4º cuadrante de pantalla. ----- ----- -----
+490+  8A49
+491+  8A49 2A 00 85     3 ld hl,(Posicion_actual)
+492+  8A4C 18 20        	jr 7F
+493+  8A4E
+494+  8A4E 28 14        1 jr z,2F
+495+  8A50
+496+  8A50              ; Estamos situados en el 1er cuadrante de pantalla. ----- ----- -----
+497+  8A50
+498+  8A50 CD 78 8A     	call Operandos					; (Posicion_actual) en HL y (Columnas)-1 en B.
+499+  8A53 7D           4 ld a,l
+500+  8A54 E6 1F        	and $1f
+501+  8A56 28 03        	jr z,6F
+502+  8A58 2B           	dec hl
+503+  8A59 10 F8        	djnz 4B
+504+  8A5B 06 0F        6 ld b,15
+505+  8A5D CD D9 8A     5 call PreviousScan
+506+  8A60 10 FB        	djnz 5B
+507+  8A62 18 0A        	jr 7F
+508+  8A64
+509+  8A64              ; Estamos situados en el 2º cuadrante de pantalla. ----- ----- -----
+510+  8A64
+511+  8A64 CD 78 8A     2 call Operandos					; (Posicion_actual) en HL y (Columnas)-1 en B.
+512+  8A67 06 0F        	ld b,15
+513+  8A69 CD D9 8A     8 call PreviousScan
+514+  8A6C 10 FB        	djnz 8B
+515+  8A6E
+516+  8A6E E5           7 push hl
+517+  8A6F DD E1        	pop ix
+518+  8A71
+519+  8A71 2A 02 85     	ld hl,(Puntero_objeto)
+520+  8A74 E5           	push hl
+521+  8A75 FD E1        	pop iy
+522+  8A77
+523+  8A77 C9           	ret
+524+  8A78
+525+  8A78              ; --------------------------------------------------------------------------------------------------------------------
+526+  8A78              ;
+527+  8A78              ;	2/1/23
+528+  8A78              ;
+529+  8A78              ;	Sub-rutina de [Calcula_puntero_de_impresion].
+530+  8A78              ;
+531+  8A78              ;	Tras esta rutina tenemos:
+532+  8A78              ;
+533+  8A78              ;	OUTPUT: HL contiene (Posicion_actual).
+534+  8A78              ;			B contiene (Columnas)-1. Nota: Este valor `nunca' será "0". El valor mínimo es "1".
+535+  8A78              ;
+536+  8A78              ;	DESTRUYE!!!!! HL,B y A.
+537+  8A78
+538+  8A78 2A 00 85     Operandos ld hl,(Posicion_actual)
+539+  8A7B 3A 34 85     	ld a,(Columnas)
+540+  8A7E 3D           	dec a
+541+  8A7F 20 01        	jr nz,1F
+542+  8A81 3C           	inc a
+543+  8A82 47           1 ld b,a
+544+  8A83 C9           	ret
+545+  8A84
+546+  8A84              ; --------------------------------------------------------------------------------------------------------------------
+547+  8A84              ;
+548+  8A84              ;	3/1/23
+549+  8A84              ;
+550+  8A84              ;	La Rutina entrega en HL la dirección de memoria donde se encuentra la rutina de impresión que debemos ejecutar.
+551+  8A84              ;
+552+  8A84              ;	Destruye: A,B,HL y DE.
+553+  8A84
+554+  8A84              Define_rutina_de_impresion
+555+  8A84
+556+  8A84 3A FF 84     	ld a,(Columns)
+557+  8A87 47           	ld b,a
+558+  8A88 3A 34 85     	ld a,(Columnas)
+559+  8A8B B8           	cp b
+560+  8A8C 20 0D        	jr nz,2f
+561+  8A8E
+562+  8A8E              ;	La entidad se imprime entera.
+563+  8A8E
+564+  8A8E 21 25 8B     	ld hl, Indice_entidades_completas
+565+  8A91 E6 01        	and 1
+566+  8A93 28 02        	jr z,1F
+567+  8A95
+568+  8A95 23           	inc hl
+569+  8A96 23           	inc hl
+570+  8A97
+571+  8A97 CD AF 86     1 call Extrae_address
+572+  8A9A C9           	ret		;	ret
+573+  8A9B
+574+  8A9B              ;	La entidad no se imprime entera en pantalla.
+575+  8A9B
+576+  8A9B 3A 12 85     2 ld a,(Cuad_objeto)
+577+  8A9E E6 01        	and 1
+578+  8AA0 28 17        	jr z,3F
+579+  8AA2
+580+  8AA2              ; 	La entidad no se imprime entera en pantalla, nos encontramos en el extremo izquierdo de la misma.
+581+  8AA2
+582+  8AA2 21 29 8B     	ld hl, Indice_entidades_incompletas_izquierda
+583+  8AA5 3A FF 84     4 ld a,(Columns)
+584+  8AA8 E6 01        	and 1
+585+  8AAA 28 EB        	jr z,1B					; Sólo imprimimos 1 (Columnas) de un objeto de 2 Columns.
+586+  8AAC
+587+  8AAC 23           	inc hl
+588+  8AAD 23           	inc hl
+589+  8AAE
+590+  8AAE 3A 34 85     	ld a,(Columnas)
+591+  8AB1 E6 01        	and 1
+592+  8AB3 20 E2        	jr nz,1B				; Sólo imprimimos 1 (Columnas) de un objeto de 3 Columns.
+593+  8AB5
+594+  8AB5 23           	inc hl
+595+  8AB6 23           	inc hl
+596+  8AB7
+597+  8AB7 18 DE        	jr 1B					; Sólo imprimimos 2 (Columnas) de un objeto de 3 Columns.
+598+  8AB9
+599+  8AB9 21 2F 8B     3 ld hl, Indice_entidades_incompletas_derecha
+600+  8ABC 18 E7        	jr 4B
+601+  8ABE
+602+  8ABE              ; --------------------------------------------------------------------------------------------------------------------
+603+  8ABE              ;
+604+  8ABE              ;	Prepara_draw
+605+  8ABE              ;
+606+  8ABE              ;	Es una rutina de carga.
+607+  8ABE              ;	Carga los registros BC,HL y E para posteriormente llamar a la rutina de pintado [DRAW].
+608+  8ABE              ;
+609+  8ABE              ;	FUNCIONAMIENTO:
+610+  8ABE              ;
+611+  8ABE              ;	- LD (Filas/Columns) del objeto a pintar en [BC].
+612+  8ABE              ;	- LD (Posicion_actual) del objeto en [HL].
+613+  8ABE              ;	- LD E,0. (Dígito de control utilizado por Draw para cálculos internos de la rutina. Ha de estar a "0").
+614+  8ABE              ;
+615+  8ABE              ;	DESTRUYE:
+616+  8ABE              ;
+617+  8ABE              ;	Logicamente, BC,HL y E quedan destruidos.
+618+  8ABE
+619+  8ABE 21 FE 84     Prepara_draw ld hl,Filas 		 					 					 ; Prepara los registros BC, E y HL.
+620+  8AC1 46           	ld b,(hl) 														     ; Carga Filas/Columns del objeto a pintar o inicializar en BC.
+621+  8AC2 23           	inc hl 												 				 ; Carga (Posicion_actual) en HL.
+622+  8AC3 4E           	ld c,(hl)
+623+  8AC4 2A 00 85     	ld hl,(Posicion_actual)
+624+  8AC7 1E 00        	ld e,0 																 ; Byte de control. Ha de estar a "0" cuando llamamos a [DRAW].
+625+  8AC9 C9           	ret
+626+  8ACA
+627+  8ACA              ;----------------------------------------------------------------------------------------------------------------
+628+  8ACA              ;
+629+  8ACA              ;	5/08/22
+630+  8ACA              ;
+631+  8ACA              ;   NextScan.
+632+  8ACA              ;
+633+  8ACA              ;   Calcula la dirección de mem. de pantalla donde se sitúa el siguiente scanline. (Inc H, línea abajo).
+634+  8ACA              ;
+635+  8ACA              ;   INPUT: HL contendra la dirección de mem. de video sobre la que queremos calcular el siguiente scanline.
+636+  8ACA              ;
+637+  8ACA              ;   OUTPUT: HL contendrá la nueva dirección de memoria de pantalla.
+638+  8ACA              ;
+639+  8ACA              ;       DESTRUIDOS: AF y HL !!!
+640+  8ACA              ;
+641+  8ACA              ;   010T TSSS LLLC CCCC (Codificación de la memoria de pantalla). $4000 - $57FF, (256 x 192 pixeles).
+642+  8ACA              ;
+643+  8ACA
+644+  8ACA 24           NextScan inc h          ; Incrementamos el scanline.
+645+  8ACB 7C               ld a,h
+646+  8ACC E6 07            and 7
+647+  8ACE C0               ret nz              ; Salimos de la rutina si el scanline se encuentra entre (1-7).
+648+  8ACF
+649+  8ACF 7D           	ld a,l              ; Scanlines a "0", cambiamos de tercio. (Siempre que estemos en la última línea, LLL).
+650+  8AD0 C6 20            add a,$20           ; Vamos a comprobarlo...
+651+  8AD2 6F               ld l,a
+652+  8AD3 D8               ret c               ; Salimos si se produce el cambio de tercio.
+653+  8AD4
+654+  8AD4 7C               ld a,h              ; No estamos en la última línea del tercio, por lo que inicializamos H restando una_
+655+  8AD5 D6 08            sub 8               ; _unidad a los bits que definen el tercio TT, (sub $08).
+656+  8AD7 67               ld h,a
+657+  8AD8 C9               ret
+658+  8AD9
+659+  8AD9              ;----------------------------------------------------------------------------------------------------------------
+660+  8AD9              ;
+661+  8AD9              ;	5/08/22
+662+  8AD9              ;
+663+  8AD9              ;   PreviousScan.
+664+  8AD9              ;
+665+  8AD9              ;   Calcula la dirección de mem. de pantalla donde se sitúa el scanline anterior. (Dec H, línea arriba).
+666+  8AD9              ;
+667+  8AD9              ;   INPUT: HL contendra la dirección de mem. de video sobre la que queremos calcular el scanline anterior.
+668+  8AD9              ;
+669+  8AD9              ;   OUTPUT: HL contendrá la nueva dirección de memoria de pantalla.
+670+  8AD9              ;
+671+  8AD9              ;       DESTRUIDOS: AF y HL !!!
+672+  8AD9              ;
+673+  8AD9              ;   010T TSSS LLLC CCCC (Codificación de la memoria de pantalla). $4000 - $57FF, (256 x 192 pixeles).
+674+  8AD9              ;
+675+  8AD9
+676+  8AD9 7C           PreviousScan ld a,h
+677+  8ADA 25               dec h               ; Dec H.
+678+  8ADB E6 07            and 7
+679+  8ADD C0               ret nz              ; Salimos de la rutina si el scanline se encuentra entre (1-7).
+680+  8ADE
+681+  8ADE 7D               ld a,l              ; Estabamos en el scanline "0" y al decrementar nos situamos en el "7" y cambiamos de tercio.
+682+  8ADF D6 20            sub $20             ; Vamos a comprobarlo...
+683+  8AE1 6F               ld l,a
+684+  8AE2 D8               ret c               ; Salimos si estábamos en la primera línea y se produce el cambio de tercio.
+685+  8AE3
+686+  8AE3 7C               ld a,h              ; No estamos en la primera línea del tercio, por lo que inicializamos H sumando una_
+687+  8AE4 C6 08            add a,8             ; _unidad a los bits que definen el tercio TT, (add a,$08).
+688+  8AE6 67               ld h,a
+689+  8AE7 C9               ret
+690+  8AE8
+691+  8AE8              ; -----------------------------------------------------------------------------------
+692+  8AE8              ;
+693+  8AE8              ;	15/1/23
+694+  8AE8
+695+  8AE8              Extrae_foto_registros
+696+  8AE8
+697+  8AE8 3A 3F 85     	ld a,(Numero_de_malotes)
+698+  8AEB A7           	and a
+699+  8AEC C8           	ret z
+700+  8AED
+701+  8AED
+702+  8AED ED 73 40 85  	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
+703+  8AF1 31 00 70     	ld sp,Album_de_fotos
+704+  8AF4
+705+  8AF4 FD E1        2 pop iy																	; (Puntero_objeto) en IY.
+706+  8AF6 E1           	pop hl																	; Puntero de impresión de pantalla en HL.
+707+  8AF7 D1           	pop de																	; Dirección de la rutina de impresión en DE.
+708+  8AF8
+709+  8AF8 ED 73 42 85  	ld (Stack_2),sp
+710+  8AFC ED 7B 40 85  	ld sp,(Stack)
+711+  8B00
+712+  8B00              ; Fabrica la llamada a la correspondiente rutina de impresión.
+713+  8B00
+714+  8B00 3E CD        	ld a,$cd
+715+  8B02 32 0A 8B     	ld (Imprime),a
+716+  8B05 EB           	ex de,hl
+717+  8B06 22 0B 8B     	ld (Imprime+1),hl
+718+  8B09 EB           	ex de,hl
+719+  8B0A
+720+  8B0A              ; Ejecuta la llamada:	CALL $xx,xx
+721+  8B0A
+722+  8B0A 00 00 00     Imprime db 0,0,0
+723+  8B0D
+724+  8B0D ED 73 40 85  	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
+725+  8B11
+726+  8B11 3A 3F 85     	ld a,(Numero_de_malotes)
+727+  8B14 3D           	dec a
+728+  8B15 28 09        	jr z,1F
+729+  8B17 32 3F 85      	ld (Numero_de_malotes),a
+730+  8B1A ED 7B 42 85  	ld sp,(Stack_2)
+731+  8B1E 18 D4        	jr 2B
+732+  8B20
+733+  8B20 AF           1 xor a
+734+  8B21 32 42 85     	ld (Stack_2),a
+735+  8B24 C9           	ret
+736+  8B25
+737+  8B25
 # file closed: Draw_XOR.asm
-733   8AF7              	include "Rutinas_de_impresion_sprites.asm"
+756   8B25              	include "Rutinas_de_impresion_sprites.asm"
 # file opened: Rutinas_de_impresion_sprites.asm
-  1+  8AF7              ;   índices de Rutinas de impresión.
-  2+  8AF7
-  3+  8AF7 07 8B        Indice_entidades_completas defw Pinta_Amadeus_2x2
-  4+  8AF9 34 8B            defw Pinta_Amadeus_3x2
-  5+  8AFB
-  6+  8AFB 8A 8B        Indice_entidades_incompletas_izquierda defw Pinta_enemigo_2x2_izquierda
-  7+  8AFD 2A 8C            defw Pinta_enemigo_3x2_izquierda_1columna
-  8+  8AFF DE 8B            defw Pinta_enemigo_3x2_izquierda_2columnas
-  9+  8B01
- 10+  8B01 B4 8B        Indice_entidades_incompletas_derecha defw Pinta_enemigo_2x2_derecha
- 11+  8B03 B8 8C            defw Pinta_enemigo_3x2_derecha_1columna
- 12+  8B05 6C 8C            defw Pinta_enemigo_3x2_derecha_2columnas
- 13+  8B07
- 14+  8B07
- 15+  8B07              ;   Conjunto de rutinas de impresión de Sprites.
- 16+  8B07              ;
- 17+  8B07              ;   12/12/22
- 18+  8B07              ;
- 19+  8B07              ;   Inputs: HL contiene (Posicion_actual) de la entidad.
- 20+  8B07              ;           B contendrá: el nº de scanlines que `podemos´ imprimir en pantalla. (ENTIDAD DE 2X2).
- 21+  8B07              ;                        LA MITAD del nº de scanlines que `podemos´imprimir en pantalla. (ENTIDAD DE 3X2).
- 22+  8B07              ;           El puntero de pila apuntará a la dirección de mem. que contenga la variable (Puntero_datas).
- 23+  8B07              ;
- 24+  8B07              ;   Modifica: DE y HL.
- 25+  8B07
- 26+  8B07 ED 73 40 85  Pinta_Amadeus_2x2 ld (Stack),sp
- 27+  8B0B FD F9        	ld sp,iy
- 28+  8B0D 06 10            ld b,16
- 29+  8B0F D1           1 pop de
- 30+  8B10 7B               ld a,e
- 31+  8B11 AE               xor (hl)
- 32+  8B12 77           	ld (hl),a
- 33+  8B13 23           	inc hl
- 34+  8B14 7A               ld a,d
- 35+  8B15 AE               xor (hl)
- 36+  8B16 77           	ld (hl),a
- 37+  8B17 2B           	dec hl
- 38+  8B18 24           	inc h
- 39+  8B19 7C               ld a,h
- 40+  8B1A E6 07            and 7
- 41+  8B1C 20 0A            jr nz,2F
- 42+  8B1E 7D               ld a,l
- 43+  8B1F C6 20            add a,$20
- 44+  8B21 6F               ld l,a
- 45+  8B22 38 04            jr c,2F
- 46+  8B24 7C               ld a,h
- 47+  8B25 D6 08            sub 8
- 48+  8B27 67               ld h,a
- 49+  8B28 7C           2 ld a,h
- 50+  8B29 FE 58            cp $58
- 51+  8B2B 28 02            jr z,3F
- 52+  8B2D 10 E0            djnz 1B
- 53+  8B2F ED 7B 40 85  3 ld sp,(Stack)
- 54+  8B33 C9           	ret
- 55+  8B34
- 56+  8B34 ED 73 40 85  Pinta_Amadeus_3x2 ld (Stack),sp
- 57+  8B38 FD F9        	ld sp,iy
- 58+  8B3A 06 08            ld b,8
- 59+  8B3C D1           1 pop de
- 60+  8B3D 7B               ld a,e
- 61+  8B3E AE               xor (hl)
- 62+  8B3F 77           	ld (hl),a
- 63+  8B40 23           	inc hl
- 64+  8B41 7A               ld a,d
- 65+  8B42 AE               xor (hl)
- 66+  8B43 77           	ld (hl),a
- 67+  8B44 23           	inc hl
- 68+  8B45 D1           	pop de
- 69+  8B46 7B               ld a,e
- 70+  8B47 AE               xor (hl)
- 71+  8B48 77           	ld (hl),a
- 72+  8B49 2B           	dec hl
- 73+  8B4A 2B           	dec hl
- 74+  8B4B 24           	inc h
- 75+  8B4C 7C               ld a,h
- 76+  8B4D E6 07            and 7
- 77+  8B4F 20 0A            jr nz,2F
- 78+  8B51 7D               ld a,l
- 79+  8B52 C6 20            add a,$20
- 80+  8B54 6F               ld l,a
- 81+  8B55 38 04            jr c,2F
- 82+  8B57 7C               ld a,h
- 83+  8B58 D6 08            sub 8
- 84+  8B5A 67               ld h,a
- 85+  8B5B 7C           2 ld a,h
- 86+  8B5C FE 58            cp $58
- 87+  8B5E 28 25            jr z,4F
- 88+  8B60 7A               ld a,d
- 89+  8B61 AE               xor (hl)
- 90+  8B62 77               ld (hl),a
- 91+  8B63 D1           	pop de
- 92+  8B64 23           	inc hl
- 93+  8B65 7B               ld a,e
- 94+  8B66 AE               xor (hl)
- 95+  8B67 77           	ld (hl),a
- 96+  8B68 23           	inc hl
- 97+  8B69 7A               ld a,d
- 98+  8B6A AE               xor (hl)
- 99+  8B6B 77           	ld (hl),a
-100+  8B6C 2B           	dec hl
-101+  8B6D 2B           	dec hl
-102+  8B6E 24           	inc h
-103+  8B6F 7C               ld a,h
-104+  8B70 E6 07            and 7
-105+  8B72 20 0A            jr nz,3F
-106+  8B74 7D               ld a,l
-107+  8B75 C6 20            add a,$20
-108+  8B77 6F               ld l,a
-109+  8B78 38 04            jr c,3F
-110+  8B7A 7C               ld a,h
-111+  8B7B D6 08            sub 8
-112+  8B7D 67               ld h,a
-113+  8B7E 7C           3 ld a,h
-114+  8B7F FE 58            cp $58
-115+  8B81 28 02            jr z,4F
-116+  8B83 10 B7            djnz 1B
-117+  8B85 ED 7B 40 85  4 ld sp,(Stack)
-118+  8B89 C9           	ret
-119+  8B8A
-120+  8B8A              ; ---------------------------------------------------
-121+  8B8A
-122+  8B8A ED 73 40 85  Pinta_enemigo_2x2_izquierda ld (Stack),sp
-123+  8B8E FD F9        	ld sp,iy
-124+  8B90 06 10            ld b,16
-125+  8B92 D1           1 pop de
-126+  8B93 7A           	ld a,d
-127+  8B94 AE           	xor (hl)
-128+  8B95 77           	ld (hl),a
-129+  8B96 24           	inc h
-130+  8B97 7C               ld a,h
-131+  8B98 E6 07            and 7
-132+  8B9A 20 0C            jr nz,2F
-133+  8B9C 7D               ld a,l
-134+  8B9D C6 20            add a,$20
-135+  8B9F 6F               ld l,a
-136+  8BA0 38 06            jr c,2F
-137+  8BA2 7C               ld a,h
-138+  8BA3 D6 08            sub 8
-139+  8BA5 67               ld h,a
-140+  8BA6 18 00            jr 2F
-141+  8BA8 7C           2 ld a,h
-142+  8BA9 FE 58            cp $58
-143+  8BAB 28 02            jr z,3F
-144+  8BAD 10 E3            djnz 1B
-145+  8BAF ED 7B 40 85  3 ld sp,(Stack)
-146+  8BB3 C9           	ret
-147+  8BB4
-148+  8BB4 ED 73 40 85  Pinta_enemigo_2x2_derecha ld (Stack),sp
-149+  8BB8 FD F9        	ld sp,iy
-150+  8BBA 06 10            ld b,16
-151+  8BBC D1           1 pop de
-152+  8BBD 7B           	ld a,e
-153+  8BBE AE           	xor (hl)
-154+  8BBF 77           	ld (hl),a
-155+  8BC0 24           	inc h
-156+  8BC1 7C               ld a,h
-157+  8BC2 E6 07            and 7
-158+  8BC4 20 0C            jr nz,2F
-159+  8BC6 7D               ld a,l
-160+  8BC7 C6 20            add a,$20
-161+  8BC9 6F               ld l,a
-162+  8BCA 38 06            jr c,2F
-163+  8BCC 7C               ld a,h
-164+  8BCD D6 08            sub 8
-165+  8BCF 67               ld h,a
-166+  8BD0 18 00            jr 2F
-167+  8BD2 7C           2 ld a,h
-168+  8BD3 FE 58            cp $58
-169+  8BD5 28 02            jr z,3F
-170+  8BD7 10 E3            djnz 1B
-171+  8BD9 ED 7B 40 85  3 ld sp,(Stack)
-172+  8BDD C9           	ret
-173+  8BDE
-174+  8BDE              ; ---------------------------------------------------
-175+  8BDE
-176+  8BDE ED 73 40 85  Pinta_enemigo_3x2_izquierda_2columnas ld (Stack),sp
-177+  8BE2 FD F9        	ld sp,iy
-178+  8BE4 06 08            ld b,8
-179+  8BE6 D1           1 pop de
-180+  8BE7 7A           	ld a,d
-181+  8BE8 AE           	xor (hl)
-182+  8BE9 77           	ld (hl),a
-183+  8BEA 23           	inc hl
-184+  8BEB D1           	pop de
-185+  8BEC 7B           	ld a,e
-186+  8BED AE           	xor (hl)
-187+  8BEE 77           	ld (hl),a
-188+  8BEF 2B           	dec hl
-189+  8BF0 24            	inc h
-190+  8BF1 7C               ld a,h
-191+  8BF2 E6 07            and 7
-192+  8BF4 20 0A            jr nz,2F
-193+  8BF6 7D               ld a,l
-194+  8BF7 C6 20            add a,$20
-195+  8BF9 6F               ld l,a
-196+  8BFA 38 04            jr c,2F
-197+  8BFC 7C               ld a,h
-198+  8BFD D6 08            sub 8
-199+  8BFF 67               ld h,a
-200+  8C00 7C           2 ld a,h
-201+  8C01 FE 58            cp $58
-202+  8C03 28 20            jr z,4F
-203+  8C05 D1               pop de
-204+  8C06 7B           	ld a,e
-205+  8C07 AE           	xor (hl)
-206+  8C08 77           	ld (hl),a
-207+  8C09 23           	inc hl
-208+  8C0A 7A           	ld a,d
-209+  8C0B AE           	xor (hl)
-210+  8C0C 77           	ld (hl),a
-211+  8C0D 2B           	dec hl
-212+  8C0E 24           	inc h
-213+  8C0F 7C               ld a,h
-214+  8C10 E6 07            and 7
-215+  8C12 20 0A            jr nz,3F
-216+  8C14 7D               ld a,l
-217+  8C15 C6 20            add a,$20
-218+  8C17 6F               ld l,a
-219+  8C18 38 04            jr c,3F
-220+  8C1A 7C               ld a,h
-221+  8C1B D6 08            sub 8
-222+  8C1D 67               ld h,a
-223+  8C1E 7C           3 ld a,h
-224+  8C1F FE 58            cp $58
-225+  8C21 28 02            jr z,4F
-226+  8C23 10 C1            djnz 1B
-227+  8C25 ED 7B 40 85  4 ld sp,(Stack)
-228+  8C29 C9           	ret
-229+  8C2A
-230+  8C2A ED 73 40 85  Pinta_enemigo_3x2_izquierda_1columna ld (Stack),sp
-231+  8C2E FD F9        	ld sp,iy
-232+  8C30 06 08            ld b,8
-233+  8C32 D1           1 pop de
-234+  8C33 D1           	pop de
-235+  8C34 7B           	ld a,e
-236+  8C35 AE           	xor (hl)
-237+  8C36 77           	ld (hl),a
-238+  8C37 24            	inc h
-239+  8C38 7C               ld a,h
-240+  8C39 E6 07            and 7
-241+  8C3B 20 0A            jr nz,2F
-242+  8C3D 7D               ld a,l
-243+  8C3E C6 20            add a,$20
-244+  8C40 6F               ld l,a
-245+  8C41 38 04            jr c,2F
-246+  8C43 7C               ld a,h
-247+  8C44 D6 08            sub 8
-248+  8C46 67               ld h,a
-249+  8C47 7C           2 ld a,h
-250+  8C48 FE 58            cp $58
-251+  8C4A 28 1B            jr z,4F
-252+  8C4C D1               pop de
-253+  8C4D 7A           	ld a,d
-254+  8C4E AE           	xor (hl)
-255+  8C4F 77           	ld (hl),a
-256+  8C50 24           	inc h
-257+  8C51 7C               ld a,h
-258+  8C52 E6 07            and 7
-259+  8C54 20 0A            jr nz,3F
-260+  8C56 7D               ld a,l
-261+  8C57 C6 20            add a,$20
-262+  8C59 6F               ld l,a
-263+  8C5A 38 04            jr c,3F
-264+  8C5C 7C               ld a,h
-265+  8C5D D6 08            sub 8
-266+  8C5F 67               ld h,a
-267+  8C60 7C           3 ld a,h
-268+  8C61 FE 58            cp $58
-269+  8C63 28 02            jr z,4F
-270+  8C65 10 CB            djnz 1B
-271+  8C67 ED 7B 40 85  4 ld sp,(Stack)
-272+  8C6B C9           	ret
-273+  8C6C
-274+  8C6C ED 73 40 85  Pinta_enemigo_3x2_derecha_2columnas ld (Stack),sp
-275+  8C70 FD F9        	ld sp,iy
-276+  8C72 06 08            ld b,8
-277+  8C74 D1           1 pop de
-278+  8C75 7B           	ld a,e
-279+  8C76 AE           	xor (hl)
-280+  8C77 77           	ld (hl),a
-281+  8C78 23           	inc hl
-282+  8C79 7A           	ld a,d
-283+  8C7A AE           	xor (hl)
-284+  8C7B 77           	ld (hl),a
-285+  8C7C 2B           	dec hl
-286+  8C7D 24             	inc h
-287+  8C7E 7C               ld a,h
-288+  8C7F E6 07            and 7
-289+  8C81 20 0A            jr nz,2F
-290+  8C83 7D               ld a,l
-291+  8C84 C6 20            add a,$20
-292+  8C86 6F               ld l,a
-293+  8C87 38 04            jr c,2F
-294+  8C89 7C               ld a,h
-295+  8C8A D6 08            sub 8
-296+  8C8C 67               ld h,a
-297+  8C8D 7C           2 ld a,h
-298+  8C8E FE 58            cp $58
-299+  8C90 28 21            jr z,4F
-300+  8C92 D1               pop de
-301+  8C93 7A           	ld a,d
-302+  8C94 AE           	xor (hl)
-303+  8C95 77           	ld (hl),a
-304+  8C96 23           	inc hl
-305+  8C97 D1               pop de
-306+  8C98 7B           	ld a,e
-307+  8C99 AE           	xor (hl)
-308+  8C9A 77           	ld (hl),a
-309+  8C9B 2B           	dec hl
-310+  8C9C 24           	inc h
-311+  8C9D 7C               ld a,h
-312+  8C9E E6 07            and 7
-313+  8CA0 20 0A            jr nz,3F
-314+  8CA2 7D               ld a,l
-315+  8CA3 C6 20            add a,$20
-316+  8CA5 6F               ld l,a
-317+  8CA6 38 04            jr c,3F
-318+  8CA8 7C               ld a,h
-319+  8CA9 D6 08            sub 8
-320+  8CAB 67               ld h,a
-321+  8CAC 7C           3 ld a,h
-322+  8CAD FE 58            cp $58
-323+  8CAF 28 02            jr z,4F
-324+  8CB1 10 C1            djnz 1B
-325+  8CB3 ED 7B 40 85  4 ld sp,(Stack)
-326+  8CB7 C9           	ret
-327+  8CB8
-328+  8CB8 ED 73 40 85  Pinta_enemigo_3x2_derecha_1columna ld (Stack),sp
-329+  8CBC FD F9        	ld sp,iy
-330+  8CBE 06 08            ld b,8
-331+  8CC0 D1           1 pop de
-332+  8CC1 7B           	ld a,e
-333+  8CC2 AE           	xor (hl)
-334+  8CC3 77           	ld (hl),a
-335+  8CC4 24            	inc h
-336+  8CC5 7C               ld a,h
-337+  8CC6 E6 07            and 7
-338+  8CC8 20 0A            jr nz,2F
-339+  8CCA 7D               ld a,l
-340+  8CCB C6 20            add a,$20
-341+  8CCD 6F               ld l,a
-342+  8CCE 38 04            jr c,2F
-343+  8CD0 7C               ld a,h
-344+  8CD1 D6 08            sub 8
-345+  8CD3 67               ld h,a
-346+  8CD4 7C           2 ld a,h
-347+  8CD5 FE 58            cp $58
-348+  8CD7 28 1C            jr z,4F
-349+  8CD9 D1               pop de
-350+  8CDA 7A           	ld a,d
-351+  8CDB AE           	xor (hl)
-352+  8CDC 77           	ld (hl),a
-353+  8CDD 24           	inc h
-354+  8CDE 7C               ld a,h
-355+  8CDF E6 07            and 7
-356+  8CE1 20 0A            jr nz,3F
-357+  8CE3 7D               ld a,l
-358+  8CE4 C6 20            add a,$20
-359+  8CE6 6F               ld l,a
-360+  8CE7 38 04            jr c,3F
-361+  8CE9 7C               ld a,h
-362+  8CEA D6 08            sub 8
-363+  8CEC 67               ld h,a
-364+  8CED 7C           3 ld a,h
-365+  8CEE FE 58            cp $58
-366+  8CF0 28 03            jr z,4F
-367+  8CF2 D1               pop de
-368+  8CF3 10 CB            djnz 1B
-369+  8CF5 ED 7B 40 85  4 ld sp,(Stack)
-370+  8CF9 C9           	ret
-371+  8CFA
-372+  8CFA              ; ---------------------------------------------------
-373+  8CFA
+  1+  8B25              ;   índices de Rutinas de impresión.
+  2+  8B25
+  3+  8B25 35 8B        Indice_entidades_completas defw Pinta_Amadeus_2x2
+  4+  8B27 62 8B            defw Pinta_Amadeus_3x2
+  5+  8B29
+  6+  8B29 B8 8B        Indice_entidades_incompletas_izquierda defw Pinta_enemigo_2x2_izquierda
+  7+  8B2B 58 8C            defw Pinta_enemigo_3x2_izquierda_1columna
+  8+  8B2D 0C 8C            defw Pinta_enemigo_3x2_izquierda_2columnas
+  9+  8B2F
+ 10+  8B2F E2 8B        Indice_entidades_incompletas_derecha defw Pinta_enemigo_2x2_derecha
+ 11+  8B31 E6 8C            defw Pinta_enemigo_3x2_derecha_1columna
+ 12+  8B33 9A 8C            defw Pinta_enemigo_3x2_derecha_2columnas
+ 13+  8B35
+ 14+  8B35
+ 15+  8B35              ;   Conjunto de rutinas de impresión de Sprites.
+ 16+  8B35              ;
+ 17+  8B35              ;   12/12/22
+ 18+  8B35              ;
+ 19+  8B35              ;   Inputs: HL contiene (Posicion_actual) de la entidad.
+ 20+  8B35              ;           B contendrá: el nº de scanlines que `podemos´ imprimir en pantalla. (ENTIDAD DE 2X2).
+ 21+  8B35              ;                        LA MITAD del nº de scanlines que `podemos´imprimir en pantalla. (ENTIDAD DE 3X2).
+ 22+  8B35              ;           El puntero de pila apuntará a la dirección de mem. que contenga la variable (Puntero_datas).
+ 23+  8B35              ;
+ 24+  8B35              ;   Modifica: DE y HL.
+ 25+  8B35
+ 26+  8B35 ED 73 40 85  Pinta_Amadeus_2x2 ld (Stack),sp
+ 27+  8B39 FD F9        	ld sp,iy
+ 28+  8B3B 06 10            ld b,16
+ 29+  8B3D D1           1 pop de
+ 30+  8B3E 7B               ld a,e
+ 31+  8B3F AE               xor (hl)
+ 32+  8B40 77           	ld (hl),a
+ 33+  8B41 23           	inc hl
+ 34+  8B42 7A               ld a,d
+ 35+  8B43 AE               xor (hl)
+ 36+  8B44 77           	ld (hl),a
+ 37+  8B45 2B           	dec hl
+ 38+  8B46 24           	inc h
+ 39+  8B47 7C               ld a,h
+ 40+  8B48 E6 07            and 7
+ 41+  8B4A 20 0A            jr nz,2F
+ 42+  8B4C 7D               ld a,l
+ 43+  8B4D C6 20            add a,$20
+ 44+  8B4F 6F               ld l,a
+ 45+  8B50 38 04            jr c,2F
+ 46+  8B52 7C               ld a,h
+ 47+  8B53 D6 08            sub 8
+ 48+  8B55 67               ld h,a
+ 49+  8B56 7C           2 ld a,h
+ 50+  8B57 FE 58            cp $58
+ 51+  8B59 28 02            jr z,3F
+ 52+  8B5B 10 E0            djnz 1B
+ 53+  8B5D ED 7B 40 85  3 ld sp,(Stack)
+ 54+  8B61 C9           	ret
+ 55+  8B62
+ 56+  8B62 ED 73 40 85  Pinta_Amadeus_3x2 ld (Stack),sp
+ 57+  8B66 FD F9        	ld sp,iy
+ 58+  8B68 06 08            ld b,8
+ 59+  8B6A D1           1 pop de
+ 60+  8B6B 7B               ld a,e
+ 61+  8B6C AE               xor (hl)
+ 62+  8B6D 77           	ld (hl),a
+ 63+  8B6E 23           	inc hl
+ 64+  8B6F 7A               ld a,d
+ 65+  8B70 AE               xor (hl)
+ 66+  8B71 77           	ld (hl),a
+ 67+  8B72 23           	inc hl
+ 68+  8B73 D1           	pop de
+ 69+  8B74 7B               ld a,e
+ 70+  8B75 AE               xor (hl)
+ 71+  8B76 77           	ld (hl),a
+ 72+  8B77 2B           	dec hl
+ 73+  8B78 2B           	dec hl
+ 74+  8B79 24           	inc h
+ 75+  8B7A 7C               ld a,h
+ 76+  8B7B E6 07            and 7
+ 77+  8B7D 20 0A            jr nz,2F
+ 78+  8B7F 7D               ld a,l
+ 79+  8B80 C6 20            add a,$20
+ 80+  8B82 6F               ld l,a
+ 81+  8B83 38 04            jr c,2F
+ 82+  8B85 7C               ld a,h
+ 83+  8B86 D6 08            sub 8
+ 84+  8B88 67               ld h,a
+ 85+  8B89 7C           2 ld a,h
+ 86+  8B8A FE 58            cp $58
+ 87+  8B8C 28 25            jr z,4F
+ 88+  8B8E 7A               ld a,d
+ 89+  8B8F AE               xor (hl)
+ 90+  8B90 77               ld (hl),a
+ 91+  8B91 D1           	pop de
+ 92+  8B92 23           	inc hl
+ 93+  8B93 7B               ld a,e
+ 94+  8B94 AE               xor (hl)
+ 95+  8B95 77           	ld (hl),a
+ 96+  8B96 23           	inc hl
+ 97+  8B97 7A               ld a,d
+ 98+  8B98 AE               xor (hl)
+ 99+  8B99 77           	ld (hl),a
+100+  8B9A 2B           	dec hl
+101+  8B9B 2B           	dec hl
+102+  8B9C 24           	inc h
+103+  8B9D 7C               ld a,h
+104+  8B9E E6 07            and 7
+105+  8BA0 20 0A            jr nz,3F
+106+  8BA2 7D               ld a,l
+107+  8BA3 C6 20            add a,$20
+108+  8BA5 6F               ld l,a
+109+  8BA6 38 04            jr c,3F
+110+  8BA8 7C               ld a,h
+111+  8BA9 D6 08            sub 8
+112+  8BAB 67               ld h,a
+113+  8BAC 7C           3 ld a,h
+114+  8BAD FE 58            cp $58
+115+  8BAF 28 02            jr z,4F
+116+  8BB1 10 B7            djnz 1B
+117+  8BB3 ED 7B 40 85  4 ld sp,(Stack)
+118+  8BB7 C9           	ret
+119+  8BB8
+120+  8BB8              ; ---------------------------------------------------
+121+  8BB8
+122+  8BB8 ED 73 40 85  Pinta_enemigo_2x2_izquierda ld (Stack),sp
+123+  8BBC FD F9        	ld sp,iy
+124+  8BBE 06 10            ld b,16
+125+  8BC0 D1           1 pop de
+126+  8BC1 7A           	ld a,d
+127+  8BC2 AE           	xor (hl)
+128+  8BC3 77           	ld (hl),a
+129+  8BC4 24           	inc h
+130+  8BC5 7C               ld a,h
+131+  8BC6 E6 07            and 7
+132+  8BC8 20 0C            jr nz,2F
+133+  8BCA 7D               ld a,l
+134+  8BCB C6 20            add a,$20
+135+  8BCD 6F               ld l,a
+136+  8BCE 38 06            jr c,2F
+137+  8BD0 7C               ld a,h
+138+  8BD1 D6 08            sub 8
+139+  8BD3 67               ld h,a
+140+  8BD4 18 00            jr 2F
+141+  8BD6 7C           2 ld a,h
+142+  8BD7 FE 58            cp $58
+143+  8BD9 28 02            jr z,3F
+144+  8BDB 10 E3            djnz 1B
+145+  8BDD ED 7B 40 85  3 ld sp,(Stack)
+146+  8BE1 C9           	ret
+147+  8BE2
+148+  8BE2 ED 73 40 85  Pinta_enemigo_2x2_derecha ld (Stack),sp
+149+  8BE6 FD F9        	ld sp,iy
+150+  8BE8 06 10            ld b,16
+151+  8BEA D1           1 pop de
+152+  8BEB 7B           	ld a,e
+153+  8BEC AE           	xor (hl)
+154+  8BED 77           	ld (hl),a
+155+  8BEE 24           	inc h
+156+  8BEF 7C               ld a,h
+157+  8BF0 E6 07            and 7
+158+  8BF2 20 0C            jr nz,2F
+159+  8BF4 7D               ld a,l
+160+  8BF5 C6 20            add a,$20
+161+  8BF7 6F               ld l,a
+162+  8BF8 38 06            jr c,2F
+163+  8BFA 7C               ld a,h
+164+  8BFB D6 08            sub 8
+165+  8BFD 67               ld h,a
+166+  8BFE 18 00            jr 2F
+167+  8C00 7C           2 ld a,h
+168+  8C01 FE 58            cp $58
+169+  8C03 28 02            jr z,3F
+170+  8C05 10 E3            djnz 1B
+171+  8C07 ED 7B 40 85  3 ld sp,(Stack)
+172+  8C0B C9           	ret
+173+  8C0C
+174+  8C0C              ; ---------------------------------------------------
+175+  8C0C
+176+  8C0C ED 73 40 85  Pinta_enemigo_3x2_izquierda_2columnas ld (Stack),sp
+177+  8C10 FD F9        	ld sp,iy
+178+  8C12 06 08            ld b,8
+179+  8C14 D1           1 pop de
+180+  8C15 7A           	ld a,d
+181+  8C16 AE           	xor (hl)
+182+  8C17 77           	ld (hl),a
+183+  8C18 23           	inc hl
+184+  8C19 D1           	pop de
+185+  8C1A 7B           	ld a,e
+186+  8C1B AE           	xor (hl)
+187+  8C1C 77           	ld (hl),a
+188+  8C1D 2B           	dec hl
+189+  8C1E 24            	inc h
+190+  8C1F 7C               ld a,h
+191+  8C20 E6 07            and 7
+192+  8C22 20 0A            jr nz,2F
+193+  8C24 7D               ld a,l
+194+  8C25 C6 20            add a,$20
+195+  8C27 6F               ld l,a
+196+  8C28 38 04            jr c,2F
+197+  8C2A 7C               ld a,h
+198+  8C2B D6 08            sub 8
+199+  8C2D 67               ld h,a
+200+  8C2E 7C           2 ld a,h
+201+  8C2F FE 58            cp $58
+202+  8C31 28 20            jr z,4F
+203+  8C33 D1               pop de
+204+  8C34 7B           	ld a,e
+205+  8C35 AE           	xor (hl)
+206+  8C36 77           	ld (hl),a
+207+  8C37 23           	inc hl
+208+  8C38 7A           	ld a,d
+209+  8C39 AE           	xor (hl)
+210+  8C3A 77           	ld (hl),a
+211+  8C3B 2B           	dec hl
+212+  8C3C 24           	inc h
+213+  8C3D 7C               ld a,h
+214+  8C3E E6 07            and 7
+215+  8C40 20 0A            jr nz,3F
+216+  8C42 7D               ld a,l
+217+  8C43 C6 20            add a,$20
+218+  8C45 6F               ld l,a
+219+  8C46 38 04            jr c,3F
+220+  8C48 7C               ld a,h
+221+  8C49 D6 08            sub 8
+222+  8C4B 67               ld h,a
+223+  8C4C 7C           3 ld a,h
+224+  8C4D FE 58            cp $58
+225+  8C4F 28 02            jr z,4F
+226+  8C51 10 C1            djnz 1B
+227+  8C53 ED 7B 40 85  4 ld sp,(Stack)
+228+  8C57 C9           	ret
+229+  8C58
+230+  8C58 ED 73 40 85  Pinta_enemigo_3x2_izquierda_1columna ld (Stack),sp
+231+  8C5C FD F9        	ld sp,iy
+232+  8C5E 06 08            ld b,8
+233+  8C60 D1           1 pop de
+234+  8C61 D1           	pop de
+235+  8C62 7B           	ld a,e
+236+  8C63 AE           	xor (hl)
+237+  8C64 77           	ld (hl),a
+238+  8C65 24            	inc h
+239+  8C66 7C               ld a,h
+240+  8C67 E6 07            and 7
+241+  8C69 20 0A            jr nz,2F
+242+  8C6B 7D               ld a,l
+243+  8C6C C6 20            add a,$20
+244+  8C6E 6F               ld l,a
+245+  8C6F 38 04            jr c,2F
+246+  8C71 7C               ld a,h
+247+  8C72 D6 08            sub 8
+248+  8C74 67               ld h,a
+249+  8C75 7C           2 ld a,h
+250+  8C76 FE 58            cp $58
+251+  8C78 28 1B            jr z,4F
+252+  8C7A D1               pop de
+253+  8C7B 7A           	ld a,d
+254+  8C7C AE           	xor (hl)
+255+  8C7D 77           	ld (hl),a
+256+  8C7E 24           	inc h
+257+  8C7F 7C               ld a,h
+258+  8C80 E6 07            and 7
+259+  8C82 20 0A            jr nz,3F
+260+  8C84 7D               ld a,l
+261+  8C85 C6 20            add a,$20
+262+  8C87 6F               ld l,a
+263+  8C88 38 04            jr c,3F
+264+  8C8A 7C               ld a,h
+265+  8C8B D6 08            sub 8
+266+  8C8D 67               ld h,a
+267+  8C8E 7C           3 ld a,h
+268+  8C8F FE 58            cp $58
+269+  8C91 28 02            jr z,4F
+270+  8C93 10 CB            djnz 1B
+271+  8C95 ED 7B 40 85  4 ld sp,(Stack)
+272+  8C99 C9           	ret
+273+  8C9A
+274+  8C9A ED 73 40 85  Pinta_enemigo_3x2_derecha_2columnas ld (Stack),sp
+275+  8C9E FD F9        	ld sp,iy
+276+  8CA0 06 08            ld b,8
+277+  8CA2 D1           1 pop de
+278+  8CA3 7B           	ld a,e
+279+  8CA4 AE           	xor (hl)
+280+  8CA5 77           	ld (hl),a
+281+  8CA6 23           	inc hl
+282+  8CA7 7A           	ld a,d
+283+  8CA8 AE           	xor (hl)
+284+  8CA9 77           	ld (hl),a
+285+  8CAA 2B           	dec hl
+286+  8CAB 24             	inc h
+287+  8CAC 7C               ld a,h
+288+  8CAD E6 07            and 7
+289+  8CAF 20 0A            jr nz,2F
+290+  8CB1 7D               ld a,l
+291+  8CB2 C6 20            add a,$20
+292+  8CB4 6F               ld l,a
+293+  8CB5 38 04            jr c,2F
+294+  8CB7 7C               ld a,h
+295+  8CB8 D6 08            sub 8
+296+  8CBA 67               ld h,a
+297+  8CBB 7C           2 ld a,h
+298+  8CBC FE 58            cp $58
+299+  8CBE 28 21            jr z,4F
+300+  8CC0 D1               pop de
+301+  8CC1 7A           	ld a,d
+302+  8CC2 AE           	xor (hl)
+303+  8CC3 77           	ld (hl),a
+304+  8CC4 23           	inc hl
+305+  8CC5 D1               pop de
+306+  8CC6 7B           	ld a,e
+307+  8CC7 AE           	xor (hl)
+308+  8CC8 77           	ld (hl),a
+309+  8CC9 2B           	dec hl
+310+  8CCA 24           	inc h
+311+  8CCB 7C               ld a,h
+312+  8CCC E6 07            and 7
+313+  8CCE 20 0A            jr nz,3F
+314+  8CD0 7D               ld a,l
+315+  8CD1 C6 20            add a,$20
+316+  8CD3 6F               ld l,a
+317+  8CD4 38 04            jr c,3F
+318+  8CD6 7C               ld a,h
+319+  8CD7 D6 08            sub 8
+320+  8CD9 67               ld h,a
+321+  8CDA 7C           3 ld a,h
+322+  8CDB FE 58            cp $58
+323+  8CDD 28 02            jr z,4F
+324+  8CDF 10 C1            djnz 1B
+325+  8CE1 ED 7B 40 85  4 ld sp,(Stack)
+326+  8CE5 C9           	ret
+327+  8CE6
+328+  8CE6 ED 73 40 85  Pinta_enemigo_3x2_derecha_1columna ld (Stack),sp
+329+  8CEA FD F9        	ld sp,iy
+330+  8CEC 06 08            ld b,8
+331+  8CEE D1           1 pop de
+332+  8CEF 7B           	ld a,e
+333+  8CF0 AE           	xor (hl)
+334+  8CF1 77           	ld (hl),a
+335+  8CF2 24            	inc h
+336+  8CF3 7C               ld a,h
+337+  8CF4 E6 07            and 7
+338+  8CF6 20 0A            jr nz,2F
+339+  8CF8 7D               ld a,l
+340+  8CF9 C6 20            add a,$20
+341+  8CFB 6F               ld l,a
+342+  8CFC 38 04            jr c,2F
+343+  8CFE 7C               ld a,h
+344+  8CFF D6 08            sub 8
+345+  8D01 67               ld h,a
+346+  8D02 7C           2 ld a,h
+347+  8D03 FE 58            cp $58
+348+  8D05 28 1C            jr z,4F
+349+  8D07 D1               pop de
+350+  8D08 7A           	ld a,d
+351+  8D09 AE           	xor (hl)
+352+  8D0A 77           	ld (hl),a
+353+  8D0B 24           	inc h
+354+  8D0C 7C               ld a,h
+355+  8D0D E6 07            and 7
+356+  8D0F 20 0A            jr nz,3F
+357+  8D11 7D               ld a,l
+358+  8D12 C6 20            add a,$20
+359+  8D14 6F               ld l,a
+360+  8D15 38 04            jr c,3F
+361+  8D17 7C               ld a,h
+362+  8D18 D6 08            sub 8
+363+  8D1A 67               ld h,a
+364+  8D1B 7C           3 ld a,h
+365+  8D1C FE 58            cp $58
+366+  8D1E 28 03            jr z,4F
+367+  8D20 D1               pop de
+368+  8D21 10 CB            djnz 1B
+369+  8D23 ED 7B 40 85  4 ld sp,(Stack)
+370+  8D27 C9           	ret
+371+  8D28
+372+  8D28              ; ---------------------------------------------------
+373+  8D28
 # file closed: Rutinas_de_impresion_sprites.asm
-734   8CFA              	include "calcula_tercio.asm"
+757   8D28              	include "calcula_tercio.asm"
 # file opened: calcula_tercio.asm
-  1+  8CFA              ; ******************************************* Indica el tercio de pantalla en el que nos encontramos según el valor del registro H ********************************************************
-  2+  8CFA              ;
-  3+  8CFA              ;	NOTA: Entrega "0", "1" o "2" en A en función del tercio en el que nos encontremos.
-  4+  8CFA              ;
-  5+  8CFA              ; *****************************************************************************************************************************************************************************************
-  6+  8CFA              ; 010T TSSS LLLC CCCC (Codificación de la memoria de pantalla). $4000 - $57FF, (256 x 192 pixeles).
-  7+  8CFA
-  8+  8CFA 7C           calcula_tercio ld a,h
-  9+  8CFB E6 18        	and $18
- 10+  8CFD CB 2F        	sra a
- 11+  8CFF CB 2F        	sra a
- 12+  8D01 CB 2F        	sra a
- 13+  8D03 C9           	ret
- 14+  8D04
+  1+  8D28              ; ******************************************* Indica el tercio de pantalla en el que nos encontramos según el valor del registro H ********************************************************
+  2+  8D28              ;
+  3+  8D28              ;	NOTA: Entrega "0", "1" o "2" en A en función del tercio en el que nos encontremos.
+  4+  8D28              ;
+  5+  8D28              ; *****************************************************************************************************************************************************************************************
+  6+  8D28              ; 010T TSSS LLLC CCCC (Codificación de la memoria de pantalla). $4000 - $57FF, (256 x 192 pixeles).
+  7+  8D28
+  8+  8D28 7C           calcula_tercio ld a,h
+  9+  8D29 E6 18        	and $18
+ 10+  8D2B CB 2F        	sra a
+ 11+  8D2D CB 2F        	sra a
+ 12+  8D2F CB 2F        	sra a
+ 13+  8D31 C9           	ret
+ 14+  8D32
 # file closed: calcula_tercio.asm
-735   8D04              	include "Calcula_direccion_atributos.asm"
-# file opened: Calcula_direccion_atributos.asm
-  1+  8D04              ; -----------------------------------------------------------------------------------------
-  2+  8D04              ;
-  3+  8D04              ;   04/11/22
-  4+  8D04              ;
-  5+  8D04              ;   Entrega una dirección de ATRIBUTOS de pantalla en HL a partir de una dirección de pantalla, dada en HL.
-  6+  8D04              ;
-  7+  8D04              ;   INPUT: HL contiene la dirección de memoria de pantalla.
-  8+  8D04              ;   OUTPUT: HL contiene la dirección de ATRIBUTOS de pantalla de la dirección que contenía HL.
-  9+  8D04              ;
- 10+  8D04              ;   DESTRUYE: HL y A. !!!!!
- 11+  8D04
- 12+  8D04 CD FA 8C     Calcula_direccion_atributos call calcula_tercio
- 13+  8D07 26 58            ld h,$58
- 14+  8D09 84               add h
- 15+  8D0A 67               ld h,a
- 16+  8D0B C9               ret
-# file closed: Calcula_direccion_atributos.asm
-736   8D0C              	include "Define_atributos.asm"
-# file opened: Define_atributos.asm
-  1+  8D0C              ; ********** **********
-  2+  8D0C              ;
-  3+  8D0C              ;   5/11/22
-  4+  8D0C              ;
-  5+  8D0C              ;   Define los atributos de un area de pantalla de X(Filas) por Y(Columnas).
-  6+  8D0C              ;
-  7+  8D0C              ;   INPUTS: HL contendrá la dirección de mem. de pantalla del 1er byte del objeto, (arriba-izquierda).
-  8+  8D0C              ;           C contendrá el nº de (Columnas) que vamos a imprimir del objeto.
-  9+  8D0C              ;           HL´ contendrán: Nº de (Filas) del objeto. / (attr) del objeto.
- 10+  8D0C              ;
- 11+  8D0C              ;   NO DESTROYERSSSS !!!!!
- 12+  8D0C
- 13+  8D0C E5           Define_atributos push hl
- 14+  8D0D C5           	push bc
- 15+  8D0E D5           	push de
- 16+  8D0F
- 17+  8D0F CD 04 8D     	call Calcula_direccion_atributos
- 18+  8D12
- 19+  8D12 D9               exx
- 20+  8D13 E5               push hl
- 21+  8D14 D9               exx
- 22+  8D15 D1               pop de
- 23+  8D16
- 24+  8D16 42               ld b,d
- 25+  8D17 7B               ld a,e 									; (Attr) en A.
- 26+  8D18
- 27+  8D18 C5           4 push bc 									; FBPPPIII (Flash, Brillo, Papel, Tinta).
- 28+  8D19 E5            	push hl 								; Guardo dirección de attr.
- 29+  8D1A
- 30+  8D1A              ; -----
- 31+  8D1A
- 32+  8D1A 77           2 ld (hl),a
- 33+  8D1B 0D           	dec c 									; Decremento (Columnas).
- 34+  8D1C 28 03        	jr z,1F
- 35+  8D1E 23           	inc hl
- 36+  8D1F 18 F9        	jr 2B
- 37+  8D21
- 38+  8D21 E1           1 pop hl 									; Recuperamos la dirección de attr. inicial, (arriba-izq).
- 39+  8D22 C1           	pop bc									; Recuperamos (Filas)/(Columnas) en BC.
- 40+  8D23
- 41+  8D23 05           	dec b									; Decremento (Filas).
- 42+  8D24 28 08        	jr z,3F                                 ; Si no quedan más (Filas), salimos. (JR 16F).
- 43+  8D26
- 44+  8D26 11 20 00     	ld de,32
- 45+  8D29 A7           	and a
- 46+  8D2A ED 5A        	adc hl,de
- 47+  8D2C 18 EA        	jr 4B									; HL situado en la siguiente (Fila) de mem. de attr.
- 48+  8D2E
- 49+  8D2E D1           3 pop de									; No quedan más Filas, Restauramos registros y RET!!!
- 50+  8D2F C1           	pop bc
- 51+  8D30 E1           	pop hl
- 52+  8D31
- 53+  8D31 C9           	ret
- 54+  8D32
-# file closed: Define_atributos.asm
-737   8D32              	include "Cls.asm"
+758   8D32              	include "Cls.asm"
 # file opened: Cls.asm
   1+  8D32              ; *********************************** Limpia la pantalla, CLEAR SCREEN ****************************************************************
   2+  8D32              ;
@@ -2485,7 +2477,7 @@
  31+  8D45 C9           	ret
  32+  8D46
 # file closed: Cls.asm
-738   8D46              	include "Direcciones.asm"
+759   8D46              	include "Direcciones.asm"
 # file opened: Direcciones.asm
   1+  8D46              ; ******************************************************************************************************************************************************************************************
   2+  8D46              ;
@@ -2503,7 +2495,7 @@
  14+  8D4B 3A 16 85     	ld a,(Vel_down)
  15+  8D4E 47           	ld b,a
  16+  8D4F 2A 00 85         ld hl,(Posicion_actual)
- 17+  8D52 CD FA 8C     2 call calcula_tercio 												; Averiguamos el tercio de pantalla en el que nos encontramos.
+ 17+  8D52 CD 28 8D     2 call calcula_tercio 												; Averiguamos el tercio de pantalla en el que nos encontramos.
  18+  8D55 E6 02        	and 2
  19+  8D57 28 0F        	jr z,1F
  20+  8D59
@@ -2522,7 +2514,7 @@
  33+  8D66              ;	call Reinicio
  34+  8D66              ; ------------------------------
  35+  8D66 18 08        	jr 3F
- 36+  8D68 CD 9C 8A     1 call NextScan
+ 36+  8D68 CD CA 8A     1 call NextScan
  37+  8D6B 22 00 85     	ld (Posicion_actual),hl
  38+  8D6E 10 E2            djnz 2B
  39+  8D70 CD 5A 90     3 call Genera_coordenadas
@@ -2545,7 +2537,7 @@
  56+  8D79 3A 15 85     	ld a,(Vel_up)
  57+  8D7C 47           	ld b,a
  58+  8D7D 2A 00 85     	ld hl,(Posicion_actual)
- 59+  8D80 CD FA 8C     3 call calcula_tercio 													; Si no estamos en el 1er tercio de la pantalla no nos preocupamos de la reaparición.
+ 59+  8D80 CD 28 8D     3 call calcula_tercio 													; Si no estamos en el 1er tercio de la pantalla no nos preocupamos de la reaparición.
  60+  8D83 A7           	and a
  61+  8D84 20 10        	jr nz,1F
  62+  8D86
@@ -2566,7 +2558,7 @@
  77+  8D94              ; -----------------------------
  78+  8D94
  79+  8D94 18 08            jr 2F                                                               ; _ [Reaparece_abajo] para preparar la `reaparición´ por la parte inferior.
- 80+  8D96 CD AB 8A     1 call PreviousScan
+ 80+  8D96 CD D9 8A     1 call PreviousScan
  81+  8D99 22 00 85     	ld (Posicion_actual),hl
  82+  8D9C 10 E2            djnz 3B
  83+  8D9E CD 5A 90     2 call Genera_coordenadas
@@ -2680,7 +2672,7 @@
 191+  8E1F 23           	inc hl
 192+  8E20 10 FC        	djnz 1B 														; (Vel_right) indica cuantas posiciones desplazaremos el (Puntero_DESPLZ)_
 193+  8E22 22 0C 85     	ld (Puntero_DESPLZ_der),hl 										; _por el índice del Sprite.
-194+  8E25 CD AC 86     	call Extrae_address
+194+  8E25 CD AF 86     	call Extrae_address
 195+  8E28 22 02 85     	ld (Puntero_objeto),hl
 196+  8E2B
 197+  8E2B              ; Modifica (Puntero_DESPLZ_izq).
@@ -2711,7 +2703,7 @@
 222+  8E43 23           	inc hl
 223+  8E44 10 FC        	djnz 5B
 224+  8E46 22 0C 85     	ld (Puntero_DESPLZ_der),hl
-225+  8E49 CD AC 86     	call Extrae_address
+225+  8E49 CD AF 86     	call Extrae_address
 226+  8E4C 22 02 85     	ld (Puntero_objeto),hl
 227+  8E4F
 228+  8E4F              ; Si nos hemos salido del índice es porque hemos completado un ciclo completo. Habrá que actualizar_
@@ -2805,7 +2797,7 @@
 316+  8EBC
 317+  8EBC              ; Inicia el puntero de Sprite.
 318+  8EBC
-319+  8EBC CD C3 86     2 call Inicia_puntero_objeto_der
+319+  8EBC CD C6 86     2 call Inicia_puntero_objeto_der
 320+  8EBF C9           3 ret
 321+  8EC0
 322+  8EC0              ; ******************************************************************************************************************************************************************************************
@@ -2913,7 +2905,7 @@
 424+  8F40 23           	inc hl
 425+  8F41 10 FC        	djnz 1B 														; Seleccionamos FRAME en función de la velocidad del Sprite.
 426+  8F43 22 0E 85     	ld (Puntero_DESPLZ_izq),hl
-427+  8F46 CD AC 86     	call Extrae_address
+427+  8F46 CD AF 86     	call Extrae_address
 428+  8F49 22 02 85     	ld (Puntero_objeto),hl
 429+  8F4C
 430+  8F4C              ; Modifica (Puntero_DESPLZ_der).
@@ -2944,7 +2936,7 @@
 455+  8F64 23           	inc hl
 456+  8F65 10 FC        	djnz 5B
 457+  8F67 22 0E 85     	ld (Puntero_DESPLZ_izq),hl
-458+  8F6A CD AC 86     	call Extrae_address
+458+  8F6A CD AF 86     	call Extrae_address
 459+  8F6D 22 02 85     	ld (Puntero_objeto),hl
 460+  8F70
 461+  8F70              ; Si nos hemos salido del índice es porque hemos completado un ciclo completo. Habrá que actualizar_
@@ -3028,7 +3020,7 @@
 539+  8FDE
 540+  8FDE              ; Inicia (Puntero_DESPLZ_izq) y (Puntero_objeto).
 541+  8FDE
-542+  8FDE CD D6 86     2 call Inicia_puntero_objeto_izq
+542+  8FDE CD D9 86     2 call Inicia_puntero_objeto_izq
 543+  8FE1 C9           3 ret
 544+  8FE2
 545+  8FE2              ; ---------- ---------- ---------- ---------- ---------- ----------
@@ -3142,7 +3134,7 @@
 653+  9056 22 00 85     	ld (Posicion_actual),hl
 654+  9059 C9           	ret
 # file closed: Direcciones.asm
-739   905A              	include "Genera_coordenadas.asm"
+760   905A              	include "Genera_coordenadas.asm"
 # file opened: Genera_coordenadas.asm
   1+  905A              ;	12/12/22
   2+  905A              ;
@@ -3159,7 +3151,7 @@
  13+  905F 7D           	ld a,l
  14+  9060 E6 1F        	and $1f
  15+  9062 32 04 85     	ld (Coordenada_X),a 								; Coordenada X del sprite, (0-$1f).
- 16+  9065 CD FA 8C     	call calcula_tercio
+ 16+  9065 CD 28 8D     	call calcula_tercio
  17+  9068 47           	ld b,a
  18+  9069 04           	inc b												; Tercio de pantalla+1 en B, (1,2 o 3).
  19+  906A 0E 00        	ld c,0 												; Contador de filas a "0".
@@ -3182,7 +3174,7 @@
  36+  9085 C1           	pop bc
  37+  9086 C9           	ret
 # file closed: Genera_coordenadas.asm
-740   9087              	include "Patrones_de_mov.asm"
+761   9087              	include "Patrones_de_mov.asm"
 # file opened: Patrones_de_mov.asm
   1+  9087
   2+  9087
@@ -3224,167 +3216,177 @@
  31+  90CD 05 14 84 14  Escaloncitos_izquierda_abajo db 5,%00010100,%10000100,%00010100,%10000100,0
  31+  90D1 84 00
  32+  90D3 03 2F 1F 00  Derecha_e_izquierda db 3,%00101111,%00011111,0
- 33+  90D7 03 1F 2F 00  Izquierda_y_derecha db 3,%00011111,%00101111,0
- 34+  90DB
- 35+  90DB              ; ----- ----- ----- ----- -----
- 36+  90DB
- 37+  90DB D7 90        Indice_mov_Izquierda_y_derecha defw Izquierda_y_derecha
- 38+  90DD D3 90        Indice_mov_Derecha_e_izquierda defw Derecha_e_izquierda
- 39+  90DF 90 90        Indice_mov_Izquierda defw Izquierda
- 40+  90E1 8D 90        Indice_mov_Derecha defw Derecha
- 41+  90E3 8A 90        Indice_mov_Abajo defw Abajo
- 42+  90E5 87 90        Indice_mov_Arriba defw Arriba
- 43+  90E7 C4 90        Indice_mov_Escaloncitos_derecha_arriba defw Escaloncitos_derecha_arriba
- 44+  90E9 C8 90        Indice_mov_Escaloncitos_derecha_abajo defw Escaloncitos_derecha_abajo
- 45+  90EB C0 90        Indice_mov_Escaloncitos_izquierda_arriba defw Escaloncitos_izquierda_arriba
- 46+  90ED CD 90        Indice_mov_Escaloncitos_izquierda_abajo defw Escaloncitos_izquierda_abajo
- 47+  90EF 93 90        Indice_mov_Onda_senoidal defw Onda_senoidal
- 48+  90F1              ; ----- ----- ----- ----- -----
- 49+  90F1
- 50+  90F1 3A 31 85     Movimiento ld a,(Contador_db_mov)                               ; Hemos iniciado la cadena de movimiento ?. Si (Contador_db_mov) aún es "0" hay que inicializarlo._
- 51+  90F4 A7               and a                                                       ; _Para hacerlo, hemos de fijar antes (Puntero_mov).
- 52+  90F5 28 02            jr z,1F
- 53+  90F7 18 13            jr Decoder                                                  ; Saltamos a [Decoder] si ya hemos iniciado la cadena.
- 54+  90F9 3A 32 85     1 ld a,(Incrementa_puntero)                                     ; Vamos a inicializar las variables de movimiento. El contador (Incrementa_puntero) es un byte que inicialmente está a "0"._
- 55+  90FC C6 02            add 2                                                       ; _va incrementando su valor en 2 unidades cada vez que iniciamos una cadena. Se utiliza para ir incrementando (Puntero_mov)_
- 56+  90FE 32 32 85         ld (Incrementa_puntero),a                                   ; _ por el índice de cadenas de movimiento correspondiente. Su valor se restablecerá a "0" cuando encontremos
- 57+  9101              ;                                                               ; _ el .db0. (Indica que hemos terminado de leer la secuencia de movimiento completa de la entidad).
- 58+  9101 2A 2F 85         ld hl,(Puntero_mov)
- 59+  9104 7E               ld a,(hl)
- 60+  9105 32 31 85         ld (Contador_db_mov),a                                      ; Contador de bytes de la cadena inicializado. (El 1er byte de cada cadena de mov. indica el nº de bytes de_
- 61+  9108 23               inc hl                                                      ; _movimiento que hemos de ejecutar).
- 62+  9109 22 2F 85         ld (Puntero_mov),hl                                         ; Situamos (Puntero_mov) en el 1er byte de instrucciones.
- 63+  910C
- 64+  910C 3A 33 85     Decoder ld a,(Repetimos_db)
- 65+  910F A7               and a
- 66+  9110 20 0C            jr nz,12F
- 67+  9112 2A 2F 85         ld hl,(Puntero_mov)
- 68+  9115 7E               ld a,(hl)
- 69+  9116 A7               and a
- 70+  9117 28 69            jr z, Reinicia_el_movimiento                              ; Hemos terminado de ejecutar todas las cadenas de movimiento. Llamamos a [Fin_de_movimiento].
- 71+  9119 E6 0F            and $0f
- 72+  911B 32 33 85         ld (Repetimos_db),a                                         ; Si la variable de repetición de .db es "0" hemos de inicializar dicha variable antes de empezar con la decodificación del .db de_
- 73+  911E              ;                                                               ; _movimiento. Este valor lo proporciona el nibble `bajo´ del byte.
- 74+  911E 2A 2F 85     12 ld hl,(Puntero_mov)
- 75+  9121 CB 7E            bit 7,(hl)
- 76+  9123 28 03            jr z,2F
- 77+  9125 CD 46 8D         call Mov_down
- 78+  9128 2A 2F 85     2 ld hl, (Puntero_mov)
- 79+  912B CB 76            bit 6,(hl)
- 80+  912D 28 03            jr z,3F
- 81+  912F CD 74 8D         call Mov_up
- 82+  9132 2A 2F 85     3 ld hl, (Puntero_mov)
- 83+  9135 CB 6E            bit 5,(hl)
- 84+  9137 28 03            jr z,4F
- 85+  9139 CD A2 8D         call Mov_right
- 86+  913C 2A 2F 85     4 ld hl, (Puntero_mov)
- 87+  913F CB 66            bit 4,(hl)
- 88+  9141 28 03            jr z,5F
- 89+  9143 CD C0 8E         call Mov_left
- 90+  9146
- 91+  9146              ; ---------- --------- --------- ---------- ----------
- 92+  9146
- 93+  9146 3A 33 85     5 ld a,(Repetimos_db)
- 94+  9149 A7               and a
- 95+  914A 28 07            jr z,6F
- 96+  914C 3D               dec a
- 97+  914D 32 33 85         ld (Repetimos_db),a
- 98+  9150 28 01            jr z,6f
- 99+  9152 C9           11 ret
-100+  9153 21 31 85     6 ld hl,Contador_db_mov
-101+  9156 35               dec (hl)                                                       ; Decrementamos el contador de .db de la cadena, (pués ya hemos ejecutado un byte de la misma).
-102+  9157 2A 2F 85         ld hl,(Puntero_mov)                                            ; No repetimos el mismo byte. Incrementamos (Puntero_mov) y salimos.
-103+  915A 23               inc hl
-104+  915B 22 2F 85         ld (Puntero_mov),hl
-105+  915E 18 F2            jr 11B
-106+  9160 2A 2D 85     7 ld hl,(Puntero_indice_mov)                                       ; PASAMOS A LA CADENA SIGUIENTE !!!!!!
-107+  9163 3A 32 85         ld a,(Incrementa_puntero)
-108+  9166 47               ld b,a
-109+  9167 23           8 inc hl
-110+  9168 10 FD            djnz 8B                                                        ; Indice_patrones_coracao +2, +4, +6, etc...
-111+  916A 5E               ld e,(hl)
-112+  916B 23               inc hl
-113+  916C 56               ld d,(hl)
-114+  916D EB               ex de,hl
-115+  916E 22 2F 85         ld (Puntero_mov),hl                                            ; (Puntero_mov) situado el el 1er .db de la siguiente cadena de movimiento.
-116+  9171 18 DF            jr 11B
-117+  9173
-118+  9173              ; ---------- --------- --------- ---------- ----------
-119+  9173              ;
-120+  9173              ;   11/8/22
-121+  9173              ;
-122+  9173              ;   Prepara_Puntero_mov
-123+  9173
-124+  9173 E5           Prepara_Puntero_mov push hl
-125+  9174 D5               push de
-126+  9175 2A 2D 85         ld hl,(Puntero_indice_mov)
-127+  9178 5E               ld e,(hl)
-128+  9179 23               inc hl
-129+  917A 56               ld d,(hl)
-130+  917B EB               ex de,hl
-131+  917C 22 2F 85         ld (Puntero_mov),hl
-132+  917F D1               pop de
-133+  9180 E1               pop hl
-134+  9181 C9               ret
-135+  9182
-136+  9182              ; ---------- --------- --------- ---------- ----------
-137+  9182              ;
-138+  9182              ;   11/8/22
-139+  9182              ;
-140+  9182              ;   Reinicia_el_movimiento
-141+  9182
-142+  9182 CD 73 91     Reinicia_el_movimiento call Prepara_Puntero_mov
-143+  9185 AF               xor a
-144+  9186 32 31 85         ld (Contador_db_mov),a
-145+  9189 32 32 85         ld (Incrementa_puntero),a
-146+  918C
-147+  918C              ;    jr $
-148+  918C
-149+  918C C3 F1 90         jp Movimiento
-150+  918F C9               ret
-151+  9190              ; ---------- --------- --------- ---------- ----------
-152+  9190
-153+  9190
-154+  9190
-155+  9190
-156+  9190
-157+  9190
-158+  9190
-159+  9190
-160+  9190
-161+  9190
-162+  9190
-163+  9190
-164+  9190
-165+  9190
-166+  9190
-167+  9190
-168+  9190
-169+  9190
+ 33+  90D7 21 1F 1F 1F  Izquierda_y_derecha db 33,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111
+ 33+  90DB 1F 1F 1F 1F
+ 34+  90DF 1F 1F 1F 1F      db %00011111,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111
+ 34+  90E3 1F 1F 1F 1F
+ 34+  90E7 1F
+ 35+  90E8 2F 2F 2F 2F      db %00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111
+ 35+  90EC 2F 2F 2F 2F
+ 35+  90F0 2F 2F
+ 36+  90F2 2F 2F 2F 2F      db %00101111,%00101111,%00101111,%00101111,%00101111,%00101111,0
+ 36+  90F6 2F 2F 00
+ 37+  90F9
+ 38+  90F9
+ 39+  90F9              ; ----- ----- ----- ----- -----
+ 40+  90F9
+ 41+  90F9 D7 90        Indice_mov_Izquierda_y_derecha defw Izquierda_y_derecha
+ 42+  90FB D3 90        Indice_mov_Derecha_e_izquierda defw Derecha_e_izquierda
+ 43+  90FD 90 90        Indice_mov_Izquierda defw Izquierda
+ 44+  90FF 8D 90        Indice_mov_Derecha defw Derecha
+ 45+  9101 8A 90        Indice_mov_Abajo defw Abajo
+ 46+  9103 87 90        Indice_mov_Arriba defw Arriba
+ 47+  9105 C4 90        Indice_mov_Escaloncitos_derecha_arriba defw Escaloncitos_derecha_arriba
+ 48+  9107 C8 90        Indice_mov_Escaloncitos_derecha_abajo defw Escaloncitos_derecha_abajo
+ 49+  9109 C0 90        Indice_mov_Escaloncitos_izquierda_arriba defw Escaloncitos_izquierda_arriba
+ 50+  910B CD 90        Indice_mov_Escaloncitos_izquierda_abajo defw Escaloncitos_izquierda_abajo
+ 51+  910D 93 90        Indice_mov_Onda_senoidal defw Onda_senoidal
+ 52+  910F              ; ----- ----- ----- ----- -----
+ 53+  910F
+ 54+  910F 3A 31 85     Movimiento ld a,(Contador_db_mov)                               ; Hemos iniciado la cadena de movimiento ?. Si (Contador_db_mov) aún es "0" hay que inicializarlo._
+ 55+  9112 A7               and a                                                       ; _Para hacerlo, hemos de fijar antes (Puntero_mov).
+ 56+  9113 28 02            jr z,1F
+ 57+  9115 18 13            jr Decoder                                                  ; Saltamos a [Decoder] si ya hemos iniciado la cadena.
+ 58+  9117 3A 32 85     1 ld a,(Incrementa_puntero)                                     ; Vamos a inicializar las variables de movimiento. El contador (Incrementa_puntero) es un byte que inicialmente está a "0"._
+ 59+  911A C6 02            add 2                                                       ; _va incrementando su valor en 2 unidades cada vez que iniciamos una cadena. Se utiliza para ir incrementando (Puntero_mov)_
+ 60+  911C 32 32 85         ld (Incrementa_puntero),a                                   ; _ por el índice de cadenas de movimiento correspondiente. Su valor se restablecerá a "0" cuando encontremos
+ 61+  911F              ;                                                               ; _ el .db0. (Indica que hemos terminado de leer la secuencia de movimiento completa de la entidad).
+ 62+  911F 2A 2F 85         ld hl,(Puntero_mov)
+ 63+  9122 7E               ld a,(hl)
+ 64+  9123 32 31 85         ld (Contador_db_mov),a                                      ; Contador de bytes de la cadena inicializado. (El 1er byte de cada cadena de mov. indica el nº de bytes de_
+ 65+  9126 23               inc hl                                                      ; _movimiento que hemos de ejecutar).
+ 66+  9127 22 2F 85         ld (Puntero_mov),hl                                         ; Situamos (Puntero_mov) en el 1er byte de instrucciones.
+ 67+  912A
+ 68+  912A 3A 33 85     Decoder ld a,(Repetimos_db)
+ 69+  912D A7               and a
+ 70+  912E 20 0C            jr nz,12F
+ 71+  9130 2A 2F 85         ld hl,(Puntero_mov)
+ 72+  9133 7E               ld a,(hl)
+ 73+  9134 A7               and a
+ 74+  9135 28 69            jr z, Reinicia_el_movimiento                              ; Hemos terminado de ejecutar todas las cadenas de movimiento. Llamamos a [Fin_de_movimiento].
+ 75+  9137 E6 0F            and $0f
+ 76+  9139 32 33 85         ld (Repetimos_db),a                                         ; Si la variable de repetición de .db es "0" hemos de inicializar dicha variable antes de empezar con la decodificación del .db de_
+ 77+  913C              ;                                                               ; _movimiento. Este valor lo proporciona el nibble `bajo´ del byte.
+ 78+  913C 2A 2F 85     12 ld hl,(Puntero_mov)
+ 79+  913F CB 7E            bit 7,(hl)
+ 80+  9141 28 03            jr z,2F
+ 81+  9143 CD 46 8D         call Mov_down
+ 82+  9146 2A 2F 85     2 ld hl, (Puntero_mov)
+ 83+  9149 CB 76            bit 6,(hl)
+ 84+  914B 28 03            jr z,3F
+ 85+  914D CD 74 8D         call Mov_up
+ 86+  9150 2A 2F 85     3 ld hl, (Puntero_mov)
+ 87+  9153 CB 6E            bit 5,(hl)
+ 88+  9155 28 03            jr z,4F
+ 89+  9157 CD A2 8D         call Mov_right
+ 90+  915A 2A 2F 85     4 ld hl, (Puntero_mov)
+ 91+  915D CB 66            bit 4,(hl)
+ 92+  915F 28 03            jr z,5F
+ 93+  9161 CD C0 8E         call Mov_left
+ 94+  9164
+ 95+  9164              ; ---------- --------- --------- ---------- ----------
+ 96+  9164
+ 97+  9164 3A 33 85     5 ld a,(Repetimos_db)
+ 98+  9167 A7               and a
+ 99+  9168 28 07            jr z,6F
+100+  916A 3D               dec a
+101+  916B 32 33 85         ld (Repetimos_db),a
+102+  916E 28 01            jr z,6f
+103+  9170 C9           11 ret
+104+  9171 21 31 85     6 ld hl,Contador_db_mov
+105+  9174 35               dec (hl)                                                       ; Decrementamos el contador de .db de la cadena, (pués ya hemos ejecutado un byte de la misma).
+106+  9175 2A 2F 85         ld hl,(Puntero_mov)                                            ; No repetimos el mismo byte. Incrementamos (Puntero_mov) y salimos.
+107+  9178 23               inc hl
+108+  9179 22 2F 85         ld (Puntero_mov),hl
+109+  917C 18 F2            jr 11B
+110+  917E 2A 2D 85     7 ld hl,(Puntero_indice_mov)                                       ; PASAMOS A LA CADENA SIGUIENTE !!!!!!
+111+  9181 3A 32 85         ld a,(Incrementa_puntero)
+112+  9184 47               ld b,a
+113+  9185 23           8 inc hl
+114+  9186 10 FD            djnz 8B                                                        ; Indice_patrones_coracao +2, +4, +6, etc...
+115+  9188 5E               ld e,(hl)
+116+  9189 23               inc hl
+117+  918A 56               ld d,(hl)
+118+  918B EB               ex de,hl
+119+  918C 22 2F 85         ld (Puntero_mov),hl                                            ; (Puntero_mov) situado el el 1er .db de la siguiente cadena de movimiento.
+120+  918F 18 DF            jr 11B
+121+  9191
+122+  9191              ; ---------- --------- --------- ---------- ----------
+123+  9191              ;
+124+  9191              ;   11/8/22
+125+  9191              ;
+126+  9191              ;   Prepara_Puntero_mov
+127+  9191
+128+  9191 E5           Prepara_Puntero_mov push hl
+129+  9192 D5               push de
+130+  9193 2A 2D 85         ld hl,(Puntero_indice_mov)
+131+  9196 5E               ld e,(hl)
+132+  9197 23               inc hl
+133+  9198 56               ld d,(hl)
+134+  9199 EB               ex de,hl
+135+  919A 22 2F 85         ld (Puntero_mov),hl
+136+  919D D1               pop de
+137+  919E E1               pop hl
+138+  919F C9               ret
+139+  91A0
+140+  91A0              ; ---------- --------- --------- ---------- ----------
+141+  91A0              ;
+142+  91A0              ;   11/8/22
+143+  91A0              ;
+144+  91A0              ;   Reinicia_el_movimiento
+145+  91A0
+146+  91A0 CD 91 91     Reinicia_el_movimiento call Prepara_Puntero_mov
+147+  91A3 AF               xor a
+148+  91A4 32 31 85         ld (Contador_db_mov),a
+149+  91A7 32 32 85         ld (Incrementa_puntero),a
+150+  91AA
+151+  91AA              ;    jr $
+152+  91AA
+153+  91AA C3 0F 91         jp Movimiento
+154+  91AD C9               ret
+155+  91AE              ; ---------- --------- --------- ---------- ----------
+156+  91AE
+157+  91AE
+158+  91AE
+159+  91AE
+160+  91AE
+161+  91AE
+162+  91AE
+163+  91AE
+164+  91AE
+165+  91AE
+166+  91AE
+167+  91AE
+168+  91AE
+169+  91AE
+170+  91AE
+171+  91AE
+172+  91AE
+173+  91AE
 # file closed: Patrones_de_mov.asm
-741   9190              	include "Guarda_foto_registros.asm"
+762   91AE              	include "Guarda_foto_registros.asm"
 # file opened: Guarda_foto_registros.asm
-  1+  9190              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  2+  9190              ;
-  3+  9190              ;	3/1/23
-  4+  9190              ;
-  5+  9190              ;	Instrucciones donde interviene el Stack Pointer, (SP).
-  6+  9190
-  7+  9190              ;	ADC HL,SP	LD (addr),SP
-  8+  9190              ;	ADD HL,SP	LD SP,(addr)
-  9+  9190              ;	ADD IX,SP	LD SP,nn
- 10+  9190              ; 	ADD IY,SP	LD SP,HL
- 11+  9190              ;				LD SP,IX
- 12+  9190              ;	DEC SP		LD SP,IY
- 13+  9190
- 14+  9190              ;	EX (SP),HL
- 15+  9190              ;	EX (SP),IX
- 16+  9190              ;	EX (SP),IY
- 17+  9190
- 18+  9190              ;	INC SP
- 19+  9190
- 20+  9190
- 21+  9190                  org $7fa0
+  1+  91AE              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  2+  91AE              ;
+  3+  91AE              ;	3/1/23
+  4+  91AE              ;
+  5+  91AE              ;	Instrucciones donde interviene el Stack Pointer, (SP).
+  6+  91AE
+  7+  91AE              ;	ADC HL,SP	LD (addr),SP
+  8+  91AE              ;	ADD HL,SP	LD SP,(addr)
+  9+  91AE              ;	ADD IX,SP	LD SP,nn
+ 10+  91AE              ; 	ADD IY,SP	LD SP,HL
+ 11+  91AE              ;				LD SP,IX
+ 12+  91AE              ;	DEC SP		LD SP,IY
+ 13+  91AE
+ 14+  91AE              ;	EX (SP),HL
+ 15+  91AE              ;	EX (SP),IX
+ 16+  91AE              ;	EX (SP),IY
+ 17+  91AE
+ 18+  91AE              ;	INC SP
+ 19+  91AE
+ 20+  91AE
+ 21+  91AE                  org $7fa0
  22+  7FA0
  23+  7FA0              ;   (Stack_snapshot) se sitúa inicialmente en (Album_de_fotos)=$7000.
  24+  7FA0              ;   Almacenaremos los datos/registros necesarios de la siguiente manera:
@@ -3417,9 +3419,9 @@
  51+  7FC0
  52+  7FC0
 # file closed: Guarda_foto_registros.asm
-742   7FC0
-743   7FC0              	SAVESNA "Pruebas.sna", START
-744   7FC0
-745   7FC0
-746   7FC0
+763   7FC0
+764   7FC0              	SAVESNA "Pruebas.sna", START
+765   7FC0
+766   7FC0
+767   7FC0
 # file closed: Banco_de_pruebas.asm
