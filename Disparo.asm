@@ -31,9 +31,31 @@ Calcula_punto_de_disparo_inicial
 
 1 jr z,3F
 
-; Estamos en el 1er cuadrante de pantalla.
+; 1er CUAD. ----- ----- ----- ----- -----
+;
+;	En el 1er y 2º cuadrante de pantalla, sólo cabe la posibilidad de que sea una entidad la que dispare,_
+;	_ por lo tanto siempre se iniciara el disparo en la parte `baja´ del sprite.
 
-    jr $
+	ld hl,(Posicion_actual)
+	call NextScan
+	    
+; Ahora HL apunta una FILA por debajo de (Posicion_actual).
+
+    ld a,(CTRL_DESPLZ)
+    and a
+    jr z, 1F
+
+; (CTRL_DESPLZ)="0".
+
+1 dec hl
+	push hl
+	pop ix										; IX contiene el puntero de impresión.
+
+
+
+
+
+
 
 ; Estamos en el 2º cuadrante de pantalla.
 

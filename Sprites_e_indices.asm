@@ -6,6 +6,21 @@
 
 	org $8000
 
+; Disparo (CTRL_DESPLZ)="0".
+; 2 Columnas, 2 Scanline.
+Disparo_0 DEFB $01,$80,$01,$80
+
+; Disparo (CTRL_DESPLZ)="f9"
+; 3 Columnas, 2 Scanline.
+
+Disparo_f9 DEFB $
+
+
+
+
+
+
+
 ; Badsat_izq. 2x2.
 
 Indice_Badsat_izq defw Badsat_izquierda
