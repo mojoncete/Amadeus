@@ -17,7 +17,7 @@
 ; ----- ----- ----- ----- -----
 
 	include "Sprites_e_indices.asm"
-	include "Entidades.asm"
+	include "Entidades_y_disparos.asm"
 
 ; ******************************************************************************************************************************************************************************************
 ; Constantes. 
@@ -702,7 +702,7 @@ Movimiento_Amadeus
 	ld a,$f7												; "5" para disparar.
 	in a,($fe)
 	and $10
-	call z,Calcula_punto_de_disparo_inicial
+	call z,Genera_disparo
     ret
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -713,7 +713,7 @@ Detecta_disparo_entidad
 	in a,($fe)
 	and 1
 	ret nz
-	call Calcula_punto_de_disparo_inicial
+	call Genera_disparo
 
 ; Pinta indicadores de FILAS. ------------------------------------------------------
 

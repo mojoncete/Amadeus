@@ -1,25 +1,30 @@
 ; ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
-;	3/12/22
+;	17/02/23
 ;
 ;	Sprites e índices.
 
 	org $8000
 
+; Disparo.
+;
+; Constan de 2Columns y 2scanlines. 
+
+Indice_disparo defw Disparo_0
+	defw Disparo_f9
+	defw Disparo_fb
+	defw Disparo_fd
+
 ; Disparo (CTRL_DESPLZ)="0".
-; 2 Columnas, 2 Scanline.
 Disparo_0 DEFB $01,$80,$01,$80
-
 ; Disparo (CTRL_DESPLZ)="f9"
-; 3 Columnas, 2 Scanline.
+Disparo_f9 DEFB $60,$00,$60,$00
+; Disparo (CTRL_DESPLZ)="fb" 
+Disparo_fb DEFW $18,$00,$18,$00
+; Disparo (CTRL_DESPLZ)="fd" 
+Disparo_fd DEFW $06,$00,$06,$00
 
-Disparo_f9 DEFB $
-
-
-
-
-
-
+; ----------------------------------------------------------------------------------------
 
 ; Badsat_izq. 2x2.
 
@@ -86,7 +91,6 @@ Badsat_izq_fe DEFB $00,$00,$10,$00,$04,$28,$00,$04
 	DEFB	$C0,$00,$A8,$80,$01,$54,$80,$00
 	DEFB	$A8,$80,$00,$50,$00,$00,$20,$00 ; $Fe (1er DESPLZ a izquierda).
 
-; ----------------------------------------------------------------------------------------
 
 Indice_Badsat_der defw Badsat_derecha
 	defw Badsat_der_f8
@@ -151,6 +155,8 @@ Badsat_der_fe DEFB $00,$20,$00,$00,$50,$80,$00,$A8
 	DEFB	$A8,$00,$04,$54,$00,$04,$AA,$00
 	DEFB	$04,$54,$00,$00,$28,$00,$00,$10 ; $Fe (7º DESPLZ a derecha).
 
+; ----------------------------------------------------------------------------------------
+
 ; Amadeus. 2x2.
 
 Indice_Amadeus_der defw Amadeus
@@ -196,3 +202,5 @@ Amadeus_Fd DEFB	$00,$06,$00,$00,$8F,$10,$00,$99
 	DEFB	$03,$9F,$9C,$03,$CF,$3C,$03,$DF
 	DEFB	$BC,$03,$FF,$FC,$03,$EF,$7C,$03
 	DEFB	$EF,$7C,$02,$2F,$44,$01,$C6,$38 ; $Fd (6º DESPLZ a derecha).
+
+; ----------------------------------------------------------------------------------------

@@ -7,7 +7,7 @@
 ; 	Calcula la dirección de memoria de pantalla donde se va a iniciar el disparo, (se aplica a_)
 ;   _entidades y Amadeus).
 
-Calcula_punto_de_disparo_inicial
+Genera_disparo
 
     ld a,(Cuad_objeto)
     cp 2
@@ -35,6 +35,8 @@ Calcula_punto_de_disparo_inicial
 ;
 ;	En el 1er y 2º cuadrante de pantalla, sólo cabe la posibilidad de que sea una entidad la que dispare,_
 ;	_ por lo tanto siempre se iniciara el disparo en la parte `baja´ del sprite.
+;   La dirección del proyectil siempre será hacia abajo. En los cuadrante 1º y 2º no se comprueba colision_
+;   _ pues sabemos que Amadeus sólo puede estar situado en los cuadrantes 3º y 4º.
 
 	ld hl,(Posicion_actual)
 	call NextScan
@@ -43,11 +45,11 @@ Calcula_punto_de_disparo_inicial
 
     ld a,(CTRL_DESPLZ)
     and a
-    jr z, 1F
+    jr z,1F
 
 ; (CTRL_DESPLZ)="0".
 
-1 dec hl
+1 ld 
 	push hl
 	pop ix										; IX contiene el puntero de impresión.
 

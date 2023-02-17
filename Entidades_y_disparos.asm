@@ -1,7 +1,70 @@
 
 ; Base de datos de entidades e Índice.
 ;
-; 31/01/23
+; 17/02/23
+
+Indice_de_disparos defw Disparo_1
+	defw Disparo_2
+	defw Disparo_3
+	defw Disparo_4
+	defw Disparo_5
+	defw Disparo_6
+	defw Disparo_7
+	defw Disparo_8
+	defw Disparo_9
+	defw Disparo_10
+
+Disparo_1 db 0,0									; Impacto / Dirección.
+	defw 0											; Puntero de_impresión.
+	defw 0											; Puntero objeto.
+	defw 0											; Rutina de impresión.										
+
+Disparo_2 db 0,0									; Impacto / Dirección.
+	defw 0											; Puntero de_impresión.
+	defw 0											; Puntero objeto.
+	defw 0											; Rutina de impresión.			
+
+Disparo_3 db 0,0									; Impacto / Dirección.
+	defw 0											; Puntero de_impresión.
+	defw 0											; Puntero objeto.
+	defw 0											; Rutina de impresión.										
+
+Disparo_4 db 0,0									; Impacto / Dirección.
+	defw 0											; Puntero de_impresión.
+	defw 0											; Puntero objeto.
+	defw 0											; Rutina de impresión.	
+
+Disparo_5 db 0,0									; Impacto / Dirección.
+	defw 0											; Puntero de_impresión.
+	defw 0											; Puntero objeto.
+	defw 0											; Rutina de impresión.										
+
+Disparo_6 db 0,0									; Impacto / Dirección.
+	defw 0											; Puntero de_impresión.
+	defw 0											; Puntero objeto.
+	defw 0											; Rutina de impresión.			
+
+Disparo_7 db 0,0									; Impacto / Dirección.
+	defw 0											; Puntero de_impresión.
+	defw 0											; Puntero objeto.
+	defw 0											; Rutina de impresión.										
+
+Disparo_8 db 0,0									; Impacto / Dirección.
+	defw 0											; Puntero de_impresión.
+	defw 0											; Puntero objeto.
+	defw 0											; Rutina de impresión.	
+
+Disparo_9 db 0,0									; Impacto / Dirección.
+	defw 0											; Puntero de_impresión.
+	defw 0											; Puntero objeto.
+	defw 0											; Rutina de impresión.										
+
+Disparo_10 db 0,0									; Impacto / Dirección.
+	defw 0											; Puntero de_impresión.
+	defw 0											; Puntero objeto.
+	defw 0											; Rutina de impresión.	
+
+; -------------------------------------------------------------------------------------
 
 Indice_de_entidades									; 58 Bytes por entidad.
 
