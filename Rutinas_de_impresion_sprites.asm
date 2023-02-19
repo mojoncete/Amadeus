@@ -25,6 +25,9 @@ Indice_entidades_incompletas_derecha defw Pinta_enemigo_2x2_derecha
 
 Pinta_Amadeus_2x2 ld (Stack),sp
 	ld sp,iy
+ 
+; >>> 
+ 
     ld b,16
 1 pop de
     ld a,e
@@ -121,6 +124,9 @@ Pinta_Amadeus_3x2 ld (Stack),sp
 
 Pinta_enemigo_2x2_izquierda ld (Stack),sp
 	ld sp,iy
+
+; >>>
+
     ld b,16
 1 pop de
 	ld a,d
@@ -147,6 +153,9 @@ Pinta_enemigo_2x2_izquierda ld (Stack),sp
 
 Pinta_enemigo_2x2_derecha ld (Stack),sp
 	ld sp,iy
+
+; >>>
+
     ld b,16
 1 pop de
 	ld a,e

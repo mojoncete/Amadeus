@@ -78,8 +78,8 @@ Indice_Sprite_izq defw Indice_Badsat_izq
 Puntero_DESPLZ_der defw 0
 Puntero_DESPLZ_izq defw 0
 
-Posicion_inicio defw $473e								; Dirección de pantalla donde aparece el objeto. [DRAW].
-Cuad_objeto db 2			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+Posicion_inicio defw $4721								; Dirección de pantalla donde aparece el objeto. [DRAW].
+Cuad_objeto db 1			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
 ; Variables de objeto. (Características).
 
@@ -252,6 +252,10 @@ Frame
     ld a,1
     out ($fe),a
 
+	call Genera_disparo
+
+	jr $
+	
 ; ----------------------------------------------------------------------
 
 	ld hl,Album_de_fotos
