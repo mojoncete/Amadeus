@@ -78,8 +78,8 @@ Indice_Sprite_izq defw Indice_Badsat_izq
 Puntero_DESPLZ_der defw 0
 Puntero_DESPLZ_izq defw 0
 
-Posicion_inicio defw $4721								; Dirección de pantalla donde aparece el objeto. [DRAW].
-Cuad_objeto db 1			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+Posicion_inicio defw $473e								; Dirección de pantalla donde aparece el objeto. [DRAW].
+Cuad_objeto db 2			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
 ; Variables de objeto. (Características).
 
@@ -149,6 +149,7 @@ Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta column
 
 
 ; Variables de funcionamiento, (No incluidas en base de datos de entidades), a partir de aquí!!!!!
+
 ; Gestión de ENTIDADES.
 
 Puntero_store_entidades defw 0
@@ -167,6 +168,12 @@ Stack_2 defw 0											; 2º variable destinada a almacenar el puntero de pila
 Stack_snapshot defw Album_de_fotos						; Puntero que indica la posición de memoria donde vamos a guardar_
 ;														; _el snapshot de los registros de la siguiente entidad.
 ;														; Inicialmente está situado el la posición $7000, Album_de_fotos.
+
+; Gestión de Disparos.
+
+Stack_guns defw Indice_de_disparos						; Este puntero se irá desplazando por el índice de disparos_
+;														; _a medida que estos se van creando. Se sitúa en el siguiente_
+;														; _campo "vacio" del índice para alojar un nuevo disparo.
 
 ; Gestión de FRAMES.
 
@@ -252,9 +259,9 @@ Frame
     ld a,1
     out ($fe),a
 
-	call Genera_disparo
+;	call Genera_disparo
 
-	jr $
+;	jr $
 	
 ; ----------------------------------------------------------------------
 
@@ -711,13 +718,14 @@ Movimiento_Amadeus
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
-Detecta_disparo_entidad
+;	Rutina provisional.
 
-	ld a,$7f
+Detecta_disparo_entidad	ld a,$7f
 	in a,($fe)
 	and 1
 	ret nz
 	call Genera_disparo
+	ret
 
 ; Pinta indicadores de FILAS. ------------------------------------------------------
 
