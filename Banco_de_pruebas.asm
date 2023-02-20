@@ -253,7 +253,7 @@ Frame
 ; He de imprimir sólo el nº de fotos que he hecho. Sólo BORRAMOS/PINTAMOS los objetos que se han desplazado.
 ; Necesito calcular nª de malotes, para ello utilizaré (Stack_snapshot)-(Album_de_fotos).
 
-    ld a,7
+    ld a,2
     out ($fe),a
 	call Extrae_foto_registros 							; Pintamos el fotograma anterior.
     ld a,1
@@ -314,7 +314,7 @@ Frame
 	call Restore_Primera_entidad
 	call Calcula_numero_de_malotes 
 
-	ld a,0
+	ld a,4
 	out ($fe),a  
 	ret
 

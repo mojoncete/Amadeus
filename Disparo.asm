@@ -98,6 +98,7 @@ Genera_disparo
 
     ld c,1                                          ; Dirección "1", hacia arriba.                        
     call PreviousScan
+    call PreviousScan
     dec hl                                          ; Puntero de impresión en HL.                                       
     jr 10F
 
@@ -111,7 +112,7 @@ Genera_disparo
 ; Ahora HL apunta una FILA por debajo de (Posicion_actual).
 
     dec hl                                          ; Puntero de impresión en HL.
-10 call Comprueba_Colision                         ; Retorna "1" o "0" en B indicando si se produce Colisión
+10 call Comprueba_Colision                          ; Retorna "1" o "0" en B indicando si se produce Colisión
 ;                                                   ; _al generar el disparo.
 
 ; LLegados a este punto tendremos:
@@ -126,8 +127,52 @@ Genera_disparo
     
 
 ; Estamos en el 4º cuadrante de pantalla.
+; 4º CUAD. ----- ----- ----- ----- -----
+;
+;	En el 3er y 4º cuadrante de pantalla, cabe la posibilidad de que sea una entidad o Amadeus el que dispara.
+;	En función del elemento que dispare variara el Puntero_de_impresión y su `Dirección'.
+;   En estos cuadrantes también es posible que se genere `Colisión', hay que comprobarlo.
 
-4 jr $
+4 ld hl,(Posicion_actual)
+
+;   Compruebo si el disparo lo efectúa Amadeus o una entidad para poder calcular el puntero de impresión.
+
+    ld a,(Ctrl_0)
+    bit 6,a
+    jr z,11F
+
+; Dispara Amadeus.
+
+    ld c,1                                          ; Dirección "1", hacia arriba.                        
+    call PreviousScan
+    call PreviousScan
+    jr 14F
+ 
+; Dispara Entidad.
+
+11 ld c,0                                            ; Dirección "0", hacia abajo.
+    ld b,8
+12 call NextScan
+    djnz 12B
+
+; Ahora HL apunta una FILA por debajo de (Posicion_actual).
+
+14 ld a,(CTRL_DESPLZ)
+    and a
+    jr z,13F
+    dec hl                                          ; Puntero de impresión en HL.
+13 call Comprueba_Colision                          ; Retorna "1" o "0" en B indicando si se produce Colisión
+;                                                   ; _al generar el disparo.
+
+; LLegados a este punto tendremos:
+;
+;       Puntero_objeto_disparo en IY.
+;       Rutinas_de_impresion en IX.
+;       Puntero_de_impresion en HL.
+;       Impacto/Dirección en BC.
+
+    call Almacena_disparo                      
+    jr 6F                                           ; RET.
 
 ; Estamos en la mitad superior de pantalla, (cuadrantes 1 y 2).
 
@@ -174,7 +219,7 @@ Genera_disparo
     ld a,(CTRL_DESPLZ)
     and a
     jr z,7F
-    inc hl
+    dec hl
 7 ld bc,0                                         ; Impacto,(B)="0". Dirección,(C)="0".
 
 ; LLegados a este punto tendremos:
@@ -194,9 +239,44 @@ Almacena_disparo
     ret
 
 ; ----------------------------------------------------------------
+;
+;   20/02/23
 
-Comprueba_Colision
+Comprueba_Colision push hl
+    ld e,0                                         ; E,(Impacto)="0".
+    call Bucle_2                                   ; Comprobamos el 1er scanline.
 
-    ld b,0
+    inc e
+    dec e
+    jr z,1F                                        ; Si no se produce impacto comprobamos el 2º scanline.
 
-    ret
+; Hay impacto.
+
+2 ld b,e
+    pop hl                                         ; Puntero de impresión en HL e indicador de Impacto en B.
+3 ret                                            
+
+1 pop hl
+    push hl
+    call NextScan
+    call Bucle_2
+    jr 2B
+
+; ---------- ----------
+
+Bucle_2 ld b,2 
+2 ld a,(hl)
+    and a
+    jr nz,1F
+    inc hl
+    djnz 2B
+3 ret
+1 ld e,1
+    jr 3B
+
+; -------------------------------------------------------------------------------------------------------------
+
+
+  
+
+ 
