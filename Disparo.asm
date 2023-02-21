@@ -105,7 +105,7 @@ Genera_disparo
 ; Dispara Entidad.
 
 8 ld c,0                                            ; Dirección "0", hacia abajo.
-    ld b,8
+    ld b,16
 9 call NextScan
     djnz 9B
 
@@ -151,7 +151,7 @@ Genera_disparo
 ; Dispara Entidad.
 
 11 ld c,0                                            ; Dirección "0", hacia abajo.
-    ld b,8
+    ld b,16
 12 call NextScan
     djnz 12B
 

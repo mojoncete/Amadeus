@@ -259,10 +259,6 @@ Frame
     ld a,1
     out ($fe),a
 
-;	call Genera_disparo
-
-;	jr $
-	
 ; ----------------------------------------------------------------------
 
 	ld hl,Album_de_fotos
@@ -278,16 +274,17 @@ Frame
 	ld a,(Ctrl_0)
 	bit 4,a
 	jr z,1F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
-    call Guarda_foto_entidad_a_pintar					; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!!!
 
 ; Voy a utilizar una rutina de lectura de teclado para disparar con cualquier entidad.
+; Las entidades sólo generan disparo cuando se mueven.
 ; 16/02/23.
 ; [[[
-1 call Detecta_disparo_entidad
+	call Detecta_disparo_entidad
 ; ]]]
 
-;1
-	ld hl,Ctrl_0
+	call Guarda_foto_entidad_a_pintar					; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!
+
+1 ld hl,Ctrl_0
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
 	xor a
 	ld (Obj_dibujado),a
