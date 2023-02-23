@@ -174,6 +174,10 @@ Stack_snapshot defw Album_de_fotos						; Puntero que indica la posición de mem
 Stack_guns defw Indice_de_disparos						; Este puntero se irá desplazando por el índice de disparos_
 ;														; _a medida que estos se van creando. Se sitúa en el siguiente_
 ;														; _campo "vacio" del índice para alojar un nuevo disparo.
+Puntero_DESPLZ_IND_DISPARO defw 0
+
+
+
 
 ; Gestión de FRAMES.
 
@@ -235,6 +239,8 @@ START ld sp,$ffff										 ; Situamos el inicio de Stack.
 	call Store_Amadeus
 
 ; Volvemos a situar los punteros STORE/RESTORE de entidades en la 1ª entidad.
+
+	call Inicia_Puntero_Disparo
 
 	call Inicia_punteros_de_entidades 
 	call Restore_Primera_entidad
@@ -447,6 +453,16 @@ Inicia_punteros_de_entidades
 	call Extrae_address
 	ld (Puntero_restore_entidades),hl
     ret
+
+; *************************************************************************************************************************************************************
+;
+; 8/1/23
+;
+;	Inicializamos (Puntero_DESPLZ_IND_DISPARO).
+
+Inicia_Puntero_Disparo ld hl,Indice_de_disparos
+	ld (Puntero_DESPLZ_IND_DISPARO),hl
+	ret
 
 ; -------------------------------------------------------------------------------------------------------------
 ;

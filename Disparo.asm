@@ -233,8 +233,40 @@ Genera_disparo
 6 ret
 
 ; ----------------------------------------------------------------
+;
+;   23/02/23
 
 Almacena_disparo 
+
+    push hl                                                                             
+    pop af                                          ; Puntero_de_impresion en AF.
+
+    ld hl,(Puntero_DESPLZ_IND_DISPARO)
+    inc hl
+    inc hl
+    ld (Puntero_DESPLZ_IND_DISPARO),hl              ; El (Puntero_DESPLZ_IND_DISPARO) ya apunta al siguiente_
+;                                                   ; _ Disparo_(+1).        
+    call Extrae_address                             ; HL contiene la dirección donde vamos a almacenar_
+
+
+;                                                   ; _ los 8 bytes que definen el disparo:                                                  
+;
+;                                                     Puntero_objeto_disparo en IY.
+;                                                     Rutinas_de_impresion en IX.
+;                                                     Puntero_de_impresion en HL.
+;                                                     Impacto/Dirección en BC. 
+    ld (Stack),sp                                   ; Guardo SP en (Stack).)
+    ld sp,hl
+    
+    push ix
+    push af
+    push iy
+    push bc
+ 
+    ld sp,(Stack)
+
+    jr $
+
 
     ret
 
@@ -245,17 +277,13 @@ Almacena_disparo
 Comprueba_Colision push hl
     ld e,0                                         ; E,(Impacto)="0".
     call Bucle_2                                   ; Comprobamos el 1er scanline.
-
     inc e
     dec e
     jr z,1F                                        ; Si no se produce impacto comprobamos el 2º scanline.
-
 ; Hay impacto.
-
 2 ld b,e
     pop hl                                         ; Puntero de impresión en HL e indicador de Impacto en B.
 3 ret                                            
-
 1 pop hl
     push hl
     call NextScan
