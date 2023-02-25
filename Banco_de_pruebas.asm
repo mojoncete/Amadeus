@@ -171,11 +171,11 @@ Stack_snapshot defw Album_de_fotos						; Puntero que indica la posición de mem
 
 ; Gestión de Disparos.
 
-Stack_guns defw Indice_de_disparos						; Este puntero se irá desplazando por el índice de disparos_
+Stack_guns defw Indice_de_disparos_entidades			; Este puntero se irá desplazando por el índice de disparos_
 ;														; _a medida que estos se van creando. Se sitúa en el siguiente_
 ;														; _campo "vacio" del índice para alojar un nuevo disparo.
-Puntero_DESPLZ_IND_DISPARO defw 0
-
+Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
+Puntero_DESPLZ_DISPARO_AMADEUS defw 0
 
 
 
@@ -238,9 +238,13 @@ START ld sp,$ffff										 ; Situamos el inicio de Stack.
 	call Guarda_foto_registros
 	call Store_Amadeus
 
-; Volvemos a situar los punteros STORE/RESTORE de entidades en la 1ª entidad.
+; Iniciamos los punteros de los índices de las dos bases de datos de disparo, (Amadeus/Entidades).
 
-	call Inicia_Puntero_Disparo
+	call Inicia_Puntero_Disparo_Entidades
+	call Inicia_Puntero_Disparo_Amadeus
+
+
+; Volvemos a situar los punteros STORE/RESTORE de entidades en la 1ª entidad.
 
 	call Inicia_punteros_de_entidades 
 	call Restore_Primera_entidad
@@ -458,10 +462,13 @@ Inicia_punteros_de_entidades
 ;
 ; 8/1/23
 ;
-;	Inicializamos (Puntero_DESPLZ_IND_DISPARO).
+;	Inicializamos los punteros de selección de los 2 índices de disparo, Amadeus y Entidades.
 
-Inicia_Puntero_Disparo ld hl,Indice_de_disparos
-	ld (Puntero_DESPLZ_IND_DISPARO),hl
+Inicia_Puntero_Disparo_Entidades ld hl,Indice_de_disparos_entidades
+	ld (Puntero_DESPLZ_DISPARO_ENTIDADES),hl
+	ret
+Inicia_Puntero_Disparo_Amadeus ld hl,Indice_de_disparos_Amadeus
+	ld (Puntero_DESPLZ_DISPARO_AMADEUS),hl
 	ret
 
 ; -------------------------------------------------------------------------------------------------------------
