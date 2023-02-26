@@ -1644,125 +1644,140 @@
 231+  8934              ;       Impacto/Dirección en BC.
 232+  8934
 233+  8934 CD 38 89         call Almacena_disparo
-234+  8937 C9           6 ret
-235+  8938
-236+  8938              ; ----------------------------------------------------------------
-237+  8938              ;
-238+  8938              ;   25/02/23
-239+  8938              ;
-240+  8938              ;   La Rutina va almacenando disparos en sus respectivas bases de datos.
-241+  8938              ;   Amadeus dispone de 2 disparos mientras que las entidades disponen de un máximo de 10.
-242+  8938
-243+  8938              Almacena_disparo
-244+  8938
-245+  8938 E5               push hl
-246+  8939 F1               pop af
-247+  893A 08               ex af,af                                        ; Puntero_de_impresion en AF'.
-248+  893B
-249+  893B 0C           3 inc c
-250+  893C 0D               dec c
-251+  893D 28 1A            jr z,1F                                         ; Según la `Dirección' del proyectil sabemos si_
-252+  893F              ;                                                   ; _ es Amadeus o una entidad la que dispara.
-253+  893F
-254+  893F              ; Dispara AMADEUS.
-255+  893F
-256+  893F C5               push bc
-257+  8940 01 F4 83         ld bc,Indice_de_disparos_Amadeus+4              ; Disparo_3A
-258+  8943 2A EA 85         ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
-259+  8946 A7               and a
-260+  8947 ED 42            sbc hl,bc
-261+  8949 CC 4B 87         call z,Inicia_Puntero_Disparo_Amadeus
-262+  894C C1               pop bc
-263+  894D 28 3B            jr z,4F
-264+  894F
-265+  894F 2A EA 85         ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
-266+  8952 23               inc hl
-267+  8953 23               inc hl
-268+  8954 22 EA 85         ld (Puntero_DESPLZ_DISPARO_AMADEUS),hl          ; (Puntero_DESPLZ_DISPARO_AMADEUS) ya apunta al siguiente_
-269+  8957              ;                                                   ; _ Disparo_(+1).
-270+  8957 18 18            jr 2F
-271+  8959
-272+  8959              ; Dispara una entidad.
-273+  8959
-274+  8959 C5           1 push bc
-275+  895A 01 1C 84         ld bc,Indice_de_disparos_entidades+20           ; Disparo_11
-276+  895D 2A E8 85         ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
-277+  8960 A7               and a
-278+  8961 ED 42            sbc hl,bc
-279+  8963 CC 44 87         call z,Inicia_Puntero_Disparo_Entidades
-280+  8966 C1               pop bc
-281+  8967 28 21            jr z,4F
-282+  8969
-283+  8969 2A E8 85         ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
-284+  896C 23               inc hl
-285+  896D 23               inc hl
-286+  896E 22 E8 85         ld (Puntero_DESPLZ_DISPARO_ENTIDADES),hl        ; El (Puntero_DESPLZ_IND_DISPARO) ya apunta al siguiente_
-287+  8971              ;                                                   ; _ Disparo_(+1).
-288+  8971 CD 69 87     2 call Extrae_address                               ; HL contiene la dirección donde vamos a almacenar_
-289+  8974              ;                                                   ; _ los 8 bytes que definen el disparo:
-290+  8974              ;
-291+  8974              ;                                                     Puntero_objeto_disparo en IY.
-292+  8974              ;                                                     Rutinas_de_impresion en IX.
-293+  8974              ;                                                     Puntero_de_impresion en HL.
-294+  8974              ;                                                     Impacto/Dirección en BC.
-295+  8974
-296+  8974 2B               dec hl                                          ; Esta parte de la rutina comprueba si este_
-297+  8975 7E               ld a,(hl)                                       ; _ almacén de disparo está vacio. Si no es así, saltamos_
-298+  8976 23               inc hl                                          ; _ al siguiente.
-299+  8977 A7               and a
-300+  8978 20 C1            jr nz,3B
-301+  897A
-302+  897A 08               ex af,af
-303+  897B ED 73 E0 85      ld (Stack),sp                                   ; Guardo SP en (Stack).)
-304+  897F F9               ld sp,hl
-305+  8980
-306+  8980 DD E5            push ix
-307+  8982 F5               push af
-308+  8983 FD E5            push iy
-309+  8985 C5               push bc
-310+  8986
-311+  8986 ED 7B E0 85      ld sp,(Stack)
-312+  898A
-313+  898A C9           4 ret
-314+  898B
-315+  898B              ; ----------------------------------------------------------------
-316+  898B              ;
-317+  898B              ;   20/02/23
-318+  898B
-319+  898B E5           Comprueba_Colision push hl
-320+  898C 1E 00            ld e,0                                         ; E,(Impacto)="0".
-321+  898E CD A2 89         call Bucle_2                                   ; Comprobamos el 1er scanline.
-322+  8991 1C               inc e
-323+  8992 1D               dec e
-324+  8993 28 03            jr z,1F                                        ; Si no se produce impacto comprobamos el 2º scanline.
-325+  8995              ; Hay impacto.
-326+  8995 43           2 ld b,e
-327+  8996 E1               pop hl                                         ; Puntero de impresión en HL e indicador de Impacto en B.
-328+  8997 C9           3 ret
-329+  8998 E1           1 pop hl
-330+  8999 E5               push hl
-331+  899A CD 96 8C         call NextScan
-332+  899D CD A2 89         call Bucle_2
-333+  89A0 18 F3            jr 2B
-334+  89A2
-335+  89A2              ; ---------- ----------
-336+  89A2
-337+  89A2 06 02        Bucle_2 ld b,2
-338+  89A4 7E           2 ld a,(hl)
-339+  89A5 A7               and a
-340+  89A6 20 04            jr nz,1F
-341+  89A8 23               inc hl
-342+  89A9 10 F9            djnz 2B
-343+  89AB C9           3 ret
-344+  89AC 1E 01        1 ld e,1
-345+  89AE 18 FB            jr 3B
-346+  89B0
-347+  89B0              ; -------------------------------------------------------------------------------------------------------------
-348+  89B0
-349+  89B0
-350+  89B0
-351+  89B0
-352+  89B0
+234+  8937
+235+  8937              ; Preparamos registros para llamar a [Guarda_foto_registros].
+236+  8937
+237+  8937              6
+238+  8937
+239+  8937              ;    push ix
+240+  8937              ;    pop hl
+241+  8937              ;    push af
+242+  8937              ;    pop ix
+243+  8937
+244+  8937
+245+  8937              ;    call Guarda_foto_registros
+246+  8937
+247+  8937              ;    jr $
+248+  8937
+249+  8937 C9               ret
+250+  8938
+251+  8938              ; ----------------------------------------------------------------
+252+  8938              ;
+253+  8938              ;   25/02/23
+254+  8938              ;
+255+  8938              ;   La Rutina va almacenando disparos en sus respectivas bases de datos.
+256+  8938              ;   Amadeus dispone de 2 disparos mientras que las entidades disponen de un máximo de 10.
+257+  8938
+258+  8938              Almacena_disparo
+259+  8938
+260+  8938 E5               push hl
+261+  8939 F1               pop af
+262+  893A 08               ex af,af                                        ; Puntero_de_impresion en AF'.
+263+  893B
+264+  893B 0C           3 inc c
+265+  893C 0D               dec c
+266+  893D 28 1A            jr z,1F                                         ; Según la `Dirección' del proyectil sabemos si_
+267+  893F              ;                                                   ; _ es Amadeus o una entidad la que dispara.
+268+  893F
+269+  893F              ; Dispara AMADEUS.
+270+  893F
+271+  893F C5               push bc
+272+  8940 01 F4 83         ld bc,Indice_de_disparos_Amadeus+4              ; Disparo_3A
+273+  8943 2A EA 85         ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
+274+  8946 A7               and a
+275+  8947 ED 42            sbc hl,bc
+276+  8949 CC 4B 87         call z,Inicia_Puntero_Disparo_Amadeus
+277+  894C C1               pop bc
+278+  894D 28 3B            jr z,4F
+279+  894F
+280+  894F 2A EA 85         ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
+281+  8952 23               inc hl
+282+  8953 23               inc hl
+283+  8954 22 EA 85         ld (Puntero_DESPLZ_DISPARO_AMADEUS),hl          ; (Puntero_DESPLZ_DISPARO_AMADEUS) ya apunta al siguiente_
+284+  8957              ;                                                   ; _ Disparo_(+1).
+285+  8957 18 18            jr 2F
+286+  8959
+287+  8959              ; Dispara una entidad.
+288+  8959
+289+  8959 C5           1 push bc
+290+  895A 01 1C 84         ld bc,Indice_de_disparos_entidades+20           ; Disparo_11
+291+  895D 2A E8 85         ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
+292+  8960 A7               and a
+293+  8961 ED 42            sbc hl,bc
+294+  8963 CC 44 87         call z,Inicia_Puntero_Disparo_Entidades
+295+  8966 C1               pop bc
+296+  8967 28 21            jr z,4F
+297+  8969
+298+  8969 2A E8 85         ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
+299+  896C 23               inc hl
+300+  896D 23               inc hl
+301+  896E 22 E8 85         ld (Puntero_DESPLZ_DISPARO_ENTIDADES),hl        ; El (Puntero_DESPLZ_IND_DISPARO) ya apunta al siguiente_
+302+  8971              ;                                                   ; _ Disparo_(+1).
+303+  8971 CD 69 87     2 call Extrae_address                               ; HL contiene la dirección donde vamos a almacenar_
+304+  8974              ;                                                   ; _ los 8 bytes que definen el disparo:
+305+  8974              ;
+306+  8974              ;                                                     Puntero_objeto_disparo en IY.
+307+  8974              ;                                                     Rutinas_de_impresion en IX.
+308+  8974              ;                                                     Puntero_de_impresion en HL.
+309+  8974              ;                                                     Impacto/Dirección en BC.
+310+  8974
+311+  8974 2B               dec hl                                          ; Esta parte de la rutina comprueba si este_
+312+  8975 7E               ld a,(hl)                                       ; _ almacén de disparo está vacio. Si no es así, saltamos_
+313+  8976 23               inc hl                                          ; _ al siguiente.
+314+  8977 A7               and a
+315+  8978 20 C1            jr nz,3B
+316+  897A
+317+  897A 08               ex af,af
+318+  897B ED 73 E0 85      ld (Stack),sp                                   ; Guardo SP en (Stack).)
+319+  897F F9               ld sp,hl
+320+  8980
+321+  8980 DD E5            push ix                                         ; Rutina de impresión.
+322+  8982 F5               push af                                         ; Puntero de impresión.
+323+  8983 FD E5            push iy                                         ; Puntero objeto.
+324+  8985 C5               push bc                                         ; Control.
+325+  8986
+326+  8986 ED 7B E0 85      ld sp,(Stack)
+327+  898A
+328+  898A C9           4 ret
+329+  898B
+330+  898B              ; ----------------------------------------------------------------
+331+  898B              ;
+332+  898B              ;   20/02/23
+333+  898B
+334+  898B E5           Comprueba_Colision push hl
+335+  898C 1E 00            ld e,0                                         ; E,(Impacto)="0".
+336+  898E CD A2 89         call Bucle_2                                   ; Comprobamos el 1er scanline.
+337+  8991 1C               inc e
+338+  8992 1D               dec e
+339+  8993 28 03            jr z,1F                                        ; Si no se produce impacto comprobamos el 2º scanline.
+340+  8995              ; Hay impacto.
+341+  8995 43           2 ld b,e
+342+  8996 E1               pop hl                                         ; Puntero de impresión en HL e indicador de Impacto en B.
+343+  8997 C9           3 ret
+344+  8998 E1           1 pop hl
+345+  8999 E5               push hl
+346+  899A CD 96 8C         call NextScan
+347+  899D CD A2 89         call Bucle_2
+348+  89A0 18 F3            jr 2B
+349+  89A2
+350+  89A2              ; ---------- ----------
+351+  89A2
+352+  89A2 06 02        Bucle_2 ld b,2
+353+  89A4 7E           2 ld a,(hl)
+354+  89A5 A7               and a
+355+  89A6 20 04            jr nz,1F
+356+  89A8 23               inc hl
+357+  89A9 10 F9            djnz 2B
+358+  89AB C9           3 ret
+359+  89AC 1E 01        1 ld e,1
+360+  89AE 18 FB            jr 3B
+361+  89B0
+362+  89B0              ; -------------------------------------------------------------------------------------------------------------
+363+  89B0
+364+  89B0
+365+  89B0
+366+  89B0
+367+  89B0
 # file closed: Disparo.asm
 787   89B0              	include "Draw_XOR.asm"
 # file opened: Draw_XOR.asm
@@ -3855,9 +3870,9 @@
  23+  7FA0              ;   (Stack_snapshot) se sitúa inicialmente en (Album_de_fotos)=$7000.
  24+  7FA0              ;   Almacenaremos los datos/registros necesarios de la siguiente manera:
  25+  7FA0              ;
- 26+  7FA0              ;   $7000 / 01 ..... Puntero de impresión de pantalla.
- 27+  7FA0              ;   $7002 / 03 ..... Dirección de mem. donde está alojada la correspondiente rutina de impresión.
- 28+  7FA0
+ 26+  7FA0              ;   $7000 / 01 ..... Puntero objeto.
+ 27+  7FA0              ;   $7002 / 03 ..... Puntero de impresion.
+ 28+  7FA0              ;   $7004 / 05 ..... Rutina de impresión.
  29+  7FA0
  30+  7FA0 ED 73 E0 85  Guarda_foto_registros ld (Stack),sp               ; Guardo SP en (Stack).
  31+  7FA4 31 9F 7F         ld sp,Guarda_foto_registros - 1               ; Sitúo el Stack Pointer en la dirección actual -1

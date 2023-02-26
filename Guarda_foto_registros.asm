@@ -23,9 +23,9 @@
 ;   (Stack_snapshot) se sitúa inicialmente en (Album_de_fotos)=$7000.
 ;   Almacenaremos los datos/registros necesarios de la siguiente manera:
 ;
-;   $7000 / 01 ..... Puntero de impresión de pantalla.
-;   $7002 / 03 ..... Dirección de mem. donde está alojada la correspondiente rutina de impresión.
-
+;   $7000 / 01 ..... Puntero objeto.
+;   $7002 / 03 ..... Puntero de impresion.
+;   $7004 / 05 ..... Rutina de impresión.
 
 Guarda_foto_registros ld (Stack),sp               ; Guardo SP en (Stack).
     ld sp,Guarda_foto_registros - 1               ; Sitúo el Stack Pointer en la dirección actual -1

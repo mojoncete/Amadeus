@@ -231,7 +231,22 @@ Genera_disparo
 ;       Impacto/Dirección en BC.
 
     call Almacena_disparo                      
-6 ret
+
+; Preparamos registros para llamar a [Guarda_foto_registros].
+
+6 
+
+;    push ix
+;    pop hl
+;    push af
+;    pop ix
+
+
+;    call Guarda_foto_registros
+
+;    jr $
+
+    ret
 
 ; ----------------------------------------------------------------
 ;
@@ -303,10 +318,10 @@ Almacena_disparo
     ld (Stack),sp                                   ; Guardo SP en (Stack).)
     ld sp,hl
 
-    push ix
-    push af
-    push iy
-    push bc
+    push ix                                         ; Rutina de impresión.
+    push af                                         ; Puntero de impresión.
+    push iy                                         ; Puntero objeto.
+    push bc                                         ; Control.
  
     ld sp,(Stack)
 
