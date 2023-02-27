@@ -25,9 +25,6 @@ Indice_entidades_incompletas_derecha defw Pinta_enemigo_2x2_derecha
 
 Pinta_Amadeus_2x2 ld (Stack),sp
 	ld sp,iy
- 
-; >>> 
- 
     ld b,16
 1 pop de
     ld a,e
@@ -379,3 +376,39 @@ Pinta_enemigo_3x2_derecha_1columna ld (Stack),sp
 	ret
 
 ; ---------------------------------------------------
+;
+;   27/02/23
+;
+;   Rutina idéntica a Pinta_Amadeus_2x2, sólo difiere de esta en el nº de scanlines_
+;   _ que imprime. No utilizamos [Pinta_Amadeus_2x2] porque cuando el programa está_
+;   _ imprimiendo elementos, no discrimina el tipo de Sprite que está pintando. 
+
+Pinta_Disparo ld (Stack),sp
+    ld sp,iy
+    ld b,2
+1 pop de
+    ld a,e
+    xor (hl)
+    ld (hl),a
+    inc hl
+    ld a,d
+    xor (hl)
+    ld (hl),a
+    dec hl
+    inc h     
+    ld a,h
+    and 7
+    jr nz,2F            
+    ld a,l              
+    add a,$20           
+    ld l,a
+    jr c,2F              
+    ld a,h              
+    sub 8              
+    ld h,a
+2 ld a,h
+    cp $58
+    jr z,3F
+    djnz 1B
+3 ld sp,(Stack)
+    ret

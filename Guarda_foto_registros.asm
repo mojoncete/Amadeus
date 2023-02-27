@@ -28,7 +28,7 @@
 ;   $7004 / 05 ..... Rutina de impresión.
 
 Guarda_foto_registros ld (Stack),sp               ; Guardo SP en (Stack).
-    ld sp,Guarda_foto_registros - 1               ; Sitúo el Stack Pointer en la dirección actual -1
+    ld sp,Guarda_foto_registros                   ; Sitúo el Stack Pointer en la dirección actual -1
 
     push hl                                       ; HL contiene la dirección de la rutina de impresión.
     push ix                                       ; IX contiene el puntero de impresión.

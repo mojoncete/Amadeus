@@ -62,7 +62,7 @@ Genera_disparo
 1 call Extrae_address
     push hl
     pop iy                              ; Puntero_objeto_disparo en IY.
-    ld ix,Pinta_Amadeus_2x2             ; Rutinas_de_impresion en IX.
+    ld ix, Pinta_Disparo          		; Rutinas_de_impresion en IX.
 
 ; --------------- ---------------- ----------------- -------------
 ;
@@ -145,23 +145,21 @@ Genera_disparo
 ; Dispara Amadeus.
 
     ld c,1                                          ; Dirección "1", hacia arriba.                        
+    inc hl
     call PreviousScan
     call PreviousScan
-    jr 14F
+    jr 13F
  
 ; Dispara Entidad.
 
 11 ld c,0                                            ; Dirección "0", hacia abajo.
     ld b,16
+    inc hl
 12 call NextScan
     djnz 12B
 
 ; Ahora HL apunta una FILA por debajo de (Posicion_actual).
 
-14 ld a,(CTRL_DESPLZ)
-    and a
-    jr z,13F
-    dec hl                                          ; Puntero de impresión en HL.
 13 call Comprueba_Colision                          ; Retorna "1" o "0" en B indicando si se produce Colisión
 ;                                                   ; _al generar el disparo.
 
@@ -213,15 +211,12 @@ Genera_disparo
 ;   _ pues sabemos que Amadeus sólo puede estar situado en los cuadrantes 3º y 4º.
 
 5 ld hl,(Posicion_actual)
+	inc hl
 	call NextScan
 
 ; Ahora HL apunta una FILA por debajo de (Posicion_actual).
 
-    ld a,(CTRL_DESPLZ)
-    and a
-    jr z,7F
-    dec hl
-7 ld bc,0                                         ; Impacto,(B)="0". Dirección,(C)="0".
+	ld bc,0                                         ; Impacto,(B)="0". Dirección,(C)="0".
 
 ; LLegados a este punto tendremos:
 ;
@@ -241,10 +236,7 @@ Genera_disparo
 ;    push af
 ;    pop ix
 
-
 ;    call Guarda_foto_registros
-
-;    jr $
 
     ret
 

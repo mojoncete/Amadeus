@@ -302,6 +302,8 @@ Frame
 	pop bc
 	djnz 2B
 
+; Tras la gestión de las entidades, ... AMADEUS.
+
 4 call Restore_Amadeus
 	call Mov_Amadeus
 	ld a,(Ctrl_0)
