@@ -690,15 +690,13 @@ PreviousScan ld a,h
 
 ; -----------------------------------------------------------------------------------
 ;
-;	15/1/23
+;	28/2/23
+;
+;	Rutina principal de pintado de entidades/Amadeus.
 
-Extrae_foto_registros 
-
-	ld a,(Numero_de_malotes)
+Extrae_foto_registros ld a,(Numero_de_malotes)
 	and a
 	ret z
-
-
 	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
 	ld sp,Album_de_fotos
 
@@ -721,16 +719,59 @@ Extrae_foto_registros
 
 Imprime db 0,0,0						
 
-	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
-
 	ld a,(Numero_de_malotes)
 	dec a
 	jr z,1F
  	ld (Numero_de_malotes),a	 
-	ld sp,(Stack_2)
+
+ 	ld sp,(Stack_2)
 	jr 2B
 
 1 xor a
 	ld (Stack_2),a
 	ret
 	
+; -----------------------------------------------------------------------------------
+;
+;	28/2/23
+;
+;	Rutina principal de pintado de disparos.
+
+Extrae_foto_registros_disparos 
+
+	ld a,(Numero_de_disparotes)
+	and a
+	ret z
+	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
+	ld sp,Album_de_fotos_disparos
+
+2 pop iy																	; (Puntero_objeto) en IY.
+	pop hl																	; Puntero de impresión de pantalla en HL.
+	pop de																	; Dirección de la rutina de impresión en DE. 
+
+	ld (Stack_2),sp
+	ld sp,(Stack)
+
+; Fabrica la llamada a la correspondiente rutina de impresión.
+
+	ld a,$cd
+	ld (Imprime2),a
+	ex de,hl
+	ld (Imprime2+1),hl
+	ex de,hl
+
+; Ejecuta la llamada:	CALL $xx,xx
+
+Imprime2 db 0,0,0						
+
+	ld a,(Numero_de_disparotes)
+	dec a
+	jr z,1F
+ 	ld (Numero_de_disparotes),a	 
+
+	ld sp,(Stack_2)
+	jr 2B
+
+1 xor a
+	ld (Stack_2),a
+	ret

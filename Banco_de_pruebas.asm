@@ -32,11 +32,13 @@ Centro_arriba equ $0160 								; Emplearemos estas constantes en la rutina de `
 Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto en las dos primeras constantes_
 Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
+
 Album_de_fotos equ $7000								; En (Album_de_fotos) vamos a ir almacenando los valores_
-
-;                                   				    ; _de los registros y las llamadas a [Pintorrejeo].   
+;                                   				    ; _de los registros y las llamadas a las rutinas de impresión.   
 ;                               				        ; De momento situamos este almacén en $7000.   
-
+Album_de_fotos_disparos equ $7050						; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
+;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´. 
+;                               				        ; De momento situamos este almacén en $7060.  
 
 ; ******************************************************************************************************************************************************************************************
 ; Variables. 
@@ -150,6 +152,13 @@ Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta column
 
 ; Variables de funcionamiento, (No incluidas en base de datos de entidades), a partir de aquí!!!!!
 
+Ctrl_1 db 0 											; 2º Byte de control de propósito general.
+
+;														DESCRIPCIÓN:
+;
+;														BIT 0, La rutina de generación de disparos, [Genera_disparo], pone este bit a "1" para indicar a la_
+;															_ rutina [Guarda_foto_registros] que los datos a guardar pertenecen a un disparo y no a una entidad,_
+;															_ por lo tanto hemos de almacenarlos en `Album_de_fotos_disparos´ en lugar de `Album_de_fotos´.
 ; Gestión de ENTIDADES.
 
 Puntero_store_entidades defw 0
@@ -168,9 +177,13 @@ Stack_2 defw 0											; 2º variable destinada a almacenar el puntero de pila
 Stack_snapshot defw Album_de_fotos						; Puntero que indica la posición de memoria donde vamos a guardar_
 ;														; _el snapshot de los registros de la siguiente entidad.
 ;														; Inicialmente está situado el la posición $7000, Album_de_fotos.
+Stack_snapshot_disparos defw Album_de_fotos_disparos	; Puntero que indica la posición de memoria donde vamos a guardar_
+;														; _el snapshot de los registros del siguiente disparo.
+;														; Inicialmente está situado en la posición $7060, Album_de_fotos_disparos.
 
 ; Gestión de Disparos.
 
+Numero_de_disparotes db 0	
 Stack_guns defw Indice_de_disparos_entidades			; Este puntero se irá desplazando por el índice de disparos_
 ;														; _a medida que estos se van creando. Se sitúa en el siguiente_
 ;														; _campo "vacio" del índice para alojar un nuevo disparo.
@@ -266,6 +279,7 @@ Frame
     ld a,2
     out ($fe),a
 	call Extrae_foto_registros 							; Pintamos el fotograma anterior.
+	call Extrae_foto_registros_disparos
     ld a,1
     out ($fe),a
 
@@ -321,7 +335,11 @@ Frame
 
 	call Inicia_punteros_de_entidades
 	call Restore_Primera_entidad
+
+; Calculamos el nº de malotes y de disparotes para pintarlos nada más comenzar el siguiente FRAME.
+
 	call Calcula_numero_de_malotes 
+	call Calcula_numero_de_disparotes
 
 	ld a,4
 	out ($fe),a  
@@ -475,25 +493,57 @@ Inicia_Puntero_Disparo_Amadeus ld hl,Indice_de_disparos_Amadeus
 
 ; -------------------------------------------------------------------------------------------------------------
 ;
-; 30/1/23 
+; 28/2/23 
 ;
 
-Calcula_numero_de_malotes ld hl,(Stack_snapshot)
+Calcula_numero_de_malotes 
+
+	ld hl,Album_de_fotos
+	ex de,hl
+	ld hl,(Stack_snapshot)
+
+	ld b,0
 	ld a,l
+	sub e
+	jr z,1F
+
+; Nº de malotes no es "0".
+
+2 sub 6
+	inc b
 	and a
-	jr z,3F
-	xor a
-	ld h,a
-	ld a,l
-1 sub 6
-	jr z,2F
-	inc h
-	jr 1B
-2 inc h
-	ld a,h
-3 ld (Numero_de_malotes),a
+	jr nz,2B
+	ld a,b
+
+1 ld (Numero_de_malotes),a
 	ret
 
+; -------------------------------------------------------------------------------------------------------------
+;
+; 28/2/23 
+;
+
+Calcula_numero_de_disparotes 
+
+	ld hl,Album_de_fotos_disparos
+	ex de,hl
+	ld hl,(Stack_snapshot_disparos)
+
+	ld b,0
+	ld a,l
+	sub e
+	jr z,1F
+
+; Nº de malotes no es "0".
+
+2 sub 6
+	inc b
+	and a
+	jr nz,2B
+	ld a,b
+
+1 ld (Numero_de_disparotes),a
+	ret
 ; *************************************************************************************************************************************************************
 ;
 ; 20/10/22
@@ -577,8 +627,6 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 
 ;	Modifica (Puntero_store_entidades)  y (Puntero_restore_entidades) con las direcciones donde se encuentran los datos_
 ;	_de la 2ª y 3ª entidad respectivamente.
-
-
 
 Store_Restore_entidades  
 

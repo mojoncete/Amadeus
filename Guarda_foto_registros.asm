@@ -34,8 +34,15 @@ Guarda_foto_registros ld (Stack),sp               ; Guardo SP en (Stack).
     push ix                                       ; IX contiene el puntero de impresión.
     push iy                                       ; IY contiene (Puntero_objeto).
 
-    ld hl,(Stack_snapshot)                        ; Album_de_fotos contiene la imagen de los registros implicados en el_
-    ld b,3                                        ; _correcto funcionamiento de las distintas rutinas de impresión.
+    ld a,(Ctrl_1)
+    bit 0,a
+    jr z,2F
+
+    ld hl,(Stack_snapshot_disparos)
+    jr 4F
+
+2 ld hl,(Stack_snapshot)                          ; Album_de_fotos contiene la imagen de los registros implicados en el_
+4 ld b,3                                          ; _correcto funcionamiento de las distintas rutinas de impresión.
 
 1 pop de
     ld (hl),e
@@ -44,8 +51,14 @@ Guarda_foto_registros ld (Stack),sp               ; Guardo SP en (Stack).
     inc hl                                        ; Volvemos a tener al puntero SP en la posición inicial, (Snapshot)-1.
     djnz 1B    
 
-    ld (Stack_snapshot),hl
-    ld sp,(Stack)
+    and a
+    jr z,5F
+
+    ld (Stack_snapshot_disparos),hl
+    jr 6F
+
+5 ld (Stack_snapshot),hl
+6 ld sp,(Stack)
 
 3 ret                                             ; Antes de salir de la rutina recuperamos SP y actualizamos,(o no), (Stack_snapshot).
 

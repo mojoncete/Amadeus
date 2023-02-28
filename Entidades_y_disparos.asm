@@ -6,7 +6,7 @@
 ; Control. %00000001 00000001 
 ;
 ;     [Bit0] ..... Impacto. "1" Cuando dispara Amadeus, (hacia arriba), "0" cuando lo_
-;               _ hacen las entidades hacia abajo.
+;                  _ hacen las entidades hacia abajo.
 ;
 ;     [Bit8] ..... Dirección. "1" Cuando se produce colisión al generar un disparo.
 
@@ -61,7 +61,7 @@ Disparo_4 defw 0									; Control.
 Disparo_5 defw 0									; Control.
 	defw 0											; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	defw 0											; Rutina de impresión.										
+	defw 0
 
 Disparo_6 defw 0									; Control.
 	defw 0											; Puntero objeto.
