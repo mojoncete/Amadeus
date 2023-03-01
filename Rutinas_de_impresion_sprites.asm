@@ -412,3 +412,4 @@ Pinta_Disparo ld (Stack),sp
     djnz 1B
 3 ld sp,(Stack)
     ret
+

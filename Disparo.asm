@@ -46,11 +46,14 @@ Genera_disparo
     ld c,a
     and a
     jr z,1F
+
+    ret
+
     and 1        
     ret z                               ; Salimos si (CTRL_DESPLZ) es distinto de $00, $f9, $fb y $fd.
-    ld b,$f9
-    ld a,c
 
+    ld a,c
+    ld b,$f9
 2 inc hl
     inc hl
     cp b
@@ -62,7 +65,7 @@ Genera_disparo
 1 call Extrae_address
     push hl
     pop iy                              ; Puntero_objeto_disparo en IY.
-    ld ix, Pinta_Disparo          		; Rutinas_de_impresion en IX.
+	ld ix, Pinta_Disparo        		; Rutinas_de_impresion en IX.
 
 ; --------------- ---------------- ----------------- -------------
 ;
@@ -70,7 +73,7 @@ Genera_disparo
 ;
 ;   Generamos variables de disparo. Varían en función del cuadrante en el que nos encontramos.
 
-    ld a,(Cuad_objeto)
+	ld a,(Cuad_objeto)
     cp 2
     jr c,3F
     jr z,3F
@@ -97,7 +100,7 @@ Genera_disparo
 
 ; Dispara Amadeus.
 
-    ld c,$81                                        ; Dirección "$81", hacia arriba.                        
+    ld c,1	                                        ; Dirección "1", hacia arriba.                        
     call PreviousScan
     call PreviousScan
     dec hl                                          ; Puntero de impresión en HL.                                       
@@ -105,7 +108,7 @@ Genera_disparo
 
 ; Dispara Entidad.
 
-8 ld c,$80                                           ; Dirección "$80", hacia abajo.
+8 ld c,0	                                        ; Dirección "0", hacia abajo.
     ld b,16
 9 call NextScan
     djnz 9B
@@ -144,17 +147,17 @@ Genera_disparo
 
 ; Dispara Amadeus.
 
-    ld c,$81                                         ; Dirección "$81", hacia arriba.                        
-    inc hl
+    ld c,1                                            ; Dirección "1", hacia arriba.                        
+;    inc hl
     call PreviousScan
     call PreviousScan
     jr 13F
  
 ; Dispara Entidad.
 
-11 ld c,$80                                           ; Dirección "0", hacia abajo.
+11 ld c,0                                        	  ; Dirección "0", hacia abajo.
     ld b,16
-    inc hl
+;    inc hl
 12 call NextScan
     djnz 12B
 
@@ -191,10 +194,10 @@ Genera_disparo
 
     dec hl                                          ; Puntero de impresión en HL.
 
-; No se produce impacto. B="$80"
-; Dirección del proyectil hacia abajo. C="80" 
+; No se produce impacto. B="0"
+; Dirección del proyectil hacia abajo. C="0" 
 
-    ld bc,$8080                                     
+    ld bc,0                                     
 
 ; LLegados a este punto tendremos:
 ;
@@ -215,7 +218,9 @@ Genera_disparo
 ;   _ pues sabemos que Amadeus sólo puede estar situado en los cuadrantes 3º y 4º.
 
 5 ld hl,(Posicion_actual)
-	inc hl
+
+;	inc hl
+
 	call NextScan
 
 ; Ahora HL apunta una FILA por debajo de (Posicion_actual).
@@ -223,7 +228,7 @@ Genera_disparo
 ; No se produce impacto. B="$80"
 ; Dirección del proyectil hacia abajo. C="80" 
 
-    ld bc,$8080 
+    ld bc,0 
 
 ; LLegados a este punto tendremos:
 ;
@@ -253,15 +258,10 @@ Almacena_disparo
     pop af                                          
     ex af,af                                        ; Puntero_de_impresion en AF'.
 
-3 
-;	inc c
-;    dec c
-;    jr z,1F                                        ; Según la `Dirección' del proyectil sabemos si_
+3 inc c
+    dec c
+    jr z,1F                                         ; Según la `Dirección' del proyectil sabemos si_
 ;                                                   ; _ es Amadeus o una entidad la que dispara.    
-
-	ld a,c
-	and 1
-	jr z,1F
 
 ; Dispara AMADEUS.
 
@@ -341,113 +341,13 @@ Almacena_disparo
 
 ; ----------------------------------------------------------------
 ;
-;   25/02/23
-;
-;   La Rutina va almacenando disparos en sus respectivas bases de datos.
-;   Amadeus dispone de 2 disparos mientras que las entidades disponen de un máximo de 10.
-
-; 	LLegados a este punto tendremos:
-;
-;       Puntero_objeto_disparo en IY.
-;       Rutinas_de_impresion en IX.
-;       Puntero_de_impresion en HL.
-;       Impacto/Dirección en BC.
-
-Almacena_disparo2 
-
-; Guardamos en Album_de_fotos_disparos los proyectiles generados.
-
-	ld hl,Ctrl_1
-	set 0,(hl) 
-
-	push ix
-    pop de 											; Rutina de impresión en DE.
-    push hl
-    pop ix 
-    push de
-    pop hl 
-
-	call Guarda_foto_registros
-
-	ld hl,Ctrl_1									; Restauramos el indicador de disparo antes de salir.
-	res 0,(hl)
-
-;3 inc c
-;    dec c
-;    jr z,1F                                         ; Según la `Dirección' del proyectil sabemos si_
-;                                                   ; _ es Amadeus o una entidad la que dispara.    
-
-; Dispara AMADEUS.
-
-;    push bc
-;    ld bc,Indice_de_disparos_Amadeus+4              ; Disparo_3A
-;    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
-;    and a
-;    sbc hl,bc
-;    call z,Inicia_Puntero_Disparo_Amadeus
-;    pop bc
-;    jr z,4F
-
-;    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
-;    inc hl
-;    inc hl
-;    ld (Puntero_DESPLZ_DISPARO_AMADEUS),hl          ; (Puntero_DESPLZ_DISPARO_AMADEUS) ya apunta al siguiente_
-;                                                   ; _ Disparo_(+1).        
-;    jr 2F
-
-; Dispara una entidad.
-
-;1 push bc
-;    ld bc,Indice_de_disparos_entidades+20           ; Disparo_11
-;    ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
-;    and a
-;    sbc hl,bc
-;    pop bc
-;    jr z,4F
-
-;    ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
-;    inc hl
-;    inc hl
-;    ld (Puntero_DESPLZ_DISPARO_ENTIDADES),hl        ; El (Puntero_DESPLZ_IND_DISPARO) ya apunta al siguiente_
-;                                                   ; _ Disparo_(+1).        
-;2 call Extrae_address                               ; HL contiene la dirección donde vamos a almacenar_
-;                                                   ; _ los 8 bytes que definen el disparo:                                                  
-;
-;                                                     Puntero_objeto_disparo en IY.
-;                                                     Rutinas_de_impresion en IX.
-;                                                     Puntero_de_impresion en HL.
-;                                                     Impacto/Dirección en BC. 
-
-;    dec hl                                          ; Esta parte de la rutina comprueba si este_
-;    ld a,(hl)                                       ; _ almacén de disparo está vacio. Si no es así, saltamos_
-;    inc hl                                          ; _ al siguiente.
-;    and a                                           
-;    jr nz,3B                                         
-
-;    ex af,af
-;    ld (Stack),sp                                   ; Guardo SP en (Stack).)
-;    ld sp,hl
-
-;    push ix                                         ; Rutina de impresión.
-;    push af                                         ; Puntero de impresión.
-;    push iy                                         ; Puntero objeto.
-;    push bc                                         ; Control.
-
-;    ld sp,(Stack)
-
-4 ret
-
-; ----------------------------------------------------------------
-;
 ;   20/02/23
 
 Comprueba_Colision push hl
-    ld e,$80                                       ; E,(Impacto)="$80".
+    ld e,0                                         ; E,(Impacto)="0".
     call Bucle_2                                   ; Comprobamos el 1er scanline.
     inc e
     dec e
-    ld a,e
-    and 1
     jr z,1F                                        ; Si no se produce impacto comprobamos el 2º scanline.
 ; Hay impacto.
 2 ld b,e
@@ -468,7 +368,7 @@ Bucle_2 ld b,2
     inc hl
     djnz 2B
 3 ret
-1 ld e,$81
+1 ld e,1
     jr 3B
 
 ; -------------------------------------------------------------------------------------------------------------

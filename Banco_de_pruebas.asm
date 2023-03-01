@@ -36,7 +36,7 @@ Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_de
 Album_de_fotos equ $7000								; En (Album_de_fotos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y las llamadas a las rutinas de impresión.   
 ;                               				        ; De momento situamos este almacén en $7000.   
-Album_de_fotos_disparos equ $7050						; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
+Album_de_fotos_disparos equ $7060						; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´. 
 ;                               				        ; De momento situamos este almacén en $7060.  
 
@@ -764,6 +764,13 @@ wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: 
 
 Movimiento_Amadeus 
 
+; Disparo.
+
+	ld a,$f7												; "5" para disparar.
+	in a,($fe)
+	and $10
+	call z,Genera_disparo
+
 	ld a,$f7		  										; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
 	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
 	and $01													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $01 resulta "0"  llama a la rutina "Mov_izq".
@@ -778,17 +785,9 @@ Movimiento_Amadeus
 	and $02													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $02 resulta "0"  llama a la rutina "Mov_der".
 	call z,Mov_right										;			"			"			"			"			"			"			"			"
 
-; Disparo.
-
-	ld a,$f7												; "5" para disparar.
-	in a,($fe)
-	and $10
-	call z,Genera_disparo
-    ret
-
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
-;	Rutina provisional.
+;	Rutina provisional para que los malotes cagen balas.
 
 Detecta_disparo_entidad	ld a,$7f
 	in a,($fe)

@@ -693,6 +693,7 @@ PreviousScan ld a,h
 ;	28/2/23
 ;
 ;	Rutina principal de pintado de entidades/Amadeus.
+;	Extrae fotos de Album_de_fotos.
 
 Extrae_foto_registros ld a,(Numero_de_malotes)
 	and a
