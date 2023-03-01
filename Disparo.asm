@@ -45,9 +45,9 @@ Genera_disparo
     ld a,(CTRL_DESPLZ)
     ld c,a
     and a
-    jr z,1F
+;    jr z,1F
 
-    ret
+    ret z
 
     and 1        
     ret z                               ; Salimos si (CTRL_DESPLZ) es distinto de $00, $f9, $fb y $fd.
@@ -58,6 +58,9 @@ Genera_disparo
     inc hl
     cp b
     jr z,1F
+
+    ret nz
+
     inc b
     inc b
     jr 2B
