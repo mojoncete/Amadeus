@@ -80,7 +80,7 @@ Indice_Sprite_izq defw Indice_Badsat_izq
 Puntero_DESPLZ_der defw 0
 Puntero_DESPLZ_izq defw 0
 
-Posicion_inicio defw $4721								; Dirección de pantalla donde aparece el objeto. [DRAW].
+Posicion_inicio defw $4723								; Dirección de pantalla donde aparece el objeto. [DRAW].
 Cuad_objeto db 1			 							; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
 ; Variables de objeto. (Características).
@@ -240,8 +240,24 @@ START ld sp,$ffff										 ; Situamos el inicio de Stack.
 	call Draw
 
 ; ---- Debug 1/3/23
-	call Mov_right
-	call Mov_right
+;	call Mov_left
+;	call Mov_left
+;	call Mov_left	
+;	call Mov_left
+;	call Mov_left
+;	call Mov_left
+	call Mov_left
+	call Mov_left
+
+;	call Mov_right
+;	call Mov_right
+;	call Mov_right
+;	call Mov_right
+;	call Mov_right
+;	call Mov_right
+;	call Mov_right
+;	call Mov_right
+
 	call Draw
 ; ----
 

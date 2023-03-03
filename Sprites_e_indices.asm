@@ -20,7 +20,7 @@ Disparo_f9 DEFB $00,$60,$00,$60
 ; Disparo (CTRL_DESPLZ)="fb" 
 Disparo_fb DEFW $18,$00,$18,$00
 ; Disparo (CTRL_DESPLZ)="fd" 
-Disparo_fd DEFW $00,$06,$00,$00,$06,$00
+Disparo_fd DEFW $06,$00,$06,$00
 
 ; ----------------------------------------------------------------------------------------
 

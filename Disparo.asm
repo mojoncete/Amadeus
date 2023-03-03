@@ -41,29 +41,33 @@ Genera_disparo
     cp b
     ret nz                              ; Salimos si la entidad no está completa en pantalla.                           
 
+; ----- ----- -----
+
     ld hl,Indice_disparo
     ld a,(CTRL_DESPLZ)
     ld c,a
+    ld b,0	; counter.
     and a
-;    jr z,1F
-
-    ret z
+    jr z,1F
 
     and 1        
     ret z                               ; Salimos si (CTRL_DESPLZ) es distinto de $00, $f9, $fb y $fd.
 
     ld a,c
-    ld b,$f9
+    ld d,$f9
 2 inc hl
     inc hl
-    cp b
+    inc b 	; inc counter.
+    cp d
     jr z,1F
-
-    ret nz
-
-    inc b
-    inc b
+    inc d
+    inc d
     jr 2B
+
+; Cuando (CTRL_DESPLZ)="0", B="0"
+;   ""        ""       "f9", B="1"
+;   ""        ""       "fb", B="2"
+;   ""        ""       "fb", B="3"
 
 1 call Extrae_address
     push hl
@@ -190,12 +194,26 @@ Genera_disparo
 ;   La dirección del proyectil siempre será hacia abajo. En los cuadrante 1º y 2º no se comprueba colision_
 ;   _ pues sabemos que Amadeus sólo puede estar situado en los cuadrantes 3º y 4º.
 
+; 	Cuando (CTRL_DESPLZ)="0", B="0"
+;	   ""        ""       "f9", B="1"
+;	   ""        ""       "fb", B="2"
+; 	   ""        ""       "fb", B="3"
+
+
 	ld hl,(Posicion_actual)
 	call NextScan
 
 ; Ahora HL apunta una FILA por debajo de (Posicion_actual).
-
-    dec hl                                          ; Puntero de impresión en HL.
+; En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
+; En CUAD_1, sólo cuando (CTRL_DESPLZ)="$f9", B="1" ..... (DEC HL)*2. El resto de combinaciones,_
+; _ B="0","2" y "3" ..... DEC HL.
+; ----- ----- -----
+	ld a,b
+	cp 1
+	jr nz,14F
+	dec hl                                          ; Puntero de impresión en HL.
+14 dec hl
+; ----- ----- -----
 
 ; No se produce impacto. B="0"
 ; Dirección del proyectil hacia abajo. C="0" 
