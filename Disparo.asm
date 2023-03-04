@@ -46,7 +46,11 @@ Genera_disparo
     ld hl,Indice_disparo
     ld a,(CTRL_DESPLZ)
     ld c,a
-    ld b,0	; counter.
+    ld b,0	                            ; B será 0,1,2 o 3 en función del valor de (CTRL_DESPLZ).
+;                                           Cuando (CTRL_DESPLZ)="0", B="0"
+;                                            ""        ""       "f9", B="1"
+;                                            ""        ""       "fb", B="2"
+;                                            ""        ""       "fb", B="3"
     and a
     jr z,1F
 
@@ -57,17 +61,12 @@ Genera_disparo
     ld d,$f9
 2 inc hl
     inc hl
-    inc b 	; inc counter.
+    inc b 	
     cp d
     jr z,1F
     inc d
     inc d
     jr 2B
-
-; Cuando (CTRL_DESPLZ)="0", B="0"
-;   ""        ""       "f9", B="1"
-;   ""        ""       "fb", B="2"
-;   ""        ""       "fb", B="3"
 
 1 call Extrae_address
     push hl
@@ -107,22 +106,42 @@ Genera_disparo
 
 ; Dispara Amadeus.
 
-    ld c,1	                                        ; Dirección "1", hacia arriba.                        
+    ld c,$81	                                    ; Dirección "$81", hacia arriba.                        
     call PreviousScan
     call PreviousScan
-    dec hl                                          ; Puntero de impresión en HL.                                       
+
+; Ahora HL apunta un scanline por debajo de (Posicion_actual) si es una entidad la que dispara o dos SCANLINES_
+; _ por arriba si se trata de Amadeus.
+; En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
+; En el cuadrante 1 y 3, sólo cuando (CTRL_DESPLZ)="$f9", B="1" ..... (DEC HL)*2. El resto de combinaciones,_
+; _ B="0","2" y "3" ..... DEC HL.
+
+    call Ajusta_disparo_parte_izquierda
     jr 10F
 
 ; Dispara Entidad.
 
-8 ld c,0	                                        ; Dirección "0", hacia abajo.
+8 ld c,$80	                                        ; Dirección "$80", hacia abajo.
+
+; Guardamos el contenido de BC en la pila pues voy a utilizar el registro B como contador.
+;   B contiene "0,1,2 o 3", dato necesario para fijar el puntero de impresión.
+
+    push bc
+
     ld b,16
 9 call NextScan
     djnz 9B
 
-; Ahora HL apunta una FILA por debajo de (Posicion_actual).
+    pop bc
 
-    dec hl                                          ; Puntero de impresión en HL.
+; Ahora HL apunta un scanline por debajo de (Posicion_actual) si es una entidad la que dispara o dos SCANLINES_
+; _ por arriba si se trata de Amadeus.
+; En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
+; En el cuadrante 1 y 3, sólo cuando (CTRL_DESPLZ)="$f9", B="1" ..... (DEC HL)*2. El resto de combinaciones,_
+; _ B="0","2" y "3" ..... DEC HL.
+
+    call Ajusta_disparo_parte_izquierda
+
 10 call Comprueba_Colision                          ; Retorna "$81" o "$80" en B indicando si se produce Colisión
 ;                                                   ; _al generar el disparo.
 
@@ -154,21 +173,41 @@ Genera_disparo
 
 ; Dispara Amadeus.
 
-    ld c,1                                            ; Dirección "1", hacia arriba.                        
-;    inc hl
+    ld c,$81                                          ; Dirección "$81", hacia arriba.                        
     call PreviousScan
     call PreviousScan
+
+; Ahora HL apunta un scanline por debajo de (Posicion_actual) si es una entidad la que dispara o dos SCANLINES_
+; _ por arriba si se trata de Amadeus.
+; En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
+; En el cuadrante 2 y 4, cuando (CTRL_DESPLZ)="$fb" y "$fd", B="2" y B="3" ..... (INC HL). El resto de combinaciones,_
+; _ B="0" y B="1" 
+
+    call Ajusta_disparo_parte_derecha
     jr 13F
  
 ; Dispara Entidad.
 
-11 ld c,0                                        	  ; Dirección "0", hacia abajo.
+11 ld c,$80                                        	  ; Dirección "$80", hacia abajo.
+  
+; Guardamos el contenido de BC en la pila pues voy a utilizar el registro B como contador.
+;   B contiene "0,1,2 o 3", dato necesario para fijar el puntero de impresión.
+
+    push bc
+
     ld b,16
-;    inc hl
 12 call NextScan
     djnz 12B
 
-; Ahora HL apunta una FILA por debajo de (Posicion_actual).
+    pop bc
+
+; Ahora HL apunta un scanline por debajo de (Posicion_actual) si es una entidad la que dispara o dos SCANLINES_
+; _ por arriba si se trata de Amadeus.
+; En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
+; En el cuadrante 2 y 4, cuando (CTRL_DESPLZ)="$fb" y "$fd", B="2" y B="3" ..... (INC HL). El resto de combinaciones,_
+; _ B="0" y B="1" 
+
+    call Ajusta_disparo_parte_derecha
 
 13 call Comprueba_Colision                            ; Retorna "$81" o "$80" en B indicando si se produce Colisión
 ;                                                     ; _al generar el disparo.
@@ -205,20 +244,15 @@ Genera_disparo
 
 ; Ahora HL apunta una FILA por debajo de (Posicion_actual).
 ; En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
-; En CUAD_1, sólo cuando (CTRL_DESPLZ)="$f9", B="1" ..... (DEC HL)*2. El resto de combinaciones,_
+; En el cuadrante 1 y 3, sólo cuando (CTRL_DESPLZ)="$f9", B="1" ..... (DEC HL)*2. El resto de combinaciones,_
 ; _ B="0","2" y "3" ..... DEC HL.
-; ----- ----- -----
-	ld a,b
-	cp 1
-	jr nz,14F
-	dec hl                                          ; Puntero de impresión en HL.
-14 dec hl
-; ----- ----- -----
 
-; No se produce impacto. B="0"
-; Dirección del proyectil hacia abajo. C="0" 
+    call Ajusta_disparo_parte_izquierda
 
-    ld bc,0                                     
+; No se produce impacto. B="$80"
+; Dirección del proyectil hacia abajo. C="$80" 
+
+    ld bc,$8080                                     
 
 ; LLegados a este punto tendremos:
 ;
@@ -239,17 +273,21 @@ Genera_disparo
 ;   _ pues sabemos que Amadeus sólo puede estar situado en los cuadrantes 3º y 4º.
 
 5 ld hl,(Posicion_actual)
-
-;	inc hl
-
 	call NextScan
 
 ; Ahora HL apunta una FILA por debajo de (Posicion_actual).
+; En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
+; En el cuadrante 2 y 4, cuando (CTRL_DESPLZ)="$fb" y "$fd", B="2" y B="3" ..... (INC HL). El resto de combinaciones,_
+; _ B="0" y B="1" 
+
+    call Ajusta_disparo_parte_derecha
+
+; Ahora HL apunta un scanline por debajo de (Posicion_actual).
 
 ; No se produce impacto. B="$80"
 ; Dirección del proyectil hacia abajo. C="80" 
 
-    ld bc,0 
+15 ld bc,$8080 
 
 ; LLegados a este punto tendremos:
 ;
@@ -266,6 +304,21 @@ Genera_disparo
 6 ret
 
 ; ----------------------------------------------------------------
+
+Ajusta_disparo_parte_derecha ld a,b
+    cp 2
+    jr c,1F
+    inc hl
+1 ret
+
+Ajusta_disparo_parte_izquierda ld a,b
+	cp 1
+	jr nz,1F
+	dec hl                                          
+1 dec hl
+    ret
+
+; ----------------------------------------------------------------
 ;
 ;   25/02/23
 ;
@@ -279,11 +332,10 @@ Almacena_disparo
     pop af                                          
     ex af,af                                        ; Puntero_de_impresion en AF'.
 
-3 inc c
-    dec c
+3 ld a,c
+    and 1
     jr z,1F                                         ; Según la `Dirección' del proyectil sabemos si_
 ;                                                   ; _ es Amadeus o una entidad la que dispara.    
-
 ; Dispara AMADEUS.
 
     push bc
@@ -362,18 +414,27 @@ Almacena_disparo
 
 ; ----------------------------------------------------------------
 ;
-;   20/02/23
+;   4/3/23
+;   
+;   Entrega el siguiente dato en el registro B en función de si se produce colisión, o no,_
+;   _ al generarse el disparo.
+;       "$80" ..... No se produce colisión.
+;       "$81" ..... Se produce colisión.
 
 Comprueba_Colision push hl
-    ld e,0                                         ; E,(Impacto)="0".
+    ld e,$80                                       ; E,(Impacto)="0".
     call Bucle_2                                   ; Comprobamos el 1er scanline.
-    inc e
-    dec e
+ 
+    ld a,e
+    and 1
     jr z,1F                                        ; Si no se produce impacto comprobamos el 2º scanline.
+ 
 ; Hay impacto.
+
 2 ld b,e
     pop hl                                         ; Puntero de impresión en HL e indicador de Impacto en B.
 3 ret                                            
+
 1 pop hl
     push hl
     call NextScan
@@ -389,7 +450,7 @@ Bucle_2 ld b,2
     inc hl
     djnz 2B
 3 ret
-1 ld e,1
+1 ld e,$81
     jr 3B
 
 ; -------------------------------------------------------------------------------------------------------------
