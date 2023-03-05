@@ -39,6 +39,7 @@ Guarda_foto_registros ld (Stack),sp               ; Guardo SP en (Stack).
     jr z,2F
 
     ld hl,(Stack_snapshot_disparos)
+
     jr 4F
 
 2 ld hl,(Stack_snapshot)                          ; Album_de_fotos contiene la imagen de los registros implicados en el_

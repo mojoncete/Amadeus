@@ -305,7 +305,6 @@ Frame
 ; [[[
 	call Detecta_disparo_entidad
 ; ]]]
-
 	call Guarda_foto_entidad_a_pintar					; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!
 
 1 ld hl,Ctrl_0
@@ -789,7 +788,7 @@ Movimiento_Amadeus
 ;
 ;	Rutina provisional para que los malotes cagen balas.
 
-Detecta_disparo_entidad	ld a,$7f
+Detecta_disparo_entidad ld a,$7f
 	in a,($fe)
 	and 1
 	ret nz

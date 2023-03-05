@@ -238,7 +238,6 @@ Genera_disparo
 ;	   ""        ""       "fb", B="2"
 ; 	   ""        ""       "fb", B="3"
 
-
 	ld hl,(Posicion_actual)
 	call NextScan
 
