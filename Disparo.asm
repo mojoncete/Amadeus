@@ -53,7 +53,6 @@ Genera_disparo
 ;                                            ""        ""       "fb", B="3"
     and a
     jr z,1F
-
     and 1        
     ret z                               ; Salimos si (CTRL_DESPLZ) es distinto de $00, $f9, $fb y $fd.
 
