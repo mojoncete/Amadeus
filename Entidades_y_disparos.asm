@@ -134,7 +134,7 @@ Amadeus_db db 2,2									; (Filas) / (Columns).
 	defw 0											;	" " " " " " "
 	db 0,0,0,0										;	" " " " " " "
 
-	db 0,0											; (Ctrl_0) / (Obj_dibujado).
+	db $40,0										; (Ctrl_0) / (Obj_dibujado).
 
 	defw 0,0	 									; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).

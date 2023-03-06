@@ -7,7 +7,7 @@
 	
 ;	Vector de interrupciones.
 
- 	defw $a101											 ; $9000. Rutina de interrupciones.
+ 	defw $a101											; $9000. Rutina de interrupciones.
 
 	org $a101		
 
@@ -255,7 +255,6 @@ START ld sp,$ffff										 ; Situamos el inicio de Stack.
 
 	call Inicia_Puntero_Disparo_Entidades
 	call Inicia_Puntero_Disparo_Amadeus
-
 
 ; Volvemos a situar los punteros STORE/RESTORE de entidades en la 1ª entidad.
 
@@ -759,7 +758,9 @@ wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: 
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
-;	16/02/23
+;	5/3/23
+;
+;	En 1er lugar detectamos disparo (5), seguido de los movimientos a izq. / derecha.
 
 Movimiento_Amadeus 
 
@@ -783,6 +784,7 @@ Movimiento_Amadeus
 	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
 	and $02													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $02 resulta "0"  llama a la rutina "Mov_der".
 	call z,Mov_right										;			"			"			"			"			"			"			"			"
+	ret	
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;

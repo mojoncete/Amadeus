@@ -32,7 +32,7 @@ Genera_disparo
 ;   NO SE GENERA disparo cuando la entidad no está impresa en su totalidad en pantalla, (está_
 ;   _ apareciendo o desapareciendo). (Columns)<>(Columnas).
 ;   Amadeus al desplazarse a 2 pixels, podrá generar disparo en cualquier situación pero las Entidades_
-;   _ sólo podran generar disparo cuando (CTRL_DESPLZ) tenga dichos valores.
+;   _ sólo podran generar disparo cuando (CTRL_DESPLZ) tenga estos valores, $00, $f9, $fb y $fd.
 ;   IY contendrá la dirección de Puntero_objeto_disparo. 
 
     ld a,(Columnas)
@@ -53,7 +53,6 @@ Genera_disparo
 ;                                            ""        ""       "fb", B="3"
     and a
     jr z,1F
-
     and 1        
     ret z                               ; Salimos si (CTRL_DESPLZ) es distinto de $00, $f9, $fb y $fd.
 
@@ -73,24 +72,21 @@ Genera_disparo
     pop iy                              ; Puntero_objeto_disparo en IY.
 	ld ix, Pinta_Disparo        		; Rutinas_de_impresion en IX.
 
-; --------------- ---------------- ----------------- -------------
-;
-;   Genera disparo.
-;
-;   Generamos variables de disparo. Varían en función del cuadrante en el que nos encontramos.
+;	Se cumplen las condiciones necesarias para generar un disparo.
+;   Las variables de disparo varían en función del cuadrante en el que se encuentre la entidad/Amadeus.
 
 	ld a,(Cuad_objeto)
     cp 2
     jr c,3F
     jr z,3F
 
-; Estamos en mitad inferior de pantalla, (cuadrantes 3 y 4).
+; 	Nos encontramos en la mitad inferior de la pantalla, (3er y 4º cuadrante).
 
     and 1
     jr z,4F
 
-; Estamos en el 3er cuadrante de pantalla.
-; 3er CUAD. ----- ----- ----- ----- -----
+; 	Estamos en el 3er cuadrante de pantalla.
+; 	3er CUAD. ----- ----- ----- ----- -----
 ;
 ;	En el 3er y 4º cuadrante de pantalla, cabe la posibilidad de que sea una entidad o Amadeus el que dispara.
 ;	En función del elemento que dispare variara el Puntero_de_impresión y su `Dirección'.
@@ -98,54 +94,50 @@ Genera_disparo
 
 	ld hl,(Posicion_actual)
 
-;   Compruebo si el disparo lo efectúa Amadeus o una entidad para poder calcular el puntero de impresión.
+;   Amadeus o entidad ???.
 
     ld a,(Ctrl_0)
     bit 6,a
     jr z,8F
 
-; Dispara Amadeus.
+; 	Dispara Amadeus.
 
     ld c,$81	                                    ; Dirección "$81", hacia arriba.                        
     call PreviousScan
     call PreviousScan
 
-; Ahora HL apunta un scanline por debajo de (Posicion_actual) si es una entidad la que dispara o dos SCANLINES_
-; _ por arriba si se trata de Amadeus.
-; En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
-; En el cuadrante 1 y 3, sólo cuando (CTRL_DESPLZ)="$f9", B="1" ..... (DEC HL)*2. El resto de combinaciones,_
-; _ B="0","2" y "3" ..... DEC HL.
+;	Ahora HL apunta 2 scanlines por encima de (Posicion_actual).
+; 	En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
+; 	En los cuadrantes 1º y3º de pantalla, sólo cuando (CTRL_DESPLZ)="$f9", B="1" ..... (DEC HL)*2. 
+;   _ El resto de combinaciones, B="0","2" o "3" ..... DEC HL.
 
     call Ajusta_disparo_parte_izquierda
     jr 10F
 
-; Dispara Entidad.
+; 	Dispara Entidad.
 
 8 ld c,$80	                                        ; Dirección "$80", hacia abajo.
 
-; Guardamos el contenido de BC en la pila pues voy a utilizar el registro B como contador.
+; 	Guardamos el contenido de BC en la pila pues voy a utilizar el registro B como contador.
 ;   B contiene "0,1,2 o 3", dato necesario para fijar el puntero de impresión.
 
     push bc
-
     ld b,16
 9 call NextScan
     djnz 9B
-
     pop bc
 
-; Ahora HL apunta un scanline por debajo de (Posicion_actual) si es una entidad la que dispara o dos SCANLINES_
-; _ por arriba si se trata de Amadeus.
-; En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
-; En el cuadrante 1 y 3, sólo cuando (CTRL_DESPLZ)="$f9", B="1" ..... (DEC HL)*2. El resto de combinaciones,_
-; _ B="0","2" y "3" ..... DEC HL.
+; 	Ahora HL apunta un scanline por debajo de (Posicion_actual).
+; 	En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
+; 	En los cuadrantes 1º y3º de pantalla, sólo cuando (CTRL_DESPLZ)="$f9", B="1" ..... (DEC HL)*2. 
+;   _ El resto de combinaciones, B="0","2" o "3" ..... DEC HL.
 
     call Ajusta_disparo_parte_izquierda
 
 10 call Comprueba_Colision                          ; Retorna "$81" o "$80" en B indicando si se produce Colisión
 ;                                                   ; _al generar el disparo.
 
-; LLegados a este punto tendremos:
+; 	LLegados a este punto tendremos:
 ;
 ;       Puntero_objeto_disparo en IY.
 ;       Rutinas_de_impresion en IX.
@@ -156,8 +148,8 @@ Genera_disparo
     jr 6F                                           ; RET.
     
 
-; Estamos en el 4º cuadrante de pantalla.
-; 4º CUAD. ----- ----- ----- ----- -----
+; 	Estamos en el 4º cuadrante de pantalla.
+; 	4º CUAD. ----- ----- ----- ----- -----
 ;
 ;	En el 3er y 4º cuadrante de pantalla, cabe la posibilidad de que sea una entidad o Amadeus el que dispara.
 ;	En función del elemento que dispare variara el Puntero_de_impresión y su `Dirección'.
@@ -165,32 +157,31 @@ Genera_disparo
 
 4 ld hl,(Posicion_actual)
 
-;   Compruebo si el disparo lo efectúa Amadeus o una entidad para poder calcular el puntero de impresión.
+;   Amadeus o entidad ???. 
 
     ld a,(Ctrl_0)
     bit 6,a
     jr z,11F
 
-; Dispara Amadeus.
+; 	Dispara Amadeus.
 
     ld c,$81                                          ; Dirección "$81", hacia arriba.                        
     call PreviousScan
     call PreviousScan
 
-; Ahora HL apunta un scanline por debajo de (Posicion_actual) si es una entidad la que dispara o dos SCANLINES_
-; _ por arriba si se trata de Amadeus.
-; En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
-; En el cuadrante 2 y 4, cuando (CTRL_DESPLZ)="$fb" y "$fd", B="2" y B="3" ..... (INC HL). El resto de combinaciones,_
-; _ B="0" y B="1" 
+; 	Ahora HL apunta 2 scanlines por encima de (Posicion_actual).
+; 	En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
+; 	En los cuadrantes 2º y 4º, cuando (CTRL_DESPLZ)="$fb" o "$fd"; B="2" y B="3" ..... (INC HL). 
+;	En el resto de combinaciones, B="0" o "1", no se corrige el puntero de impresión.
 
     call Ajusta_disparo_parte_derecha
     jr 13F
  
-; Dispara Entidad.
+; 	Dispara Entidad.
 
 11 ld c,$80                                        	  ; Dirección "$80", hacia abajo.
   
-; Guardamos el contenido de BC en la pila pues voy a utilizar el registro B como contador.
+; 	Guardamos el contenido de BC en la pila pues voy a utilizar el registro B como contador.
 ;   B contiene "0,1,2 o 3", dato necesario para fijar el puntero de impresión.
 
     push bc
@@ -201,11 +192,10 @@ Genera_disparo
 
     pop bc
 
-; Ahora HL apunta un scanline por debajo de (Posicion_actual) si es una entidad la que dispara o dos SCANLINES_
-; _ por arriba si se trata de Amadeus.
-; En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
-; En el cuadrante 2 y 4, cuando (CTRL_DESPLZ)="$fb" y "$fd", B="2" y B="3" ..... (INC HL). El resto de combinaciones,_
-; _ B="0" y B="1" 
+; 	Ahora HL apunta un scanline por debajo de (Posicion_actual).
+; 	En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
+; 	En los cuadrantes 2º y 4º, cuando (CTRL_DESPLZ)="$fb" o "$fd"; B="2" y B="3" ..... (INC HL). 
+;	En el resto de combinaciones, B="0" o "1", no se corrige el puntero de impresión.
 
     call Ajusta_disparo_parte_derecha
 
@@ -222,11 +212,11 @@ Genera_disparo
     call Almacena_disparo                      
     jr 6F                                           ; RET.
 
-; Estamos en la mitad superior de pantalla, (cuadrantes 1 y 2).
+; 	La entidad que dispara se encuentra en la mitad superior de pantalla, (cuadrantes 1º y 2º).
 
 3 jr z,5F
 
-; 1er CUAD. ----- ----- ----- ----- -----
+; 	1er CUAD. ----- ----- ----- ----- -----
 ;
 ;	En el 1er y 2º cuadrante de pantalla, sólo cabe la posibilidad de que sea una entidad la que dispare,_
 ;	_ por lo tanto siempre se iniciara el disparo en la parte `baja´ del sprite.
@@ -241,19 +231,19 @@ Genera_disparo
 	ld hl,(Posicion_actual)
 	call NextScan
 
-; Ahora HL apunta una FILA por debajo de (Posicion_actual).
-; En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
-; En el cuadrante 1 y 3, sólo cuando (CTRL_DESPLZ)="$f9", B="1" ..... (DEC HL)*2. El resto de combinaciones,_
-; _ B="0","2" y "3" ..... DEC HL.
+; 	Ahora HL apunta una FILA por debajo de (Posicion_actual).
+; 	En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
+; 	En los cuadrantes 1º y3º de pantalla, sólo cuando (CTRL_DESPLZ)="$f9", B="1" ..... (DEC HL)*2. 
+;   _ El resto de combinaciones, B="0","2" o "3" ..... DEC HL.
 
     call Ajusta_disparo_parte_izquierda
 
-; No se produce impacto. B="$80"
-; Dirección del proyectil hacia abajo. C="$80" 
+; 	No se produce impacto. B="$80"
+; 	Dirección del proyectil hacia abajo. C="$80" 
 
     ld bc,$8080                                     
 
-; LLegados a este punto tendremos:
+; 	LLegados a este punto tendremos:
 ;
 ;       Puntero_objeto_disparo en IY.
 ;       Rutinas_de_impresion en IX.
@@ -263,8 +253,8 @@ Genera_disparo
     call Almacena_disparo                      
     jr 6F                                           ; RET.
 
-; Estamos en el 2º cuadrante de pantalla.
-; 2º CUAD. ----- ----- ----- ----- -----
+; 	Estamos en el 2º cuadrante de pantalla.
+; 	2º CUAD. ----- ----- ----- ----- -----
 ;
 ;	En el 1er y 2º cuadrante de pantalla, sólo cabe la posibilidad de que sea una entidad la que dispare,_
 ;	_ por lo tanto siempre se iniciara el disparo en la parte `baja´ del sprite.
@@ -274,21 +264,19 @@ Genera_disparo
 5 ld hl,(Posicion_actual)
 	call NextScan
 
-; Ahora HL apunta una FILA por debajo de (Posicion_actual).
-; En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
-; En el cuadrante 2 y 4, cuando (CTRL_DESPLZ)="$fb" y "$fd", B="2" y B="3" ..... (INC HL). El resto de combinaciones,_
-; _ B="0" y B="1" 
+; 	Ahora HL apunta una FILA por debajo de (Posicion_actual).
+; 	En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
+; 	En los cuadrantes 2º y 4º, cuando (CTRL_DESPLZ)="$fb" o "$fd"; B="2" y B="3" ..... (INC HL). 
+;	En el resto de combinaciones, B="0" o "1", no se corrige el puntero de impresión.
 
     call Ajusta_disparo_parte_derecha
 
-; Ahora HL apunta un scanline por debajo de (Posicion_actual).
-
-; No se produce impacto. B="$80"
-; Dirección del proyectil hacia abajo. C="80" 
+; 	No se produce impacto. B="$80"
+; 	Dirección del proyectil hacia abajo. C="80" 
 
 15 ld bc,$8080 
 
-; LLegados a este punto tendremos:
+; 	LLegados a este punto tendremos:
 ;
 ;       Puntero_objeto_disparo en IY.
 ;       Rutinas_de_impresion en IX.
@@ -297,12 +285,13 @@ Genera_disparo
 
     call Almacena_disparo                      
 
-; Preparamos registros para llamar a [Guarda_foto_registros].
-; Antes de llamar a [Guarda_foto_registros] indicamos que se trata de un disparo.
-
 6 ret
 
 ; ----------------------------------------------------------------
+;
+;	Estas dos subrutinas se encargan de `corregir´, el puntero de impresión del proyectil_
+;	_ en función del valor de la variable (CTRL_DESPLZ) y de la situación en pantalla,_
+;	_ (lado izq. o derecho), de la entidad que lo genera.
 
 Ajusta_disparo_parte_derecha ld a,b
     cp 2
@@ -321,21 +310,25 @@ Ajusta_disparo_parte_izquierda ld a,b
 ;
 ;   25/02/23
 ;
-;   La Rutina va almacenando disparos en sus respectivas bases de datos.
+;   La Rutina va almacenando disparos en sus respectiva bases de datos.
 ;   Amadeus dispone de 2 disparos mientras que las entidades disponen de un máximo de 10.
-
 
 Almacena_disparo 
 
-    push hl                                                                             
+    push hl  										; HL contiene el puntero de impresión.                                                                          
     pop af                                          
     ex af,af                                        ; Puntero_de_impresion en AF'.
 
-3 ld a,c
+3 ld a,c 											; C contiene la "dirección" del proyectil.
     and 1
     jr z,1F                                         ; Según la `Dirección' del proyectil sabemos si_
 ;                                                   ; _ es Amadeus o una entidad la que dispara.    
-; Dispara AMADEUS.
+; 	Dispara AMADEUS.
+
+;	Comprobamos que a Amadeus aún le quedan disparos.
+;	Si es así, nos situamos en la siguiente dirección del índice de disparos de Amadeus.
+;	Si por el contrario, estamos al final de índice, (no disponemos de más disparos),_
+;	_ iniciamos (Puntero_DESPLZ_DISPARO_AMADEUS) situándolo al comienzo del índice y salimos.
 
     push bc
     ld bc,Indice_de_disparos_Amadeus+4              ; Disparo_3A
