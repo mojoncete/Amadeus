@@ -736,9 +736,9 @@ Imprime db 0,0,0
 ;
 ;	28/2/23
 ;
-;	Rutina principal de pintado de disparos.
+;	Pinta los disparos generados.
 
-Extrae_foto_registros_disparos 
+Extrae_foto_disparos
 
 	ld a,(Numero_de_disparotes)
 	and a

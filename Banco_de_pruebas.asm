@@ -183,14 +183,11 @@ Stack_snapshot_disparos defw Album_de_fotos_disparos	; Puntero que indica la pos
 
 ; Gestión de Disparos.
 
+Puntero_extraccion_disparo_Amadeus defw 0
+Puntero_extraccion_disparo_entidades defw 0
 Numero_de_disparotes db 0	
-Stack_guns defw Indice_de_disparos_entidades			; Este puntero se irá desplazando por el índice de disparos_
-;														; _a medida que estos se van creando. Se sitúa en el siguiente_
-;														; _campo "vacio" del índice para alojar un nuevo disparo.
 Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
 Puntero_DESPLZ_DISPARO_AMADEUS defw 0
-
-
 
 ; Gestión de FRAMES.
 
@@ -278,7 +275,7 @@ Frame
     ld a,2
     out ($fe),a
 	call Extrae_foto_registros 							; Pintamos el fotograma anterior.
-	call Extrae_foto_registros_disparos
+	call Extrae_foto_disparos
     ld a,1
     out ($fe),a
 
