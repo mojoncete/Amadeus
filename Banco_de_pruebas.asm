@@ -183,8 +183,8 @@ Stack_snapshot_disparos defw Album_de_fotos_disparos	; Puntero que indica la pos
 
 ; Gestión de Disparos.
 
-Puntero_extraccion_disparo_Amadeus defw 0
-Puntero_extraccion_disparo_entidades defw 0
+;Puntero_extraccion_disparo_Amadeus defw 0
+;Puntero_extraccion_disparo_entidades defw 0
 Numero_de_disparotes db 0	
 Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
 Puntero_DESPLZ_DISPARO_AMADEUS defw 0

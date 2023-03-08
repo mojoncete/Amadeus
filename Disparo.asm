@@ -380,9 +380,9 @@ Almacena_disparo
     ld (Stack),sp                                   ; Guardo SP en (Stack).)
     ld sp,hl
 
-;    push ix                                         ; Rutina de impresión.
-;    push af                                         ; Puntero de impresión.
-;    push iy                                         ; Puntero objeto.
+    push ix                                         ; Rutina de impresión.
+    push af                                         ; Puntero de impresión.
+    push iy                                         ; Puntero objeto.
 
     push bc                                         ; Control.
 
