@@ -1859,68 +1859,61 @@
 403+  89C9 21 D0 85     	ld hl,Ctrl_1									; Restauramos el indicador de disparo antes de salir.
 404+  89CC CB 86        	res 0,(hl)
 405+  89CE
-406+  89CE              ;   Preparamos los punteros de extraccion de disparos para utilizarlos más tarde en la rutina: Extrae_foto_registros_disparos.
-407+  89CE
-408+  89CE              ;    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
-409+  89CE              ;    ld (Puntero_extraccion_disparo_Amadeus),hl
-410+  89CE              ;    ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
-411+  89CE              ;    ld (Puntero_extraccion_disparo_entidades),hl
-412+  89CE
-413+  89CE              ;   Inicializamos los punteros de disparos antes de salir. Pretendemos que los campos vacíos del índice siempre estén
-414+  89CE              ;   _ al final. Los disparos nuevos que se generen se guardarán en el primer cajón vacío del índice.
-415+  89CE
-416+  89CE CD 4B 87         call Inicia_Puntero_Disparo_Amadeus
-417+  89D1 CD 44 87         call Inicia_Puntero_Disparo_Entidades
-418+  89D4
-419+  89D4 C9           4 ret
-420+  89D5
-421+  89D5              ; ----------------------------------------------------------------
-422+  89D5              ;
-423+  89D5              ;   4/3/23
-424+  89D5              ;
-425+  89D5              ;   Entrega el siguiente dato en el registro B en función de si se produce colisión, o no,_
-426+  89D5              ;   _ al generarse el disparo.
-427+  89D5              ;       "$80" ..... No se produce colisión.
-428+  89D5              ;       "$81" ..... Se produce colisión.
-429+  89D5
-430+  89D5 E5           Comprueba_Colision push hl
-431+  89D6 1E 80            ld e,$80                                       ; E,(Impacto)="0".
-432+  89D8 CD ED 89         call Bucle_2                                   ; Comprobamos el 1er scanline.
-433+  89DB
-434+  89DB 7B               ld a,e
-435+  89DC E6 01            and 1
-436+  89DE 28 03            jr z,1F                                        ; Si no se produce impacto comprobamos el 2º scanline.
-437+  89E0
-438+  89E0              ; Hay impacto.
-439+  89E0
-440+  89E0 43           2 ld b,e
-441+  89E1 E1               pop hl                                         ; Puntero de impresión en HL e indicador de Impacto en B.
-442+  89E2 C9           3 ret
-443+  89E3
-444+  89E3 E1           1 pop hl
-445+  89E4 E5               push hl
-446+  89E5 CD E1 8C         call NextScan
-447+  89E8 CD ED 89         call Bucle_2
-448+  89EB 18 F3            jr 2B
-449+  89ED
-450+  89ED              ; ---------- ----------
-451+  89ED
-452+  89ED 06 02        Bucle_2 ld b,2
-453+  89EF 7E           2 ld a,(hl)
-454+  89F0 A7               and a
-455+  89F1 20 04            jr nz,1F
-456+  89F3 23               inc hl
-457+  89F4 10 F9            djnz 2B
-458+  89F6 C9           3 ret
-459+  89F7 1E 81        1 ld e,$81
-460+  89F9 18 FB            jr 3B
-461+  89FB
-462+  89FB              ; -------------------------------------------------------------------------------------------------------------
-463+  89FB
-464+  89FB
-465+  89FB
-466+  89FB
-467+  89FB
+406+  89CE              ;   Inicializamos los punteros de disparos antes de salir. Pretendemos que los campos vacíos del índice siempre estén
+407+  89CE              ;   _ al final. Los disparos nuevos que se generen se guardarán en el primer cajón vacío del índice.
+408+  89CE
+409+  89CE CD 4B 87         call Inicia_Puntero_Disparo_Amadeus
+410+  89D1 CD 44 87         call Inicia_Puntero_Disparo_Entidades
+411+  89D4
+412+  89D4 C9           4 ret
+413+  89D5
+414+  89D5              ; ----------------------------------------------------------------
+415+  89D5              ;
+416+  89D5              ;   4/3/23
+417+  89D5              ;
+418+  89D5              ;   Entrega el siguiente dato en el registro B en función de si se produce colisión, o no,_
+419+  89D5              ;   _ al generarse el disparo.
+420+  89D5              ;       "$80" ..... No se produce colisión.
+421+  89D5              ;       "$81" ..... Se produce colisión.
+422+  89D5
+423+  89D5 E5           Comprueba_Colision push hl
+424+  89D6 1E 80            ld e,$80                                       ; E,(Impacto)="0".
+425+  89D8 CD ED 89         call Bucle_2                                   ; Comprobamos el 1er scanline.
+426+  89DB
+427+  89DB 7B               ld a,e
+428+  89DC E6 01            and 1
+429+  89DE 28 03            jr z,1F                                        ; Si no se produce impacto comprobamos el 2º scanline.
+430+  89E0
+431+  89E0              ; Hay impacto.
+432+  89E0
+433+  89E0 43           2 ld b,e
+434+  89E1 E1               pop hl                                         ; Puntero de impresión en HL e indicador de Impacto en B.
+435+  89E2 C9           3 ret
+436+  89E3
+437+  89E3 E1           1 pop hl
+438+  89E4 E5               push hl
+439+  89E5 CD E1 8C         call NextScan
+440+  89E8 CD ED 89         call Bucle_2
+441+  89EB 18 F3            jr 2B
+442+  89ED
+443+  89ED              ; ---------- ----------
+444+  89ED
+445+  89ED 06 02        Bucle_2 ld b,2
+446+  89EF 7E           2 ld a,(hl)
+447+  89F0 A7               and a
+448+  89F1 20 04            jr nz,1F
+449+  89F3 23               inc hl
+450+  89F4 10 F9            djnz 2B
+451+  89F6 C9           3 ret
+452+  89F7 1E 81        1 ld e,$81
+453+  89F9 18 FB            jr 3B
+454+  89FB
+455+  89FB              ; -------------------------------------------------------------------------------------------------------------
+456+  89FB
+457+  89FB
+458+  89FB
+459+  89FB
+460+  89FB
 # file closed: Disparo.asm
 834   89FB              	include "Draw_XOR.asm"
 # file opened: Draw_XOR.asm

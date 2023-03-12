@@ -383,7 +383,6 @@ Almacena_disparo
     push ix                                         ; Rutina de impresión.
     push af                                         ; Puntero de impresión.
     push iy                                         ; Puntero objeto.
-
     push bc                                         ; Control.
 
     ld sp,(Stack)
@@ -402,13 +401,6 @@ Almacena_disparo
 
 	ld hl,Ctrl_1									; Restauramos el indicador de disparo antes de salir.
 	res 0,(hl)
-
-;   Preparamos los punteros de extraccion de disparos para utilizarlos más tarde en la rutina: Extrae_foto_registros_disparos.
-
-;    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
-;    ld (Puntero_extraccion_disparo_Amadeus),hl
-;    ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
-;    ld (Puntero_extraccion_disparo_entidades),hl
 
 ;   Inicializamos los punteros de disparos antes de salir. Pretendemos que los campos vacíos del índice siempre estén
 ;   _ al final. Los disparos nuevos que se generen se guardarán en el primer cajón vacío del índice.
