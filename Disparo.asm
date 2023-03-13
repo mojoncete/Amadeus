@@ -452,8 +452,36 @@ Bucle_2 ld b,2
     jr 3B
 
 ; -------------------------------------------------------------------------------------------------------------
+;
+;   13/03/23
+;
+;   Limpia el album de fotos de disparos después de cada borra/pinta. 50fps.
+;
+;   DESTRUYE: HL,BC,DE y A.
 
+Limpia_album_disparos ld hl,Album_de_fotos_disparos
+    ld a,(hl)
+    and a
+    ret z                                               ; Salimos de la rutina si no hay ningún disparo en pantalla.
 
-  
-
+    ld b,h
+    ld c,l
+    ld hl,(Stack_snapshot_disparos)
+    push hl
+    and a
+    sbc hl,bc                                           
+    push hl
+    pop bc                                              ; BC contiene el nº de bytes a limpiar.
  
+    pop hl
+    ld d,h
+    ld e,l
+    dec de
+    lddr                                                ; Limpiamos.
+
+    ld hl,Album_de_fotos_disparos
+    ld (Stack_snapshot_disparos),hl
+
+    ret
+
+; -------------------------------------------------------------------------------------------------------------
