@@ -498,17 +498,23 @@ Motor_de_disparos ld bc,Disparo_3A
     jr z,1F                                              ; Disparo vacio, saltamos al siguiente.
 
 ; ----- ----- ----- ----- ----- -----
-; Actúa el motor.
- 
-    ld (Stack),sp
-    ld sp,hl
-    jr $
+
+    push bc
+
+    call foto_disparo_a_borrar 
+    call Mueve_disparo
+    call foto_disparo_a_borrar 
+
+    pop bc
+
+    jr 7F
+
 ; ----- ----- ----- ----- ----- -----
 
 1 sbc hl,bc
     jr z,3F                                              ; Hemos llegado al final del índice de disparos de Amadeus??
 
-    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)               ; Avanza disparo.
+7 ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)               ; Avanza disparo.
     inc hl
     inc hl
     ld (Puntero_DESPLZ_DISPARO_AMADEUS),hl
@@ -525,20 +531,23 @@ Motor_de_disparos ld bc,Disparo_3A
     jr z,4F                                              ; Disparo vacio, saltamos al siguiente.
 
 ; ----- ----- ----- ----- ----- -----
-; Actúa el motor.
-    
-    ld (Stack),sp
-    ld sp,hl
-    jr $
 
+    push bc
 
+    call foto_disparo_a_borrar 
+    call Mueve_disparo
+    call foto_disparo_a_borrar 
+ 
+    pop bc
+
+    jr 8F
 
 ; ----- ----- ----- ----- ----- -----
 
 4 sbc hl,bc
     jr z,6F
 
-    ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
+8 ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
     inc hl
     inc hl
     ld (Puntero_DESPLZ_DISPARO_ENTIDADES),hl
@@ -546,3 +555,70 @@ Motor_de_disparos ld bc,Disparo_3A
 
 6 call Inicia_Puntero_Disparo_Entidades
     ret
+
+; ------------------------------------------------------------------
+
+foto_disparo_a_borrar push hl
+    inc hl
+    inc hl
+    ld (Stack),sp
+    ld sp,hl                                             ; Situamos el sp en Puntero objeto
+    pop iy
+    pop ix
+    pop hl
+    ld sp,(Stack)
+    ld a,(Ctrl_1)
+    set 0,a
+    ld (Ctrl_1),a
+    call Guarda_foto_registros
+    ld a,(Ctrl_1)
+    res 0,a
+    ld (Ctrl_1),a
+    pop hl
+    ret
+
+Mueve_disparo push hl
+    ld a,(hl)
+    ld b,4
+1 inc hl
+    djnz 1B
+
+    call Extrae_address
+
+    and 1
+    jr z,2F
+
+; Disparo hacia arriba, (Amadeus).    
+
+; Nota: Aquí podemos implementar una variable para modificar la velocidad del disparo en función_
+; _ de la dificultad.
+
+    call PreviousScan 
+;    call PreviousScan
+;    call PreviousScan
+;    call PreviousScan
+
+; TRABAJAR LÍMITE SUPERIOR DEL DISPAROOOOO !!!!!!!!!!!
+
+3 ex de,hl
+
+    ld (hl),e
+    inc hl
+    ld (hl),d
+
+    pop hl
+    ret
+
+; Disparo hacia abajo, (Entidad).
+
+; Nota: Aquí podemos implementar una variable para modificar la velocidad del disparo en función_
+; _ de la dificultad.
+
+2 call NextScan
+;    call NextScan
+;    call NextScan
+;    call NextScan
+  
+; TRABAJAR LÍMITE SUPERIOR DEL DISPAROOOOO !!!!!!!!!!!
+
+    jr 3B

@@ -395,6 +395,7 @@ Pinta_Disparo ld (Stack),sp
     xor (hl)
     ld (hl),a
     dec hl
+
     inc h     
     ld a,h
     and 7
@@ -409,6 +410,7 @@ Pinta_Disparo ld (Stack),sp
 2 ld a,h
     cp $58
     jr z,3F
+
     djnz 1B
 3 ld sp,(Stack)
     ret
