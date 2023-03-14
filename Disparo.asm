@@ -485,3 +485,64 @@ Limpia_album_disparos ld hl,Album_de_fotos_disparos
     ret
 
 ; -------------------------------------------------------------------------------------------------------------
+;
+;   14/03/23
+;
+
+Motor_de_disparos ld bc,Disparo_3A
+    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)               ; Avanza disparo.
+
+2 call Extrae_address
+    ld a,(hl)
+    and a
+    jr z,1F                                              ; Disparo vacio, saltamos al siguiente.
+
+; ----- ----- ----- ----- ----- -----
+; Actúa el motor.
+ 
+    ld (Stack),sp
+    ld sp,hl
+    jr $
+; ----- ----- ----- ----- ----- -----
+
+1 sbc hl,bc
+    jr z,3F                                              ; Hemos llegado al final del índice de disparos de Amadeus??
+
+    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)               ; Avanza disparo.
+    inc hl
+    inc hl
+    ld (Puntero_DESPLZ_DISPARO_AMADEUS),hl
+    jr 2B
+
+3 call Inicia_Puntero_Disparo_Amadeus
+    
+    ld bc,Disparo_11
+    ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
+
+5 call Extrae_address
+    ld a,(hl)
+    and a
+    jr z,4F                                              ; Disparo vacio, saltamos al siguiente.
+
+; ----- ----- ----- ----- ----- -----
+; Actúa el motor.
+    
+    ld (Stack),sp
+    ld sp,hl
+    jr $
+
+
+
+; ----- ----- ----- ----- ----- -----
+
+4 sbc hl,bc
+    jr z,6F
+
+    ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
+    inc hl
+    inc hl
+    ld (Puntero_DESPLZ_DISPARO_ENTIDADES),hl
+    jr 5B
+
+6 call Inicia_Puntero_Disparo_Entidades
+    ret
