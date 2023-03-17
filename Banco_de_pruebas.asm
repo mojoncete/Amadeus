@@ -159,6 +159,13 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 ;														BIT 0, La rutina de generación de disparos, [Genera_disparo], pone este bit a "1" para indicar a la_
 ;															_ rutina [Guarda_foto_registros] que los datos a guardar pertenecen a un disparo y no a una entidad,_
 ;															_ por lo tanto hemos de almacenarlos en `Album_de_fotos_disparos´ en lugar de `Album_de_fotos´.
+;														BIT 1, Este bit indica que el disparo sale de la pantalla, ($4000-$57ff).
+
+
+
+
+
+
 ; Gestión de ENTIDADES.
 
 Puntero_store_entidades defw 0

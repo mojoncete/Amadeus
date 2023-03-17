@@ -500,11 +500,9 @@ Motor_de_disparos ld bc,Disparo_3A
 ; ----- ----- ----- ----- ----- -----
 
     push bc
-
     call foto_disparo_a_borrar 
     call Mueve_disparo
     call foto_disparo_a_borrar 
-
     pop bc
 
     jr 7F
@@ -514,7 +512,7 @@ Motor_de_disparos ld bc,Disparo_3A
 1 sbc hl,bc
     jr z,3F                                              ; Hemos llegado al final del índice de disparos de Amadeus??
 
-7 ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)               ; Avanza disparo.
+7 ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)                 ; Avanza disparo.
     inc hl
     inc hl
     ld (Puntero_DESPLZ_DISPARO_AMADEUS),hl
@@ -558,7 +556,13 @@ Motor_de_disparos ld bc,Disparo_3A
 
 ; ------------------------------------------------------------------
 
-foto_disparo_a_borrar push hl
+foto_disparo_a_borrar 
+
+    ld a,(hl)                                            ; Si el disparo está vacio salimos de la rutina.
+    and a                                                ; [Mueve_disparo] a eliminado el disparo de la base de datos_
+    ret z                                                ; _ al sobrepasar los límites de pantalla.
+
+    push hl
     inc hl
     inc hl
     ld (Stack),sp
@@ -598,7 +602,16 @@ Mueve_disparo push hl
 ;    call PreviousScan
 ;    call PreviousScan
 
-; TRABAJAR LÍMITE SUPERIOR DEL DISPAROOOOO !!!!!!!!!!!
+; Detecta si el disparo de Amadeus sale de pantalla:
+
+    ld a,h
+    cp $40
+    jr nc,3F
+
+; Si el proyectil sale de pantalla borramos el disparo de la base de datos.   
+
+    call Elimina_disparo_de_base_de_datos 
+    jr 4F
 
 3 ex de,hl
 
@@ -606,7 +619,7 @@ Mueve_disparo push hl
     inc hl
     ld (hl),d
 
-    pop hl
+4 pop hl
     ret
 
 ; Disparo hacia abajo, (Entidad).
@@ -622,3 +635,21 @@ Mueve_disparo push hl
 ; TRABAJAR LÍMITE SUPERIOR DEL DISPAROOOOO !!!!!!!!!!!
 
     jr 3B
+
+Elimina_disparo_de_base_de_datos 
+
+    ex de,hl
+    ld b,4
+1 dec hl
+    djnz 1B
+    ld bc,7
+
+    xor a
+    ld (hl),a
+    ld d,h
+    ld e,l
+    inc de
+
+    ldir
+
+    ret
