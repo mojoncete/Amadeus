@@ -16,7 +16,7 @@ Indice_de_disparos_Amadeus defw Disparo_1A
 
 Disparo_1A defw 0									; Control.
 	defw 0											; Puntero objeto.
-	defw 0											; Puntero de impresión.
+ON_Disparo_2A defw 0								; Puntero de impresión.
 	defw 0											; Rutina de impresión.										
 
 Disparo_2A defw 0									; Control.

@@ -35,6 +35,8 @@ Genera_disparo
 ;   _ sólo podran generar disparo cuando (CTRL_DESPLZ) tenga estos valores, $00, $f9, $fb y $fd.
 ;   IY contendrá la dirección de Puntero_objeto_disparo. 
 
+; Exclusiones:
+
     ld a,(Columnas)
     ld b,a
     ld a,(Columns)
@@ -43,7 +45,22 @@ Genera_disparo
 
 ; ----- ----- -----
 
-    ld hl,Indice_disparo
+; Habilita el segundo disparo si el primero ha superado la línea $4860
+
+    ld hl,ON_Disparo_2A
+    call Extrae_address
+    inc h
+    dec h
+    jr z,14F
+
+    ld de,$4860                         ; Si el 1er disparo no ha llegado a esta línea no se autoriza el segundo. RET.
+    and a
+    sbc hl,de
+    ret nc
+
+; ----- ----- -----
+
+14 ld hl,Indice_disparo
     ld a,(CTRL_DESPLZ)
     ld c,a
     ld b,0	                            ; B será 0,1,2 o 3 en función del valor de (CTRL_DESPLZ).
@@ -331,11 +348,11 @@ Almacena_disparo
 ;	_ iniciamos (Puntero_DESPLZ_DISPARO_AMADEUS) situándolo al comienzo del índice y salimos.
 
     push bc
-    ld bc,Indice_de_disparos_Amadeus+4              ; Disparo_3A
+    ld bc,Indice_de_disparos_Amadeus+4              ; Disparo_3A. Indica que no quedan disparos. Final de índice.
     ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
     and a
     sbc hl,bc
-    call z,Inicia_Puntero_Disparo_Amadeus
+    call z,Inicia_Puntero_Disparo_Amadeus           ; Iniciamos el puntero de desplazamiento del índice y salimos. Amadeus no tiene disparos.
     pop bc
     jr z,4F
 
@@ -598,9 +615,8 @@ Mueve_disparo push hl
 ; _ de la dificultad.
 
     call PreviousScan 
-;    call PreviousScan
-;    call PreviousScan
-;    call PreviousScan
+    call PreviousScan
+    call PreviousScan
 
 ; Detecta si el disparo de Amadeus sale de pantalla:
 
@@ -628,13 +644,18 @@ Mueve_disparo push hl
 ; _ de la dificultad.
 
 2 call NextScan
-;    call NextScan
-;    call NextScan
-;    call NextScan
-  
-; TRABAJAR LÍMITE SUPERIOR DEL DISPAROOOOO !!!!!!!!!!!
+    call NextScan
+    call NextScan
 
-    jr 3B
+  ; Detecta si el disparo de la entidad sale de la pantalla.
+
+    ld a,h
+    cp $58
+    jr c,3B
+
+    call Elimina_disparo_de_base_de_datos 
+    jr 4B
+
 
 Elimina_disparo_de_base_de_datos 
 
