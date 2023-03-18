@@ -514,6 +514,17 @@ Motor_de_disparos ld bc,Disparo_3A
     and a
     jr z,1F                                              ; Disparo vacio, saltamos al siguiente.
 
+
+; **********************************************************************************************
+; Hay colisión ?????????????                             18/03/23
+
+    inc hl
+    ld a,(hl)
+    and 1
+    jr nz,$
+    dec hl
+; **********************************************************************************************
+
 ; ----- ----- ----- ----- ----- -----
 
     push bc
@@ -544,6 +555,16 @@ Motor_de_disparos ld bc,Disparo_3A
     ld a,(hl)
     and a
     jr z,4F                                              ; Disparo vacio, saltamos al siguiente.
+
+; **********************************************************************************************
+; Hay colisión ?????????????                             18/03/23
+
+    inc hl
+    ld a,(hl)
+    and 1
+    jr nz,$
+    dec hl
+; **********************************************************************************************
 
 ; ----- ----- ----- ----- ----- -----
 
@@ -629,13 +650,25 @@ Mueve_disparo push hl
     call Elimina_disparo_de_base_de_datos 
     jr 4F
 
-3 ex de,hl
+; Se ha desplazado la bala, compruebo colisión.
+
+3 push de
+    push bc
+    call Comprueba_Colision
+    ld a,b
+    pop bc
+    pop de
+
+    ex de,hl
 
     ld (hl),e
     inc hl
     ld (hl),d
 
 4 pop hl
+    inc hl
+    ld (hl),a                                   ; Modificamos el byte "impacto" de la base de datos del disparo si hay colisión.
+    dec hl
     ret
 
 ; Disparo hacia abajo, (Entidad).
