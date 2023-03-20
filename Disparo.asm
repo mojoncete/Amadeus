@@ -51,7 +51,7 @@ Genera_disparo
     call Extrae_address
     inc h
     dec h
-    jr z,14F
+    jr z,14F                            ; No hay almacenado ningún disparo de Amadeus. Seguimos con la rutina.
 
     ld de,$4860                         ; Si el 1er disparo no ha llegado a esta línea no se autoriza el segundo. RET.
     and a
@@ -237,7 +237,7 @@ Genera_disparo
 ;
 ;	En el 1er y 2º cuadrante de pantalla, sólo cabe la posibilidad de que sea una entidad la que dispare,_
 ;	_ por lo tanto siempre se iniciara el disparo en la parte `baja´ del sprite.
-;   La dirección del proyectil siempre será hacia abajo. En los cuadrante 1º y 2º no se comprueba colision_
+;   La dirección del proyectil siempre será hacia abajo. En los cuadrantes 1º y 2º no se comprueba colision_
 ;   _ pues sabemos que Amadeus sólo puede estar situado en los cuadrantes 3º y 4º.
 
 ; 	Cuando (CTRL_DESPLZ)="0", B="0"
@@ -436,37 +436,38 @@ Almacena_disparo
 ;       "$80" ..... No se produce colisión.
 ;       "$81" ..... Se produce colisión.
 
-Comprueba_Colision push hl
-    ld e,$80                                       ; E,(Impacto)="0".
+;   Nota: Es necesario que se produzca colisión en los dos scanlines que forman el disparo.
+;         La sensibilidad la puedo ajustar eliminando la segunda línea "ld e,$80" de [Comprueba_Colision].
+
+
+Comprueba_Colision push iy                         ; Puntero objeto (disparo).
+    push hl                                        ; Puntero de impresión.                                 
+    ld e,$80                                       ; E,(Impacto)="$80".
     call Bucle_2                                   ; Comprobamos el 1er scanline.
- 
-    ld a,e
-    and 1
-    jr z,1F                                        ; Si no se produce impacto comprobamos el 2º scanline.
- 
+    pop hl
+    push hl
+    call NextScan
+    ld e,$80
+    call Bucle_2      
+
 ; Hay impacto.
 
 2 ld b,e
     pop hl                                         ; Puntero de impresión en HL e indicador de Impacto en B.
-3 ret                                            
+    pop iy
+    ret                                            
 
-1 pop hl
-    push hl
-    call NextScan
-    call Bucle_2
-    jr 2B
-
-; ---------- ----------
+ ; ---------- ----------
 
 Bucle_2 ld b,2 
-2 ld a,(hl)
-    and a
-    jr nz,1F
-    inc hl
+2 ld a,(iy)
+    and (hl)
+    jr z,1F
+    ld e,$81
+1 inc hl
+    inc iy
     djnz 2B
-3 ret
-1 ld e,$81
-    jr 3B
+    ret                                         
 
 ; -------------------------------------------------------------------------------------------------------------
 ;
