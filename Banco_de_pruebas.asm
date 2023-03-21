@@ -288,7 +288,7 @@ Frame
 ; ----------------------------------------------------------------------
 
 	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
-	call Motor_de_disparos								; Borra/mueve/pinta cada uno de los disparos.
+	call Motor_de_disparos								; Borra/mueve/pinta cada uno de los disparos y crea un nuevo album de fotos.
 
 	ld hl,Album_de_fotos
     ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_

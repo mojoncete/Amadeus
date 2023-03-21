@@ -327,7 +327,7 @@ Ajusta_disparo_parte_izquierda ld a,b
 ;
 ;   25/02/23
 ;
-;   La Rutina va almacenando disparos en sus respectiva bases de datos.
+;   La Rutina va almacenando disparos en sus respectivas bases de datos.
 ;   Amadeus dispone de 2 disparos mientras que las entidades disponen de un máximo de 10.
 
 Almacena_disparo 
@@ -433,6 +433,7 @@ Almacena_disparo
 ;   
 ;   Entrega el siguiente dato en el registro B en función de si se produce colisión, o no,_
 ;   _ al generarse el disparo.
+;
 ;       "$80" ..... No se produce colisión.
 ;       "$81" ..... Se produce colisión.
 
@@ -447,7 +448,7 @@ Comprueba_Colision push iy                         ; Puntero objeto (disparo).
     pop hl
     push hl
     call NextScan
-    ld e,$80
+    ld e,$80                                       ; ----- ( ) -----
     call Bucle_2      
 
 ; Hay impacto.
@@ -515,22 +516,24 @@ Motor_de_disparos ld bc,Disparo_3A
     and a
     jr z,1F                                              ; Disparo vacio, saltamos al siguiente.
 
-
-; **********************************************************************************************
-; Hay colisión ?????????????                             18/03/23
-
-    inc hl
-    ld a,(hl)
-    and 1
-    jr nz,$
-    dec hl
-; **********************************************************************************************
-
 ; ----- ----- ----- ----- ----- -----
 
     push bc
     call foto_disparo_a_borrar 
-    call Mueve_disparo
+
+; Existe colisión con este disparo???
+
+    inc hl                                               ; El 1er byte indica dirección, el 2º, IMPACTO.
+    ld a,(hl)
+    dec hl
+    and 1
+    jr z,9F
+
+; Elimino el disparo de la base de datos.
+
+    jr $
+
+9 call Mueve_disparo
     call foto_disparo_a_borrar 
     pop bc
 
@@ -557,24 +560,26 @@ Motor_de_disparos ld bc,Disparo_3A
     and a
     jr z,4F                                              ; Disparo vacio, saltamos al siguiente.
 
-; **********************************************************************************************
-; Hay colisión ?????????????                             18/03/23
-
-    inc hl
-    ld a,(hl)
-    and 1
-    jr nz,$
-    dec hl
-; **********************************************************************************************
-
 ; ----- ----- ----- ----- ----- -----
 
     push bc
 
     call foto_disparo_a_borrar 
-    call Mueve_disparo
+
+; Existe colisión con este disparo???
+
+    inc hl                                               ; El 1er byte indica dirección, el 2º, IMPACTO.
+    ld a,(hl)
+    dec hl
+    and 1
+    jr z,10F
+
+; Elimino el disparo de la base de datos.
+
+    jr $
+
+10 call Mueve_disparo
     call foto_disparo_a_borrar 
- 
     pop bc
 
     jr 8F
@@ -691,9 +696,7 @@ Mueve_disparo push hl
     jr 4B
 
 
-Elimina_disparo_de_base_de_datos 
-
-    ex de,hl
+Elimina_disparo_de_base_de_datos ex de,hl
     ld b,4
 1 dec hl
     djnz 1B
