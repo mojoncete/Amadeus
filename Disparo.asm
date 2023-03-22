@@ -505,7 +505,7 @@ Limpia_album_disparos ld hl,Album_de_fotos_disparos
 
 ; -------------------------------------------------------------------------------------------------------------
 ;
-;   14/03/23
+;   22/03/23
 ;
 
 Motor_de_disparos ld bc,Disparo_3A
@@ -531,7 +531,11 @@ Motor_de_disparos ld bc,Disparo_3A
 
 ; Elimino el disparo de la base de datos.
 
-    jr $
+    push hl
+    call Elimina_disparo_de_base_de_datos
+    pop hl
+    ld a,1
+    ld (Impacto),a                                       ; Indicamos que se ha producido Impacto en una entidad.
 
 9 call Mueve_disparo
     call foto_disparo_a_borrar 
@@ -563,7 +567,6 @@ Motor_de_disparos ld bc,Disparo_3A
 ; ----- ----- ----- ----- ----- -----
 
     push bc
-
     call foto_disparo_a_borrar 
 
 ; Existe colisión con este disparo???
@@ -576,7 +579,11 @@ Motor_de_disparos ld bc,Disparo_3A
 
 ; Elimino el disparo de la base de datos.
 
-    jr $
+    push hl
+    call Elimina_disparo_de_base_de_datos
+    pop hl
+    ld a,2                                               ; Indicamos que se ha producido Impacto en Amadeus.
+    ld (Impacto),a
 
 10 call Mueve_disparo
     call foto_disparo_a_borrar 
@@ -649,11 +656,17 @@ Mueve_disparo push hl
 
     ld a,h
     cp $40
-    jr nc,3F
+    jr nc,3F                                    ; El disparo no ha salido de la pantalla. Compreba colisión.
 
 ; Si el proyectil sale de pantalla borramos el disparo de la base de datos.   
 
+    ex de,hl
+    ld b,4
+6 dec hl
+    djnz 6B
+
     call Elimina_disparo_de_base_de_datos 
+
     jr 4F
 
 ; Se ha desplazado la bala, compruebo colisión.
@@ -690,24 +703,23 @@ Mueve_disparo push hl
 
     ld a,h
     cp $58
-    jr c,3B
+    jr c,3B                                     ; El disparo no ha salido de la pantalla. Compreba colisión.
+
+    ex de,hl
+    ld b,4
+5 dec hl
+    djnz 5B
 
     call Elimina_disparo_de_base_de_datos 
+
     jr 4B
 
-
-Elimina_disparo_de_base_de_datos ex de,hl
-    ld b,4
-1 dec hl
-    djnz 1B
-    ld bc,7
-
+; HL apunta al primer byte de la base de datos del disparo.
+Elimina_disparo_de_base_de_datos ld bc,7
     xor a
     ld (hl),a
     ld d,h
     ld e,l
     inc de
-
     ldir
-
     ret

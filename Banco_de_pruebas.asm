@@ -193,7 +193,11 @@ Stack_snapshot_disparos defw Album_de_fotos_disparos	; Puntero que indica la pos
 Numero_de_disparotes db 0	
 Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
 Puntero_DESPLZ_DISPARO_AMADEUS defw 0
-Impacto db 0
+Impacto db 0											; Este byte indica que se ha producido impacto:
+; 														; (Impacto)="1". El impacto se produce en una entidad.
+;														; (Impacto)="2". El impacto se produce en Amadeus.
+Direccion_de_impacto defw 0								; Esta variable almacena la direccíon de mem. de pantalla donde se ha producido_
+;														; _ el impacto.
 
 ; Gestión de FRAMES.
 
@@ -287,7 +291,20 @@ Frame
 
 ; ----------------------------------------------------------------------
 
-	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
+;	Existe colisión?????
+
+	ld a,(Impacto)
+	and a
+	jr z,5F
+
+; A="1" Impacto en entidad.
+; A="2"	Impacto en Amadeus.
+
+	jr $
+
+
+
+5 call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
 	call Motor_de_disparos								; Borra/mueve/pinta cada uno de los disparos y crea un nuevo album de fotos.
 
 	ld hl,Album_de_fotos
