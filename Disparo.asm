@@ -583,9 +583,43 @@ Motor_de_disparos ld bc,Disparo_3A
     and 1
     jr z,10F
 
+; La colisión se produce con Amadeus??? 
+
+    jr $
+; -----------------------debug
+    push hl
+    ld b,4
+13 inc hl
+    djnz 13B
+    
+    call Extrae_address  
+    push hl                                              ; Dirección de pantalla donde se encuentra_
+;                                                        ; _ el proyectil.
+    ld hl,Amadeus_db
+    inc hl
+    inc hl
+    call Extrae_address    
+    ex de,hl                                             ; Posicion_actual de Amadeus en DE.
+
+    pop hl
+    and a
+    sbc hl,de
+    ex af,af'
+    pop hl
+    ex af,af'
+    jr nc,14F
+
+; No hay impacto, no se trata de Amadeus.
+
+    inc hl
+    dec (hl)
+    dec hl
+    jr 10F
+; -----------------------debug
+
 ; Elimino el disparo de la base de datos.
 
-    push hl
+14 push hl
     call Elimina_disparo_de_base_de_datos
     pop hl
 
