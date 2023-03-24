@@ -448,10 +448,14 @@ Comprueba_Colision push iy                         ; Puntero objeto (disparo).
     pop hl
     push hl
     call NextScan
+
+    ld a,h                                         ; El 1er scanline de la bala se pinta en pantalla.
+    cp $58                                         ; El 2º scanline indica colisión porque entra en zona_
+    jr z,2F                                        ; _ de atributos. Evitamos comprobar colisión en el _
+;                                                  ; _ 2º scanline si esto es así.    
+
     ld e,$80                                       ; ----- ( ) -----
     call Bucle_2      
-
-; Hay impacto.
 
 2 ld b,e
     pop hl                                         ; Puntero de impresión en HL e indicador de Impacto en B.
@@ -536,10 +540,12 @@ Motor_de_disparos ld bc,Disparo_3A
     pop hl
     ld a,1
     ld (Impacto),a                                       ; Indicamos que se ha producido Impacto en una entidad.
+    jr 11F
 
 9 call Mueve_disparo
     call foto_disparo_a_borrar 
-    pop bc
+
+11 pop bc
 
     jr 7F
 
@@ -582,12 +588,14 @@ Motor_de_disparos ld bc,Disparo_3A
     push hl
     call Elimina_disparo_de_base_de_datos
     pop hl
+
     ld a,2                                               ; Indicamos que se ha producido Impacto en Amadeus.
     ld (Impacto),a
+    jr 12F
 
 10 call Mueve_disparo
     call foto_disparo_a_borrar 
-    pop bc
+12 pop bc
 
     jr 8F
 
@@ -637,6 +645,8 @@ Mueve_disparo push hl
     ld b,4
 1 inc hl
     djnz 1B
+
+; HL apunta a la dirección donde se encuentra el puntero de impresión en pantalla.
 
     call Extrae_address
 

@@ -80,7 +80,7 @@ Indice_Sprite_izq defw Indice_Badsat_izq
 Puntero_DESPLZ_der defw 0
 Puntero_DESPLZ_izq defw 0
 
-Posicion_inicio defw $473e								; Dirección de pantalla donde aparece el objeto. [DRAW].
+Posicion_inicio defw $475e								; Dirección de pantalla donde aparece el objeto. [DRAW].
 Cuad_objeto db 2										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
 ; Variables de objeto. (Características).
@@ -132,7 +132,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
-Puntero_indice_mov defw Indice_mov_Izquierda_y_derecha
+Puntero_indice_mov defw Indice_mov_Escaloncitos_izquierda_abajo
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0
@@ -302,9 +302,10 @@ Frame
 
 	jr $
 
+5 xor a
+	ld (Impacto),a										; Flag (Impacto) a "0".
 
-
-5 call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
+	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
 	call Motor_de_disparos								; Borra/mueve/pinta cada uno de los disparos y crea un nuevo album de fotos.
 
 	ld hl,Album_de_fotos
