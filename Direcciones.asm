@@ -380,11 +380,11 @@ Mov_left
 
 ; ---------- ---------- ----------
 
-	ld b,2 															; Para hacer que el objeto aparezca poco a poco, hemos de desplazarlo 2 veces: El primer desplazamiento_
+	ld b,3 															; Para hacer que el objeto aparezca poco a poco, hemos de desplazarlo 2 veces: El primer desplazamiento_
 5 push bc 															; _pone (CTRL_DESPLZ) a "0" y el segundo a "$ff". Con esto hacemos que el Sprite tenga espacio en blanco delante_
 
-	ld hl,(Indice_Sprite_izq)			
-	ld (Puntero_DESPLZ_izq),hl
+;	ld hl,(Indice_Sprite_izq)			
+;	ld (Puntero_DESPLZ_izq),hl
 
 	call DESPLZ_IZQ
 	pop bc
@@ -396,6 +396,7 @@ Mov_left
 	jr 2F 															; Salimos para pintar la nueva posición.
 
 ; ---------- ---------- ----------
+
 ; Movemos, no hay recolocación.
 
 8 ld hl,(Posicion_actual)

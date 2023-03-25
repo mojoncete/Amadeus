@@ -453,7 +453,6 @@ Comprueba_Colision push iy                         ; Puntero objeto (disparo).
     cp $58                                         ; El 2º scanline indica colisión porque entra en zona_
     jr z,2F                                        ; _ de atributos. Evitamos comprobar colisión en el _
 ;                                                  ; _ 2º scanline si esto es así.    
-
     ld e,$80                                       ; ----- ( ) -----
     call Bucle_2      
 
@@ -585,36 +584,10 @@ Motor_de_disparos ld bc,Disparo_3A
 
 ; La colisión se produce con Amadeus??? 
 
-    jr $
 ; -----------------------debug
-    push hl
-    ld b,4
-13 inc hl
-    djnz 13B
-    
-    call Extrae_address  
-    push hl                                              ; Dirección de pantalla donde se encuentra_
-;                                                        ; _ el proyectil.
-    ld hl,Amadeus_db
-    inc hl
-    inc hl
-    call Extrae_address    
-    ex de,hl                                             ; Posicion_actual de Amadeus en DE.
 
-    pop hl
-    and a
-    sbc hl,de
-    ex af,af'
-    pop hl
-    ex af,af'
-    jr nc,14F
+    jr $
 
-; No hay impacto, no se trata de Amadeus.
-
-    inc hl
-    dec (hl)
-    dec hl
-    jr 10F
 ; -----------------------debug
 
 ; Elimino el disparo de la base de datos.
