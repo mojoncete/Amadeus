@@ -80,8 +80,8 @@ Indice_Sprite_izq defw Indice_Badsat_izq
 Puntero_DESPLZ_der defw 0
 Puntero_DESPLZ_izq defw 0
 
-Posicion_inicio defw $473e								; Dirección de pantalla donde aparece el objeto. [DRAW].
-Cuad_objeto db 2										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+Posicion_inicio defw $50cd								; Dirección de pantalla donde aparece el objeto. [DRAW].
+Cuad_objeto db 3										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
 ; Variables de objeto. (Características).
 
@@ -132,7 +132,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
-Puntero_indice_mov defw Indice_mov_Izquierda_y_derecha
+Puntero_indice_mov defw 0
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0
@@ -171,7 +171,7 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 Puntero_store_entidades defw 0
 Puntero_restore_entidades defw 0
 Indice_restore defw 0
-Numero_de_entidades db 1								; Nº de objetos en pantalla, (contando con Amadeus).
+Numero_de_entidades db 2								; Nº de objetos en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -249,6 +249,16 @@ START ld sp,$ffff										 ; Situamos el inicio de Stack.
 	call Store_Restore_entidades 				    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_entidades) en la siguiente.
 	pop bc
 	djnz 1B  											; Decremento el contador de entidades.
+
+; 
+
+
+
+
+
+
+
+
 
 ; 	INICIA AMADEUS!!!!!
 
@@ -368,7 +378,7 @@ Frame
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	29/1/23
+;	27/03/23
 
 Mov_obj 
 
@@ -379,6 +389,11 @@ Mov_obj
     call Prepara_var_pintado_borrado                    ; Almaceno las `VARIABLES DE BORRADO´. de la entidad almacenada en DRAW en (Variables_de_borrado).
 ;														; Obj_dibujado="0".
 ; Movemos Entidades malignas.
+
+	ld hl,(Puntero_indice_mov) 							; No hay movimiento, objeto estático!!!.
+	inc h                                               ; Salimos de la rutina.
+	dec h
+	ret z
 
 	call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
 	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!

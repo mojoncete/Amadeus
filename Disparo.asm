@@ -1,6 +1,6 @@
 ; ******************************************************************************************************************************************************************************************
 ;
-;   19/02/23
+;   27/03/23
 ;
 ; 	La rutina determina si es factible, o no, `generar' un disparo.
 ;   En el caso de generar disparo la rutina proporciona 4 variables:
@@ -43,11 +43,21 @@ Genera_disparo
     cp b
     ret nz                              ; Salimos si la entidad no está completa en pantalla.                           
 
+; ----- ----- ----- 
+
+    ld a,(Ctrl_0)                       ; Una entidad no podrá disparar si se encuentra por_
+    bit 6,a                             ; _ debajo de la línea "$14" de pantalla.
+    jr nz,16F
+
+    ld a,(Coordenada_y)
+    cp $14
+    ret nc
+
 ; ----- ----- -----
 
 ; Habilita el segundo disparo si el primero ha superado la línea $4860
 
-    ld hl,ON_Disparo_2A
+16 ld hl,ON_Disparo_2A
     call Extrae_address
     inc h
     dec h
