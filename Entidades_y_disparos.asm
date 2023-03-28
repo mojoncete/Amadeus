@@ -5,10 +5,10 @@
 
 ; Control. %00000001 00000001 
 ;
-;     [Bit0] ..... Impacto. "1" Cuando dispara Amadeus, (hacia arriba), "0" cuando lo_
-;                  _ hacen las entidades hacia abajo.
+;     [Byte 0] ..... Impacto. "$81" Cuando dispara Amadeus, (hacia arriba), "$80" cuando lo_
+;                    _ hacen las entidades hacia abajo.
 ;
-;     [Bit8] ..... Dirección. "1" Cuando se produce colisión al generar un disparo.
+;     [Byte 1] ..... Dirección. "$81" Cuando se produce colisión al generar un disparo."$80" si no la hay.
 
 Indice_de_disparos_Amadeus defw Disparo_1A
 	defw Disparo_2A
@@ -195,8 +195,13 @@ Entidad_2 db 2,2		                            ; (Filas) / (Columns).
 	defw 0											; (Puntero_DESPLZ_der).
 	defw 0											; (Puntero_DESPLZ_izq).
 
+<<<<<<< HEAD
 	defw $507e                                      ; (Posicion_inicio).
 	db 4											; (Cuad_objeto).
+=======
+	defw $4761                                      ; (Posicion_inicio).
+	db 1											; (Cuad_objeto).
+>>>>>>> c0a0d270ee4450360613338b998b740c4540e8f8
 
 	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
@@ -212,7 +217,11 @@ Entidad_2 db 2,2		                            ; (Filas) / (Columns).
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 
+<<<<<<< HEAD
 	defw Indice_mov_Izquierda_y_derecha,0  	  		; (Puntero_indice_mov) / (Puntero_mov).
+=======
+	defw Indice_mov_Escaloncitos_derecha_abajo,0  	; (Puntero_indice_mov) / (Puntero_mov).
+>>>>>>> c0a0d270ee4450360613338b998b740c4540e8f8
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
 
 	db 0 											; (Columnas).									

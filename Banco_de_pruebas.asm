@@ -312,9 +312,10 @@ Frame
 
 	jr $
 
+5 xor a
+	ld (Impacto),a										; Flag (Impacto) a "0".
 
-
-5 call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
+	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
 	call Motor_de_disparos								; Borra/mueve/pinta cada uno de los disparos y crea un nuevo album de fotos.
 
 	ld hl,Album_de_fotos
