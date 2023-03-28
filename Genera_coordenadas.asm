@@ -15,6 +15,7 @@ Genera_coordenadas push bc
 	ld hl,(Posicion_actual)
 	ld a,l
 	and $1f
+
 	ld (Coordenada_X),a 								; Coordenada Y del sprite, (0-$1f). Columnas.
 
 	call calcula_tercio
@@ -76,6 +77,6 @@ Genera_coordenadas_disparo
 	sub 32
 	jr nz,1B
 
-	djnz 1B 
+	djnz 1B 											; Filas en E. Coordenada_y.
 	ret
 

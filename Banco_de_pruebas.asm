@@ -80,7 +80,7 @@ Indice_Sprite_izq defw Indice_Badsat_izq
 Puntero_DESPLZ_der defw 0
 Puntero_DESPLZ_izq defw 0
 
-Posicion_inicio defw $50cd								; Dirección de pantalla donde aparece el objeto. [DRAW].
+Posicion_inicio defw $508d								; Dirección de pantalla donde aparece el objeto. [DRAW].
 Cuad_objeto db 3										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
 ; Variables de objeto. (Características).
@@ -196,9 +196,8 @@ Puntero_DESPLZ_DISPARO_AMADEUS defw 0
 Impacto db 0											; Este byte indica que se ha producido impacto:
 ; 														; (Impacto)="1". El impacto se produce en una entidad.
 ;														; (Impacto)="2". El impacto se produce en Amadeus.
-Direccion_de_impacto defw 0								; Esta variable almacena la direccíon de mem. de pantalla donde se ha producido_
-;														; _ el impacto.
-
+Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posibles columnas_
+;														; _ que puede ocupar el sprite de Amadeus. (Colisión).
 ; Gestión de FRAMES.
 
 Switch db 0

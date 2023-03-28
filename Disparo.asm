@@ -518,7 +518,7 @@ Limpia_album_disparos ld hl,Album_de_fotos_disparos
 
 ; -------------------------------------------------------------------------------------------------------------
 ;
-;   22/03/23
+;   28/03/23
 ;
 
 Motor_de_disparos ld bc,Disparo_3A
@@ -593,10 +593,31 @@ Motor_de_disparos ld bc,Disparo_3A
     jr z,10F
 
 ; La colisión se produce con Amadeus??? 
+; Amadeus siempre tiene (Coordenada_y)="$16".
 
-; -----------------------debug
+    push hl
 
+    ld b,4
+16 inc hl
+    djnz 16B                                             ; Sitúa HL en el Puntero_de_impresion del disparo.
+
+    call Extrae_address
+    call Genera_coordenadas_disparo
+    ld a,e                                               ; Fila en la que se encuentra el disparo en A.
+    cp $16
+    jr c,15F
+
+; ----------- debug (Colisiones en filas 16 y 17).
     jr $
+
+; No hay colisión. Amadeus se encuentra en una línea inferior.
+; Restauramos el indicador de colisión y movemos el disparo, (JR 10F).
+
+15  pop hl  
+    inc hl
+    dec (hl)
+    dec hl
+    jr 10F
 
 ; -----------------------debug
 
