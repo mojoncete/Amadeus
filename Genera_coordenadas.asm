@@ -1,37 +1,81 @@
-;	12/12/22
+; ------------------------------------------------------------------------
+;
+;	28/03/23
 ;
 ;	Proporciona las coordenadas del objeto a imprimir.
 ;	Fila superior "0", Columna izquierda "0".
 ;
 ;	Input: HL contendrá la (Posicion_actual) del Sprite.
 ;
-;	Modifica: A
+;	Modifica: A,BC y DE.
 
 Genera_coordenadas push bc
 	push hl
+
 	ld hl,(Posicion_actual)
 	ld a,l
 	and $1f
-	ld (Coordenada_X),a 								; Coordenada X del sprite, (0-$1f).
+	ld (Coordenada_X),a 								; Coordenada Y del sprite, (0-$1f). Columnas.
+
 	call calcula_tercio
-	ld b,a	
-	inc b												; Tercio de pantalla+1 en B, (1,2 o 3).
-	ld c,0 												; Contador de filas a "0".
+	inc a
+	ld b,a 												; "1", "2" o "3" en función del tercio de pantalla.
+
+	ld e,0
 	ld a,l
-	and $e0 											; Ahora (A) apunta al 1er char. de la fila en la que se encuentra el objeto.
-	jr z,2F
-1 inc c
+	and $e0
+1 inc e
 	sub 32
 	jr nz,1B
-2 inc c
-	inc b
-	dec b
-	jr z,3F
-	ld a,$e0
-	djnz 1B
-3 ld a,c
-	dec a
+
+	djnz 1B 
+
+	ld a,e
 	ld (Coordenada_y),a
+
 	pop hl
 	pop bc
+
 	ret
+
+; ------------------------------------------------------------------------
+;	28/03/23
+;
+;	Proporciona las coordenadas del disparo a imprimir.
+;	Fila superior "0", Columna izquierda "0".
+;
+;	Input: HL contendrá la posición del proyectil en pantalla.
+;	Output: DE contendrá las coordenadas del disparo:
+;
+;		DE="$120d"
+;
+;		D, (Coordenada_X), Columnas, $12
+;		E, (Coordenada_y), Filas, $0d
+;
+;	Nota: El char. de la esquina superior izquierda de pantalla sería: $0000, Columna "0", Fila "0".
+
+;	Modifica: A,BC y DE.
+
+
+Genera_coordenadas_disparo 
+
+; HL contendrá la dirección de pantalla del disparo. (Puntero de impresión).
+
+	ld a,l
+	and $1f
+	ld d,a 												; Columnas en D. Coordenada_X.
+
+	call calcula_tercio
+	inc a
+	ld b,a 												; "1", "2" o "3" en función del tercio de pantalla.
+
+	ld e,0
+	ld a,l
+	and $e0
+1 inc e
+	sub 32
+	jr nz,1B
+
+	djnz 1B 
+	ret
+

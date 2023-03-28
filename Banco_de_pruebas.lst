@@ -537,7 +537,7 @@
 195+  84F6 00 00        	defw 0											; (Puntero_DESPLZ_der).
 196+  84F8 00 00        	defw 0											; (Puntero_DESPLZ_izq).
 197+  84FA
-198+  84FA 5E 50        	defw $505e                                      ; (Posicion_inicio).
+198+  84FA 7E 50        	defw $507e                                      ; (Posicion_inicio).
 199+  84FC 04           	db 4											; (Cuad_objeto).
 200+  84FD
 201+  84FD 01 01 01 01  	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
@@ -554,7 +554,7 @@
 212+  8515
 213+  8515 00 00        	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 214+  8517
-215+  8517 C4 94 00 00  	defw Indice_mov_Izquierda_y_derecha,0  			; (Puntero_indice_mov) / (Puntero_mov).
+215+  8517 D0 94 00 00  	defw Indice_mov_Izquierda_y_derecha,0  	  		; (Puntero_indice_mov) / (Puntero_mov).
 216+  851B 00 00 00     	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).
 217+  851E
 218+  851E 00           	db 0 											; (Columnas).
@@ -593,7 +593,7 @@
 251+  854F
 252+  854F 00 00        	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 253+  8551
-254+  8551 D8 94 00 00  	defw Indice_mov_Onda_senoidal,0					; (Puntero_indice_mov) / (Puntero_mov).
+254+  8551 E4 94 00 00  	defw Indice_mov_Onda_senoidal,0					; (Puntero_indice_mov) / (Puntero_mov).
 255+  8555 00 00 00     	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).
 256+  8558
 257+  8558 00           	db 0 											; (Columnas).
@@ -632,7 +632,7 @@
 290+  8589
 291+  8589 00 00        	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 292+  858B
-293+  858B C8 94 00 00  	defw Indice_mov_Izquierda,0                     ; (Puntero_indice_mov) / (Puntero_mov).
+293+  858B D4 94 00 00  	defw Indice_mov_Izquierda,0                     ; (Puntero_indice_mov) / (Puntero_mov).
 294+  858F 00 00 00     	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).
 295+  8592
 296+  8592 00           	db 0 											; (Columnas).
@@ -1017,7 +1017,7 @@
 395   86C3 25           	dec h
 396   86C4 C8           	ret z
 397   86C5
-398   86C5 CD DA 94     	call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
+398   86C5 CD E6 94     	call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
 399   86C8 3A C3 85     	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
 400   86CB CB 67        	bit 4,a
 401   86CD C8           	ret z
@@ -1543,7 +1543,7 @@
  46+  88C0              ; ----- ----- -----
  47+  88C0
  48+  88C0 3A C3 85         ld a,(Ctrl_0)                       ; Una entidad no podrá disparar si se encuentra por_
- 49+  88C3 CB 77            bit 6,a                             ; _ debajo de la línea "$14" de pantalla.
+ 49+  88C3 CB 77            bit 6,a                             ; _ debajo de la fila "$14" de pantalla.
  50+  88C5 20 06            jr nz,16F
  51+  88C7
  52+  88C7 3A 9D 85         ld a,(Coordenada_y)
@@ -2206,7 +2206,7 @@
 709+  8B2C CD 33 8E         call NextScan
 710+  8B2F CD 33 8E         call NextScan
 711+  8B32
-712+  8B32                ; Detecta si el disparo de la entidad sale de la pantalla.
+712+  8B32              ; Detecta si el disparo de la entidad sale de la pantalla.
 713+  8B32
 714+  8B32 7C               ld a,h
 715+  8B33 FE 58            cp $58
@@ -2250,7 +2250,7 @@
  15+  8B5C 22 98 85     	ld (Posicion_actual),hl							; Indicamos que (Posicion_actual) = (Posicion_inicio) y saltamos a la subrutina [Inicializacion], (donde asignaremos_
  16+  8B5F CD EE 8C     	call Inicializacion   							; _(Limite_horizontal), (Limite_vertical) y (Cuad_objeto). También asignaremos las coordenadas X e Y. (Posición 0,0)_
  17+  8B62              ;													; _la esquina superior izquierda de la pantalla.
- 18+  8B62 CD 5C 95     	call Prepara_Puntero_mov 						; El objeto está inicializado. Antes de salir inicializamos tb el puntero de movimiento del objeto.
+ 18+  8B62 CD 68 95     	call Prepara_Puntero_mov 						; El objeto está inicializado. Antes de salir inicializamos tb el puntero de movimiento del objeto.
  19+  8B65 3A C3 85     1 ld a,(Ctrl_0)
  20+  8B68 CB 6F        	bit 5,a
  21+  8B6A 20 06        	jr nz,3F										; Si acabamos de inicializar un objeto, NO COMPROBAMOS LÍMITES.
@@ -4144,257 +4144,298 @@
 # file closed: Direcciones.asm
 880   9425              	include "Genera_coordenadas.asm"
 # file opened: Genera_coordenadas.asm
-  1+  9425              ;	12/12/22
+  1+  9425              ; ------------------------------------------------------------------------
   2+  9425              ;
-  3+  9425              ;	Proporciona las coordenadas del objeto a imprimir.
-  4+  9425              ;	Fila superior "0", Columna izquierda "0".
-  5+  9425              ;
-  6+  9425              ;	Input: HL contendrá la (Posicion_actual) del Sprite.
+  3+  9425              ;	28/03/23
+  4+  9425              ;
+  5+  9425              ;	Proporciona las coordenadas del objeto a imprimir.
+  6+  9425              ;	Fila superior "0", Columna izquierda "0".
   7+  9425              ;
-  8+  9425              ;	Modifica: A
-  9+  9425
- 10+  9425 C5           Genera_coordenadas push bc
- 11+  9426 E5           	push hl
- 12+  9427 2A 98 85     	ld hl,(Posicion_actual)
- 13+  942A 7D           	ld a,l
- 14+  942B E6 1F        	and $1f
- 15+  942D 32 9C 85     	ld (Coordenada_X),a 								; Coordenada X del sprite, (0-$1f).
- 16+  9430 CD F3 90     	call calcula_tercio
- 17+  9433 47           	ld b,a
- 18+  9434 04           	inc b												; Tercio de pantalla+1 en B, (1,2 o 3).
- 19+  9435 0E 00        	ld c,0 												; Contador de filas a "0".
- 20+  9437 7D           	ld a,l
- 21+  9438 E6 E0        	and $e0 											; Ahora (A) apunta al 1er char. de la fila en la que se encuentra el objeto.
- 22+  943A 28 05        	jr z,2F
- 23+  943C 0C           1 inc c
- 24+  943D D6 20        	sub 32
- 25+  943F 20 FB        	jr nz,1B
- 26+  9441 0C           2 inc c
- 27+  9442 04           	inc b
- 28+  9443 05           	dec b
- 29+  9444 28 04        	jr z,3F
- 30+  9446 3E E0        	ld a,$e0
- 31+  9448 10 F2        	djnz 1B
- 32+  944A 79           3 ld a,c
- 33+  944B 3D           	dec a
- 34+  944C 32 9D 85     	ld (Coordenada_y),a
- 35+  944F E1           	pop hl
- 36+  9450 C1           	pop bc
- 37+  9451 C9           	ret
+  8+  9425              ;	Input: HL contendrá la (Posicion_actual) del Sprite.
+  9+  9425              ;
+ 10+  9425              ;	Modifica: A,BC y DE.
+ 11+  9425
+ 12+  9425 C5           Genera_coordenadas push bc
+ 13+  9426 E5           	push hl
+ 14+  9427
+ 15+  9427 2A 98 85     	ld hl,(Posicion_actual)
+ 16+  942A 7D           	ld a,l
+ 17+  942B E6 1F        	and $1f
+ 18+  942D 32 9C 85     	ld (Coordenada_X),a 								; Coordenada Y del sprite, (0-$1f). Columnas.
+ 19+  9430
+ 20+  9430 CD F3 90     	call calcula_tercio
+ 21+  9433 3C           	inc a
+ 22+  9434 47           	ld b,a 												; "1", "2" o "3" en función del tercio de pantalla.
+ 23+  9435
+ 24+  9435 1E 00        	ld e,0
+ 25+  9437 7D           	ld a,l
+ 26+  9438 E6 E0        	and $e0
+ 27+  943A 1C           1 inc e
+ 28+  943B D6 20        	sub 32
+ 29+  943D 20 FB        	jr nz,1B
+ 30+  943F
+ 31+  943F 10 F9        	djnz 1B
+ 32+  9441
+ 33+  9441 7B           	ld a,e
+ 34+  9442 32 9D 85     	ld (Coordenada_y),a
+ 35+  9445
+ 36+  9445 E1           	pop hl
+ 37+  9446 C1           	pop bc
+ 38+  9447
+ 39+  9447 C9           	ret
+ 40+  9448
+ 41+  9448              ; ------------------------------------------------------------------------
+ 42+  9448              ;	28/03/23
+ 43+  9448              ;
+ 44+  9448              ;	Proporciona las coordenadas del disparo a imprimir.
+ 45+  9448              ;	Fila superior "0", Columna izquierda "0".
+ 46+  9448              ;
+ 47+  9448              ;	Input: HL contendrá la posición del proyectil en pantalla.
+ 48+  9448              ;	Output: DE contendrá las coordenadas del disparo:
+ 49+  9448              ;
+ 50+  9448              ;		DE="$120d"
+ 51+  9448              ;
+ 52+  9448              ;		D, (Coordenada_X), Columnas, $12
+ 53+  9448              ;		E, (Coordenada_y), Filas, $0d
+ 54+  9448              ;
+ 55+  9448              ;	Nota: El char. de la esquina superior izquierda de pantalla sería: $0000, Columna "0", Fila "0".
+ 56+  9448
+ 57+  9448              ;	Modifica: A,BC y DE.
+ 58+  9448
+ 59+  9448
+ 60+  9448              Genera_coordenadas_disparo
+ 61+  9448
+ 62+  9448              ; HL contendrá la dirección de pantalla del disparo. (Puntero de impresión).
+ 63+  9448
+ 64+  9448 7D           	ld a,l
+ 65+  9449 E6 1F        	and $1f
+ 66+  944B 57           	ld d,a 												; Columnas en D. Coordenada_X.
+ 67+  944C
+ 68+  944C CD F3 90     	call calcula_tercio
+ 69+  944F 3C           	inc a
+ 70+  9450 47           	ld b,a 												; "1", "2" o "3" en función del tercio de pantalla.
+ 71+  9451
+ 72+  9451 1E 00        	ld e,0
+ 73+  9453 7D           	ld a,l
+ 74+  9454 E6 E0        	and $e0
+ 75+  9456 1C           1 inc e
+ 76+  9457 D6 20        	sub 32
+ 77+  9459 20 FB        	jr nz,1B
+ 78+  945B
+ 79+  945B 10 F9        	djnz 1B
+ 80+  945D C9           	ret
+ 81+  945E
 # file closed: Genera_coordenadas.asm
-881   9452              	include "Patrones_de_mov.asm"
+881   945E              	include "Patrones_de_mov.asm"
 # file opened: Patrones_de_mov.asm
-  1+  9452
-  2+  9452
-  3+  9452              ;   11/8/22
-  4+  9452              ;
-  5+  9452              ;   Base de datos. PATRONES DE MOVIMIENTO.
-  6+  9452              ;
-  7+  9452              ;   Mov_obj.asm
-  8+  9452              ;
-  9+  9452              ;   Coordenada_X db 0 									    	; Coordenada X del objeto. (En chars.)
- 10+  9452              ;   Coordenada_y db 0 									    	; Coordenada Y del objeto. (En chars.)
- 11+  9452              ;
- 12+  9452              ;   Codificación:
- 13+  9452              ;
- 14+  9452              ;   % abajo,arriba,derecha,izquierda ..... nº de repeticiones del movimiento.
- 15+  9452
- 16+  9452              ;   El "0"; último .db indica que ya hemos terminado de ejecutar todas las cadenas de movimiento.
- 17+  9452
- 18+  9452 02 40 00     Arriba db 2,%01000000,0
- 19+  9455 02 80 00     Abajo db 2,%10000000,0
- 20+  9458 02 20 00     Derecha db 2,%00100000,0
- 21+  945B 02 10 00     Izquierda db 2,%00010000,0
- 22+  945E 2C 44 60 42  Onda_senoidal db 44,%01000100,%01100000,%01000010,%01100000,%01000010,%01100000,%01000000,%01100011
- 22+  9462 60 42 60 40
- 22+  9466 63
- 23+  9467 22 60 25 A0      db %00100010,%01100000,%00100101,%10100000,%00100010,%10100011,%10000000,%10100000
- 23+  946B 22 A3 80 A0
- 24+  946F 82 A0 82 A0      db %10000010,%10100000,%10000010,%10100000,%10000100,%10100000,%10000011,%10100000
- 24+  9473 84 A0 83 A0
- 25+  9477 82 A0 82 A0      db %10000010,%10100000,%10000010,%10100000,%10000000,%10100011,%00100010,%10100000
- 25+  947B 80 A3 22 A0
- 26+  947F 25 60 22 63      db %00100101,%01100000,%00100010,%01100011,%01000000,%01100000,%01000010,%01100000
- 26+  9483 40 60 42 60
- 27+  9487 42 60 44 00      db %01000010,%01100000,%01000100,0
- 28+  948B 03 14 44 00  Escaloncitos_izquierda_arriba db 3,%00010100,%01000100,0
- 29+  948F 03 24 44 00  Escaloncitos_derecha_arriba db 3,%00100100,%01000100,0
- 30+  9493 04 24 84 24  Escaloncitos_derecha_abajo db 4,%00100100,%10000100,%00100100,%10000100
- 30+  9497 84
- 31+  9498 05 14 84 14  Escaloncitos_izquierda_abajo db 5,%00010100,%10000100,%00010100,%10000100,0
- 31+  949C 84 00
- 32+  949E 03 2F 1F 00  Derecha_e_izquierda db 3,%00101111,%00011111,0
- 33+  94A2 21 1F 1F 1F  Izquierda_y_derecha db 33,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111
- 33+  94A6 1F 1F 1F 1F
- 34+  94AA 1F 1F 1F 1F      db %00011111,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111
- 34+  94AE 1F 1F 1F 1F
- 34+  94B2 1F
- 35+  94B3 2F 2F 2F 2F      db %00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111
- 35+  94B7 2F 2F 2F 2F
- 35+  94BB 2F 2F
- 36+  94BD 2F 2F 2F 2F      db %00101111,%00101111,%00101111,%00101111,%00101111,%00101111,0
- 36+  94C1 2F 2F 00
- 37+  94C4
- 38+  94C4
- 39+  94C4              ; ----- ----- ----- ----- -----
- 40+  94C4
- 41+  94C4 A2 94        Indice_mov_Izquierda_y_derecha defw Izquierda_y_derecha
- 42+  94C6 9E 94        Indice_mov_Derecha_e_izquierda defw Derecha_e_izquierda
- 43+  94C8 5B 94        Indice_mov_Izquierda defw Izquierda
- 44+  94CA 58 94        Indice_mov_Derecha defw Derecha
- 45+  94CC 55 94        Indice_mov_Abajo defw Abajo
- 46+  94CE 52 94        Indice_mov_Arriba defw Arriba
- 47+  94D0 8F 94        Indice_mov_Escaloncitos_derecha_arriba defw Escaloncitos_derecha_arriba
- 48+  94D2 93 94        Indice_mov_Escaloncitos_derecha_abajo defw Escaloncitos_derecha_abajo
- 49+  94D4 8B 94        Indice_mov_Escaloncitos_izquierda_arriba defw Escaloncitos_izquierda_arriba
- 50+  94D6 98 94        Indice_mov_Escaloncitos_izquierda_abajo defw Escaloncitos_izquierda_abajo
- 51+  94D8 5E 94        Indice_mov_Onda_senoidal defw Onda_senoidal
- 52+  94DA              ; ----- ----- ----- ----- -----
- 53+  94DA
- 54+  94DA 3A C9 85     Movimiento ld a,(Contador_db_mov)                               ; Hemos iniciado la cadena de movimiento ?. Si (Contador_db_mov) aún es "0" hay que inicializarlo._
- 55+  94DD A7               and a                                                       ; _Para hacerlo, hemos de fijar antes (Puntero_mov).
- 56+  94DE 28 02            jr z,1F
- 57+  94E0 18 13            jr Decoder                                                  ; Saltamos a [Decoder] si ya hemos iniciado la cadena.
- 58+  94E2 3A CA 85     1 ld a,(Incrementa_puntero)                                     ; Vamos a inicializar las variables de movimiento. El contador (Incrementa_puntero) es un byte que inicialmente está a "0"._
- 59+  94E5 C6 02            add 2                                                       ; _va incrementando su valor en 2 unidades cada vez que iniciamos una cadena. Se utiliza para ir incrementando (Puntero_mov)_
- 60+  94E7 32 CA 85         ld (Incrementa_puntero),a                                   ; _ por el índice de cadenas de movimiento correspondiente. Su valor se restablecerá a "0" cuando encontremos
- 61+  94EA              ;                                                               ; _ el .db0. (Indica que hemos terminado de leer la secuencia de movimiento completa de la entidad).
- 62+  94EA 2A C7 85         ld hl,(Puntero_mov)
- 63+  94ED 7E               ld a,(hl)
- 64+  94EE 32 C9 85         ld (Contador_db_mov),a                                      ; Contador de bytes de la cadena inicializado. (El 1er byte de cada cadena de mov. indica el nº de bytes de_
- 65+  94F1 23               inc hl                                                      ; _movimiento que hemos de ejecutar).
- 66+  94F2 22 C7 85         ld (Puntero_mov),hl                                         ; Situamos (Puntero_mov) en el 1er byte de instrucciones.
- 67+  94F5
- 68+  94F5 3A CB 85     Decoder ld a,(Repetimos_db)
- 69+  94F8 A7               and a
- 70+  94F9 20 0C            jr nz,12F
- 71+  94FB 2A C7 85         ld hl,(Puntero_mov)
- 72+  94FE 7E               ld a,(hl)
- 73+  94FF A7               and a
- 74+  9500 28 69            jr z, Reinicia_el_movimiento                              ; Hemos terminado de ejecutar todas las cadenas de movimiento. Llamamos a [Fin_de_movimiento].
- 75+  9502 E6 0F            and $0f
- 76+  9504 32 CB 85         ld (Repetimos_db),a                                         ; Si la variable de repetición de .db es "0" hemos de inicializar dicha variable antes de empezar con la decodificación del .db de_
- 77+  9507              ;                                                               ; _movimiento. Este valor lo proporciona el nibble `bajo´ del byte.
- 78+  9507 2A C7 85     12 ld hl,(Puntero_mov)
- 79+  950A CB 7E            bit 7,(hl)
- 80+  950C 28 03            jr z,2F
- 81+  950E CD 11 91         call Mov_down
- 82+  9511 2A C7 85     2 ld hl, (Puntero_mov)
- 83+  9514 CB 76            bit 6,(hl)
- 84+  9516 28 03            jr z,3F
- 85+  9518 CD 3F 91         call Mov_up
- 86+  951B 2A C7 85     3 ld hl, (Puntero_mov)
- 87+  951E CB 6E            bit 5,(hl)
- 88+  9520 28 03            jr z,4F
- 89+  9522 CD 6D 91         call Mov_right
- 90+  9525 2A C7 85     4 ld hl, (Puntero_mov)
- 91+  9528 CB 66            bit 4,(hl)
- 92+  952A 28 03            jr z,5F
- 93+  952C CD 8B 92         call Mov_left
- 94+  952F
- 95+  952F              ; ---------- --------- --------- ---------- ----------
- 96+  952F
- 97+  952F 3A CB 85     5 ld a,(Repetimos_db)
- 98+  9532 A7               and a
- 99+  9533 28 07            jr z,6F
-100+  9535 3D               dec a
-101+  9536 32 CB 85         ld (Repetimos_db),a
-102+  9539 28 01            jr z,6f
-103+  953B C9           11 ret
-104+  953C 21 C9 85     6 ld hl,Contador_db_mov
-105+  953F 35               dec (hl)                                                       ; Decrementamos el contador de .db de la cadena, (pués ya hemos ejecutado un byte de la misma).
-106+  9540 2A C7 85         ld hl,(Puntero_mov)                                            ; No repetimos el mismo byte. Incrementamos (Puntero_mov) y salimos.
-107+  9543 23               inc hl
-108+  9544 22 C7 85         ld (Puntero_mov),hl
-109+  9547 18 F2            jr 11B
-110+  9549 2A C5 85     7 ld hl,(Puntero_indice_mov)                                       ; PASAMOS A LA CADENA SIGUIENTE !!!!!!
-111+  954C 3A CA 85         ld a,(Incrementa_puntero)
-112+  954F 47               ld b,a
-113+  9550 23           8 inc hl
-114+  9551 10 FD            djnz 8B                                                        ; Indice_patrones_coracao +2, +4, +6, etc...
-115+  9553 5E               ld e,(hl)
-116+  9554 23               inc hl
-117+  9555 56               ld d,(hl)
-118+  9556 EB               ex de,hl
-119+  9557 22 C7 85         ld (Puntero_mov),hl                                            ; (Puntero_mov) situado el el 1er .db de la siguiente cadena de movimiento.
-120+  955A 18 DF            jr 11B
-121+  955C
-122+  955C              ; ---------- --------- --------- ---------- ----------
-123+  955C              ;
-124+  955C              ;   11/8/22
-125+  955C              ;
-126+  955C              ;   Prepara_Puntero_mov
-127+  955C
-128+  955C E5           Prepara_Puntero_mov push hl
-129+  955D D5               push de
-130+  955E 2A C5 85         ld hl,(Puntero_indice_mov)
-131+  9561 5E               ld e,(hl)
-132+  9562 23               inc hl
-133+  9563 56               ld d,(hl)
-134+  9564 EB               ex de,hl
-135+  9565 22 C7 85         ld (Puntero_mov),hl
-136+  9568 D1               pop de
-137+  9569 E1               pop hl
-138+  956A C9               ret
-139+  956B
-140+  956B              ; ---------- --------- --------- ---------- ----------
-141+  956B              ;
-142+  956B              ;   11/8/22
-143+  956B              ;
-144+  956B              ;   Reinicia_el_movimiento
-145+  956B
-146+  956B CD 5C 95     Reinicia_el_movimiento call Prepara_Puntero_mov
-147+  956E AF               xor a
-148+  956F 32 C9 85         ld (Contador_db_mov),a
-149+  9572 32 CA 85         ld (Incrementa_puntero),a
-150+  9575
-151+  9575              ;    jr $
-152+  9575
-153+  9575 C3 DA 94         jp Movimiento
-154+  9578 C9               ret
-155+  9579              ; ---------- --------- --------- ---------- ----------
-156+  9579
-157+  9579
-158+  9579
-159+  9579
-160+  9579
-161+  9579
-162+  9579
-163+  9579
-164+  9579
-165+  9579
-166+  9579
-167+  9579
-168+  9579
-169+  9579
-170+  9579
-171+  9579
-172+  9579
-173+  9579
+  1+  945E
+  2+  945E
+  3+  945E              ;   11/8/22
+  4+  945E              ;
+  5+  945E              ;   Base de datos. PATRONES DE MOVIMIENTO.
+  6+  945E              ;
+  7+  945E              ;   Mov_obj.asm
+  8+  945E              ;
+  9+  945E              ;   Coordenada_X db 0 									    	; Coordenada X del objeto. (En chars.)
+ 10+  945E              ;   Coordenada_y db 0 									    	; Coordenada Y del objeto. (En chars.)
+ 11+  945E              ;
+ 12+  945E              ;   Codificación:
+ 13+  945E              ;
+ 14+  945E              ;   % abajo,arriba,derecha,izquierda ..... nº de repeticiones del movimiento.
+ 15+  945E
+ 16+  945E              ;   El "0"; último .db indica que ya hemos terminado de ejecutar todas las cadenas de movimiento.
+ 17+  945E
+ 18+  945E 02 40 00     Arriba db 2,%01000000,0
+ 19+  9461 02 80 00     Abajo db 2,%10000000,0
+ 20+  9464 02 20 00     Derecha db 2,%00100000,0
+ 21+  9467 02 10 00     Izquierda db 2,%00010000,0
+ 22+  946A 2C 44 60 42  Onda_senoidal db 44,%01000100,%01100000,%01000010,%01100000,%01000010,%01100000,%01000000,%01100011
+ 22+  946E 60 42 60 40
+ 22+  9472 63
+ 23+  9473 22 60 25 A0      db %00100010,%01100000,%00100101,%10100000,%00100010,%10100011,%10000000,%10100000
+ 23+  9477 22 A3 80 A0
+ 24+  947B 82 A0 82 A0      db %10000010,%10100000,%10000010,%10100000,%10000100,%10100000,%10000011,%10100000
+ 24+  947F 84 A0 83 A0
+ 25+  9483 82 A0 82 A0      db %10000010,%10100000,%10000010,%10100000,%10000000,%10100011,%00100010,%10100000
+ 25+  9487 80 A3 22 A0
+ 26+  948B 25 60 22 63      db %00100101,%01100000,%00100010,%01100011,%01000000,%01100000,%01000010,%01100000
+ 26+  948F 40 60 42 60
+ 27+  9493 42 60 44 00      db %01000010,%01100000,%01000100,0
+ 28+  9497 03 14 44 00  Escaloncitos_izquierda_arriba db 3,%00010100,%01000100,0
+ 29+  949B 03 24 44 00  Escaloncitos_derecha_arriba db 3,%00100100,%01000100,0
+ 30+  949F 04 24 84 24  Escaloncitos_derecha_abajo db 4,%00100100,%10000100,%00100100,%10000100
+ 30+  94A3 84
+ 31+  94A4 05 14 84 14  Escaloncitos_izquierda_abajo db 5,%00010100,%10000100,%00010100,%10000100,0
+ 31+  94A8 84 00
+ 32+  94AA 03 2F 1F 00  Derecha_e_izquierda db 3,%00101111,%00011111,0
+ 33+  94AE 21 1F 1F 1F  Izquierda_y_derecha db 33,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111
+ 33+  94B2 1F 1F 1F 1F
+ 34+  94B6 1F 1F 1F 1F      db %00011111,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111
+ 34+  94BA 1F 1F 1F 1F
+ 34+  94BE 1F
+ 35+  94BF 2F 2F 2F 2F      db %00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111
+ 35+  94C3 2F 2F 2F 2F
+ 35+  94C7 2F 2F
+ 36+  94C9 2F 2F 2F 2F      db %00101111,%00101111,%00101111,%00101111,%00101111,%00101111,0
+ 36+  94CD 2F 2F 00
+ 37+  94D0
+ 38+  94D0
+ 39+  94D0              ; ----- ----- ----- ----- -----
+ 40+  94D0
+ 41+  94D0 AE 94        Indice_mov_Izquierda_y_derecha defw Izquierda_y_derecha
+ 42+  94D2 AA 94        Indice_mov_Derecha_e_izquierda defw Derecha_e_izquierda
+ 43+  94D4 67 94        Indice_mov_Izquierda defw Izquierda
+ 44+  94D6 64 94        Indice_mov_Derecha defw Derecha
+ 45+  94D8 61 94        Indice_mov_Abajo defw Abajo
+ 46+  94DA 5E 94        Indice_mov_Arriba defw Arriba
+ 47+  94DC 9B 94        Indice_mov_Escaloncitos_derecha_arriba defw Escaloncitos_derecha_arriba
+ 48+  94DE 9F 94        Indice_mov_Escaloncitos_derecha_abajo defw Escaloncitos_derecha_abajo
+ 49+  94E0 97 94        Indice_mov_Escaloncitos_izquierda_arriba defw Escaloncitos_izquierda_arriba
+ 50+  94E2 A4 94        Indice_mov_Escaloncitos_izquierda_abajo defw Escaloncitos_izquierda_abajo
+ 51+  94E4 6A 94        Indice_mov_Onda_senoidal defw Onda_senoidal
+ 52+  94E6              ; ----- ----- ----- ----- -----
+ 53+  94E6
+ 54+  94E6 3A C9 85     Movimiento ld a,(Contador_db_mov)                               ; Hemos iniciado la cadena de movimiento ?. Si (Contador_db_mov) aún es "0" hay que inicializarlo._
+ 55+  94E9 A7               and a                                                       ; _Para hacerlo, hemos de fijar antes (Puntero_mov).
+ 56+  94EA 28 02            jr z,1F
+ 57+  94EC 18 13            jr Decoder                                                  ; Saltamos a [Decoder] si ya hemos iniciado la cadena.
+ 58+  94EE 3A CA 85     1 ld a,(Incrementa_puntero)                                     ; Vamos a inicializar las variables de movimiento. El contador (Incrementa_puntero) es un byte que inicialmente está a "0"._
+ 59+  94F1 C6 02            add 2                                                       ; _va incrementando su valor en 2 unidades cada vez que iniciamos una cadena. Se utiliza para ir incrementando (Puntero_mov)_
+ 60+  94F3 32 CA 85         ld (Incrementa_puntero),a                                   ; _ por el índice de cadenas de movimiento correspondiente. Su valor se restablecerá a "0" cuando encontremos
+ 61+  94F6              ;                                                               ; _ el .db0. (Indica que hemos terminado de leer la secuencia de movimiento completa de la entidad).
+ 62+  94F6 2A C7 85         ld hl,(Puntero_mov)
+ 63+  94F9 7E               ld a,(hl)
+ 64+  94FA 32 C9 85         ld (Contador_db_mov),a                                      ; Contador de bytes de la cadena inicializado. (El 1er byte de cada cadena de mov. indica el nº de bytes de_
+ 65+  94FD 23               inc hl                                                      ; _movimiento que hemos de ejecutar).
+ 66+  94FE 22 C7 85         ld (Puntero_mov),hl                                         ; Situamos (Puntero_mov) en el 1er byte de instrucciones.
+ 67+  9501
+ 68+  9501 3A CB 85     Decoder ld a,(Repetimos_db)
+ 69+  9504 A7               and a
+ 70+  9505 20 0C            jr nz,12F
+ 71+  9507 2A C7 85         ld hl,(Puntero_mov)
+ 72+  950A 7E               ld a,(hl)
+ 73+  950B A7               and a
+ 74+  950C 28 69            jr z, Reinicia_el_movimiento                              ; Hemos terminado de ejecutar todas las cadenas de movimiento. Llamamos a [Fin_de_movimiento].
+ 75+  950E E6 0F            and $0f
+ 76+  9510 32 CB 85         ld (Repetimos_db),a                                         ; Si la variable de repetición de .db es "0" hemos de inicializar dicha variable antes de empezar con la decodificación del .db de_
+ 77+  9513              ;                                                               ; _movimiento. Este valor lo proporciona el nibble `bajo´ del byte.
+ 78+  9513 2A C7 85     12 ld hl,(Puntero_mov)
+ 79+  9516 CB 7E            bit 7,(hl)
+ 80+  9518 28 03            jr z,2F
+ 81+  951A CD 11 91         call Mov_down
+ 82+  951D 2A C7 85     2 ld hl, (Puntero_mov)
+ 83+  9520 CB 76            bit 6,(hl)
+ 84+  9522 28 03            jr z,3F
+ 85+  9524 CD 3F 91         call Mov_up
+ 86+  9527 2A C7 85     3 ld hl, (Puntero_mov)
+ 87+  952A CB 6E            bit 5,(hl)
+ 88+  952C 28 03            jr z,4F
+ 89+  952E CD 6D 91         call Mov_right
+ 90+  9531 2A C7 85     4 ld hl, (Puntero_mov)
+ 91+  9534 CB 66            bit 4,(hl)
+ 92+  9536 28 03            jr z,5F
+ 93+  9538 CD 8B 92         call Mov_left
+ 94+  953B
+ 95+  953B              ; ---------- --------- --------- ---------- ----------
+ 96+  953B
+ 97+  953B 3A CB 85     5 ld a,(Repetimos_db)
+ 98+  953E A7               and a
+ 99+  953F 28 07            jr z,6F
+100+  9541 3D               dec a
+101+  9542 32 CB 85         ld (Repetimos_db),a
+102+  9545 28 01            jr z,6f
+103+  9547 C9           11 ret
+104+  9548 21 C9 85     6 ld hl,Contador_db_mov
+105+  954B 35               dec (hl)                                                       ; Decrementamos el contador de .db de la cadena, (pués ya hemos ejecutado un byte de la misma).
+106+  954C 2A C7 85         ld hl,(Puntero_mov)                                            ; No repetimos el mismo byte. Incrementamos (Puntero_mov) y salimos.
+107+  954F 23               inc hl
+108+  9550 22 C7 85         ld (Puntero_mov),hl
+109+  9553 18 F2            jr 11B
+110+  9555 2A C5 85     7 ld hl,(Puntero_indice_mov)                                       ; PASAMOS A LA CADENA SIGUIENTE !!!!!!
+111+  9558 3A CA 85         ld a,(Incrementa_puntero)
+112+  955B 47               ld b,a
+113+  955C 23           8 inc hl
+114+  955D 10 FD            djnz 8B                                                        ; Indice_patrones_coracao +2, +4, +6, etc...
+115+  955F 5E               ld e,(hl)
+116+  9560 23               inc hl
+117+  9561 56               ld d,(hl)
+118+  9562 EB               ex de,hl
+119+  9563 22 C7 85         ld (Puntero_mov),hl                                            ; (Puntero_mov) situado el el 1er .db de la siguiente cadena de movimiento.
+120+  9566 18 DF            jr 11B
+121+  9568
+122+  9568              ; ---------- --------- --------- ---------- ----------
+123+  9568              ;
+124+  9568              ;   11/8/22
+125+  9568              ;
+126+  9568              ;   Prepara_Puntero_mov
+127+  9568
+128+  9568 E5           Prepara_Puntero_mov push hl
+129+  9569 D5               push de
+130+  956A 2A C5 85         ld hl,(Puntero_indice_mov)
+131+  956D 5E               ld e,(hl)
+132+  956E 23               inc hl
+133+  956F 56               ld d,(hl)
+134+  9570 EB               ex de,hl
+135+  9571 22 C7 85         ld (Puntero_mov),hl
+136+  9574 D1               pop de
+137+  9575 E1               pop hl
+138+  9576 C9               ret
+139+  9577
+140+  9577              ; ---------- --------- --------- ---------- ----------
+141+  9577              ;
+142+  9577              ;   11/8/22
+143+  9577              ;
+144+  9577              ;   Reinicia_el_movimiento
+145+  9577
+146+  9577 CD 68 95     Reinicia_el_movimiento call Prepara_Puntero_mov
+147+  957A AF               xor a
+148+  957B 32 C9 85         ld (Contador_db_mov),a
+149+  957E 32 CA 85         ld (Incrementa_puntero),a
+150+  9581 C3 E6 94         jp Movimiento
+151+  9584 C9               ret
+152+  9585              ; ---------- --------- --------- ---------- ----------
+153+  9585
+154+  9585
+155+  9585
+156+  9585
+157+  9585
+158+  9585
+159+  9585
+160+  9585
+161+  9585
+162+  9585
+163+  9585
+164+  9585
+165+  9585
+166+  9585
+167+  9585
+168+  9585
+169+  9585
+170+  9585
 # file closed: Patrones_de_mov.asm
-882   9579              	include "Guarda_foto_registros.asm"
+882   9585              	include "Guarda_foto_registros.asm"
 # file opened: Guarda_foto_registros.asm
-  1+  9579              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  2+  9579              ;
-  3+  9579              ;	3/1/23
-  4+  9579              ;
-  5+  9579              ;	Instrucciones donde interviene el Stack Pointer, (SP).
-  6+  9579
-  7+  9579              ;	ADC HL,SP	LD (addr),SP
-  8+  9579              ;	ADD HL,SP	LD SP,(addr)
-  9+  9579              ;	ADD IX,SP	LD SP,nn
- 10+  9579              ; 	ADD IY,SP	LD SP,HL
- 11+  9579              ;				LD SP,IX
- 12+  9579              ;	DEC SP		LD SP,IY
- 13+  9579
- 14+  9579              ;	EX (SP),HL
- 15+  9579              ;	EX (SP),IX
- 16+  9579              ;	EX (SP),IY
- 17+  9579
- 18+  9579              ;	INC SP
- 19+  9579
- 20+  9579
- 21+  9579                  org $7fa0
+  1+  9585              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  2+  9585              ;
+  3+  9585              ;	3/1/23
+  4+  9585              ;
+  5+  9585              ;	Instrucciones donde interviene el Stack Pointer, (SP).
+  6+  9585
+  7+  9585              ;	ADC HL,SP	LD (addr),SP
+  8+  9585              ;	ADD HL,SP	LD SP,(addr)
+  9+  9585              ;	ADD IX,SP	LD SP,nn
+ 10+  9585              ; 	ADD IY,SP	LD SP,HL
+ 11+  9585              ;				LD SP,IX
+ 12+  9585              ;	DEC SP		LD SP,IY
+ 13+  9585
+ 14+  9585              ;	EX (SP),HL
+ 15+  9585              ;	EX (SP),IX
+ 16+  9585              ;	EX (SP),IY
+ 17+  9585
+ 18+  9585              ;	INC SP
+ 19+  9585
+ 20+  9585
+ 21+  9585                  org $7fa0
  22+  7FA0
  23+  7FA0              ;   (Stack_snapshot) se sitúa inicialmente en (Album_de_fotos)=$7000.
  24+  7FA0              ;   Almacenaremos los datos/registros necesarios de la siguiente manera:

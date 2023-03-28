@@ -147,9 +147,6 @@ Reinicia_el_movimiento call Prepara_Puntero_mov
     xor a
     ld (Contador_db_mov),a
     ld (Incrementa_puntero),a
-
-;    jr $
-
     jp Movimiento
     ret
 ; ---------- --------- --------- ---------- ----------

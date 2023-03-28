@@ -46,7 +46,7 @@ Genera_disparo
 ; ----- ----- ----- 
 
     ld a,(Ctrl_0)                       ; Una entidad no podrá disparar si se encuentra por_
-    bit 6,a                             ; _ debajo de la línea "$14" de pantalla.
+    bit 6,a                             ; _ debajo de la fila "$14" de pantalla.
     jr nz,16F
 
     ld a,(Coordenada_y)
@@ -709,7 +709,7 @@ Mueve_disparo push hl
     call NextScan
     call NextScan
 
-  ; Detecta si el disparo de la entidad sale de la pantalla.
+; Detecta si el disparo de la entidad sale de la pantalla.
 
     ld a,h
     cp $58
