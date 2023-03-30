@@ -80,7 +80,7 @@ Indice_Sprite_izq defw Indice_Badsat_izq
 Puntero_DESPLZ_der defw 0
 Puntero_DESPLZ_izq defw 0
 
-Posicion_inicio defw $508d								; Dirección de pantalla donde aparece el objeto. [DRAW].
+Posicion_inicio defw $50cd								; Dirección de pantalla donde aparece el objeto. [DRAW].
 Cuad_objeto db 3										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
 ; Variables de objeto. (Características).

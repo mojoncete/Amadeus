@@ -608,7 +608,35 @@ Motor_de_disparos ld bc,Disparo_3A
     jr c,15F
 
 ; ----------- debug (Colisiones en filas 16 y 17).
-    jr $
+
+    push de                                              ; DE contiene las coordenadas del disparo que ha colisionado.
+
+    call Guarda_coordenadas_X_de_Amadeus
+    
+    pop de                                               ; Coordenadas del disparo en DE. D Coordenada_X.
+
+    ld hl,Coordenadas_X_Amadeus
+    ld a,(hl) 
+18 cp d
+    jr nz,17F
+
+    jr $  ; COLISIóN AMADEUS !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+17 inc hl
+    ld a,(hl)
+    and a
+    jr z,15F                                             ; No hay colisión con Amadeus.
+    jr 18B
+
+
+
+
+
+
+
+
+
+
 
 ; No hay colisión. Amadeus se encuentra en una línea inferior.
 ; Restauramos el indicador de colisión y movemos el disparo, (JR 10F).
@@ -771,3 +799,51 @@ Elimina_disparo_de_base_de_datos ld bc,7
     inc de
     ldir
     ret
+
+; -----------------------------------------------------------------
+;
+;   Guarda las Coordenadas_X que ocupa Amadeus en la pantalla.
+;
+;   2 Coordenadas_X, (si CTRL_DESPLZ es "0").
+;   3 Coordenadas_X, (si CTRL_DESPLZ es distinto de "0").
+;
+;   En función de si el cuadrante de pantalla en el que se encuentra la nave, es par o impar,_ 
+;   _ las columnas guardadas irán en orden creciente o decreciente.
+;
+;   Esta información se almacenará en un pequeño almacen de 3 bytes: Coordenadas_X_Amadeus.
+;
+;   MODIFICA: A, HL, DE y C
+
+Guarda_coordenadas_X_de_Amadeus ld hl,Amadeus_db+6
+    ld d,(hl)                                           ; Coordenada_X de Amadeus en D.
+    inc hl
+    inc hl
+    ld e,(hl)                                           ; (CTRL_DESPLZ) de Amadeus en E.
+
+    ld hl,Amadeus_db+20
+    ld c,(hl)                                           ; (Cuad_objeto) de Amadeus en C.
+
+
+    ld hl,Coordenadas_X_Amadeus
+    ld (hl),d
+
+3 ld a,c
+    and 1
+    jr nz,1F
+    inc d
+    jr 2F                                               ; Amadeus se compone como mínimo de 2 chars.:
+
+;   (Coordenada_X) de (Posicion_actual) + (Coordenada_X) de (Posicion_actual)-1 cuando estamos en los cuadrantes 1º y 3º de pantalla.
+;   (Coordenada_X) de (Posicion_actual) + (Coordenada_X) de (Posicion_actual)-1 cuando estamos en los cuadrantes 1º y 3º de pantalla.   
+
+1 dec d
+2 inc hl
+    ld (hl),d
+
+    ld a,e                                              ; Si (CTRL_DESPLZ) de Amadeus es distinto de "0", Amadeus estará formado por 3 chars. y_
+    and a                                               ; _ por lo tanto tendrá 3 coordenadas X.
+    ret z
+
+    xor a
+    ld e,a
+    jr 3B
