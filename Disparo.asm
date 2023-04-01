@@ -485,6 +485,25 @@ Bucle_2 ld b,2
 
 ; -------------------------------------------------------------------------------------------------------------
 ;
+;   01/04/23
+;
+;   
+;
+
+Detecta_colision_nave_entidad jr $
+
+
+
+
+
+    ret
+
+
+
+
+
+; -------------------------------------------------------------------------------------------------------------
+;
 ;   13/03/23
 ;
 ;   Limpia el album de fotos de disparos después de cada borra/pinta. 50fps.
@@ -607,12 +626,10 @@ Motor_de_disparos ld bc,Disparo_3A
     cp $16
     jr c,15F
 
-; ----------- debug (Colisiones en filas 16 y 17).
+; (Colisiones en filas 16 y 17).
 
     push de                                              ; DE contiene las coordenadas del disparo que ha colisionado.
-
     call Guarda_coordenadas_X_de_Amadeus
-    
     pop de                                               ; Coordenadas del disparo en DE. D Coordenada_X.
 
     ld hl,Coordenadas_X_Amadeus
@@ -620,23 +637,16 @@ Motor_de_disparos ld bc,Disparo_3A
 18 cp d
     jr nz,17F
 
-    jr $  ; COLISIóN AMADEUS !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+; Colisión Amadeus !!!!!!!!!!
+
+    pop hl
+    jr 14F
 
 17 inc hl
     ld a,(hl)
     and a
     jr z,15F                                             ; No hay colisión con Amadeus.
     jr 18B
-
-
-
-
-
-
-
-
-
-
 
 ; No hay colisión. Amadeus se encuentra en una línea inferior.
 ; Restauramos el indicador de colisión y movemos el disparo, (JR 10F).

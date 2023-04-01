@@ -11,32 +11,25 @@
 
 Genera_coordenadas push bc
 	push hl
-
 	ld hl,(Posicion_actual)
 	ld a,l
 	and $1f
-
 	ld (Coordenada_X),a 								; Coordenada Y del sprite, (0-$1f). Columnas.
-
 	call calcula_tercio
-	inc a
-	ld b,a 												; "1", "2" o "3" en función del tercio de pantalla.
-
+	ld b,a 												; "0", "1" o "1" en función del tercio de pantalla.
 	ld e,0
 	ld a,l
 	and $e0
+	jr z,1F
+	inc b
 1 inc e
 	sub 32
 	jr nz,1B
-
 	djnz 1B 
-
 	ld a,e
 	ld (Coordenada_y),a
-
 	pop hl
 	pop bc
-
 	ret
 
 ; ------------------------------------------------------------------------
@@ -65,18 +58,16 @@ Genera_coordenadas_disparo
 	ld a,l
 	and $1f
 	ld d,a 												; Columnas en D. Coordenada_X.
-
 	call calcula_tercio
-	inc a
 	ld b,a 												; "1", "2" o "3" en función del tercio de pantalla.
-
 	ld e,0
 	ld a,l
 	and $e0
+	jr z,1F
+	inc b
 1 inc e
 	sub 32
 	jr nz,1B
-
 	djnz 1B 											; Filas en E. Coordenada_y.
 	ret
 

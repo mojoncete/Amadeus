@@ -80,8 +80,8 @@ Indice_Sprite_izq defw Indice_Badsat_izq
 Puntero_DESPLZ_der defw 0
 Puntero_DESPLZ_izq defw 0
 
-Posicion_inicio defw $50cd								; Dirección de pantalla donde aparece el objeto. [DRAW].
-Cuad_objeto db 3										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+Posicion_inicio defw $473e								; Dirección de pantalla donde aparece el objeto. [DRAW].
+Cuad_objeto db 2										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
 ; Variables de objeto. (Características).
 
@@ -132,7 +132,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
-Puntero_indice_mov defw 0
+Puntero_indice_mov defw Indice_mov_Escaloncitos_izquierda_abajo
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0
@@ -249,16 +249,6 @@ START ld sp,$ffff										 ; Situamos el inicio de Stack.
 	pop bc
 	djnz 1B  											; Decremento el contador de entidades.
 
-; 
-
-
-
-
-
-
-
-
-
 ; 	INICIA AMADEUS!!!!!
 
 3 call Restore_Amadeus
@@ -306,8 +296,8 @@ Frame
 	and a
 	jr z,5F
 
-; A="1" Impacto en entidad.
-; A="2"	Impacto en Amadeus.
+; A="1" Impacto en entidad por disparo de Amadeus.
+; A="2"	Impacto en Amadeus por disparo en entidad.
 
 	jr $
 
@@ -343,7 +333,8 @@ Frame
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
 	xor a
 	ld (Obj_dibujado),a
-	call Store_Restore_entidades
+
+6 call Store_Restore_entidades
 	pop bc
 	djnz 2B
 
@@ -399,6 +390,13 @@ Mov_obj
 	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
 	bit 4,a
 	ret z
+
+; Ha habido desplazamiento de la entidad maligna, :-).
+; Ha llegado a zona de AMADEUS ???
+
+;	ld a,(Coordenada_y)
+;	cp $14
+;	call nc, Detecta_colision_nave_entidad
 
 ; ---------
 
