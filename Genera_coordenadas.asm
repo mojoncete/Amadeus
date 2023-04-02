@@ -11,6 +11,7 @@
 
 Genera_coordenadas push bc
 	push hl
+
 	ld hl,(Posicion_actual)
 	ld a,l
 	and $1f
@@ -28,8 +29,10 @@ Genera_coordenadas push bc
 	djnz 1B 
 	ld a,e
 	ld (Coordenada_y),a
+
 	pop hl
 	pop bc
+
 	ret
 
 ; ------------------------------------------------------------------------
