@@ -488,19 +488,94 @@ Bucle_2 ld b,2
 ;   01/04/23
 ;
 ;   
+;   La entidad se encuentra en la fila $14,$15 o $16 de pantalla.
+;   Vamos a comprobar si existe colisión con Amadeus. Consideramos que se produce colisión_
+;   _ si hay contacto de los dos scanlines inferiores que forman la entidad con la nave.
 ;
+;   INPUTS: IX contiene el "puntero_de_impresión" de la entidad, (arriba-izq).
+;           IY contiene el "puntero_objeto" de la entidad, (arriba-izq).
 
-Detecta_colision_nave_entidad jr $
+Detecta_colision_nave_entidad 
 
+; Antes de nada llamaremos a la rutina [Calcula_puntero_de_impresion]. Nos proporcionara:
+; Puntero_de_impresión de la entidad en IX y puntero_objeto en IY.
 
+    ld hl,(Posicion_actual)
+    call Calcula_puntero_de_impresion
 
+; Con estos datos podremos situar HL en el penúltimo scanline del puntero_de_impresión de la entidad y_
+; _ y IY en el 1er dato del penúltimo scanline que forma la entidad, (Puntero_objeto).
 
+    ld b,14
+    push ix
+    pop hl
+1 call NextScan
+    djnz 1B
+    push hl    
+    pop ix
 
-    ret
+    push iy
+    pop hl
 
+; Sumaremos 28/42 bytes en función de las (Columns) que formen la entidad.
 
+    ld a,(Columns)
+    and 1
+    jr nz,2F
+    ld bc,28
+    jr 3F
+2 ld bc,42    
+3 and a
+    adc hl,bc
+    push hl
+    pop iy
 
+    push ix
+    pop hl
 
+    push hl
+
+; Llegados a este punto, HL apunta al puntero de impresión del penúltimo scanline de pantalla de la entidad.
+; IY apunta a los "datos" del penúltimo scanline que forman la entidad.
+
+    jr $
+
+    ld e,0                                         ; E,(Impacto)="0".
+    call Bucle_3                                   ; Comprobamos el 1er scanline.
+
+    ld a,e
+    and 1
+    jr z,4F
+    pop hl
+
+    push hl
+    call NextScan
+
+    ld a,h                                         ; El 1er scanline de la bala se pinta en pantalla.
+    cp $58                                         ; El 2º scanline indica colisión porque entra en zona_
+    jr z,4F                                        ; _ de atributos. Evitamos comprobar colisión en el _
+;                                                  ; _ 2º scanline si esto es así.    
+    ld e,0                                         ; ----- ( ) -----
+    call Bucle_3      
+
+4 pop hl                                         ; Puntero de impresión en HL e indicador de Impacto en B.
+;    pop iy
+    ret                                            
+
+ ; ---------- ----------
+
+Bucle_3 ld a,(Columnas)
+    ld b,a 
+2 ld a,(iy)
+    and (hl)
+    jr z,1F
+    
+    ld e,1
+
+1 inc hl
+    inc iy
+    djnz 2B
+    ret                                   
 
 ; -------------------------------------------------------------------------------------------------------------
 ;

@@ -393,7 +393,7 @@ Mov_obj
 	bit 4,a
 	ret z
 
-; Ha habido desplazamiento de la entidad maligna, :-).
+; Ha habido desplazamiento de la entidad maligna. :-).
 ; Ha llegado a zona de AMADEUS ???
 
 	ld a,(Coordenada_y)
@@ -837,18 +837,26 @@ Detecta_disparo_entidad ld a,$7f
 
 ; Pinta indicadores de FILAS. ------------------------------------------------------
 
-Pinta_FILAS ld hl,$4010
-;	ld b,9
-;2 push hl
-;	push bc
+Pinta_FILAS ld hl,$4000	;$4010
+
+; ----------
+	ld b,32
+2 push hl
+	push bc
+; ----------
+
 	ld b,$bf
 1 ld (hl),%10000000
 	call NextScan
 	djnz 1B
-;	pop bc 
-;	pop hl
-;	inc l 
-;	djnz 2B
+
+; ----------
+	pop bc 
+	pop hl
+	inc l 
+	djnz 2B
+; ----------
+
 	ld b,3
     ld hl,$4700
 3 call Bucle_1
