@@ -50,7 +50,7 @@ Mov_down ld hl,Ctrl_0
 ;
 ;
 Mov_up ld hl,Ctrl_0
-	set 3,(hl) 															; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
+	set 4,(hl) 															; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
 ; 																		; _esta información para evitar que la entidad se vuelva borrar/pintar_
 ; 																		; _ en el caso de que no lo haya.
 	ld a,(Vel_up)
@@ -129,22 +129,22 @@ Mov_right ld hl,Ctrl_0
 ; Perfiles de velocidad
 ;
 
-6 ld a,(CTRL_DESPLZ) 											; Velocidad 1
+6 ld a,(CTRL_DESPLZ) 												; Velocidad 1
 	cp $fe 															
 	jr nz,8F
 	jr 3F
-1 ld a,(CTRL_DESPLZ) 											; Velocidad 2
+1 ld a,(CTRL_DESPLZ) 												; Velocidad 2
 	cp $fd
 	jr nz,8F
 	jr 3F
-7 ld a,(CTRL_DESPLZ) 											; Velocidad 4
+7 ld a,(CTRL_DESPLZ) 												; Velocidad 4
 	cp $fb
 	jr nz,8F
 
 ; ---------- ---------- ----------
 
 3 
-	call Reaparece_izquierda 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
+	call Reaparece_izquierda 										; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
 ;	call Reinicio
 
 ; ---------- ---------- ----------

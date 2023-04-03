@@ -11,8 +11,10 @@
 
 Genera_coordenadas push bc
 	push hl
+	push de
 
 	ld hl,(Posicion_actual)
+
 	ld a,l
 	and $1f
 	ld (Coordenada_X),a 								; Coordenada Y del sprite, (0-$1f). Columnas.
@@ -38,6 +40,7 @@ Genera_coordenadas push bc
 2 ld a,e
 	ld (Coordenada_y),a
 
+	pop de
 	pop hl
 	pop bc
 

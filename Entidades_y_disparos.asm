@@ -195,8 +195,8 @@ Entidad_2 db 2,2		                            ; (Filas) / (Columns).
 	defw 0											; (Puntero_DESPLZ_der).
 	defw 0											; (Puntero_DESPLZ_izq).
 
-	defw $50d8                                      ; (Posicion_inicio).
-	db 4											; (Cuad_objeto).
+	defw $471e                                      ; (Posicion_inicio).
+	db 2											; (Cuad_objeto).
 
 	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
@@ -212,7 +212,7 @@ Entidad_2 db 2,2		                            ; (Filas) / (Columns).
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 
-	defw 0,0							  	  		; (Puntero_indice_mov) / (Puntero_mov).
+	defw Indice_mov_Escaloncitos_izquierda_abajo,0	; (Puntero_indice_mov) / (Puntero_mov).
 
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
 
