@@ -198,7 +198,7 @@ Entidad_2 db 2,2		                            ; (Filas) / (Columns).
 	defw $471e                                      ; (Posicion_inicio).
 	db 2											; (Cuad_objeto).
 
-	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+	db 4,1,1,8                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
 	db 0,0											; Variables_de_borrado 
 	defw 0										 	;	" " " " " " "

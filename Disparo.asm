@@ -512,7 +512,7 @@ Detecta_colision_nave_entidad
 1 call NextScan
     djnz 1B
     push hl    
-    pop ix
+    pop ix                                         ; Puntero_de_impresion de la entidad implicada en el penúltimo scanline.
 
     push iy
     pop hl
@@ -528,8 +528,8 @@ Detecta_colision_nave_entidad
 3 and a
     adc hl,bc
     push hl
-    pop iy
-
+    pop iy                                          ; Puntero_objeto de la entidad implicada apuntando al 1er dato del penúltimo_
+;                                                   ; _ scanline.
     push ix
     pop hl
 
@@ -538,7 +538,7 @@ Detecta_colision_nave_entidad
 ; Llegados a este punto, HL apunta al puntero de impresión del penúltimo scanline de pantalla de la entidad.
 ; IY apunta a los "datos" del penúltimo scanline que forman la entidad.
 
-    jr $
+;    jr $
 
     ld e,0                                         ; E,(Impacto)="0".
     call Bucle_3                                   ; Comprobamos el 1er scanline.
@@ -546,20 +546,24 @@ Detecta_colision_nave_entidad
     ld a,e
     and 1
     jr z,4F
-    pop hl
 
+    pop hl
     push hl
     call NextScan
 
     ld a,h                                         ; El 1er scanline de la bala se pinta en pantalla.
     cp $58                                         ; El 2º scanline indica colisión porque entra en zona_
     jr z,4F                                        ; _ de atributos. Evitamos comprobar colisión en el _
+    jr nc,4F
 ;                                                  ; _ 2º scanline si esto es así.    
     ld e,0                                         ; ----- ( ) -----
     call Bucle_3      
 
+    ld a,e
+    and a
+    jr nz,$
+
 4 pop hl                                         ; Puntero de impresión en HL e indicador de Impacto en B.
-;    pop iy
     ret                                            
 
  ; ---------- ----------
