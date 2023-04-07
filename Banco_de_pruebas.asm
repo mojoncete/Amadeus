@@ -57,7 +57,7 @@ Puntero_objeto defw 0									; Donde están los datos para pintar el Sprite.
 Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
 Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 
-; ---------- ---------- ---------- ---------;      ;---------
+; ---------- ---------- ---------- ---------;      ;--------- ---------- ---------- ---------- 
 
 CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos.
 ; 														; El hecho de que este byte sea distinto de "0", indica que se ha modificado el nº de columnas del objeto.
@@ -89,6 +89,8 @@ Vel_left db 1 											; Velocidad izquierda. Nº de píxeles que desplazamos 
 Vel_right db 2 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
 Vel_up db 1 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
 Vel_down db 4 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
+
+Impacto db 0											; Impacto. "1" existe impacto en la entidad.
 
 Variables_de_borrado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
 	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
@@ -217,15 +219,12 @@ START ld sp,$ffff										 ; Situamos el inicio de Stack.
 	IM 2 											     ; Habilitamos el modo 2 de INTERRUPCIONES.
 	DI 													 										 
 
-	ld a,1
-	out ($fe),a
-
 	ld a,%00000111
 	call Cls
 
 ;	call Pinta_FILAS
 
-	call Pulsa_ENTER
+	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
 	ld hl,Numero_de_entidades
 	ld b,(hl)
