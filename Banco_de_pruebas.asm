@@ -80,15 +80,15 @@ Indice_Sprite_izq defw Indice_Badsat_izq
 Puntero_DESPLZ_der defw 0
 Puntero_DESPLZ_izq defw 0
 
-Posicion_inicio defw $4721								; Dirección de pantalla donde aparece el objeto. [DRAW].
+Posicion_inicio defw $4741								; Dirección de pantalla donde aparece el objeto. [DRAW].
 Cuad_objeto db 1										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
 ; Variables de objeto. (Características).
 
 Vel_left db 1 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
-Vel_right db 2 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
+Vel_right db 1 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
 Vel_up db 1 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
-Vel_down db 4 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
+Vel_down db 2 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
 
 Impacto db 0											; Impacto. "1" existe impacto en la entidad.
 
@@ -134,7 +134,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
-Puntero_indice_mov defw Indice_mov_Escaloncitos_derecha_abajo
+Puntero_indice_mov defw Indice_mov_Escaloncitos_derecha_abajo ; Puntero del patrón de movimiento de la entidad. "0" No hay movimiento.
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0
@@ -195,11 +195,15 @@ Stack_snapshot_disparos defw Album_de_fotos_disparos	; Puntero que indica la pos
 Numero_de_disparotes db 0	
 Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
 Puntero_DESPLZ_DISPARO_AMADEUS defw 0
-Impacto db 0											; Este byte indica que se ha producido impacto:
+Impacto2 db 0											; Este byte indica que se ha producido impacto:
 ; 														; (Impacto)="1". El impacto se produce en una entidad.
 ;														; (Impacto)="2". El impacto se produce en Amadeus.
 Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posibles columnas_
 ;														; _ que puede ocupar el sprite de Amadeus. (Colisión).
+Coordenadas_X_Entidad ds 3								; 3 Bytes reservados para almacenar las 3 posibles columnas_
+;														; _ que puede ocupar el sprite de una entidad. (Colisión).
+
+
 ; Gestión de FRAMES.
 
 Switch db 0
@@ -291,7 +295,7 @@ Frame
 
 ;	Existe colisión?????
 
-	ld a,(Impacto)
+	ld a,(Impacto2)
 	and a
 	jr z,5F
 
@@ -301,7 +305,7 @@ Frame
 	jr $
 
 5 xor a
-	ld (Impacto),a										; Flag (Impacto) a "0".
+	ld (Impacto2),a										; Flag (Impacto) a "0".
 
 	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
 	call Motor_de_disparos								; Borra/mueve/pinta cada uno de los disparos y crea un nuevo album de fotos.
@@ -674,7 +678,7 @@ Store_Restore_entidades
 
 	ld hl,Filas
 	ld de,(Puntero_store_entidades) 					; Puntero que se desplaza por las distintas entidades.
-	ld bc,58
+	ld bc,59
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
 ;	Incrementa el puntero STORE. Guarda los datos de `Entidad´+1 en Draw, (Puntero RESTORE).
@@ -682,7 +686,7 @@ Store_Restore_entidades
 	ld hl,(Puntero_restore_entidades)
 	ld (Puntero_store_entidades),hl 					; Situamos (Puntero_store_entidades) en la 2ª entidad.
 	ld de,Filas 										; Hemos RECUPERADO los parámetros de la 2ª entidad de su base de datos.
-	ld bc,58
+	ld bc,59
 	ldir
 
 ;	Incrementa RESTORE !!!!! 
@@ -709,7 +713,7 @@ Restore_Primera_entidad push hl
  	push bc
 	ld hl,(Puntero_store_entidades)						; (Puntero_store_entidades) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,58
+	ld bc,59
 	ldir
 	pop bc
 	pop de
@@ -730,7 +734,7 @@ Restore_Amadeus	push hl
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Filas
-	ld bc,58
+	ld bc,59
 	ldir
 	pop bc
 	pop de
@@ -751,7 +755,7 @@ Store_Amadeus push hl
  	push bc
 	ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Amadeus_db
-	ld bc,58
+	ld bc,59
 	ldir
 	pop bc
 	pop de

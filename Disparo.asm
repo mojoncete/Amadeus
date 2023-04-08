@@ -463,7 +463,7 @@ Comprueba_Colision push iy                         ; Puntero objeto (disparo).
     cp $58                                         ; El 2º scanline indica colisión porque entra en zona_
     jr z,2F                                        ; _ de atributos. Evitamos comprobar colisión en el _
 ;                                                  ; _ 2º scanline si esto es así.    
-    ld e,$80                                       ; ----- ( ) -----
+    ld e,$80                                       ; ----- ( ) ----- ----- 
     call Bucle_2      
 
 2 ld b,e
@@ -497,14 +497,48 @@ Bucle_2 ld b,2
 
 Detecta_colision_nave_entidad 
 
-; Antes de nada llamaremos a la rutina [Calcula_puntero_de_impresion]. Nos proporcionara:
+; Antes de nada, averiguaremos si la entidad ocupa alguna de las columnas que ocupa Amadeus en pantalla.
+; Guardamos las coordenadas_X de la entidad en el almacen:
+
+; Preparamos registros:
+
+    ld hl,Filas+6
+    ld d,(hl)                                           ; Coordenada_X de Amadeus en D.
+    inc hl
+    inc hl
+    ld e,(hl)                                           ; (CTRL_DESPLZ) de Amadeus en E.
+    ld hl,Filas+20
+    ld c,(hl)                                           ; (Cuad_objeto) de Amadeus en C.
+    ld hl,Coordenadas_X_Entidad
+
+    call Guarda_coordenadas_X
+    
+; Guardamos las coordenadas_X de Amadeus en el almacen:
+
+; Preparamos registros:
+
+    ld hl,Amadeus_db+6
+    ld d,(hl)                                           ; Coordenada_X de Amadeus en D.
+    inc hl
+    inc hl
+    ld e,(hl)                                           ; (CTRL_DESPLZ) de Amadeus en E.
+    ld hl,Amadeus_db+20
+    ld c,(hl)                                           ; (Cuad_objeto) de Amadeus en C.
+    ld hl,Coordenadas_X_Amadeus
+
+    call Guarda_coordenadas_X
+
+    jr $
+
+
+; Si coinciden las columnas de la entidad con las de Amadeus, llamaremos a la rutina [Calcula_puntero_de_impresion]. Nos proporcionara:
 ; Puntero_de_impresión de la entidad en IX y puntero_objeto en IY.
 
     ld hl,(Posicion_actual)
     call Calcula_puntero_de_impresion
 
 ; Con estos datos podremos situar HL en el penúltimo scanline del puntero_de_impresión de la entidad y_
-; _ y IY en el 1er dato del penúltimo scanline que forma la entidad, (Puntero_objeto).
+; _ el registro IY en el 1er dato del penúltimo scanline que forma la entidad, (Puntero_objeto).
 
     ld b,14
     push ix
@@ -538,7 +572,24 @@ Detecta_colision_nave_entidad
 ; Llegados a este punto, HL apunta al puntero de impresión del penúltimo scanline de pantalla de la entidad.
 ; IY apunta a los "datos" del penúltimo scanline que forman la entidad.
 
-;    jr $
+; debugggg -----------------------------------------    
+
+;    call Guarda_coordenadas_X_de_Amadeus
+; (Colisiones en filas 16 y 17).
+;    ld hl,Coordenadas_X_Amadeus
+;    ld a,(hl) 
+;18 cp d
+;    jr nz,17F
+; Colisión Amadeus !!!!!!!!!!
+;    pop hl
+;    jr 14F
+;17 inc hl
+;    ld a,(hl)
+;    and a
+;    jr z,15F                                             ; No hay colisión con Amadeus.
+;    jr 18B
+
+; debuggggg -------------------------------
 
     ld e,0                                         ; E,(Impacto)="0".
     call Bucle_3                                   ; Comprobamos el 1er scanline.
@@ -646,7 +697,7 @@ Motor_de_disparos ld bc,Disparo_3A
     call Elimina_disparo_de_base_de_datos
     pop hl
     ld a,1
-    ld (Impacto),a                                       ; Indicamos que se ha producido Impacto en una entidad.
+    ld (Impacto2),a                                       ; Indicamos que se ha producido Impacto en una entidad.
     jr 11F
 
 9 call Mueve_disparo
@@ -708,7 +759,20 @@ Motor_de_disparos ld bc,Disparo_3A
 ; (Colisiones en filas 16 y 17).
 
     push de                                              ; DE contiene las coordenadas del disparo que ha colisionado.
-    call Guarda_coordenadas_X_de_Amadeus
+
+; Preparamos los registros para llamar a [Guarda_coordenadas_X_de_Amadeus]
+
+    ld hl,Amadeus_db+6
+    ld d,(hl)                                           ; Coordenada_X de Amadeus en D.
+    inc hl
+    inc hl
+    ld e,(hl)                                           ; (CTRL_DESPLZ) de Amadeus en E.
+    ld hl,Amadeus_db+20
+    ld c,(hl)                                           ; (Cuad_objeto) de Amadeus en C.
+    ld hl,Coordenadas_X_Amadeus
+
+    call Guarda_coordenadas_X
+
     pop de                                               ; Coordenadas del disparo en DE. D Coordenada_X.
 
     ld hl,Coordenadas_X_Amadeus
@@ -745,7 +809,7 @@ Motor_de_disparos ld bc,Disparo_3A
     pop hl
 
     ld a,2                                               ; Indicamos que se ha producido Impacto en Amadeus.
-    ld (Impacto),a
+    ld (Impacto2),a
     jr 12F
 
 10 call Mueve_disparo
@@ -891,32 +955,23 @@ Elimina_disparo_de_base_de_datos ld bc,7
 
 ; -----------------------------------------------------------------
 ;
-;   Guarda las Coordenadas_X que ocupa Amadeus en la pantalla.
+;   Guarda las Coordenadas_X que ocupa Amadeus/Entidad en la pantalla.
 ;
 ;   2 Coordenadas_X, (si CTRL_DESPLZ es "0").
 ;   3 Coordenadas_X, (si CTRL_DESPLZ es distinto de "0").
 ;
-;   En función de si el cuadrante de pantalla en el que se encuentra la nave, es par o impar,_ 
-;   _ las columnas guardadas irán en orden creciente o decreciente.
+;   Esta información se almacenará en un pequeño almacen de 3 bytes: Coordenadas_X_Amadeus o Coordenadas_X_Entidad.
 ;
-;   Esta información se almacenará en un pequeño almacen de 3 bytes: Coordenadas_X_Amadeus.
+;   INPUTS:
 ;
+;   DE contiene (Coordenada_X)/(CTRL_DESPLZ) de la Entidad/Amadeus respectivamente.
+;   C contiene (Cuad_objeto) de la Entidad/Amadeus.
+;   HL contiene la dirección del 1er byte de los almacenes de 3 bytes, (Coordenadas_X_Amadeus) o (Coordenadas_X_Entidad). 
+
 ;   MODIFICA: A, HL, DE y C
 
-Guarda_coordenadas_X_de_Amadeus ld hl,Amadeus_db+6
-    ld d,(hl)                                           ; Coordenada_X de Amadeus en D.
-    inc hl
-    inc hl
-    ld e,(hl)                                           ; (CTRL_DESPLZ) de Amadeus en E.
-
-    ld hl,Amadeus_db+20
-    ld c,(hl)                                           ; (Cuad_objeto) de Amadeus en C.
-
-
-    ld hl,Coordenadas_X_Amadeus
-    ld (hl),d
-
-3 ld a,c
+Guarda_coordenadas_X ld (hl),d               ; Cargamos la 1ª Coordenada_X en su almacen.
+    ld a,c
     and 1
     jr nz,1F
     inc d
@@ -935,4 +990,4 @@ Guarda_coordenadas_X_de_Amadeus ld hl,Amadeus_db+6
 
     xor a
     ld e,a
-    jr 3B
+    jr Guarda_coordenadas_X
