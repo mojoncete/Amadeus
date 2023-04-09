@@ -528,6 +528,17 @@ Detecta_colision_nave_entidad
 
     call Guarda_coordenadas_X
 
+; Vamos a comparar las columnas_X de Amadeus y la entidad.
+
+    jr $
+
+    ld de,Coordenadas_X_Entidad
+    ld a,(de)
+
+    ld hl,Coordenadas_X_Amadeus
+    cp (hl)
+    inc hl
+
     jr $
 
 
@@ -760,7 +771,7 @@ Motor_de_disparos ld bc,Disparo_3A
 
     push de                                              ; DE contiene las coordenadas del disparo que ha colisionado.
 
-; Preparamos los registros para llamar a [Guarda_coordenadas_X_de_Amadeus]
+; Preparamos los registros para llamar a [Guarda_coordenadas_X]. Necesitamos averiguar que columnas ocupa Amadeus.
 
     ld hl,Amadeus_db+6
     ld d,(hl)                                           ; Coordenada_X de Amadeus en D.
@@ -773,7 +784,9 @@ Motor_de_disparos ld bc,Disparo_3A
 
     call Guarda_coordenadas_X
 
-    pop de                                               ; Coordenadas del disparo en DE. D Coordenada_X.
+    pop de                                              ; Coordenadas del disparo en DE. D Coordenada_X.
+
+; Comparamos la coordenada_X del disparo con las coordenadas_X de Amadeus.
 
     ld hl,Coordenadas_X_Amadeus
     ld a,(hl) 
@@ -787,6 +800,7 @@ Motor_de_disparos ld bc,Disparo_3A
 
 17 inc hl
     ld a,(hl)
+
     and a
     jr z,15F                                             ; No hay colisión con Amadeus.
     jr 18B
@@ -970,7 +984,7 @@ Elimina_disparo_de_base_de_datos ld bc,7
 
 ;   MODIFICA: A, HL, DE y C
 
-Guarda_coordenadas_X ld (hl),d               ; Cargamos la 1ª Coordenada_X en su almacen.
+Guarda_coordenadas_X ld (hl),d                          ; Cargamos la 1ª Coordenada_X en su almacen.
     ld a,c
     and 1
     jr nz,1F
