@@ -86,9 +86,9 @@ Cuad_objeto db 1										; Almacena el cuadrante de pantalla donde se encuentra
 ; Variables de objeto. (Características).
 
 Vel_left db 1 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
-Vel_right db 1 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
+Vel_right db 2 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
 Vel_up db 1 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
-Vel_down db 2 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
+Vel_down db 4 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
 
 Impacto db 0											; Impacto. "1" existe impacto en la entidad.
 
@@ -301,6 +301,7 @@ Frame
 
 ; A="1" Impacto en entidad por disparo de Amadeus.
 ; A="2"	Impacto en Amadeus por disparo en entidad.
+; A="3"	Colisión de Amadeus con una entidad sin disparo.
 
 	jr $
 
@@ -402,10 +403,15 @@ Mov_obj
 	ld a,(Coordenada_y)
 	cp $14
 	call nc, Detecta_colision_nave_entidad
+	ld a,e
+	jr z,1F
+
+    ld a,3
+    ld (Impacto),a
 
 ; ---------
 
-	ld a,1 				 								; Cambiamos (Obj_dibujado) a "1" para poder almacenar el contenido de DRAW en_  
+1 ld a,1 				 								; Cambiamos (Obj_dibujado) a "1" para poder almacenar el contenido de DRAW en_  
 	ld (Obj_dibujado),a 								; _(Variables_de_pintado).					
     call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
     call Repone_borrar                                  ; Si ha habido movimiento de la entidad, borraremos el FRAME anterior.

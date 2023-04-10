@@ -500,6 +500,8 @@ Detecta_colision_nave_entidad
 ; Antes de nada, averiguaremos si la entidad ocupa alguna de las columnas que ocupa Amadeus en pantalla.
 ; Guardamos las coordenadas_X de la entidad en el almacen:
 
+    ld hl,(Posicion_actual)
+
 ; Preparamos registros:
 
     ld hl,Filas+6
@@ -512,7 +514,7 @@ Detecta_colision_nave_entidad
     ld c,(hl)                                           ; (Cuad_objeto) de Amadeus en C.
     ld hl,Coordenadas_X_Entidad
     call Guarda_coordenadas_X
-    
+
 ; Guardamos las coordenadas_X de Amadeus en el almacen:
 
 ; Preparamos registros:
@@ -524,7 +526,6 @@ Detecta_colision_nave_entidad
     ld e,(hl)                                           ; (CTRL_DESPLZ) de Amadeus en E y A'.
     ld a,e
     ex af,af'
-
     ld hl,Amadeus_db+20
     ld c,(hl)                                           ; (Cuad_objeto) de Amadeus en C.
     ld hl,Coordenadas_X_Amadeus
@@ -573,7 +574,11 @@ Detecta_colision_nave_entidad
 ; Si coinciden las columnas de la entidad con las de Amadeus, llamaremos a la rutina [Calcula_puntero_de_impresion]. Nos proporcionara:
 ; Puntero_de_impresión de la entidad en IX y puntero_objeto en IY.
 
-11 ld hl,(Posicion_actual)
+11 
+
+    jr $
+
+    ld hl,(Posicion_actual)
     call Calcula_puntero_de_impresion
 
 ; Con estos datos podremos situar HL en el penúltimo scanline del puntero_de_impresión de la entidad y_
