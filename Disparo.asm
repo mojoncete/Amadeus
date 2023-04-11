@@ -50,7 +50,7 @@ Genera_disparo
     jr nz,16F
 
     ld a,(Coordenada_y)
-    cp $14
+    cp $13
     ret nc
 
 ; ----- ----- -----

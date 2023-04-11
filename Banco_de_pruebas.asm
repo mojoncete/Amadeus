@@ -80,15 +80,15 @@ Indice_Sprite_izq defw Indice_Badsat_izq
 Puntero_DESPLZ_der defw 0
 Puntero_DESPLZ_izq defw 0
 
-Posicion_inicio defw $473e								; Dirección de pantalla donde aparece el objeto. [DRAW].
-Cuad_objeto db 2										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+Posicion_inicio defw $507e								; Dirección de pantalla donde aparece el objeto. [DRAW].
+Cuad_objeto db 4										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
 ; Variables de objeto. (Características).
 
-Vel_left db 4 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
+Vel_left db 1 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
 Vel_right db 1 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
 Vel_up db 1 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
-Vel_down db 8 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
+Vel_down db 1 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
 
 Impacto db 0											; Si después del movimiento de la entidad, (Impacto) se coloca a "1",_
 ;														; _ existen muchas posibilidades de que esta entidad haya colisionado con Amadeus. 
@@ -135,7 +135,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
-Puntero_indice_mov defw Indice_mov_Escaloncitos_izquierda_abajo  ; Puntero del patrón de movimiento de la entidad. "0" No hay movimiento.
+Puntero_indice_mov defw Indice_mov_Izquierda_y_derecha  ; Puntero del patrón de movimiento de la entidad. "0" No hay movimiento.
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0
@@ -306,7 +306,10 @@ Frame
 
 	jr $
 
-5 xor a
+5 call Inicia_punteros_de_entidades
+	call Restore_Primera_entidad
+
+	xor a
 	ld (Impacto2),a										; Flag (Impacto2) a "0".
 
 	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
@@ -353,7 +356,7 @@ Frame
 
 ; Comprobamos posible colisión entre Amadeus y una entidad.
 
-	call Detecta_colision_nave_entidad 
+;	call Detecta_colision_nave_entidad 
 
 7 ld a,(Ctrl_0)
 	bit 4,a
@@ -370,8 +373,8 @@ Frame
 
 ; -----
 
-	call Inicia_punteros_de_entidades
-	call Restore_Primera_entidad
+;	call Inicia_punteros_de_entidades
+;	call Restore_Primera_entidad
 
 ; Calculamos el nº de malotes y de disparotes para pintarlos nada más comenzar el siguiente FRAME.
 
