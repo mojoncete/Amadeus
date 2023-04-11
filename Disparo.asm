@@ -570,62 +570,49 @@ Compara_coordenadas_X
 
 Detecta_colision_nave_entidad 
 
+; LLegados a este punto, los datos que contiene DRAW son los de Amadeus.
+
     ld hl,(Posicion_actual)
     call Calcula_puntero_de_impresion
 
 ; Ahora, IX contiene el "puntero_de_impresión" de la entidad, (arriba-izq).
 ;        IY contiene el "puntero_objeto" de la entidad, (arriba-izq).
  
-; Con estos datos podremos situar HL en el penúltimo scanline del puntero_de_impresión de la entidad y_
-; _ el registro IY en el 1er dato del penúltimo scanline que forma la entidad, (Puntero_objeto).
+    jr $
 
-    ld b,14
-    push ix
-    pop hl
-1 call NextScan
-    djnz 1B
-    push hl    
-    pop ix                                         ; Puntero_de_impresion de la entidad implicada en el penúltimo scanline.
-    push iy
-    pop hl
-
-; Sumaremos 28/42 bytes en función de las (Columns) que formen la entidad.
-
-    ld a,(Columns)
-    and 1
-    jr nz,2F
-    ld bc,28
-    jr 3F
-2 ld bc,42    
-3 and a
-    adc hl,bc
-    push hl
-    pop iy                                          ; Puntero_objeto de la entidad implicada apuntando al 1er dato del penúltimo_
-;                                                   ; _ scanline.
     push ix
     pop hl
     push hl
 
-; Llegados a este punto, HL apunta al puntero de impresión del penúltimo scanline de pantalla de la entidad.
-; IY apunta a los "datos" del penúltimo scanline que forman la entidad.
+; ----- ----- -----
 
     ld e,0                                         ; E,(Impacto)="0".
-    call Bucle_3                                   ; Comprobamos el 1er scanline.
-    pop hl
+    ld b,16
+
+2 call Bucle_3                                   ; Comprobamos el 1er scanline.
+    ld a,e
+    jr z,3F
+
+    ld hl,Impacto2
+    set 2,(hl)
+    jr 1F
+
+3 pop hl
     push hl
     call NextScan
     ld a,h                                         ; El 1er scanline de la bala se pinta en pantalla.
     cp $58                                         ; El 2º scanline indica colisión porque entra en zona_
-    jr z,4F                                        ; _ de atributos. Evitamos comprobar colisión en el _
-    jr nc,4F
+    jr z,1F                                        ; _ de atributos. Evitamos comprobar colisión en el _
+    jr nc,1F
 ;                                                  ; _ 2º scanline si esto es así.    
-    call Bucle_3      
-4 pop hl                                           ; Puntero de impresión en HL e indicador de Impacto en B.
+    djnz 2B
+
+1 pop hl                                           ; Puntero de impresión en HL e indicador de Impacto en B.
     ret                                            
 
  ; ---------- ----------
 
-Bucle_3 ld a,(Columnas)
+Bucle_3 ld a,(Columns)
     ld b,a 
 2 ld a,(iy)
     and (hl)

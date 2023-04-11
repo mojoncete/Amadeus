@@ -354,12 +354,6 @@ Frame
 ; Comprobamos posible colisión entre Amadeus y una entidad.
 
 	call Detecta_colision_nave_entidad 
-	ld a,e
-	jr z,7F
-	
-	ld hl,Impacto2
-	set 2,(hl)
-	ld (Impacto2),a
 
 7 ld a,(Ctrl_0)
 	bit 4,a
