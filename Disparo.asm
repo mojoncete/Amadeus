@@ -485,22 +485,17 @@ Bucle_2 ld b,2
 
 ; -------------------------------------------------------------------------------------------------------------
 ;
-;   01/04/23
-;
+;   11/04/23
 ;   
 ;   La entidad se encuentra en la fila $14,$15 o $16 de pantalla.
-;   Vamos a comprobar si existe colisión con Amadeus. Consideramos que se produce colisión_
-;   _ si hay contacto de los dos scanlines inferiores que forman la entidad con la nave.
+;   Vamos a comprobar si la entidad ocupa alguna de las columnas ocupadas por Amadeus y por lo_
+;   _ tanto, existe riesgo alto de colisión entre ambas. 
 ;
-;   INPUTS: IX contiene el "puntero_de_impresión" de la entidad, (arriba-izq).
-;           IY contiene el "puntero_objeto" de la entidad, (arriba-izq).
+;   MODIFICA: HL,DE,BC,A y AF´.
 
-Detecta_colision_nave_entidad 
+Compara_coordenadas_X
 
-; Antes de nada, averiguaremos si la entidad ocupa alguna de las columnas que ocupa Amadeus en pantalla.
-; Guardamos las coordenadas_X de la entidad en el almacen:
-
-    ld hl,(Posicion_actual)
+; Guardamos las coordenadas_X de la entidad y Amadeus en sus correspondientes almacenes.
 
 ; Preparamos registros:
 
@@ -514,8 +509,6 @@ Detecta_colision_nave_entidad
     ld c,(hl)                                           ; (Cuad_objeto) de Amadeus en C.
     ld hl,Coordenadas_X_Entidad
     call Guarda_coordenadas_X
-
-; Guardamos las coordenadas_X de Amadeus en el almacen:
 
 ; Preparamos registros:
 
@@ -536,51 +529,53 @@ Detecta_colision_nave_entidad
 
     inc b
     dec b
-    jr z,5F
+    jr z,1F
     ld b,3
-    jr 6F
-5 ld b,2
-
-6 ex af,af'
+    jr 2F
+1 ld b,2
+2 ex af,af'
     inc a
     dec a
-    jr z,9F
+    jr z,5F
     ld c,3
-    jr 10F
-9 ld c,2
-10 ld a,c
+    jr 6F
+5 ld c,2
+6 ld a,c
     ex af,af'
     ld de,Coordenadas_X_Entidad
-8 ld a,(de)
-
+4 ld a,(de)
     ld hl,Coordenadas_X_Amadeus
-7 cp (hl)
-
-    jr z,11F
-
+3 cp (hl)
+    jr z,7F
     inc hl
     dec c
-    jr nz,7B
-
+    jr nz,3B
     inc de
     ex af,af'
     ld c,a
     ex af,af'
-    
-    djnz 8B
+    djnz 4B
+8 ret
+7 ld a,1                                                ; El .db (Impacto)="1" indica que es altamente probable que esta_
+    ld (Impacto),a                                      ; _ entidad colisione con Amadeus, (ha superado, o está en la fila $14) y 
+;                                                       ; _ alguna de las columnas_X que ocupa coinciden con las de Amadeus.
+    ld hl,Impacto2
+    set 2,(hl)
+    jr 8B
 
-    ret
+; -----------------------------------------------------------------------
+;
+;   11/04/23
+;   
 
-; Si coinciden las columnas de la entidad con las de Amadeus, llamaremos a la rutina [Calcula_puntero_de_impresion]. Nos proporcionara:
-; Puntero_de_impresión de la entidad en IX y puntero_objeto en IY.
-
-11 
-
-    jr $
+Detecta_colision_nave_entidad 
 
     ld hl,(Posicion_actual)
     call Calcula_puntero_de_impresion
 
+; Ahora, IX contiene el "puntero_de_impresión" de la entidad, (arriba-izq).
+;        IY contiene el "puntero_objeto" de la entidad, (arriba-izq).
+ 
 ; Con estos datos podremos situar HL en el penúltimo scanline del puntero_de_impresión de la entidad y_
 ; _ el registro IY en el 1er dato del penúltimo scanline que forma la entidad, (Puntero_objeto).
 
@@ -591,7 +586,6 @@ Detecta_colision_nave_entidad
     djnz 1B
     push hl    
     pop ix                                         ; Puntero_de_impresion de la entidad implicada en el penúltimo scanline.
-
     push iy
     pop hl
 
@@ -610,7 +604,6 @@ Detecta_colision_nave_entidad
 ;                                                   ; _ scanline.
     push ix
     pop hl
-
     push hl
 
 ; Llegados a este punto, HL apunta al puntero de impresión del penúltimo scanline de pantalla de la entidad.
@@ -618,27 +611,15 @@ Detecta_colision_nave_entidad
 
     ld e,0                                         ; E,(Impacto)="0".
     call Bucle_3                                   ; Comprobamos el 1er scanline.
-
-    ld a,e
-    and 1
-    jr z,4F
-
     pop hl
     push hl
     call NextScan
-
     ld a,h                                         ; El 1er scanline de la bala se pinta en pantalla.
     cp $58                                         ; El 2º scanline indica colisión porque entra en zona_
     jr z,4F                                        ; _ de atributos. Evitamos comprobar colisión en el _
     jr nc,4F
 ;                                                  ; _ 2º scanline si esto es así.    
-    ld e,0                                         ; ----- ( ) -----
     call Bucle_3      
-
-    ld a,e
-    and a
-    jr nz,$
-
 4 pop hl                                           ; Puntero de impresión en HL e indicador de Impacto en B.
     ret                                            
 
@@ -649,9 +630,7 @@ Bucle_3 ld a,(Columnas)
 2 ld a,(iy)
     and (hl)
     jr z,1F
-    
     ld e,1
-
 1 inc hl
     inc iy
     djnz 2B
@@ -720,9 +699,9 @@ Motor_de_disparos ld bc,Disparo_3A
 
     push hl
     call Elimina_disparo_de_base_de_datos
-    pop hl
-    ld a,1
-    ld (Impacto2),a                                       ; Indicamos que se ha producido Impacto en una entidad.
+    ld hl,Impacto2
+    set 0,(hl)
+    pop hl                                               ; Indicamos que se ha producido Impacto en una entidad.
     jr 11F
 
 9 call Mueve_disparo
@@ -834,10 +813,9 @@ Motor_de_disparos ld bc,Disparo_3A
 
 14 push hl
     call Elimina_disparo_de_base_de_datos
+    ld hl,Impacto2
+    set 1,(hl)
     pop hl
-
-    ld a,2                                               ; Indicamos que se ha producido Impacto en Amadeus.
-    ld (Impacto2),a
     jr 12F
 
 10 call Mueve_disparo
