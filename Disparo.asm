@@ -578,19 +578,19 @@ Detecta_colision_nave_entidad
 ; Ahora, IX contiene el "puntero_de_impresión" de la entidad, (arriba-izq).
 ;        IY contiene el "puntero_objeto" de la entidad, (arriba-izq).
  
-    jr $
+
+;    jr $
 
     push ix
     pop hl
     push hl
 
 ; ----- ----- -----
-
-    ld e,0                                         ; E,(Impacto)="0".
-    ld b,16
-
-2 call Bucle_3                                   ; Comprobamos el 1er scanline.
+    ld e,0                                        ; Indica impacto.
+    ld b,15
+2 call Bucle_3                                    ; Comprobamos el 1er scanline.
     ld a,e
+    and a
     jr z,3F
 
     ld hl,Impacto2
@@ -598,8 +598,8 @@ Detecta_colision_nave_entidad
     jr 1F
 
 3 pop hl
-    push hl
     call NextScan
+    push hl
     ld a,h                                         ; El 1er scanline de la bala se pinta en pantalla.
     cp $58                                         ; El 2º scanline indica colisión porque entra en zona_
     jr z,1F                                        ; _ de atributos. Evitamos comprobar colisión en el _
@@ -612,15 +612,17 @@ Detecta_colision_nave_entidad
 
  ; ---------- ----------
 
-Bucle_3 ld a,(Columns)
+Bucle_3 push bc                                    ; guardamos el contador de scanlines en la pila.
+    ld a,(Columns)
     ld b,a 
 2 ld a,(iy)
-    and (hl)
+    cp (hl)
     jr z,1F
     ld e,1
 1 inc hl
     inc iy
     djnz 2B
+    pop bc
     ret                                   
 
 ; -------------------------------------------------------------------------------------------------------------
@@ -985,3 +987,25 @@ Guarda_coordenadas_X ld (hl),d                          ; Cargamos la 1ª Coorde
     ld e,a
     jr Guarda_coordenadas_X
 
+; -----------------------------------------------------------------
+;
+;   12/04/23
+;
+
+Selector_de_impactos ld a,(Impacto2)    
+    cp 4
+    jr nz,$
+    call Detecta_colision_nave_entidad 
+    ld a,e
+    ret z
+
+    ld hl,Impacto
+    ld (hl),1
+    ld hl,Impacto2
+    set 3,(hl)
+    res 2,(hl)
+
+    ld a,(Impacto2) ; debugg
+
+    jr $
+    ret
