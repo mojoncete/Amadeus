@@ -590,12 +590,12 @@ Detecta_colision_nave_entidad
     ld b,15
 2 call Bucle_3                                    ; Comprobamos el 1er scanline.
     ld a,e
-    and a
-    jr z,3F
+    cp 5
+    jr c,3F
 
-    ld hl,Impacto2
-    set 2,(hl)
-    jr 1F
+;    ld hl,Impacto2
+;    set 2,(hl)
+;    jr 1F
 
 3 pop hl
     call NextScan
@@ -618,7 +618,9 @@ Bucle_3 push bc                                    ; guardamos el contador de sc
 2 ld a,(iy)
     cp (hl)
     jr z,1F
-    ld e,1
+
+    inc e
+
 1 inc hl
     inc iy
     djnz 2B
@@ -996,16 +998,14 @@ Selector_de_impactos ld a,(Impacto2)
     cp 4
     jr nz,$
     call Detecta_colision_nave_entidad 
+
     ld a,e
     ret z
+    cp 5
+    ret c
 
     ld hl,Impacto
     ld (hl),1
-    ld hl,Impacto2
-    set 3,(hl)
-    res 2,(hl)
-
-    ld a,(Impacto2) ; debugg
-
     jr $
+
     ret
