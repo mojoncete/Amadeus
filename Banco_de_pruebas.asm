@@ -80,15 +80,15 @@ Indice_Sprite_izq defw Indice_Badsat_izq
 Puntero_DESPLZ_der defw 0
 Puntero_DESPLZ_izq defw 0
 
-Posicion_inicio defw $47ee								; Dirección de pantalla donde aparece el objeto. [DRAW].
-Cuad_objeto db 2										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+Posicion_inicio defw $47c1								; Dirección de pantalla donde aparece el objeto. [DRAW].
+Cuad_objeto db 1										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
 ; Variables de objeto. (Características).
 
-Vel_left db 2 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
-Vel_right db 1 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
+Vel_left db 1 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
+Vel_right db 2 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
 Vel_up db 1 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
-Vel_down db 8 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
+Vel_down db 1 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
 
 Impacto db 0											; Si después del movimiento de la entidad, (Impacto) se coloca a "1",_
 ;														; _ existen muchas posibilidades de que esta entidad haya colisionado con Amadeus. 
@@ -135,7 +135,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
-Puntero_indice_mov defw Indice_mov_Escaloncitos_izquierda_abajo  ; Puntero del patrón de movimiento de la entidad. "0" No hay movimiento.
+Puntero_indice_mov defw Indice_mov_Escaloncitos_derecha_abajo  ; Puntero del patrón de movimiento de la entidad. "0" No hay movimiento.
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0

@@ -361,15 +361,15 @@ Mov_left
 ; ---------- ---------- ----------
 
 6 ld a,(CTRL_DESPLZ)
-	cp $f9 															
+	cp $f8 														
 	jr nz,8F
 	jr 4F
 1 ld a,(CTRL_DESPLZ) 												
-	cp $fa
+	cp $f9
 	jr nz,8F
 	jr 4F
 7 ld a,(CTRL_DESPLZ)
-	cp $fc
+	cp $fb
 	jr nz,8F
 
 ; ---------- ---------- ----------
@@ -380,7 +380,7 @@ Mov_left
 
 ; ---------- ---------- ----------
 
-	ld b,3 															; Para hacer que el objeto aparezca poco a poco, hemos de desplazarlo 2 veces: El primer desplazamiento_
+	ld b,2 															; Para hacer que el objeto aparezca poco a poco, hemos de desplazarlo 2 veces: El primer desplazamiento_
 5 push bc 															; _pone (CTRL_DESPLZ) a "0" y el segundo a "$ff". Con esto hacemos que el Sprite tenga espacio en blanco delante_
 
 ;	ld hl,(Indice_Sprite_izq)			
