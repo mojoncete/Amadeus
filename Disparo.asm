@@ -31,8 +31,8 @@ Genera_disparo
 ;   _ tenga valores distintos de $00, $f9, $fb y $fd.
 ;   NO SE GENERA disparo cuando la entidad no está impresa en su totalidad en pantalla, (está_
 ;   _ apareciendo o desapareciendo). (Columns)<>(Columnas).
-;   Amadeus al desplazarse a 2 pixels, podrá generar disparo en cualquier situación pero las Entidades_
-;   _ sólo podran generar disparo cuando (CTRL_DESPLZ) tenga estos valores, $00, $f9, $fb y $fd.
+;   Amadeus, (al desplazarse a 2 pixels), podrá generar disparo en cualquier situación. Las entidades_
+;   _ sólo podran generar disparo cuando (CTRL_DESPLZ) tenga los valores, $00, $f9, $fb y $fd.
 ;   IY contendrá la dirección de Puntero_objeto_disparo. 
 
 ; Exclusiones:
@@ -45,13 +45,14 @@ Genera_disparo
 
 ; ----- ----- ----- 
 
-    ld a,(Ctrl_0)                       ; Una entidad no podrá disparar si se encuentra por_
-    bit 6,a                             ; _ debajo de la fila "$14" de pantalla.
+    ld a,(Ctrl_0)                       
+    bit 6,a                             
     jr nz,16F
 
     ld a,(Coordenada_y)
-    cp $13
-    ret nc
+    cp $13                              ; Una entidad no podrá disparar si se encuentra por_
+    ret nc                              ; _ debajo de la fila "$14" de pantalla.
+    jr 14F
 
 ; ----- ----- -----
 
@@ -63,8 +64,8 @@ Genera_disparo
     dec h
     jr z,14F                            ; No hay almacenado ningún disparo de Amadeus. Seguimos con la rutina.
 
-    ld de,$4860                         ; Si el 1er disparo no ha llegado a esta línea no se autoriza el segundo. RET.
-    and a
+    ld de,$4860                         ; Si el 1er disparo no ha llegado a este scanline de pantalla,_
+    and a                               ; _ salimos de la rutina, (no se autorizará un 2º disparo de Amadeus). 
     sbc hl,de
     ret nc
 
@@ -160,9 +161,10 @@ Genera_disparo
 ;   _ El resto de combinaciones, B="0","2" o "3" ..... DEC HL.
 
     call Ajusta_disparo_parte_izquierda
+    jr 17F
 
-10 call Comprueba_Colision                          ; Retorna "$81" o "$80" en B indicando si se produce Colisión
-;                                                   ; _al generar el disparo.
+10 call Comprueba_Colision                            ; Retorna "$81" o "$80" en B indicando si se produce Colisión
+;                                                     ; _al generar el disparo.
 
 ; 	LLegados a este punto tendremos:
 ;
@@ -171,8 +173,8 @@ Genera_disparo
 ;       Puntero_de_impresion en HL.
 ;       Impacto/Dirección en BC.
 
-    call Almacena_disparo                      
-    jr 6F                                           ; RET.
+17 call Almacena_disparo                      
+    jr 6F                                             ; RET.
     
 
 ; 	Estamos en el 4º cuadrante de pantalla.
@@ -225,6 +227,8 @@ Genera_disparo
 ;	En el resto de combinaciones, B="0" o "1", no se corrige el puntero de impresión.
 
     call Ajusta_disparo_parte_derecha
+    jr 18F
+
 
 13 call Comprueba_Colision                            ; Retorna "$81" o "$80" en B indicando si se produce Colisión
 ;                                                     ; _al generar el disparo.
@@ -236,8 +240,8 @@ Genera_disparo
 ;       Puntero_de_impresion en HL.
 ;       Impacto/Dirección en BC.
 
-    call Almacena_disparo                      
-    jr 6F                                           ; RET.
+18 call Almacena_disparo                      
+    jr 6F                                             ; RET.
 
 ; 	La entidad que dispara se encuentra en la mitad superior de pantalla, (cuadrantes 1º y 2º).
 
@@ -587,7 +591,7 @@ Detecta_colision_nave_entidad
 
 ; ----- ----- -----
     ld e,0                                        ; Indica impacto.
-    ld b,15
+    ld b,10
 2 call Bucle_3                                    ; Comprobamos el 1er scanline.
     ld a,e
     cp 5
