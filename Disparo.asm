@@ -139,7 +139,6 @@ Genera_disparo
 ; 	En los cuadrantes 1º y3º de pantalla, sólo cuando (CTRL_DESPLZ)="$f9", B="1" ..... (DEC HL)*2. 
 ;   _ El resto de combinaciones, B="0","2" o "3" ..... DEC HL.
 
-    call Ajusta_disparo_parte_izquierda
     jr 10F
 
 ; 	Dispara Entidad.
@@ -160,10 +159,8 @@ Genera_disparo
 ; 	En los cuadrantes 1º y3º de pantalla, sólo cuando (CTRL_DESPLZ)="$f9", B="1" ..... (DEC HL)*2. 
 ;   _ El resto de combinaciones, B="0","2" o "3" ..... DEC HL.
 
-    call Ajusta_disparo_parte_izquierda
-    jr 17F
-
-10 call Comprueba_Colision                            ; Retorna "$81" o "$80" en B indicando si se produce Colisión
+10 call Ajusta_disparo_parte_izquierda
+    call Comprueba_Colision                            ; Retorna "$81" o "$80" en B indicando si se produce Colisión
 ;                                                     ; _al generar el disparo.
 
 ; 	LLegados a este punto tendremos:
@@ -173,10 +170,9 @@ Genera_disparo
 ;       Puntero_de_impresion en HL.
 ;       Impacto/Dirección en BC.
 
-17 call Almacena_disparo                      
+    call Almacena_disparo                      
     jr 6F                                             ; RET.
     
-
 ; 	Estamos en el 4º cuadrante de pantalla.
 ; 	4º CUAD. ----- ----- ----- ----- -----
 ;
@@ -203,7 +199,6 @@ Genera_disparo
 ; 	En los cuadrantes 2º y 4º, cuando (CTRL_DESPLZ)="$fb" o "$fd"; B="2" y B="3" ..... (INC HL). 
 ;	En el resto de combinaciones, B="0" o "1", no se corrige el puntero de impresión.
 
-    call Ajusta_disparo_parte_derecha
     jr 13F
  
 ; 	Dispara Entidad.
@@ -226,11 +221,8 @@ Genera_disparo
 ; 	En los cuadrantes 2º y 4º, cuando (CTRL_DESPLZ)="$fb" o "$fd"; B="2" y B="3" ..... (INC HL). 
 ;	En el resto de combinaciones, B="0" o "1", no se corrige el puntero de impresión.
 
-    call Ajusta_disparo_parte_derecha
-    jr 18F
-
-
-13 call Comprueba_Colision                            ; Retorna "$81" o "$80" en B indicando si se produce Colisión
+13 call Ajusta_disparo_parte_derecha
+    call Comprueba_Colision                            ; Retorna "$81" o "$80" en B indicando si se produce Colisión
 ;                                                     ; _al generar el disparo.
 
 ; LLegados a este punto tendremos:
@@ -240,7 +232,7 @@ Genera_disparo
 ;       Puntero_de_impresion en HL.
 ;       Impacto/Dirección en BC.
 
-18 call Almacena_disparo                      
+    call Almacena_disparo                      
     jr 6F                                             ; RET.
 
 ; 	La entidad que dispara se encuentra en la mitad superior de pantalla, (cuadrantes 1º y 2º).
