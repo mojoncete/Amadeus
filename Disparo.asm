@@ -64,7 +64,7 @@ Genera_disparo
     dec h
     jr z,14F                            ; No hay almacenado ningún disparo de Amadeus. Seguimos con la rutina.
 
-    ld de,$4860                         ; Si el 1er disparo no ha llegado a este scanline de pantalla,_
+    ld de,$4820                         ; Si el 1er disparo no ha llegado a este scanline de pantalla,_
     and a                               ; _ salimos de la rutina, (no se autorizará un 2º disparo de Amadeus). 
     sbc hl,de
     ret nc
@@ -703,7 +703,6 @@ Motor_de_disparos ld bc,Disparo_3A
     call foto_disparo_a_borrar 
 
 11 pop bc
-
     jr 7F
 
 ; ----- ----- ----- ----- ----- -----
@@ -718,7 +717,6 @@ Motor_de_disparos ld bc,Disparo_3A
     jr 2B
 
 3 call Inicia_Puntero_Disparo_Amadeus
-    
     ld bc,Disparo_11
     ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
 
@@ -743,19 +741,25 @@ Motor_de_disparos ld bc,Disparo_3A
 ; La colisión se produce con Amadeus??? 
 ; Amadeus siempre tiene (Coordenada_y)="$16".
 
+    jr $
+
     push hl
 
     ld b,4
 16 inc hl
     djnz 16B                                             ; Sitúa HL en el Puntero_de_impresion del disparo.
-
     call Extrae_address
     call Genera_coordenadas_disparo
+
     ld a,e                                               ; Fila en la que se encuentra el disparo en A.
     cp $16
     jr c,15F
 
 ; (Colisiones en filas 16 y 17).
+
+
+    jr $
+
 
     push de                                              ; DE contiene las coordenadas del disparo que ha colisionado.
 
@@ -769,12 +773,14 @@ Motor_de_disparos ld bc,Disparo_3A
     ld hl,Amadeus_db+20
     ld c,(hl)                                           ; (Cuad_objeto) de Amadeus en C.
     ld hl,Coordenadas_X_Amadeus
-
     call Guarda_coordenadas_X
 
     pop de                                              ; Coordenadas del disparo en DE. D Coordenada_X.
 
 ; Comparamos la coordenada_X del disparo con las coordenadas_X de Amadeus.
+
+
+    jr $
 
     ld hl,Coordenadas_X_Amadeus
     ld a,(hl) 
@@ -782,21 +788,24 @@ Motor_de_disparos ld bc,Disparo_3A
     jr nz,17F
 
 ; Colisión Amadeus !!!!!!!!!!
-
     pop hl
     jr 14F
 
 17 inc hl
     ld a,(hl)
-
     and a
-    jr z,15F                                             ; No hay colisión con Amadeus.
+    push af                                            ; No hay colisión con Amadeus.
+    call z,Limpia_Coordenadas_X_Amadeus                                           
+    pop af
+    and a
+    jr z,15F                                           ; No hay colisión con Amadeus.
+
     jr 18B
 
 ; No hay colisión. Amadeus se encuentra en una línea inferior.
 ; Restauramos el indicador de colisión y movemos el disparo, (JR 10F).
 
-15  pop hl  
+15 pop hl  
     inc hl
     dec (hl)
     dec hl
@@ -1012,4 +1021,17 @@ Selector_de_impactos ld a,(Impacto2)
     ld (hl),1
     jr $
 
+    ret
+
+; -----------------------------------------------------------------
+;
+;   16/04/23
+;
+
+Limpia_Coordenadas_X_Amadeus xor a
+    ld b,3
+    ld hl,Coordenadas_X_Amadeus
+1 ld (hl),a
+    inc hl
+    djnz 1B
     ret

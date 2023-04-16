@@ -174,7 +174,7 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 Puntero_store_entidades defw 0
 Puntero_restore_entidades defw 0
 Indice_restore defw 0
-Numero_de_entidades db 2								; Nº de objetos en pantalla, (contando con Amadeus).
+Numero_de_entidades db 1								; Nº de objetos en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -401,9 +401,9 @@ Mov_obj
 ; Ha habido desplazamiento de la entidad maligna.
 ; Ha llegado a zona de AMADEUS ???
 
-	ld a,(Coordenada_y)
-	cp $14
-	call nc, Compara_coordenadas_X
+;	ld a,(Coordenada_y)
+;	cp $14
+;	call nc, Compara_coordenadas_X
 
 ; ---------
 
