@@ -1,6 +1,6 @@
 ; ******************************************************************************************************************************************************************************************
 ;
-;   27/03/23
+;   17/04/23
 ;
 ; 	La rutina determina si es factible, o no, `generar' un disparo.
 ;   En el caso de generar disparo la rutina proporciona 4 variables:
@@ -143,7 +143,8 @@ Genera_disparo
 
 ; 	Dispara Entidad.
 
-8 ld c,$80	                                        ; Dirección "$80", hacia abajo.
+8 ld bc,$8080	                                    ; Dirección C="$80", hacia abajo.
+;                                                   ; Impacto B="$80", no hay impacto.
 
 ; 	Guardamos el contenido de BC en la pila pues voy a utilizar el registro B como contador.
 ;   B contiene "0,1,2 o 3", dato necesario para fijar el puntero de impresión.
@@ -153,6 +154,8 @@ Genera_disparo
 9 call NextScan
     djnz 9B
     pop bc
+    call Ajusta_disparo_parte_izquierda
+    jr 17F
 
 ; 	Ahora HL apunta un scanline por debajo de (Posicion_actual).
 ; 	En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
@@ -161,7 +164,7 @@ Genera_disparo
 
 10 call Ajusta_disparo_parte_izquierda
     call Comprueba_Colision                            ; Retorna "$81" o "$80" en B indicando si se produce Colisión
-;                                                     ; _al generar el disparo.
+;                                                      ; _al generar el disparo.
 
 ; 	LLegados a este punto tendremos:
 ;
@@ -170,7 +173,7 @@ Genera_disparo
 ;       Puntero_de_impresion en HL.
 ;       Impacto/Dirección en BC.
 
-    call Almacena_disparo                      
+17 call Almacena_disparo                      
     jr 6F                                             ; RET.
     
 ; 	Estamos en el 4º cuadrante de pantalla.
@@ -203,18 +206,20 @@ Genera_disparo
  
 ; 	Dispara Entidad.
 
-11 ld c,$80                                        	  ; Dirección "$80", hacia abajo.
-  
+11 ld bc,$8080                                        ; Dirección C="$80", hacia abajo.
+;                                                     ; Impacto B="$80", no hay impacto.
+
 ; 	Guardamos el contenido de BC en la pila pues voy a utilizar el registro B como contador.
 ;   B contiene "0,1,2 o 3", dato necesario para fijar el puntero de impresión.
 
     push bc
-
     ld b,16
 12 call NextScan
     djnz 12B
-
     pop bc
+
+    call Ajusta_disparo_parte_derecha
+    jr 18F
 
 ; 	Ahora HL apunta un scanline por debajo de (Posicion_actual).
 ; 	En función de (CTRL-DESPLZ) variará, (en un char., a derecha o izquierda), el puntero de impresión.
@@ -222,8 +227,8 @@ Genera_disparo
 ;	En el resto de combinaciones, B="0" o "1", no se corrige el puntero de impresión.
 
 13 call Ajusta_disparo_parte_derecha
-    call Comprueba_Colision                            ; Retorna "$81" o "$80" en B indicando si se produce Colisión
-;                                                     ; _al generar el disparo.
+    call Comprueba_Colision                             ; Retorna "$81" o "$80" en B indicando si se produce Colisión
+;                                                       ; _al generar el disparo.
 
 ; LLegados a este punto tendremos:
 ;
@@ -232,8 +237,8 @@ Genera_disparo
 ;       Puntero_de_impresion en HL.
 ;       Impacto/Dirección en BC.
 
-    call Almacena_disparo                      
-    jr 6F                                             ; RET.
+18 call Almacena_disparo                      
+    jr 6F                                               ; RET.
 
 ; 	La entidad que dispara se encuentra en la mitad superior de pantalla, (cuadrantes 1º y 2º).
 
@@ -335,6 +340,9 @@ Ajusta_disparo_parte_izquierda ld a,b
 ;
 ;   La Rutina va almacenando disparos en sus respectivas bases de datos.
 ;   Amadeus dispone de 2 disparos mientras que las entidades disponen de un máximo de 10.
+;
+;   Antes de salir de la rutina `iniciamos` los punteros de disparos, así vamos almacenando_
+;   _ los disparos generados en el primer campo que quede libre de la base de datos.
 
 Almacena_disparo 
 
@@ -451,6 +459,11 @@ Comprueba_Colision push iy                         ; Puntero objeto (disparo).
     push hl                                        ; Puntero de impresión.                                 
     ld e,$80                                       ; E,(Impacto)="$80".
     call Bucle_2                                   ; Comprobamos el 1er scanline.
+
+    ld a,e
+    and 1
+    jr nz,2F                                       ; Salimos si E="$81". Hay colisión.
+
     pop hl
     push hl
     call NextScan
@@ -575,7 +588,7 @@ Detecta_colision_nave_entidad
 ;        IY contiene el "puntero_objeto" de la entidad, (arriba-izq).
  
 
-;    jr $
+;   jr $
 
     push ix
     pop hl
@@ -733,8 +746,6 @@ Motor_de_disparos ld bc,Disparo_3A
 ; La colisión se produce con Amadeus??? 
 ; Amadeus siempre tiene (Coordenada_y)="$16".
 
-    jr $
-
     push hl
 
     ld b,4
@@ -748,10 +759,6 @@ Motor_de_disparos ld bc,Disparo_3A
     jr c,15F
 
 ; (Colisiones en filas 16 y 17).
-
-
-    jr $
-
 
     push de                                              ; DE contiene las coordenadas del disparo que ha colisionado.
 
@@ -770,7 +777,6 @@ Motor_de_disparos ld bc,Disparo_3A
     pop de                                              ; Coordenadas del disparo en DE. D Coordenada_X.
 
 ; Comparamos la coordenada_X del disparo con las coordenadas_X de Amadeus.
-
 
     jr $
 
