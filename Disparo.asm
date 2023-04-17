@@ -568,13 +568,18 @@ Compara_coordenadas_X
 7 ld a,1                                                ; El .db (Impacto)="1" indica que es altamente probable que esta_
     ld (Impacto),a                                      ; _ entidad colisione con Amadeus, (ha superado, o está en la fila $14) y 
 ;                                                       ; _ alguna de las columnas_X que ocupa coinciden con las de Amadeus.
+
+
+; !!!!! Necesito guardar la dirección donde se van a guardar los datos de esta entidad !!
+
+
     ld hl,Impacto2
     set 2,(hl)
     jr 8B
 
 ; -----------------------------------------------------------------------
 ;
-;   11/04/23
+;   17/04/23
 ;   
 
 Detecta_colision_nave_entidad 
@@ -584,27 +589,27 @@ Detecta_colision_nave_entidad
     ld hl,(Posicion_actual)
     call Calcula_puntero_de_impresion
 
-; Ahora, IX contiene el "puntero_de_impresión" de la entidad, (arriba-izq).
-;        IY contiene el "puntero_objeto" de la entidad, (arriba-izq).
+; Ahora, IX contiene el "puntero_de_impresión" de Amadeus, (arriba-izq).
+;        IY contiene el "puntero_objeto" de Amadeus, (arriba-izq).
  
-
-;   jr $
-
     push ix
     pop hl
     push hl
 
 ; ----- ----- -----
-    ld e,0                                        ; Indica impacto.
+    ld e,0                                         ; Indica impacto.
     ld b,10
-2 call Bucle_3                                    ; Comprobamos el 1er scanline.
+2 call Bucle_3                                     ; Comprobamos el 1er scanline.
     ld a,e
     cp 5
     jr c,3F
 
-;    ld hl,Impacto2
-;    set 2,(hl)
-;    jr 1F
+    ld hl,Impacto
+    ld (hl),1                                      
+    ld hl,Impacto2                                 ; Cuando se produce Colisión, RES el bit2 de (Impacto2) y_
+    res 2,(hl)                                     ; _  colocamos a "1" el .db (Impacto) de Amadeus.
+
+    jr 1F
 
 3 pop hl
     call NextScan
@@ -615,6 +620,8 @@ Detecta_colision_nave_entidad
     jr nc,1F
 ;                                                  ; _ 2º scanline si esto es así.    
     djnz 2B
+
+; Aqui tengo que fabricar una rutina que ponga a "0" el .db (Impacto) de la entidad implicada.
 
 1 pop hl                                           ; Puntero de impresión en HL e indicador de Impacto en B.
     ret                                            
@@ -778,27 +785,21 @@ Motor_de_disparos ld bc,Disparo_3A
 
 ; Comparamos la coordenada_X del disparo con las coordenadas_X de Amadeus.
 
-    jr $
-
+    ld b,3
     ld hl,Coordenadas_X_Amadeus
-    ld a,(hl) 
-18 cp d
+18 ld a,(hl) 
+    cp d
     jr nz,17F
 
 ; Colisión Amadeus !!!!!!!!!!
+
+    jr $
+
     pop hl
     jr 14F
 
 17 inc hl
-    ld a,(hl)
-    and a
-    push af                                            ; No hay colisión con Amadeus.
-    call z,Limpia_Coordenadas_X_Amadeus                                           
-    pop af
-    and a
-    jr z,15F                                           ; No hay colisión con Amadeus.
-
-    jr 18B
+    djnz 18B
 
 ; No hay colisión. Amadeus se encuentra en una línea inferior.
 ; Restauramos el indicador de colisión y movemos el disparo, (JR 10F).
@@ -1006,17 +1007,22 @@ Guarda_coordenadas_X ld (hl),d                          ; Cargamos la 1ª Coorde
 ;
 
 Selector_de_impactos ld a,(Impacto2)    
+    and a
+    ret z
+
     cp 4
     jr nz,$
+
     call Detecta_colision_nave_entidad 
 
     ld a,e
-    ret z
-    cp 5
-    ret c
+    ret z                                               ; No existe colisiíon.
 
-    ld hl,Impacto
-    ld (hl),1
+    cp 5
+    ret c                                               ; Factor de sensibilidad de la colisión. Hace falta_
+;                                                       ; _ detectar colisión en 5 scancines para considerar IMPACTO.
+    
+; Se ha producido colisión entre una entidad y Amadeus.    
     jr $
 
     ret
@@ -1026,8 +1032,8 @@ Selector_de_impactos ld a,(Impacto2)
 ;   16/04/23
 ;
 
-Limpia_Coordenadas_X_Amadeus xor a
-    ld b,3
+Limpia_Coordenadas_X xor a
+    ld b,6
     ld hl,Coordenadas_X_Amadeus
 1 ld (hl),a
     inc hl
