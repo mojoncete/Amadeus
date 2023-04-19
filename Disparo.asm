@@ -505,6 +505,7 @@ Bucle_2 ld b,2
 Compara_coordenadas_X
 
 ; Guardamos las coordenadas_X de la entidad y Amadeus en sus correspondientes almacenes.
+; DRAW tiene almacenados, en este momento, los datos de la última ENTIDAD que hemos desplazado.
 
 ; Preparamos registros:
 
@@ -564,18 +565,25 @@ Compara_coordenadas_X
     ld c,a
     ex af,af'
     djnz 4B
-8 ret
+
+; Limpiamos los almacenes de coordenadas y salimos.
+
+8 call Limpia_Coordenadas_X
+    ret
+
 7 ld a,1                                                ; El .db (Impacto)="1" indica que es altamente probable que esta_
     ld (Impacto),a                                      ; _ entidad colisione con Amadeus, (ha superado, o está en la fila $14) y 
-;                                                       ; _ alguna de las columnas_X que ocupa coinciden con las de Amadeus.
-
-
-; !!!!! Necesito guardar la dirección donde se van a guardar los datos de esta entidad !!
-
-
-    ld hl,Impacto2
+    ld hl,Impacto2                                      ; _ alguna de las columnas_X que ocupa coinciden con las de Amadeus.
     set 2,(hl)
     jr 8B
+
+
+
+;                                                       ; !!!!! Necesito guardar la dirección donde se van a guardar los datos de esta entidad !!
+
+
+
+
 
 ; -----------------------------------------------------------------------
 ;
@@ -604,12 +612,23 @@ Detecta_colision_nave_entidad
     cp 5
     jr c,3F
 
+; LLegados a este punto:
+;
+;   HAY COLISIÓN !!!!!.
+;
+;   .db (Impacto) de Amadeus a "1".
+;   RES el bit2 de (Impacto2).
+;
+;   Nota: El .db (Impacto) de la entidad implicada lo puso a "1" la rutina [Compara_coordenadas_X]. 
+
     ld hl,Impacto
     ld (hl),1                                      
     ld hl,Impacto2                                 ; Cuando se produce Colisión, RES el bit2 de (Impacto2) y_
-    res 2,(hl)                                     ; _  colocamos a "1" el .db (Impacto) de Amadeus.
-
+    res 2,(hl)                                     ; _ SET el bit3. El bit3 de (Impacto2) indica que hay contacto_
+    set 3,(hl)                                     ; _  entre una entidad y Amadeus.
     jr 1F
+
+; -----
 
 3 pop hl
     call NextScan
@@ -622,6 +641,19 @@ Detecta_colision_nave_entidad
     djnz 2B
 
 ; Aqui tengo que fabricar una rutina que ponga a "0" el .db (Impacto) de la entidad implicada.
+
+; LLegados a este punto:
+;
+;   NO HAY COLISIÓN !!!!!.
+;
+;   .db (Impacto) de Amadeus a "0".
+;   RES el bit2 de (Impacto2).
+;
+;   Nota: El .db (Impacto) de la entidad implicada lo puso a "1" la rutina [Compara_coordenadas_X]. 
+;   Hemos de colocarlo a "0".
+
+    ld hl,Impacto2                                 ; Cuando se produce Colisión, RES el bit2 de (Impacto2) y_
+    res 2,(hl)                                     ; _ SET el bit3. El bit3 de (Impacto2) indica que hay contacto_
 
 1 pop hl                                           ; Puntero de impresión en HL e indicador de Impacto en B.
     ret                                            
@@ -793,8 +825,6 @@ Motor_de_disparos ld bc,Disparo_3A
 
 ; Colisión Amadeus !!!!!!!!!!
 
-    jr $
-
     pop hl
     jr 14F
 
@@ -812,12 +842,15 @@ Motor_de_disparos ld bc,Disparo_3A
 
 ; -----------------------debug
 
-; Elimino el disparo de la base de datos.
+; Elimino el disparo de la base de datos, indicamos el impacto, SET1,(Impacto2) y limpiamos el_
+; _ almacén de coordenadas_X de Amadeus.
 
 14 push hl
     call Elimina_disparo_de_base_de_datos
     ld hl,Impacto2
     set 1,(hl)
+    call Limpia_Coordenadas_X
+
     pop hl
     jr 12F
 
@@ -1013,18 +1046,17 @@ Selector_de_impactos ld a,(Impacto2)
     cp 4
     jr nz,$
 
+; La colisión se produce por contacto entre Amadeus y una entidad.
+
     call Detecta_colision_nave_entidad 
 
-    ld a,e
+    ld hl,Impacto2
+    bit 3,(hl)
     ret z                                               ; No existe colisiíon.
 
-    cp 5
-    ret c                                               ; Factor de sensibilidad de la colisión. Hace falta_
-;                                                       ; _ detectar colisión en 5 scancines para considerar IMPACTO.
-    
 ; Se ha producido colisión entre una entidad y Amadeus.    
-    jr $
 
+    jr $
     ret
 
 ; -----------------------------------------------------------------
