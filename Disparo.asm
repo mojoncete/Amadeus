@@ -577,14 +577,6 @@ Compara_coordenadas_X
     set 2,(hl)
     jr 8B
 
-
-
-;                                                       ; !!!!! Necesito guardar la dirección donde se van a guardar los datos de esta entidad !!
-
-
-
-
-
 ; -----------------------------------------------------------------------
 ;
 ;   17/04/23
@@ -617,11 +609,11 @@ Detecta_colision_nave_entidad
 ;   HAY COLISIÓN !!!!!.
 ;
 ;   .db (Impacto) de Amadeus a "1".
-;   RES el bit2 de (Impacto2).
+;   SET el bit3 de (Impacto2).
 ;
 ;   Nota: El .db (Impacto) de la entidad implicada lo puso a "1" la rutina [Compara_coordenadas_X]. 
 
-    ld hl,Impacto
+    ld hl,Amadeus_db+25
     ld (hl),1                                      
     ld hl,Impacto2                                 ; Cuando se produce Colisión, RES el bit2 de (Impacto2) y_
     res 2,(hl)                                     ; _ SET el bit3. El bit3 de (Impacto2) indica que hay contacto_
@@ -650,10 +642,12 @@ Detecta_colision_nave_entidad
 ;   RES el bit2 de (Impacto2).
 ;
 ;   Nota: El .db (Impacto) de la entidad implicada lo puso a "1" la rutina [Compara_coordenadas_X]. 
-;   Hemos de colocarlo a "0".
+;   Lo colocamos a "0".
 
-    ld hl,Impacto2                                 ; Cuando se produce Colisión, RES el bit2 de (Impacto2) y_
-    res 2,(hl)                                     ; _ SET el bit3. El bit3 de (Impacto2) indica que hay contacto_
+    ld hl,Impacto2                                 
+    res 2,(hl)                                     
+    ld hl,(Entidad_sospechosa_de_colision)
+    ld (hl),0
 
 1 pop hl                                           ; Puntero de impresión en HL e indicador de Impacto en B.
     ret                                            
@@ -1044,7 +1038,8 @@ Selector_de_impactos ld a,(Impacto2)
     ret z
 
     cp 4
-    jr nz,$
+    jr nz,1F
+
 
 ; La colisión se produce por contacto entre Amadeus y una entidad.
 
@@ -1052,12 +1047,28 @@ Selector_de_impactos ld a,(Impacto2)
 
     ld hl,Impacto2
     bit 3,(hl)
-    ret z                                               ; No existe colisiíon.
+    ret nz                                               ; Existe colisión, RET.
 
-; Se ha producido colisión entre una entidad y Amadeus.    
+; No hay colisión SIN disparos. Analizamos si hay impacto por disparos.  
+; Primero analizamos si algún disparo impacta en Amadeus.
+
+1 ld hl,Impacto2
+    bit 1,(hl)
+    jr z,2F
+
+    ld hl,Amadeus_db+25                                  ; Existe colisión con Amadeus.  
+    ld (hl),1                                            ; (Impacto) de Amadeus a "1".
+    jr 3F
+
+2 ld hl,Impacto2
+    bit 0,(hl)
+    ret z
+
+; Aquí llamaremos a la rutina que detecta a que entidad hemos alcanzado.    
 
     jr $
-    ret
+
+3 ret 
 
 ; -----------------------------------------------------------------
 ;

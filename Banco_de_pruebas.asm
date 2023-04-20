@@ -199,6 +199,10 @@ Puntero_DESPLZ_DISPARO_AMADEUS defw 0
 Impacto2 db 0											; Este byte indica que se ha producido impacto:
 ; 														; (Impacto)="1". El impacto se produce en una entidad.
 ;														; (Impacto)="2". El impacto se produce en Amadeus.
+Entidad_sospechosa_de_colision defw 0					; Almacena la dirección de memoria donde se encuentra el .db_
+;														; _(Impacto) de la entidad que ocupa el mismo espacio que Amadeus.
+;														; Necesitaremos poner a "0" este .db en el caso de que finalmente no se_
+;														; _produzca colisión.
 Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posibles columnas_
 ;														; _ que puede ocupar el sprite de Amadeus. (Colisión).
 Coordenadas_X_Entidad ds 3								; 3 Bytes reservados para almacenar las 3 posibles columnas_
@@ -302,7 +306,10 @@ Frame
 ; Bit 1 a "1" Impacto en Amadeus por disparo. ($02)
 ; Bit 2 a "1" Colisión de Amadeus con entidad, (sin disparo). ($04)
 
-5 call Inicia_punteros_de_entidades
+	xor a
+	ld (Impacto2),a										; Flag (Impacto2) a "0".
+
+	call Inicia_punteros_de_entidades
 	call Restore_Primera_entidad
 
 	xor a
@@ -317,7 +324,13 @@ Frame
 	and a
 	jr z,4F												; Entidades="0". Saltamos a Amadeus.
 
-2 push bc
+; debuggggg. STOP si hay impacto en la entidad que contiene DRAW.!!!!!!!!
+2 ld a,(Impacto) 
+	and a
+	jr nz,$
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	push bc
 	call Mov_obj										; MOVEMOS y decrementamos (Numero_de_malotes)
 
 	ld a,(Ctrl_0)
@@ -344,6 +357,13 @@ Frame
 ; Tras la gestión de las entidades, ... AMADEUS.
 
 4 call Restore_Amadeus
+
+; debuggggg. STOP si hay impacto en la entidad que contiene DRAW.!!!!!!!!
+	ld a,(Impacto) 
+	and a
+	jr nz,$
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	call Mov_Amadeus
 
 	ld a,(Ctrl_0)
@@ -356,13 +376,13 @@ Frame
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
 	xor a
 	ld (Obj_dibujado),a
+
 	call Store_Amadeus
 
 	call Motor_de_disparos								; Borra/mueve/pinta cada uno de los disparos y crea un nuevo album de fotos.
 
 ; Calculamos el nº de malotes y de disparotes para pintarlos nada más comenzar el siguiente FRAME.
 
-	call Limpia_Coordenadas_X
 	call Calcula_numero_de_malotes 
 	call Calcula_numero_de_disparotes
 
@@ -400,7 +420,8 @@ Mov_obj
 
 	ld a,(Coordenada_y)
 	cp $14
-	call nc, Compara_coordenadas_X
+	call nc, Compara_coordenadas_X 						; Si esta entidad ocupa alguna de las columnas que_
+;														; ocupa Amadeus, tendremos el .db (Impacto)="1".	
 
 ; ---------
 
@@ -673,16 +694,28 @@ Store_Restore_entidades
  	push bc
 
 ;	STORE !!!!!
-;	Guarda lo que hay en Draw en la correspondiente `Entidad´.
+;	Guarda la entidad cargada en Draw en su correspondiente DB.
 
 	ld hl,Filas
 	ld de,(Puntero_store_entidades) 					; Puntero que se desplaza por las distintas entidades.
 	ld bc,59
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
+; 	Entidad_sospechosa. 20/4/23
+
+	ld a,(Impacto)
+	and a
+	jr z,1F
+
+	ld hl,(Puntero_store_entidades) 					; Si la rutina [Compara_coordenadas_X] detecta que hay_
+	ld bc,25                          					; _ una entidad en zona de Amadeus, guardaremos la direccíon_
+	and a 												; _ donde se encuentra su .db (Impacto) para poder ponerlo a_
+	adc hl,bc 											; _ "0" más adelante.
+	ld (Entidad_sospechosa_de_colision),hl
+	
 ;	Incrementa el puntero STORE. Guarda los datos de `Entidad´+1 en Draw, (Puntero RESTORE).
 
-	ld hl,(Puntero_restore_entidades)
+1 ld hl,(Puntero_restore_entidades)
 	ld (Puntero_store_entidades),hl 					; Situamos (Puntero_store_entidades) en la 2ª entidad.
 	ld de,Filas 										; Hemos RECUPERADO los parámetros de la 2ª entidad de su base de datos.
 	ld bc,59
