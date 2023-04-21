@@ -728,13 +728,39 @@ Motor_de_disparos ld bc,Disparo_3A
     and 1
     jr z,9F
 
-; Elimino el disparo de la base de datos.
+;   En este punto:
+;
+;   HL está situado en el 1er byte de la DB del disparo que ha impactado en Amadeus.
+;   IX contiene el puntero de impresión, (zona de pantalla donde se ha producido el impacto_
+;   _con la entidad).
+; 
+;   Disparo_2A defw 0                                ; Control.
+;    defw 0                                          ; Puntero objeto.
+;    defw 0                                          ; Puntero de impresión.
+;    defw 0                                          ; Rutina de impresión.          
 
     push hl
+
+    ld b,4
+19 inc hl
+    djnz 19B
+
+    call Extrae_address
+    call Genera_coordenadas_disparo
+
+; Ahora tenemos la coordenada_X del disparo en D y la coordenada_y en E.
+
+    ex de,hl
+    ld (Coordenadas_disparo_certero),hl
+
+
+; Elimino el disparo de la base de datos.
+
+    pop hl
     call Elimina_disparo_de_base_de_datos
     ld hl,Impacto2
-    set 0,(hl)
-    pop hl                                               ; Indicamos que se ha producido Impacto en una entidad.
+    set 0,(hl)                                        ; Indicamos que se ha producido Impacto en una entidad.
+                                                 
     jr 11F
 
 9 call Mueve_disparo
@@ -980,6 +1006,7 @@ Mueve_disparo push hl
     jr 4B
 
 ; HL apunta al primer byte de la base de datos del disparo.
+
 Elimina_disparo_de_base_de_datos ld bc,7
     xor a
     ld (hl),a
@@ -1066,7 +1093,8 @@ Selector_de_impactos ld a,(Impacto2)
 
 ; Aquí llamaremos a la rutina que detecta a que entidad hemos alcanzado.    
 
-    jr $
+    ld hl,Ctrl_1
+    set 2,(hl)
 
 3 ret 
 

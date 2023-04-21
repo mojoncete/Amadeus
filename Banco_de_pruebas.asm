@@ -163,11 +163,7 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 ;															_ rutina [Guarda_foto_registros] que los datos a guardar pertenecen a un disparo y no a una entidad,_
 ;															_ por lo tanto hemos de almacenarlos en `Album_de_fotos_disparos´ en lugar de `Album_de_fotos´.
 ;														BIT 1, Este bit indica que el disparo sale de la pantalla, ($4000-$57ff).
-
-
-
-
-
+;														BIT 2, Este bit a "1" indica que un disparo de Amadeus a alcanzado a una entidad.
 
 ; Gestión de ENTIDADES.
 
@@ -203,9 +199,11 @@ Entidad_sospechosa_de_colision defw 0					; Almacena la dirección de memoria do
 ;														; _(Impacto) de la entidad que ocupa el mismo espacio que Amadeus.
 ;														; Necesitaremos poner a "0" este .db en el caso de que finalmente no se_
 ;														; _produzca colisión.
+Coordenadas_disparo_certero defw 0						; Almacenamos aquí las coordenadas del disparo que ha alcanzado a Amadeus.
+;											            ; (Coordenadas_disparo_certero)=Y ..... (Coordenadas_disparo_certero +1)=X.
 Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posibles columnas_
 ;														; _ que puede ocupar el sprite de Amadeus. (Colisión).
-Coordenadas_X_Entidad ds 3								; 3 Bytes reservados para almacenar las 3 posibles columnas_
+Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 posibles columnas_
 ;														; _ que puede ocupar el sprite de una entidad. (Colisión).
 
 
@@ -325,9 +323,15 @@ Frame
 	jr z,4F												; Entidades="0". Saltamos a Amadeus.
 
 ; debuggggg. STOP si hay impacto en la entidad que contiene DRAW.!!!!!!!!
-2 ld a,(Impacto) 
+
+2 ld a,(Ctrl_1)
+	bit 2,a
+	jr nz,$	; tengo que comparar las coordenadas de esta entidad con (Coordenadas_disparo_certero).
+
+	ld a,(Impacto) 
 	and a
 	jr nz,$
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 	push bc
@@ -359,9 +363,11 @@ Frame
 4 call Restore_Amadeus
 
 ; debuggggg. STOP si hay impacto en la entidad que contiene DRAW.!!!!!!!!
+
 	ld a,(Impacto) 
 	and a
 	jr nz,$
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 	call Mov_Amadeus
