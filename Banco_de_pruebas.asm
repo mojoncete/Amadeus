@@ -85,10 +85,10 @@ Cuad_objeto db 2										; Almacena el cuadrante de pantalla donde se encuentra
 
 ; Variables de objeto. (Características).
 
-Vel_left db 2 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
+Vel_left db 1 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
 Vel_right db 1 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
 Vel_up db 1 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
-Vel_down db 4 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
+Vel_down db 1 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
 
 Impacto db 0											; Si después del movimiento de la entidad, (Impacto) se coloca a "1",_
 ;														; _ existen muchas posibilidades de que esta entidad haya colisionado con Amadeus. 
@@ -135,7 +135,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
-Puntero_indice_mov defw Indice_mov_Escaloncitos_izquierda_abajo  ; Puntero del patrón de movimiento de la entidad. "0" No hay movimiento.
+Puntero_indice_mov defw Indice_mov_Izquierda_y_derecha  ; Puntero del patrón de movimiento de la entidad. "0" No hay movimiento.
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0
@@ -199,7 +199,7 @@ Entidad_sospechosa_de_colision defw 0					; Almacena la dirección de memoria do
 ;														; _(Impacto) de la entidad que ocupa el mismo espacio que Amadeus.
 ;														; Necesitaremos poner a "0" este .db en el caso de que finalmente no se_
 ;														; _produzca colisión.
-Coordenadas_disparo_certero defw 0						; Almacenamos aquí las coordenadas del disparo que ha alcanzado a Amadeus.
+Coordenadas_disparo_certero ds 2						; Almacenamos aquí las coordenadas del disparo que ha alcanzado a Amadeus.
 ;											            ; (Coordenadas_disparo_certero)=Y ..... (Coordenadas_disparo_certero +1)=X.
 Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posibles columnas_
 ;														; _ que puede ocupar el sprite de Amadeus. (Colisión).
@@ -322,13 +322,29 @@ Frame
 	and a
 	jr z,4F												; Entidades="0". Saltamos a Amadeus.
 
-; debuggggg. STOP si hay impacto en la entidad que contiene DRAW.!!!!!!!!
+; ----- ----- ----- ----- -----
+
+; Código que ejecutamos con cada entidad:
+
+; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
+; con las coordenadas de la entidad almacenada en DRAW.
 
 2 ld a,(Ctrl_1)
 	bit 2,a
-	jr nz,$	; tengo que comparar las coordenadas de esta entidad con (Coordenadas_disparo_certero).
+	jr z,7F	
 
-	ld a,(Impacto) 
+	ld hl,(Coordenadas_disparo_certero)
+	ex de,hl 										; D contiene la coordenada_y del disparo.
+;													; E contiene la coordenada_X del disparo.	
+
+	ld hl,(Coordenada_X) 							; L Coordenada_x de la entidad.
+;													; H Coordenado_y de la entidad.	
+	and a
+	sbc hl,de
+
+	jr $
+
+7 ld a,(Impacto) 
 	and a
 	jr nz,$
 

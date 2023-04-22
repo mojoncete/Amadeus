@@ -750,9 +750,10 @@ Motor_de_disparos ld bc,Disparo_3A
 
 ; Ahora tenemos la coordenada_X del disparo en D y la coordenada_y en E.
 
-    ex de,hl
-    ld (Coordenadas_disparo_certero),hl
-
+    ld hl,Coordenadas_disparo_certero
+    ld (hl),d
+    inc hl
+    ld (hl),e
 
 ; Elimino el disparo de la base de datos.
 
