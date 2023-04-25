@@ -1111,3 +1111,44 @@ Limpia_Coordenadas_X xor a
     inc hl
     djnz 1B
     ret
+
+; -----------------------------------------------------------------
+;
+;   25/04/23
+;
+
+Determina_resultado_comparativa 
+
+    jr $
+
+    ld a,h
+    ld b,0
+
+    call Compara_cositas
+    inc b
+    dec b
+    ret z                                   ; B="0". Indica que H es distinto de "0, $ff o $01". Salimos de la rutina.
+
+    jr $
+
+    ld a,l                                  ; B="1". La comparación de H es satisfactoria, pasamos a comparar L.
+    ld b,0
+    cp $02
+    jr z,1F
+    cp $fe
+    jr z,1F
+
+    call Compara_cositas
+    jr 2F
+ 
+1 inc b
+2 ret 
+
+Compara_cositas and a
+    jr z,1F
+    cp $ff
+    jr z,1F
+    cp $01
+    ret nz
+1 inc b
+    ret

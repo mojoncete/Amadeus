@@ -80,15 +80,15 @@ Indice_Sprite_izq defw Indice_Badsat_izq
 Puntero_DESPLZ_der defw 0
 Puntero_DESPLZ_izq defw 0
 
-Posicion_inicio defw $477e								; Dirección de pantalla donde aparece el objeto. [DRAW].
-Cuad_objeto db 2										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+Posicion_inicio defw $4781								; Dirección de pantalla donde aparece el objeto. [DRAW].
+Cuad_objeto db 1										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
 ; Variables de objeto. (Características).
 
 Vel_left db 1 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
 Vel_right db 1 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
 Vel_up db 1 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
-Vel_down db 1 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
+Vel_down db 2 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
 
 Impacto db 0											; Si después del movimiento de la entidad, (Impacto) se coloca a "1",_
 ;														; _ existen muchas posibilidades de que esta entidad haya colisionado con Amadeus. 
@@ -135,7 +135,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
-Puntero_indice_mov defw Indice_mov_Izquierda_y_derecha  ; Puntero del patrón de movimiento de la entidad. "0" No hay movimiento.
+Puntero_indice_mov defw Indice_mov_Onda_senoidal	    ; Puntero del patrón de movimiento de la entidad. "0" No hay movimiento.
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0
@@ -187,6 +187,8 @@ Stack_snapshot_disparos defw Album_de_fotos_disparos	; Puntero que indica la pos
 ;														; _el snapshot de los registros del siguiente disparo.
 ;														; Inicialmente está situado en la posición $7060, Album_de_fotos_disparos.
 
+;---------------------------------------------------------------------------------------------------------------
+
 ; Gestión de Disparos.
 
 Numero_de_disparotes db 0	
@@ -206,6 +208,14 @@ Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posi
 Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 posibles columnas_
 ;														; _ que puede ocupar el sprite de una entidad. (Colisión).
 
+;---------------------------------------------------------------------------------------------------------------
+
+; Relojes y temporizaciones.
+
+Habilita_disparo_Amadeus db 1
+Temporizacion_disparo_Amadeus db $10
+
+;---------------------------------------------------------------------------------------------------------------
 
 ; Gestión de FRAMES.
 
@@ -295,10 +305,27 @@ Frame
     out ($fe),a
 
 ; ----------------------------------------------------------------------
+; Relojes y temporizaciones.
+
+	ld a,(Habilita_disparo_Amadeus)
+	and a
+	jr nz,8F
+
+	ld hl,Temporizacion_disparo_Amadeus
+	dec (hl)
+	
+	inc (hl)
+	dec (hl)
+	jr nz,8F
+
+	ld a,1
+	ld (Habilita_disparo_Amadeus),a
+	ld a,$10
+	ld (Temporizacion_disparo_Amadeus),a
 
 ;	Existe colisión?????
 
-	call Selector_de_impactos
+8 call Selector_de_impactos
 
 ; Bit 0 a "1" Impacto en entidad por disparo. ($01)
 ; Bit 1 a "1" Impacto en Amadeus por disparo. ($02)
@@ -327,7 +354,7 @@ Frame
 ; Código que ejecutamos con cada entidad:
 
 ; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
-; con las coordenadas de la entidad almacenada en DRAW.
+; _con las coordenadas de la entidad almacenada en DRAW.
 
 2 ld a,(Ctrl_1)
 	bit 2,a
@@ -336,13 +363,18 @@ Frame
 	ld hl,(Coordenadas_disparo_certero)
 	ex de,hl 										; D contiene la coordenada_y del disparo.
 ;													; E contiene la coordenada_X del disparo.	
-
 	ld hl,(Coordenada_X) 							; L Coordenada_x de la entidad.
 ;													; H Coordenado_y de la entidad.	
 	and a
 	sbc hl,de
 
-	jr $
+	call Determina_resultado_comparativa
+
+
+
+
+
+
 
 7 ld a,(Impacto) 
 	and a
@@ -861,12 +893,20 @@ Movimiento_Amadeus
 
 ; Disparo.
 
+	ld a,(Habilita_disparo_Amadeus)
+	and a
+	jr nz,1F
+	jr 2F
+
+1 xor a
+	ld (Habilita_disparo_Amadeus),a
+
 	ld a,$f7												; "5" para disparar.
 	in a,($fe)
 	and $10
 	call z,Genera_disparo
 
-	ld a,$f7		  										; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
+2 ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
 	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
 	and $01													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $01 resulta "0"  llama a la rutina "Mov_izq".
     call z,Mov_left											;			"			"			"			"			"			"			"			"
