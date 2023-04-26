@@ -213,7 +213,7 @@ Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 pos
 ; Relojes y temporizaciones.
 
 Habilita_disparo_Amadeus db 1
-Temporizacion_disparo_Amadeus db $10
+Temporiza_disparo_Amadeus db 30
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -305,23 +305,23 @@ Frame
     out ($fe),a
 
 ; ----------------------------------------------------------------------
-; Relojes y temporizaciones.
 
 	ld a,(Habilita_disparo_Amadeus)
 	and a
 	jr nz,8F
 
-	ld hl,Temporizacion_disparo_Amadeus
+	ld hl,Temporiza_disparo_Amadeus
 	dec (hl)
-	
+
 	inc (hl)
 	dec (hl)
+
 	jr nz,8F
 
 	ld a,1
 	ld (Habilita_disparo_Amadeus),a
-	ld a,$10
-	ld (Temporizacion_disparo_Amadeus),a
+	ld a,30
+	ld (Temporiza_disparo_Amadeus),a
 
 ;	Existe colisión?????
 
@@ -898,13 +898,18 @@ Movimiento_Amadeus
 	jr nz,1F
 	jr 2F
 
-1 xor a
-	ld (Habilita_disparo_Amadeus),a
-
-	ld a,$f7												; "5" para disparar.
+1 ld a,$f7													; "5" para disparar.
 	in a,($fe)
 	and $10
+
+	push af
 	call z,Genera_disparo
+	pop af
+	jr nz,2F
+
+	ld a,(Habilita_disparo_Amadeus)
+	xor 1
+	ld (Habilita_disparo_Amadeus),a
 
 2 ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
 	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.

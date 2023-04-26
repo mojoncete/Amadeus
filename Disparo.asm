@@ -47,29 +47,11 @@ Genera_disparo
 
     ld a,(Ctrl_0)                       
     bit 6,a                             
-    jr nz,16F
+    jr nz,14F
 
     ld a,(Coordenada_y)
     cp $13                              ; Una entidad no podrá disparar si se encuentra por_
     ret nc                              ; _ debajo de la fila "$14" de pantalla.
-    jr 14F
-
-; ----- ----- -----
-
-; Habilita el segundo disparo si el primero ha superado la línea $4860
-
-16 ld hl,ON_Disparo_2A
-    call Extrae_address
-    inc h
-    dec h
-    jr z,14F                            ; No hay almacenado ningún disparo de Amadeus. Seguimos con la rutina.
-
-    ld de,$4820                         ; Si el 1er disparo no ha llegado a este scanline de pantalla,_
-    and a                               ; _ salimos de la rutina, (no se autorizará un 2º disparo de Amadeus). 
-    sbc hl,de
-    ret nc
-
-; ----- ----- -----
 
 14 ld hl,Indice_disparo
     ld a,(CTRL_DESPLZ)
