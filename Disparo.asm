@@ -85,7 +85,14 @@ Genera_disparo
 ;	Se cumplen las condiciones necesarias para generar un disparo.
 ;   Las variables de disparo varían en función del cuadrante en el que se encuentre la entidad/Amadeus.
 
-	ld a,(Cuad_objeto)
+    ld a,(Ctrl_0)
+    bit 6,a
+    jr nz,19F
+
+    xor a
+    ld (Habilita_disparo_entidad),a
+
+19 ld a,(Cuad_objeto)
     cp 2
     jr c,3F
     jr z,3F
@@ -1101,8 +1108,6 @@ Limpia_Coordenadas_X xor a
 
 Determina_resultado_comparativa 
 
-    jr $
-
     ld a,h
     ld b,0
 
@@ -1110,8 +1115,6 @@ Determina_resultado_comparativa
     inc b
     dec b
     ret z                                   ; B="0". Indica que H es distinto de "0, $ff o $01". Salimos de la rutina.
-
-    jr $
 
     ld a,l                                  ; B="1". La comparación de H es satisfactoria, pasamos a comparar L.
     ld b,0

@@ -163,7 +163,7 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 ;															_ rutina [Guarda_foto_registros] que los datos a guardar pertenecen a un disparo y no a una entidad,_
 ;															_ por lo tanto hemos de almacenarlos en `Album_de_fotos_disparos´ en lugar de `Album_de_fotos´.
 ;														BIT 1, Este bit indica que el disparo sale de la pantalla, ($4000-$57ff).
-;														BIT 2, Este bit a "1" indica que un disparo de Amadeus a alcanzado a una entidad.
+;														BIT 2, Este bit a "1" indica que un disparo de Amadeus a alcanzado a una entidad. 
 
 ; Gestión de ENTIDADES.
 
@@ -213,7 +213,12 @@ Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 pos
 ; Relojes y temporizaciones.
 
 Habilita_disparo_Amadeus db 1
-Temporiza_disparo_Amadeus db 30
+Tiempo_disparo_Amadeus db 30							; Restaura (Temporiza_disparo_Amadeus). 
+Temporiza_disparo_Amadeus db 30 						; Reloj, decreciente.
+
+Habilita_disparo_entidad db 1
+Tiempo_disparo_entidad db 15							; Restaura (Temporiza_disparo_entidad). 
+Temporiza_disparo_entidad db 15							; Reloj, decreciente.
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -297,6 +302,8 @@ Frame
 ; He de imprimir sólo el nº de fotos que he hecho. Sólo BORRAMOS/PINTAMOS los objetos que se han desplazado.
 ; Necesito calcular nª de malotes, para ello utilizaré (Stack_snapshot)-(Album_de_fotos).
 
+; PINTAMOS.
+
     ld a,2
     out ($fe),a
 	call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
@@ -306,24 +313,17 @@ Frame
 
 ; ----------------------------------------------------------------------
 
-	ld a,(Habilita_disparo_Amadeus)
-	and a
-	jr nz,8F
+; RELOJES.
 
-	ld hl,Temporiza_disparo_Amadeus
-	dec (hl)
+	ld hl,Habilita_disparo_Amadeus
+	ld de,Temporiza_disparo_Amadeus
+	call Habilita_disparos 								; 30 Frames como mínimo entre cada disparo de Amadeus.
 
-	inc (hl)
-	dec (hl)
+	ld hl,Habilita_disparo_entidad 						; El nº de frames mínimo entre disparos de entidad será_
+	ld de,Temporiza_disparo_entidad 					; _ variable y variará en función de la dificultad.
+	call Habilita_disparos 								
 
-	jr nz,8F
-
-	ld a,1
-	ld (Habilita_disparo_Amadeus),a
-	ld a,30
-	ld (Temporiza_disparo_Amadeus),a
-
-;	Existe colisión?????
+; COLISIONES.
 
 8 call Selector_de_impactos
 
@@ -370,11 +370,14 @@ Frame
 
 	call Determina_resultado_comparativa
 
+	inc b
+	dec b
+	jr z,7F
 
-
-
-
-
+	ld a,1											; Esta entidad ha sido alcanzada por un disparo_
+	ld (Impacto),a 									; _de Amadeus. Lo indicamos activando su .db (Impacto).
+	ld hl,Ctrl_1									; Restauramos el FLAG de comparación de entidad-disparo,_
+	res 2,(hl)										; _(Bit2 Ctrl_1).
 
 7 ld a,(Impacto) 
 	and a
@@ -930,7 +933,12 @@ Movimiento_Amadeus
 ;
 ;	Rutina provisional para que los malotes cagen balas.
 
-Detecta_disparo_entidad ld a,$7f
+Detecta_disparo_entidad 
+
+	ld a,(Habilita_disparo_entidad)
+	and a
+	ret z
+	ld a,$7f
 	in a,($fe)
 	and 1
 	ret nz
@@ -990,6 +998,7 @@ Bucle_1 push bc
 	include "Genera_coordenadas.asm"
 	include "Patrones_de_mov.asm"
 	include "Guarda_foto_registros.asm"
+	include "Relojes_y_temporizaciones.asm"
 
 	SAVESNA "Pruebas.sna", START
 
