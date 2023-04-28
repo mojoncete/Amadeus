@@ -252,15 +252,16 @@ START ld sp,$ffff										 ; Situamos el inicio de Stack.
 	ld b,(hl)
 	inc b
 	dec b
-	jr z,3F												; Si no hay entidades, cargamos AMADEUS.
+	jr z,3F										   		 ; Si no hay entidades, cargamos AMADEUS.
 
-;	Cada vez que iniciamos una entidad, hay que hacer una llamada a (Inicia_sprite). Sólo al iniciar!!!!!
+	call Inicia_punteros_de_entidades					 ; Sitúa (Puntero_store_entidades) en la 1ª entidad del_
+;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.
+
+;	Cada vez que iniciamos una entidad, hay que hacer una llamada a (Inicia_Puntero_objeto). 
 ;   Inicialmente tengo cargada la 1ª entidad en DRAW.	
 ;	Pintamos el resto de entidades:
 
-	call Inicia_punteros_de_entidades
-
-;	INICIA ENTIDADES!!!!!
+;	INICIA ENTIDADES !!!!!
 
 1 push bc  												; Guardo el contador de entidades.
  	call Inicia_Puntero_objeto
@@ -270,7 +271,7 @@ START ld sp,$ffff										 ; Situamos el inicio de Stack.
 	pop bc
 	djnz 1B  											; Decremento el contador de entidades.
 
-; 	INICIA AMADEUS!!!!!
+; 	INICIA AMADEUS !!!!!
 
 3 call Restore_Amadeus
 	call Inicia_Puntero_objeto
@@ -278,12 +279,12 @@ START ld sp,$ffff										 ; Situamos el inicio de Stack.
 	call Guarda_foto_registros
 	call Store_Amadeus
 
-; Iniciamos los punteros de los índices de las dos bases de datos de disparo, (Amadeus/Entidades).
+; 	INICIA DISPAROS !!!!!
 
 	call Inicia_Puntero_Disparo_Entidades
 	call Inicia_Puntero_Disparo_Amadeus
 
-; Volvemos a situar los punteros STORE/RESTORE de entidades en la 1ª entidad.
+; Una vez inicializadas las entidades y Amadeus, Cargamos la 1ª entidad en DRAW.
 
 	call Inicia_punteros_de_entidades 
 	call Restore_Primera_entidad
@@ -313,6 +314,10 @@ Frame
 
 ; ----------------------------------------------------------------------
 
+	ld a,(Ctrl_1)
+	bit 3,a
+	jr nz,$
+
 ; RELOJES.
 
 	ld hl,Habilita_disparo_Amadeus
@@ -339,7 +344,7 @@ Frame
 
 ; ---------------------------------------------------------------------------------------
 
-	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
+9 call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
 	ld hl,Album_de_fotos
     ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
 ;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
@@ -358,54 +363,35 @@ Frame
 2 ld a,(Ctrl_1)
 	bit 2,a
 	jr z,7F	
-
 	ld hl,(Coordenadas_disparo_certero)
-	ex de,hl 										; D contiene la coordenada_y del disparo.
-;													; E contiene la coordenada_X del disparo.	
-	ld hl,(Coordenada_X) 							; L Coordenada_x de la entidad.
-;													; H Coordenado_y de la entidad.	
+	ex de,hl 											; D contiene la coordenada_y del disparo.
+;														; E contiene la coordenada_X del disparo.	
+	ld hl,(Coordenada_X) 								; L Coordenada_x de la entidad.
+;														; H Coordenado_y de la entidad.	
 	and a
 	sbc hl,de
-
 	call Determina_resultado_comparativa
-
 	inc b
 	dec b
-	jr z,7F
+	jr z,7F 																	
+
+; ----- ----- -----
 
 	ld a,1												; Esta entidad ha sido alcanzada por un disparo_
 	ld (Impacto),a 										; _de Amadeus. Lo indicamos activando su .db (Impacto).
 	ld hl,Ctrl_1										; Restauramos el FLAG de comparación de entidad-disparo,_
 	res 2,(hl)											; _(Bit2 Ctrl_1).
+; debugggg
+	set 3,(hl)
+; debugggg
 
 7 push bc
 
-	ld a,(Impacto)
-	and a
-	jr z,9F
-
-; ----- Impacto
-
-	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la "ENTIDAD a borrar", pues ha habido IMPACTO!!!!!
-
-;	call Borra_datos_entidad
-;	ld hl,Numero_de_entidades
-;	dec (hl)
-
-	xor a
-	ld (Impacto),a
-
-	jr $
-
-	jr 6F
-
-; ----- Impacto
-
-9 call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
+	call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
 
 	ld a,(Ctrl_0)
 	bit 4,a
-	jr z,1F                                       	    ; Omitimos BORRAR/PINTAR si no hay movimiento.
+	jr z,6F                                       	    ; Omitimos BORRAR/PINTAR si no hay movimiento.
 
 ; Voy a utilizar una rutina de lectura de teclado para disparar con cualquier entidad.
 ; [[[
@@ -413,12 +399,21 @@ Frame
 ; ]]]
 	call Guarda_foto_entidad_a_pintar					; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!
 
-1 ld hl,Ctrl_0
+	ld hl,Ctrl_0
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
 	xor a
 	ld (Obj_dibujado),a
 
-6 call Store_Restore_entidades
+6 
+
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	ld a,(Ctrl_1)
+	bit 3,a
+	jr nz,$
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+	call Store_Restore_entidades
 	pop bc
 	djnz 2B
 
@@ -458,6 +453,7 @@ Frame
 
 	ld a,4
 	out ($fe),a  
+
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -472,6 +468,11 @@ Mov_obj
 	ld (Obj_dibujado),a
     call Prepara_var_pintado_borrado                    ; Almaceno las `VARIABLES DE BORRADO´. de la entidad almacenada en DRAW en (Variables_de_borrado).
 ;														; Obj_dibujado="0".
+; Impacto ???
+
+	ld a,(Impacto)
+	and a
+	jr nz,1F
 
 ; Movemos Entidades malignas.
 
@@ -493,14 +494,13 @@ Mov_obj
 	cp $14
 	call nc, Compara_coordenadas_X 						; Si esta entidad ocupa alguna de las columnas que_
 ;														; ocupa Amadeus, tendremos el .db (Impacto)="1".	
-
 ; ---------
 
-1 ld a,1 				 								; Cambiamos (Obj_dibujado) a "1" para poder almacenar el contenido de DRAW en_  
+	ld a,1 				 								; Cambiamos (Obj_dibujado) a "1" para poder almacenar el contenido de DRAW en_  
 	ld (Obj_dibujado),a 								; _(Variables_de_pintado).					
     call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
     call Repone_borrar                                  ; Si ha habido movimiento de la entidad, borraremos el FRAME anterior.
-	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la "ENTIDAD a borrar", pues ha habido movimiento_
+1 call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la "ENTIDAD a borrar", pues ha habido movimiento_
 	ret													; _de la misma.
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -628,6 +628,10 @@ Inicia_Puntero_Disparo_Amadeus ld hl,Indice_de_disparos_Amadeus
 
 Calcula_numero_de_malotes 
 
+	ld a,(Ctrl_1)
+	bit 3,a
+	jr nz,$
+
 	ld hl,Album_de_fotos
 	ex de,hl
 	ld hl,(Stack_snapshot)
@@ -721,7 +725,6 @@ Inicia_puntero_objeto_der ld hl,(Indice_Sprite_der)
 	ld (Puntero_objeto),hl
 
 	ld hl,(Indice_Sprite_izq)							; Cuando "Iniciamos el Sprite a derecha",_					
-;	call Extrae_address
 	ld (Puntero_DESPLZ_izq),hl
 	ret
 
@@ -734,8 +737,7 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 	ld (Puntero_objeto),hl
 
 	ld hl,(Indice_Sprite_der)							; Cuando "Iniciamos el Sprite a izquierda",_					
-;	call Extrae_address									; _situamos (Puntero_DESPLZ_der) en el último defw_
-	ld (Puntero_DESPLZ_der),hl
+	ld (Puntero_DESPLZ_der),hl							; _situamos (Puntero_DESPLZ_der) en el último defw_
 	ret
 
 ; Tenemos que activar el bit6 de (Ctrl_0) si el Sprite que hemos cargado es AMADEUS.
@@ -788,6 +790,7 @@ Store_Restore_entidades
 
 1 ld hl,(Puntero_restore_entidades)
 	ld (Puntero_store_entidades),hl 					; Situamos (Puntero_store_entidades) en la 2ª entidad.
+
 	ld de,Filas 										; Hemos RECUPERADO los parámetros de la 2ª entidad de su base de datos.
 	ld bc,59
 	ldir
@@ -800,6 +803,7 @@ Store_Restore_entidades
 	ld (Indice_restore),hl
     call Extrae_address
     ld (Puntero_restore_entidades),hl
+
 	pop bc
 	pop de
 	pop hl
@@ -871,17 +875,15 @@ Store_Amadeus push hl
 ;
 ;	27/04/23
 ;
-; 	Limpia los datos del almacén de entidades de DRAW donde se encuentra una "entidad impactada".
+; 	Limpia los datos del almacén de entidades de DRAW, (donde se encuentra la "entidad impactada").
 ;
 ;	Destruye: HL,BC,DE,A
 
-Borra_datos_entidad ld hl,(Puntero_store_entidades)
+Borra_datos_entidad ld hl,Filas
 	ld bc,58
 	xor a
 	ld (hl),a
-	push hl
-	pop de
-	inc de
+	ld de,Filas+1
 	ldir
 	ret
 

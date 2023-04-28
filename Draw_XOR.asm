@@ -695,7 +695,9 @@ PreviousScan ld a,h
 ;	Rutina principal de pintado de entidades/Amadeus.
 ;	Extrae fotos de Album_de_fotos.
 
-Extrae_foto_entidades ld a,(Numero_de_malotes)
+Extrae_foto_entidades 
+
+	ld a,(Numero_de_malotes)
 	and a
 	ret z
 	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos

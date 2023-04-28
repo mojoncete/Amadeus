@@ -27,7 +27,9 @@
 ;   $7002 / 03 ..... Puntero de impresion.
 ;   $7004 / 05 ..... Rutina de impresión.
 
-Guarda_foto_registros ld (Stack),sp               ; Guardo SP en (Stack).
+Guarda_foto_registros 
+
+    ld (Stack),sp                                 ; Guardo SP en (Stack).
     ld sp,Guarda_foto_registros                   ; Sitúo el Stack Pointer en la dirección actual -1
 
     push hl                                       ; HL contiene la dirección de la rutina de impresión.
@@ -52,7 +54,7 @@ Guarda_foto_registros ld (Stack),sp               ; Guardo SP en (Stack).
     inc hl                                        ; Volvemos a tener al puntero SP en la posición inicial, (Snapshot)-1.
     djnz 1B    
 
-    and a
+    bit 0,a
     jr z,5F
 
     ld (Stack_snapshot_disparos),hl
