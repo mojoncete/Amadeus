@@ -62,7 +62,6 @@ Guarda_foto_registros
 
 5 ld (Stack_snapshot),hl
 6 ld sp,(Stack)
-
 3 ret                                             ; Antes de salir de la rutina recuperamos SP y actualizamos,(o no), (Stack_snapshot).
 
 

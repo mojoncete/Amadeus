@@ -314,10 +314,6 @@ Frame
 
 ; ----------------------------------------------------------------------
 
-	ld a,(Ctrl_1)
-	bit 3,a
-	jr nz,$
-
 ; RELOJES.
 
 	ld hl,Habilita_disparo_Amadeus
@@ -330,7 +326,7 @@ Frame
 
 ; COLISIONES.
 
-8 call Selector_de_impactos
+	call Selector_de_impactos
 
 ; Bit 0 a "1" Impacto en entidad por disparo. ($01)
 ; Bit 1 a "1" Impacto en Amadeus por disparo. ($02)
@@ -344,7 +340,7 @@ Frame
 
 ; ---------------------------------------------------------------------------------------
 
-9 call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
+	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
 	ld hl,Album_de_fotos
     ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
 ;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
@@ -360,7 +356,16 @@ Frame
 ; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
 ; _con las coordenadas de la entidad almacenada en DRAW.
 
-2 ld a,(Ctrl_1)
+2 
+
+; debuggggg............
+	ld a,(Impacto)										 
+	and a
+	jr nz,$
+; debuggggg............
+
+
+	ld a,(Ctrl_1)
 	bit 2,a
 	jr z,7F	
 	ld hl,(Coordenadas_disparo_certero)
@@ -381,13 +386,10 @@ Frame
 	ld (Impacto),a 										; _de Amadeus. Lo indicamos activando su .db (Impacto).
 	ld hl,Ctrl_1										; Restauramos el FLAG de comparación de entidad-disparo,_
 	res 2,(hl)											; _(Bit2 Ctrl_1).
-; debugggg
-	set 3,(hl)
-; debugggg
 
 7 push bc
 
-	call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
+	call Mov_obj										; MOVEMOS y decrementamos (Numero_de_malotes)
 
 	ld a,(Ctrl_0)
 	bit 4,a
@@ -404,16 +406,7 @@ Frame
 	xor a
 	ld (Obj_dibujado),a
 
-6 
-
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	ld a,(Ctrl_1)
-	bit 3,a
-	jr nz,$
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-	call Store_Restore_entidades
+6 call Store_Restore_entidades
 	pop bc
 	djnz 2B
 
@@ -466,14 +459,11 @@ Mov_obj
 
 	xor a
 	ld (Obj_dibujado),a
+	ld (Ctrl_0),a 										; El bit4 de (Ctrl_0) puede estar alzado debido al movimiento de Amadeus.
+;														; Necesito restaurarlo, lo utilizaremos para detectar el movimiento_
+; 														; _de la entidad.
     call Prepara_var_pintado_borrado                    ; Almaceno las `VARIABLES DE BORRADO´. de la entidad almacenada en DRAW en (Variables_de_borrado).
 ;														; Obj_dibujado="0".
-; Impacto ???
-
-	ld a,(Impacto)
-	and a
-	jr nz,1F
-
 ; Movemos Entidades malignas.
 
 	ld hl,(Puntero_indice_mov) 							; No hay movimiento, objeto estático!!!.
@@ -492,7 +482,7 @@ Mov_obj
 
 	ld a,(Coordenada_y)
 	cp $14
-	call nc, Compara_coordenadas_X 						; Si esta entidad ocupa alguna de las columnas que_
+	call nc,Compara_coordenadas_X 						; Si esta entidad ocupa alguna de las columnas que_
 ;														; ocupa Amadeus, tendremos el .db (Impacto)="1".	
 ; ---------
 
