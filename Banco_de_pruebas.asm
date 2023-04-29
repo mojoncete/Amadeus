@@ -163,7 +163,9 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 ;															_ rutina [Guarda_foto_registros] que los datos a guardar pertenecen a un disparo y no a una entidad,_
 ;															_ por lo tanto hemos de almacenarlos en `Album_de_fotos_disparos´ en lugar de `Album_de_fotos´.
 ;														BIT 1, Este bit indica que el disparo sale de la pantalla, ($4000-$57ff).
-;														BIT 2, Este bit a "1" indica que un disparo de Amadeus a alcanzado a una entidad. 
+;														BIT 2, Este bit a "1" indica que un disparo de Amadeus a alcanzado a una entidad, hay que confirmarlo_
+; 															_ comparando las coordenadas del disparo con las de la entidad almacenada en DRAW. 
+;	                                                    BIT 3, Indica que esta entidad ha sido alcanzada por un proyectil de AMADEUS.													
 
 ; Gestión de ENTIDADES.
 
@@ -277,6 +279,8 @@ START ld sp,$ffff										 ; Situamos el inicio de Stack.
 	call Inicia_Puntero_objeto
 	call Draw
 	call Guarda_foto_registros
+
+	ld de,Amadeus_db
 	call Store_Amadeus
 
 ; 	INICIA DISPAROS !!!!!
@@ -314,13 +318,9 @@ Frame
 
 ; ----------------------------------------------------------------------
 
-
-
-	ld a,(Ctrl_1)
-	bit 3,a
-	jr nz,$
-
-
+;	ld a,(Ctrl_1)
+;	bit 3,a
+;	jr nz,$
 
 ; RELOJES.
 
@@ -346,9 +346,17 @@ Frame
 	call Inicia_punteros_de_entidades
 	call Restore_Primera_entidad
 
+	ld a,(Filas)
+	and a
+	jr nz,10F 											; Si la 1ª entidad está vacía, saltamos a la siguiente.
+
+	call Store_Restore_entidades
+
+
+
 ; ---------------------------------------------------------------------------------------
 
-	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
+10 call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
 	ld hl,Album_de_fotos
     ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
 ;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
@@ -361,25 +369,32 @@ Frame
 
 ; Código que ejecutamos con cada entidad:
 
-; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
-; _con las coordenadas de la entidad almacenada en DRAW.
+; Impacto ???
 
 2 ld a,(Impacto)										 
 	and a
 	jr z,8F
 
-	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la "ENTIDAD a borrar".
-	call Borra_datos_entidad
-	ld hl,Numero_de_entidades
+; Hay Impacto en esta entidad.
+
+	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la entidad `impactada´ para borrarla.
+	call Borra_datos_entidad							; Borramos todos los datos de la entidad.
+
+	ld hl,(Puntero_store_entidades)
+	ld d,h
+	ld e,l
+	call Store_Amadeus									; Limpiamos `su base de datos´.
+
+	ld hl,Numero_de_entidades							; Una alimaña menos.
 	dec (hl)
 
-; debugggg -----
 	ld hl,Ctrl_1
-	set 3,(hl)
-; debugggg -----
+	set 3,(hl)											; Activamos el FLAG de impacto de entidad de DRAW.
 
 	jr 9F
 
+; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
+; _con las coordenadas de la entidad almacenada en DRAW.
 
 8 ld a,(Ctrl_1)
 	bit 2,a
@@ -451,19 +466,20 @@ Frame
 	xor a
 	ld (Obj_dibujado),a
 
-	call Store_Amadeus
+	ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
+	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
 
 	call Motor_de_disparos								; Borra/mueve/pinta cada uno de los disparos y crea un nuevo album de fotos.
 
 ; Calculamos el nº de malotes y de disparotes para pintarlos nada más comenzar el siguiente FRAME.
 
-	call Calcula_numero_de_malotes 
 	call Calcula_numero_de_disparotes
+9 call Calcula_numero_de_malotes 
 
 	ld a,4
 	out ($fe),a  
 
-9 ret
+	ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -771,7 +787,7 @@ Store_Restore_entidades
 ;	STORE !!!!!
 ;	Guarda la entidad cargada en Draw en su correspondiente DB.
 
-	ld hl,Filas
+2 ld hl,Filas
 	ld de,(Puntero_store_entidades) 					; Puntero que se desplaza por las distintas entidades.
 	ld bc,59
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
@@ -793,6 +809,8 @@ Store_Restore_entidades
 1 ld hl,(Puntero_restore_entidades)
 	ld (Puntero_store_entidades),hl 					; Situamos (Puntero_store_entidades) en la 2ª entidad.
 
+	push hl
+
 	ld de,Filas 										; Hemos RECUPERADO los parámetros de la 2ª entidad de su base de datos.
 	ld bc,59
 	ldir
@@ -805,6 +823,12 @@ Store_Restore_entidades
 	ld (Indice_restore),hl
     call Extrae_address
     ld (Puntero_restore_entidades),hl
+
+    pop hl
+
+ 	ld a,(hl)
+ 	and a
+ 	jr z,2B												; Si el cajón está vacío, saltamos al siguiente.
 
 	pop bc
 	pop de
@@ -852,26 +876,20 @@ Restore_Amadeus	push hl
 
 ; *************************************************************************************************************************************************************
 ;
-;	29/01/23
+;	29/04/23
 ;
 ;	Store_Amadeus
 ;
-;	Almacenamos los parámetros de Amadeus, contenidos en DRAW en su base de datos.
+;	Almacena los datos de la entidad alojada en DRAW, (incl. Amadeus), en su respectiva base de datos.
 ;	
+;	INPUT: DE contiene la dirección del 1er byte de la base de datos donde vamos a guardar los datos de la entidad.
+;
+;	DESTRUYE: HL y BC y DE.
 
-Store_Amadeus push hl 
-	push de
- 	push bc
-	ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
-	ld de,Amadeus_db
+Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
 	ld bc,59
 	ldir
-	pop bc
-	pop de
-	pop hl
 	ret
-
-; **************************************************************************************************
 
 ; -----------------------------------------------------------
 ;
