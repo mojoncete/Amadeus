@@ -199,10 +199,10 @@ Entidad_2 db 2,2		                            ; (Filas) / (Columns).
 	defw 0											; (Puntero_DESPLZ_der).
 	defw 0											; (Puntero_DESPLZ_izq).
 
-	defw $50c6                                      ; (Posicion_inicio).
-	db 3											; (Cuad_objeto).
+	defw $485e                                      ; (Posicion_inicio).
+	db 2											; (Cuad_objeto).
 
-	db 4,1,1,8                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
 	db 0											; Impacto. "1" existe impacto en la entidad.
 
@@ -218,7 +218,7 @@ Entidad_2 db 2,2		                            ; (Filas) / (Columns).
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 
-	defw 0,0								  		; (Puntero_indice_mov) / (Puntero_mov).
+	defw Indice_mov_Izquierda_y_derecha,0			; (Puntero_indice_mov) / (Puntero_mov).
 
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
 
@@ -260,7 +260,7 @@ Entidad_3 db 2,2                                 	; (Filas) / (Columns).
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 
-	defw Indice_mov_Onda_senoidal,0					; (Puntero_indice_mov) / (Puntero_mov).
+	defw Indice_mov_Derecha,0						; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).								  
 
 	db 0 											; (Columnas).									

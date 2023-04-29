@@ -170,7 +170,7 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 Puntero_store_entidades defw 0
 Puntero_restore_entidades defw 0
 Indice_restore defw 0
-Numero_de_entidades db 2								; Nº de entidades en pantalla, (contando con Amadeus).
+Numero_de_entidades db 3								; Nº de entidades en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -314,6 +314,14 @@ Frame
 
 ; ----------------------------------------------------------------------
 
+
+
+	ld a,(Ctrl_1)
+	bit 3,a
+	jr nz,$
+
+
+
 ; RELOJES.
 
 	ld hl,Habilita_disparo_Amadeus
@@ -356,16 +364,24 @@ Frame
 ; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
 ; _con las coordenadas de la entidad almacenada en DRAW.
 
-2 
-
-; debuggggg............
-	ld a,(Impacto)										 
+2 ld a,(Impacto)										 
 	and a
-	jr nz,$
-; debuggggg............
+	jr z,8F
+
+	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la "ENTIDAD a borrar".
+	call Borra_datos_entidad
+	ld hl,Numero_de_entidades
+	dec (hl)
+
+; debugggg -----
+	ld hl,Ctrl_1
+	set 3,(hl)
+; debugggg -----
+
+	jr 9F
 
 
-	ld a,(Ctrl_1)
+8 ld a,(Ctrl_1)
 	bit 2,a
 	jr z,7F	
 	ld hl,(Coordenadas_disparo_certero)
@@ -447,7 +463,7 @@ Frame
 	ld a,4
 	out ($fe),a  
 
-	ret
+9 ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -617,10 +633,6 @@ Inicia_Puntero_Disparo_Amadeus ld hl,Indice_de_disparos_Amadeus
 ;
 
 Calcula_numero_de_malotes 
-
-	ld a,(Ctrl_1)
-	bit 3,a
-	jr nz,$
 
 	ld hl,Album_de_fotos
 	ex de,hl
