@@ -353,7 +353,7 @@ Frame
 	ld hl,Album_de_fotos
     ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
 ;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
-    ld a,(Numero_de_entidades)
+	ld a,(Numero_de_entidades)
     ld b,a
 	and a
 	jr z,4F												; Entidades="0". Saltamos a Amadeus.
@@ -370,18 +370,16 @@ Frame
 
 ; Hay Impacto en esta entidad.
 
+	push bc
 	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la entidad `impactada´ para borrarla.
 	call Borra_datos_entidad							; Borramos todos los datos de la entidad.
-
 	ld hl,(Puntero_store_entidades)
 	ld d,h
 	ld e,l
 	call Store_Amadeus									; Limpiamos `su base de datos´.
-
 	ld hl,Numero_de_entidades							; Una alimaña menos.
 	dec (hl)
-
-	jr 9F
+	jr 6F
 
 ; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
 ; _con las coordenadas de la entidad almacenada en DRAW.
@@ -389,6 +387,7 @@ Frame
 8 ld a,(Ctrl_1)
 	bit 2,a
 	jr z,7F	
+
 	ld hl,(Coordenadas_disparo_certero)
 	ex de,hl 											; D contiene la coordenada_y del disparo.
 ;														; E contiene la coordenada_X del disparo.	
@@ -767,6 +766,10 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 ;	_de la 2ª y 3ª entidad respectivamente.
 
 Store_Restore_entidades  
+
+	ld a,(Numero_de_entidades)
+	and a
+	ret z
 
 	push hl 
 	push de
