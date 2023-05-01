@@ -165,7 +165,6 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 ;														BIT 1, Este bit indica que el disparo sale de la pantalla, ($4000-$57ff).
 ;														BIT 2, Este bit a "1" indica que un disparo de Amadeus a alcanzado a una entidad, hay que confirmarlo_
 ; 															_ comparando las coordenadas del disparo con las de la entidad almacenada en DRAW. 
-;	                                                    BIT 3, Indica que esta entidad ha sido alcanzada por un proyectil de AMADEUS.													
 
 ; Gestión de ENTIDADES.
 
@@ -318,10 +317,6 @@ Frame
 
 ; ----------------------------------------------------------------------
 
-;	ld a,(Ctrl_1)
-;	bit 3,a
-;	jr nz,$
-
 ; RELOJES.
 
 	ld hl,Habilita_disparo_Amadeus
@@ -351,8 +346,6 @@ Frame
 	jr nz,10F 											; Si la 1ª entidad está vacía, saltamos a la siguiente.
 
 	call Store_Restore_entidades
-
-
 
 ; ---------------------------------------------------------------------------------------
 
@@ -387,9 +380,6 @@ Frame
 
 	ld hl,Numero_de_entidades							; Una alimaña menos.
 	dec (hl)
-
-	ld hl,Ctrl_1
-	set 3,(hl)											; Activamos el FLAG de impacto de entidad de DRAW.
 
 	jr 9F
 
@@ -444,8 +434,6 @@ Frame
 ; Tras la gestión de las entidades, ... AMADEUS.
 
 4 call Restore_Amadeus
-
-; debuggggg. STOP si hay impacto en la entidad que contiene DRAW.!!!!!!!!
 
 	ld a,(Impacto) 
 	and a
