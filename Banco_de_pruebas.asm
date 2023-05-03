@@ -800,7 +800,10 @@ Store_Restore_entidades
 1 ld hl,(Puntero_restore_entidades)
 	ld (Puntero_store_entidades),hl 					; Situamos (Puntero_store_entidades) en la 2ª entidad.
 
-	push hl
+	ld a,(hl)
+	and a
+	push af
+	jr z,3F
 
 	ld de,Filas 										; Hemos RECUPERADO los parámetros de la 2ª entidad de su base de datos.
 	ld bc,59
@@ -808,18 +811,16 @@ Store_Restore_entidades
 
 ;	Incrementa RESTORE !!!!! 
 
-    ld hl,(Indice_restore)
+3 ld hl,(Indice_restore)
 	inc hl
 	inc hl
 	ld (Indice_restore),hl
     call Extrae_address
     ld (Puntero_restore_entidades),hl
 
-    pop hl
-
- 	ld a,(hl)
- 	and a
- 	jr z,2B												; Si el cajón está vacío, saltamos al siguiente.
+	pop af
+	and a
+	jr z,1B
 
 	pop bc
 	pop de
