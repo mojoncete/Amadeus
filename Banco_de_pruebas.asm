@@ -769,12 +769,17 @@ Store_Restore_entidades
 
 	ld a,(Numero_de_entidades)
 	and a
-	ret z
+	ret z												 ; Salimos de la rutina si no quedan entidades vivitas y coleando.
 
 	push hl 
 	push de
  	push bc
 
+	call Comprueba_fin_de_indice
+	call z,Inicia_punteros_de_entidades
+	call Restore_Primera_entidad
+	jr 4F
+	
 ;	STORE !!!!!
 ;	Guarda la entidad cargada en Draw en su correspondiente DB.
 
@@ -822,9 +827,18 @@ Store_Restore_entidades
 	and a
 	jr z,1B
 
-	pop bc
+4 pop bc
 	pop de
 	pop hl
+	ret
+
+; --------------------------------------------------------
+
+Comprueba_fin_de_indice	ld hl,(Puntero_store_entidades)
+	ld de,Entidad_5
+	ex de,hl
+	and a
+	sbc hl,de
 	ret
 
 ; **************************************************************************************************

@@ -98,6 +98,8 @@ Indice_de_entidades									; 58 Bytes por entidad.
 	defw Entidad_2
 	defw Entidad_3
 	defw Entidad_4
+	defw Entidad_5
+
 ;	...
 ;	...
 ;	+ entidades ...
@@ -302,6 +304,47 @@ Entidad_4 db 2,2                                  	; (Filas) / (Columns).
 	db 0,0											; (Ctrl_0) / (Obj_dibujado).
 
 	defw Indice_mov_Izquierda,0                     ; (Puntero_indice_mov) / (Puntero_mov).
+	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).							  
+
+	db 0 											; (Columnas).									
+	defw 0											; (Limite_horizontal).
+	db 0											; (Limite_vertical).
+
+; ---------- ---------- ---------- ---------- ----------
+
+Entidad_5 db 2,2                                  	; (Filas) / (Columns).
+	defw 0                                          ; (Posicion_actual).
+	defw 0 											; (Puntero_objeto).
+	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
+
+	db %00000001									; (Attr).
+
+	defw Indice_Badsat_der							; (Indice_Sprite_der).
+	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
+	
+	defw 0											; (Puntero_DESPLZ_der).
+	defw 0											; (Puntero_DESPLZ_izq).
+
+	defw $4000                                      ; (Posicion_inicio).
+	db 1											; (Cuad_objeto).
+
+	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+
+	db 0											; Impacto. "1" existe impacto en la entidad.
+
+	db 0,0											; Variables_de_borrado 
+	defw 0										 	;	" " " " " " "
+	defw 0											;	" " " " " " "
+	db 0,0,0,0										;	" " " " " " "
+
+	db 0,0											; Variables_de_pintado 
+	defw 0											;	" " " " " " "
+	defw 0											;	" " " " " " "
+	db 0,0,0,0										;	" " " " " " "
+
+	db 0,0											; (Ctrl_0) / (Obj_dibujado).
+
+	defw Indice_mov_Abajo,0   		                ; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).							  
 
 	db 0 											; (Columnas).									
