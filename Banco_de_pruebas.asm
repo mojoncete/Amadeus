@@ -373,12 +373,15 @@ Frame
 	push bc
 	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la entidad `impactada´ para borrarla.
 	call Borra_datos_entidad							; Borramos todos los datos de la entidad.
-	ld hl,(Puntero_store_entidades)
-	ld d,h
-	ld e,l
-	call Store_Amadeus									; Limpiamos `su base de datos´.
+;	ld hl,(Puntero_store_entidades)
+;	ld d,h
+;	ld e,l
+;	call Store_Amadeus									; Limpiamos `su base de datos´.
 	ld hl,Numero_de_entidades							; Una alimaña menos.
 	dec (hl)
+
+;	jr $
+
 	jr 6F
 
 ; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
@@ -775,11 +778,6 @@ Store_Restore_entidades
 	push de
  	push bc
 
-	call Comprueba_fin_de_indice
-	call z,Inicia_punteros_de_entidades
-	call Restore_Primera_entidad
-	jr 4F
-	
 ;	STORE !!!!!
 ;	Guarda la entidad cargada en Draw en su correspondiente DB.
 
@@ -823,22 +821,24 @@ Store_Restore_entidades
     call Extrae_address
     ld (Puntero_restore_entidades),hl
 
-	pop af
+	ld hl,(Puntero_store_entidades)
+	ld de,Entidad_5
+	ex de,hl
+	and a
+	sbc hl,de
+	jr nz,5F
+
+	call z,Inicia_punteros_de_entidades
+	call Restore_Primera_entidad
+	jr 4F
+
+5 pop af
 	and a
 	jr z,1B
 
 4 pop bc
 	pop de
 	pop hl
-	ret
-
-; --------------------------------------------------------
-
-Comprueba_fin_de_indice	ld hl,(Puntero_store_entidades)
-	ld de,Entidad_5
-	ex de,hl
-	and a
-	sbc hl,de
 	ret
 
 ; **************************************************************************************************
