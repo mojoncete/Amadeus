@@ -339,13 +339,13 @@ Frame
 	ld (Impacto2),a										; Flag (Impacto2) a "0".
 
 	call Inicia_punteros_de_entidades
-	call Restore_Primera_entidad
+12 call Restore_Primera_entidad
 
 	ld a,(Filas)
 	and a
-	jr nz,10F 											; Si la 1ª entidad está vacía, saltamos a la siguiente.
-
-	call Store_Restore_entidades
+	jr nz,10F 											; Nos situamos en la 1ª entidad NO VACÍA del índice de ENTIDADES.
+	call Incrementa_punteros_entidades
+	jr 12B
 
 ; ---------------------------------------------------------------------------------------
 
@@ -370,17 +370,12 @@ Frame
 
 ; Hay Impacto en esta entidad.
 
-	push bc
+	push bc 											; Guardo el nº de entidades.
+
 	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la entidad `impactada´ para borrarla.
 	call Borra_datos_entidad							; Borramos todos los datos de la entidad.
-;	ld hl,(Puntero_store_entidades)
-;	ld d,h
-;	ld e,l
-;	call Store_Amadeus									; Limpiamos `su base de datos´.
 	ld hl,Numero_de_entidades							; Una alimaña menos.
 	dec (hl)
-
-;	jr $
 
 	jr 6F
 
@@ -390,6 +385,8 @@ Frame
 8 ld a,(Ctrl_1)
 	bit 2,a
 	jr z,7F	
+
+	push bc 											; Guardo el nº de entidades.
 
 	ld hl,(Coordenadas_disparo_certero)
 	ex de,hl 											; D contiene la coordenada_y del disparo.
@@ -401,7 +398,7 @@ Frame
 	call Determina_resultado_comparativa
 	inc b
 	dec b
-	jr z,7F 																	
+	jr z,11F 																	
 
 ; ----- ----- -----
 
@@ -410,6 +407,7 @@ Frame
 	ld hl,Ctrl_1										; Restauramos el FLAG de comparación de entidad-disparo,_
 	res 2,(hl)											; _(Bit2 Ctrl_1).
 
+11 pop bc
 7 push bc
 
 	call Mov_obj										; MOVEMOS y decrementamos (Numero_de_malotes)
@@ -430,6 +428,7 @@ Frame
 	ld (Obj_dibujado),a
 
 6 call Store_Restore_entidades
+
 	pop bc
 	djnz 2B
 
@@ -781,7 +780,7 @@ Store_Restore_entidades
 ;	STORE !!!!!
 ;	Guarda la entidad cargada en Draw en su correspondiente DB.
 
-2 ld hl,Filas
+	ld hl,Filas
 	ld de,(Puntero_store_entidades) 					; Puntero que se desplaza por las distintas entidades.
 	ld bc,59
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
@@ -801,44 +800,23 @@ Store_Restore_entidades
 ;	Incrementa el puntero STORE. Guarda los datos de `Entidad´+1 en Draw, (Puntero RESTORE).
 
 1 ld hl,(Puntero_restore_entidades)
-	ld (Puntero_store_entidades),hl 					; Situamos (Puntero_store_entidades) en la 2ª entidad.
-
 	ld a,(hl)
 	and a
 	push af
-	jr z,3F
+	jr z,2F
 
-	ld de,Filas 										; Hemos RECUPERADO los parámetros de la 2ª entidad de su base de datos.
+	ld de,Filas
 	ld bc,59
 	ldir
 
-;	Incrementa RESTORE !!!!! 
-
-3 ld hl,(Indice_restore)
-	inc hl
-	inc hl
-	ld (Indice_restore),hl
-    call Extrae_address
-    ld (Puntero_restore_entidades),hl
-
-	ld hl,(Puntero_store_entidades)
-	ld de,Entidad_5
-	ex de,hl
-	and a
-	sbc hl,de
-	jr nz,5F
-
-	call z,Inicia_punteros_de_entidades
-	call Restore_Primera_entidad
-	jr 4F
-
-5 pop af
-	and a
+2 call Incrementa_punteros_entidades
+	pop af
 	jr z,1B
 
-4 pop bc
+	pop bc
 	pop de
 	pop hl
+
 	ret
 
 ; **************************************************************************************************
@@ -858,6 +836,23 @@ Restore_Primera_entidad push hl
 	pop de
 	pop hl
 	ret
+
+
+; **************************************************************************************************
+;
+;	08/05/23
+;
+;	Incrementamos los dos punteros de entidades. (+1).
+
+Incrementa_punteros_entidades ld hl,(Puntero_restore_entidades)
+	ld (Puntero_store_entidades),hl 				
+	ld hl,(Indice_restore)
+	inc hl
+	inc hl
+	ld (Indice_restore),hl
+    call Extrae_address
+    ld (Puntero_restore_entidades),hl
+    ret
 
 ; **************************************************************************************************
 ;
