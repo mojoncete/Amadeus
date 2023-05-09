@@ -171,7 +171,7 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 Puntero_store_entidades defw 0
 Puntero_restore_entidades defw 0
 Indice_restore defw 0
-Numero_de_entidades db 3								; Nº de entidades en pantalla, (contando con Amadeus).
+Numero_de_entidades db 5								; Nº de entidades en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -487,9 +487,9 @@ Mov_obj
 ;														; Obj_dibujado="0".
 ; Movemos Entidades malignas.
 
-	ld hl,(Puntero_indice_mov) 							; No hay movimiento, objeto estático!!!.
-	inc h                                               ; Salimos de la rutina.
-	dec h
+	ld hl,Puntero_indice_mov			 				; (hl)="0", objeto estático!!!.
+	inc (hl)
+	dec (hl)                                            ; Salimos de la rutina.
 	ret z
 
 	call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
