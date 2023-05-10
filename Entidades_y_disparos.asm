@@ -92,7 +92,7 @@ Disparo_11 defw 0
 
 ; -------------------------------------------------------------------------------------
 
-Indice_de_entidades									; 58 Bytes por entidad.
+Indice_de_entidades									; 60 Bytes por entidad.
 
 	defw Entidad_1
 	defw Entidad_2
@@ -138,7 +138,7 @@ Amadeus_db db 2,2									; (Filas) / (Columns).
 	defw 0											;	" " " " " " "
 	db 0,0,0,0										;	" " " " " " "
 
-	db $40,0										; (Ctrl_0) / (Obj_dibujado).
+	db $40,0,0										; (Ctrl_0) / (Obj_dibujado) / (Autoriza_movimiento).
 
 	defw 0,0	 									; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).
@@ -178,7 +178,7 @@ Entidad_1 db 0,0									; (Filas) / (Columns).
 	defw 0											;	" " " " " " "
 	db 0,0,0,0										;	" " " " " " "
 
-	db 0,0											; (Ctrl_0) / (Obj_dibujado).
+	db 0,0,0										; (Ctrl_0) / (Obj_dibujado) / (Autoriza_movimiento).
 
 	defw 0,0					 					; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
@@ -218,10 +218,9 @@ Entidad_2 db 2,2		                            ; (Filas) / (Columns).
 	defw 0											;	" " " " " " "
 	db 0,0,0,0										;	" " " " " " "
 
-	db 0,0											; (Ctrl_0) / (Obj_dibujado).
+	db 0,0,0										; (Ctrl_0) / (Obj_dibujado) / (Autoriza_movimiento).
 
-	defw 0,0			; (Puntero_indice_mov) / (Puntero_mov).
-
+	defw Indice_mov_Escaloncitos_izquierda_abajo,0	; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
 
 	db 0 											; (Columnas).									
@@ -260,7 +259,7 @@ Entidad_3 db 2,2                                 	; (Filas) / (Columns).
 	defw 0											;	" " " " " " "
 	db 0,0,0,0										;	" " " " " " "
 
-	db 0,0											; (Ctrl_0) / (Obj_dibujado).
+	db 0,0,0										; (Ctrl_0) / (Obj_dibujado) / (Autoriza_movimiento).
 
 	defw Indice_mov_Derecha,0						; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).								  
@@ -301,7 +300,7 @@ Entidad_4 db 2,2                                  	; (Filas) / (Columns).
 	defw 0											;	" " " " " " "
 	db 0,0,0,0										;	" " " " " " "
 
-	db 0,0											; (Ctrl_0) / (Obj_dibujado).
+	db 0,0,0										; (Ctrl_0) / (Obj_dibujado) / (Autoriza_movimiento).
 
 	defw Indice_mov_Escaloncitos_izquierda_abajo,0  ; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).							  
@@ -342,7 +341,7 @@ Entidad_5 db 2,2                                  	; (Filas) / (Columns).
 	defw 0											;	" " " " " " "
 	db 0,0,0,0										;	" " " " " " "
 
-	db 0,0											; (Ctrl_0) / (Obj_dibujado).
+	db 0,0,0										; (Ctrl_0) / (Obj_dibujado) / (Autoriza_movimiento).
 
 	defw Indice_mov_Abajo,0   		                ; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).							  

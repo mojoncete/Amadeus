@@ -135,6 +135,8 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
+
+Autoriza_movimiento db 0                                ; "1" Autoriza el movimiento de la entidad. "0", no hay movimiento.
 Puntero_indice_mov defw Indice_mov_Onda_senoidal	    ; Puntero del patrón de movimiento de la entidad. "0" No hay movimiento.
 Puntero_mov defw 0
 Contador_db_mov db 0
@@ -148,7 +150,7 @@ Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado
 ; 														; _(Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
 Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta columna se modifica (Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
 
-; 59 Bytes por entidad.
+; 60 Bytes por entidad.
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 ;					         		---------;      ;---------
 
@@ -168,10 +170,11 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 
 ; Gestión de ENTIDADES.
 
+Entidades_x_frame db 2									; Nº de entidades que pintaremos en un frame, (excluye a Amadeus).
 Puntero_store_entidades defw 0
 Puntero_restore_entidades defw 0
 Indice_restore defw 0
-Numero_de_entidades db 5								; Nº de entidades en pantalla, (contando con Amadeus).
+Numero_de_entidades db 2								; Nº de entidades en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -782,7 +785,7 @@ Store_Restore_entidades
 
 	ld hl,Filas
 	ld de,(Puntero_store_entidades) 					; Puntero que se desplaza por las distintas entidades.
-	ld bc,59
+	ld bc,60
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
 ; 	Entidad_sospechosa. 20/4/23
@@ -806,7 +809,7 @@ Store_Restore_entidades
 	jr z,2F
 
 	ld de,Filas
-	ld bc,59
+	ld bc,60
 	ldir
 
 2 call Incrementa_punteros_entidades
@@ -830,7 +833,7 @@ Restore_Primera_entidad push hl
  	push bc
 	ld hl,(Puntero_store_entidades)						; (Puntero_store_entidades) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,59
+	ld bc,60
 	ldir
 	pop bc
 	pop de
@@ -868,7 +871,7 @@ Restore_Amadeus	push hl
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Filas
-	ld bc,59
+	ld bc,60
 	ldir
 	pop bc
 	pop de
@@ -888,7 +891,7 @@ Restore_Amadeus	push hl
 ;	DESTRUYE: HL y BC y DE.
 
 Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
-	ld bc,59
+	ld bc,60
 	ldir
 	ret
 
@@ -901,7 +904,7 @@ Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeu
 ;	Destruye: HL,BC,DE,A
 
 Borra_datos_entidad ld hl,Filas
-	ld bc,58
+	ld bc,59
 	xor a
 	ld (hl),a
 	ld de,Filas+1
