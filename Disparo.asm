@@ -446,6 +446,7 @@ Almacena_disparo
 
 Comprueba_Colision push iy                         ; Puntero objeto (disparo).
     push hl                                        ; Puntero de impresión.                                 
+
     ld e,$80                                       ; E,(Impacto)="$80".
     call Bucle_2                                   ; Comprobamos el 1er scanline.
 
@@ -948,15 +949,20 @@ Mueve_disparo push hl
     djnz 6B
 
     call Elimina_disparo_de_base_de_datos 
-
-    jr 4F
+    pop hl
+    jr 7F
 
 ; Se ha desplazado la bala, compruebo colisión.
 
 3 push de
     push bc
+
     call Comprueba_Colision
+
+; B="$80", no hay colisión. B="$81", existe colisión. 
+
     ld a,b
+
     pop bc
     pop de
 
@@ -968,9 +974,9 @@ Mueve_disparo push hl
 
 4 pop hl
     inc hl
-    ld (hl),a                                   ; Modificamos el byte "impacto" de la base de datos del disparo si hay colisión.
+    ld (hl),a                                   ; Modificamos el byte "impacto" de la base de datos del disparo si es necesario.
     dec hl
-    ret
+7 ret
 
 ; Disparo hacia abajo, (Entidad).
 
@@ -993,8 +999,8 @@ Mueve_disparo push hl
     djnz 5B
 
     call Elimina_disparo_de_base_de_datos 
-
-    jr 4B
+    pop hl
+    jr 7B
 
 ; HL apunta al primer byte de la base de datos del disparo.
 

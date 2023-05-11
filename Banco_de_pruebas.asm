@@ -380,6 +380,10 @@ Frame
 	ld hl,Numero_de_entidades							; Una alimaña menos.
 	dec (hl)
 
+; debugg 
+;	jr $	; Para imagen cuando hay impacto.
+; debugg 
+
 	jr 6F
 
 ; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
