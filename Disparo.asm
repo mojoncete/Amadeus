@@ -753,6 +753,11 @@ Motor_de_disparos ld bc,Disparo_3A
     ld hl,Impacto2
     set 0,(hl)                                        ; Indicamos que se ha producido Impacto en una entidad.
                                                  
+;debuggggg
+    ld hl,(Coordenadas_disparo_certero)
+    jr $
+;debuggggg
+
     jr 11F
 
 9 call Mueve_disparo
@@ -765,14 +770,13 @@ Motor_de_disparos ld bc,Disparo_3A
 
 1 sbc hl,bc
     jr z,3F                                              ; Hemos llegado al final del índice de disparos de Amadeus??
-
 7 ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)                 ; Avanza disparo.
     inc hl
     inc hl
     ld (Puntero_DESPLZ_DISPARO_AMADEUS),hl
     jr 2B
-
 3 call Inicia_Puntero_Disparo_Amadeus
+
     ld bc,Disparo_11
     ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
 
