@@ -293,7 +293,7 @@ START ld sp,$ffff										 ; Situamos el inicio de Stack.
 ; Una vez inicializadas las entidades y Amadeus, Cargamos la 1ª entidad en DRAW.
 
 	call Inicia_punteros_de_entidades 
-	call Restore_Primera_entidad
+	call Restore_entidad
 
 	ld a,(Numero_de_entidades)
 	inc a
@@ -342,8 +342,8 @@ Frame
 	ld (Impacto2),a										; Flag (Impacto2) a "0".
 
 	call Inicia_punteros_de_entidades
-12 call Restore_Primera_entidad
-
+12 call Restore_entidad 								; Vuelca los datos de la entidad, hacia la que apunta (Puntero_store_entidades),_
+; 														; _ en DRAW.
 	ld a,(Filas)
 	and a
 	jr nz,10F 											; Nos situamos en la 1ª entidad NO VACÍA del índice de ENTIDADES.
@@ -367,13 +367,13 @@ Frame
 
 ; Impacto ???
 
-2 ld a,(Impacto)										 
+2 push bc 												; Nº de entidades.
+
+	ld a,(Impacto)										 
 	and a
 	jr z,8F
 
 ; Hay Impacto en esta entidad.
-
-	push bc 											; Guardo el nº de entidades.
 
 	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la entidad `impactada´ para borrarla.
 	call Borra_datos_entidad							; Borramos todos los datos de la entidad.
@@ -389,8 +389,6 @@ Frame
 	bit 2,a
 	jr z,7F	
 
-	push bc 											; Guardo el nº de entidades.
-
 	ld hl,(Coordenadas_disparo_certero)
 	ex de,hl 											; D contiene la coordenada_y del disparo.
 ;														; E contiene la coordenada_X del disparo.	
@@ -401,7 +399,7 @@ Frame
 	call Determina_resultado_comparativa
 	inc b
 	dec b
-	jr z,11F 																	
+	jr z,7F 																	
 
 ; ----- ----- -----
 
@@ -410,10 +408,7 @@ Frame
 	ld hl,Ctrl_1										; Restauramos el FLAG de comparación de entidad-disparo,_
 	res 2,(hl)											; _(Bit2 Ctrl_1).
 
-11 pop bc
-7 push bc
-
-	call Mov_obj										; MOVEMOS y decrementamos (Numero_de_malotes)
+7 call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
 
 	ld a,(Ctrl_0)
 	bit 4,a
@@ -828,13 +823,15 @@ Store_Restore_entidades
 ;
 ;	Cargamos los datos de la 1º entidad del índice_de_entidades
 
-Restore_Primera_entidad push hl 
+Restore_entidad push hl 
 	push de
  	push bc
+
 	ld hl,(Puntero_store_entidades)						; (Puntero_store_entidades) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
 	ld bc,60
 	ldir
+
 	pop bc
 	pop de
 	pop hl
