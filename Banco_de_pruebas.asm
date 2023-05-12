@@ -86,7 +86,7 @@ Cuad_objeto db 1										; Almacena el cuadrante de pantalla donde se encuentra
 ; Variables de objeto. (Características).
 
 Vel_left db 1 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
-Vel_right db 1 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
+Vel_right db 2 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
 Vel_up db 1 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
 Vel_down db 2 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
 
@@ -135,7 +135,6 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 
 ; Movimiento.
 
-
 Autoriza_movimiento db 0                                ; "1" Autoriza el movimiento de la entidad. "0", no hay movimiento.
 Puntero_indice_mov defw Indice_mov_Onda_senoidal	    ; Puntero del patrón de movimiento de la entidad. "0" No hay movimiento.
 Puntero_mov defw 0
@@ -150,7 +149,11 @@ Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado
 ; 														; _(Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
 Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta columna se modifica (Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
 
-; 60 Bytes por entidad.
+; variables de control general.
+
+Ctrl_2 db 0 											; Byte de control general de la entidad.
+
+; 61 Bytes por entidad.
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 ;					         		---------;      ;---------
 
@@ -165,8 +168,8 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 ;															_ rutina [Guarda_foto_registros] que los datos a guardar pertenecen a un disparo y no a una entidad,_
 ;															_ por lo tanto hemos de almacenarlos en `Album_de_fotos_disparos´ en lugar de `Album_de_fotos´.
 ;														BIT 1, Este bit indica que el disparo sale de la pantalla, ($4000-$57ff).
-;														BIT 2, Este bit a "1" indica que un disparo de Amadeus a alcanzado a una entidad, hay que confirmarlo_
-; 															_ comparando las coordenadas del disparo con las de la entidad almacenada en DRAW. 
+;														BIT 2, Este bit a "1" indica que un disparo de Amadeus ha alcanzado a una entidad. Como no sabemos cual,_
+;															_ hemos de comparar las coordenadas de (Coordenadas_disparo_certero) con las de cada entidad.
 
 ; Gestión de ENTIDADES.
 
@@ -174,7 +177,7 @@ Entidades_x_frame db 2									; Nº de entidades que pintaremos en un frame, (e
 Puntero_store_entidades defw 0
 Puntero_restore_entidades defw 0
 Indice_restore defw 0
-Numero_de_entidades db 2								; Nº de entidades en pantalla, (contando con Amadeus).
+Numero_de_entidades db 1								; Nº de entidades en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -238,8 +241,9 @@ Temp_Raster defw $ff00
 ;
 ;	14/11/22	
 
-START ld sp,$ffff										 ; Situamos el inicio de Stack.
+START 
 
+	ld sp,$ffff											 ; Situamos el inicio de Stack.
 	ld a,$a0 											 ; Habilitamos el modo 2 de interrupciones y fijamos el salto a $a0ff
 	ld i,a 												 ; Byte alto de la dirección donde se encuentra nuestro vector de interrupciones en el registro I. ($90). El byte bajo será siempre $ff.
 	IM 2 											     ; Habilitamos el modo 2 de INTERRUPCIONES.
@@ -302,9 +306,13 @@ START ld sp,$ffff										 ; Situamos el inicio de Stack.
 2 ei
 	jr 2B
 
+	ret
 ; -----------------------------------------------------------------------------------
 
 Frame 
+
+
+
 
 ; He de imprimir sólo el nº de fotos que he hecho. Sólo BORRAMOS/PINTAMOS los objetos que se han desplazado.
 ; Necesito calcular nª de malotes, para ello utilizaré (Stack_snapshot)-(Album_de_fotos).
@@ -380,10 +388,6 @@ Frame
 	ld hl,Numero_de_entidades							; Una alimaña menos.
 	dec (hl)
 
-; debugg 
-;	jr $	; Para imagen cuando hay impacto.
-; debugg 
-
 	jr 6F
 
 ; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
@@ -400,17 +404,24 @@ Frame
 ;														; H Coordenado_y de la entidad.	
 	and a
 	sbc hl,de
+
 	call Determina_resultado_comparativa
 	inc b
 	dec b
+
+	jr z,$
+
 	jr z,7F 																	
 
 ; ----- ----- -----
 
 	ld a,1												; Esta entidad ha sido alcanzada por un disparo_
 	ld (Impacto),a 										; _de Amadeus. Lo indicamos activando su .db (Impacto).
-	ld hl,Ctrl_1										; Restauramos el FLAG de comparación de entidad-disparo,_
-	res 2,(hl)											; _(Bit2 Ctrl_1).
+	ld hl,Ctrl_1
+	res 2,(hl)
+	ld hl,Coordenadas_disparo_certero
+	ld (hl),0
+
 
 7 call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
 
@@ -784,7 +795,7 @@ Store_Restore_entidades
 
 	ld hl,Filas
 	ld de,(Puntero_store_entidades) 					; Puntero que se desplaza por las distintas entidades.
-	ld bc,60
+	ld bc,61
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
 ; 	Entidad_sospechosa. 20/4/23
@@ -808,7 +819,7 @@ Store_Restore_entidades
 	jr z,2F
 
 	ld de,Filas
-	ld bc,60
+	ld bc,61
 	ldir
 
 2 call Incrementa_punteros_entidades
@@ -833,7 +844,7 @@ Restore_entidad push hl
 
 	ld hl,(Puntero_store_entidades)						; (Puntero_store_entidades) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,60
+	ld bc,61
 	ldir
 
 	pop bc
@@ -872,7 +883,7 @@ Restore_Amadeus	push hl
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Filas
-	ld bc,60
+	ld bc,61
 	ldir
 	pop bc
 	pop de
@@ -892,7 +903,7 @@ Restore_Amadeus	push hl
 ;	DESTRUYE: HL y BC y DE.
 
 Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
-	ld bc,60
+	ld bc,61
 	ldir
 	ret
 
@@ -905,7 +916,7 @@ Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeu
 ;	Destruye: HL,BC,DE,A
 
 Borra_datos_entidad ld hl,Filas
-	ld bc,59
+	ld bc,60
 	xor a
 	ld (hl),a
 	ld de,Filas+1

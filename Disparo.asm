@@ -752,11 +752,6 @@ Motor_de_disparos ld bc,Disparo_3A
     call Elimina_disparo_de_base_de_datos
     ld hl,Impacto2
     set 0,(hl)                                        ; Indicamos que se ha producido Impacto en una entidad.
-                                                 
-;debuggggg
-    ld hl,(Coordenadas_disparo_certero)
-    jr $
-;debuggggg
 
     jr 11F
 
@@ -1119,19 +1114,26 @@ Limpia_Coordenadas_X xor a
 
 Determina_resultado_comparativa 
 
+;   Tenemos en Hl el resultado de comparar las coordenadas de esta entidad con las del dispar_
+;   _ que tiene colisión, (Coordenadas_disparo_certero).
+;
+;   HL ..... Coordenada_Y / Coordenada_X de la entidad en curso.
+;   DE ..... Coordenada_Y / Coordenada_X de (Coordenadas_disparo_certero).
+;
+;   SBC HL,DE
+
     ld a,h
     ld b,0
 
     call Compara_cositas
+
     inc b
     dec b
-    ret z                                   ; B="0". Indica que H es distinto de "0, $ff o $01". Salimos de la rutina.
+    ret z                                   ; B="0". Indica que H es distinto de "0, $fe, $ff o $01". Salimos de la rutina.
 
     ld a,l                                  ; B="1". La comparación de H es satisfactoria, pasamos a comparar L.
     ld b,0
     cp $02
-    jr z,1F
-    cp $fe
     jr z,1F
 
     call Compara_cositas
@@ -1142,9 +1144,13 @@ Determina_resultado_comparativa
 
 Compara_cositas and a
     jr z,1F
+
+    cp $fe
+    jr z,1F
     cp $ff
     jr z,1F
     cp $01
     ret nz
+
 1 inc b
     ret

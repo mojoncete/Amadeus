@@ -92,7 +92,7 @@ Disparo_11 defw 0
 
 ; -------------------------------------------------------------------------------------
 
-Indice_de_entidades									; 60 Bytes por entidad.
+Indice_de_entidades									; 61 Bytes por entidad.
 
 	defw Entidad_1
 	defw Entidad_2
@@ -145,7 +145,7 @@ Amadeus_db db 2,2									; (Filas) / (Columns).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
-	db 0											; (Limite_vertical).
+	db 0,0											; (Limite_vertical), (Ctrl_2).
 
 ; ---------- ---------- ---------- ---------- ----------
 
@@ -185,7 +185,7 @@ Entidad_1 db 0,0									; (Filas) / (Columns).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
-	db 0											; (Limite_vertical).
+	db 0,0											; (Limite_vertical), (Ctrl_2).
 
 ; ---------- ---------- ---------- ---------- ----------	
 
@@ -225,7 +225,7 @@ Entidad_2 db 2,2		                            ; (Filas) / (Columns).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
-	db 0											; (Limite_vertical).
+	db 0,0											; (Limite_vertical), (Ctrl_2).
 
 ; ---------- ---------- ---------- ---------- ----------	
 
@@ -266,7 +266,7 @@ Entidad_3 db 2,2                                 	; (Filas) / (Columns).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
-	db 0											; (Limite_vertical).
+	db 0,0											; (Limite_vertical), (Ctrl_2).
 
 ; ---------- ---------- ---------- ---------- ----------
 
@@ -307,7 +307,7 @@ Entidad_4 db 2,2                                  	; (Filas) / (Columns).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
-	db 0											; (Limite_vertical).
+	db 0,0											; (Limite_vertical), (Ctrl_2).
 
 ; ---------- ---------- ---------- ---------- ----------
 
@@ -348,4 +348,5 @@ Entidad_5 db 2,2                                  	; (Filas) / (Columns).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
-	db 0											; (Limite_vertical).
+	db 0,0											; (Limite_vertical), (Ctrl_2).
+	
