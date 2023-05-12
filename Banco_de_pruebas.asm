@@ -12,6 +12,11 @@
 	org $a101		
 
 	call Frame
+; Debugggggg
+;	ld a,(Ctrl_1)
+;	bit 3,a
+;	jr nz,$
+; Debugggggg
 	reti									 
 
 ; ----- ----- ----- ----- -----
@@ -303,16 +308,19 @@ START
 	inc a
 	ld (Numero_de_malotes),a
 
+;	xor a
+
 2 ei
 	jr 2B
 
-	ret
+;	ld hl,Ctrl_1
+;	res 3,(hl)
+;	jr START
+
+;	ret
 ; -----------------------------------------------------------------------------------
 
 Frame 
-
-
-
 
 ; He de imprimir sólo el nº de fotos que he hecho. Sólo BORRAMOS/PINTAMOS los objetos que se han desplazado.
 ; Necesito calcular nª de malotes, para ello utilizaré (Stack_snapshot)-(Album_de_fotos).
@@ -327,6 +335,22 @@ Frame
     out ($fe),a
 
 ; ----------------------------------------------------------------------
+
+; Debugggg para bucle!!!!!
+;	ld a,(Numero_de_entidades)
+;	and a
+;	jr nz,13F
+
+;	ld a,1
+;	ld (Numero_de_entidades),a
+
+;	ld a,(Ctrl_1)
+;	set 3,a
+;	ld (Ctrl_1),a
+
+;	ret
+; Debugggg para bucle!!!!!
+
 
 ; RELOJES.
 
@@ -367,7 +391,7 @@ Frame
 	ld a,(Numero_de_entidades)
     ld b,a
 	and a
-	jr z,4F												; Entidades="0". Saltamos a Amadeus.
+	jr z,4F
 
 ; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- ----- 
 
@@ -834,9 +858,9 @@ Store_Restore_entidades
 
 ; **************************************************************************************************
 ;
-;	29/10/22
+;	12/05/23
 ;
-;	Cargamos los datos de la 1º entidad del índice_de_entidades
+;	Cargamos los datos de la entidad señalada por el puntero (Puntero_store_entidades).
 
 Restore_entidad push hl 
 	push de

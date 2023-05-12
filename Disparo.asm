@@ -1133,9 +1133,7 @@ Determina_resultado_comparativa
 
     ld a,l                                  ; B="1". La comparación de H es satisfactoria, pasamos a comparar L.
     ld b,0
-    cp $02
-    jr z,1F
-
+ 
     call Compara_cositas
     jr 2F
  
@@ -1145,11 +1143,17 @@ Determina_resultado_comparativa
 Compara_cositas and a
     jr z,1F
 
+    cp $fd
+    jr z,1F
     cp $fe
     jr z,1F
     cp $ff
     jr z,1F
     cp $01
+    jr z,1F
+    cp $02
+    jr z,1F
+    cp $03
     ret nz
 
 1 inc b

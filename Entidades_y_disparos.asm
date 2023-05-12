@@ -149,22 +149,22 @@ Amadeus_db db 2,2									; (Filas) / (Columns).
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Entidad_1 db 0,0									; (Filas) / (Columns).
+Entidad_1 db 2,2									; (Filas) / (Columns).
 	defw 0											; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
 	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
 
-	db %00000000 									; (Attr).
+	db %00000100 									; (Attr).
 
-	defw 0											; (Indice_Sprite_der).
-	defw 0											; (Indice_Sprite_izq).
+	defw Indice_Badsat_der							; (Indice_Sprite_der).
+	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
 	defw 0											; (Puntero_DESPLZ_der).
 	defw 0											; (Puntero_DESPLZ_izq).
 
-	defw 0											; (Posicion_inicio).
-	db 0											; (Cuad_objeto).
+	defw $4781										; (Posicion_inicio).
+	db 1											; (Cuad_objeto).
 
-	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+	db 1,2,1,2										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
 	db 0											; Impacto. "1" existe impacto en la entidad.
 
@@ -180,7 +180,7 @@ Entidad_1 db 0,0									; (Filas) / (Columns).
 
 	db 0,0,0										; (Ctrl_0) / (Obj_dibujado) / (Autoriza_movimiento).
 
-	defw 0,0					 					; (Puntero_indice_mov) / (Puntero_mov).
+	defw Indice_mov_Onda_senoidal,0					; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
 
 	db 0 											; (Columnas).									
