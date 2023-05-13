@@ -19,7 +19,7 @@
 ; Debugggggg
 	reti									 
 
-; ----- ----- ----- ----- -----
+; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
 
 	include "Sprites_e_indices.asm"
 	include "Cajas_y_disparos.asm"
@@ -177,7 +177,7 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 ;														BIT 2, Este bit a "1" indica que un disparo de Amadeus ha alcanzado a una entidad. Como no sabemos cual,_
 ;															_ hemos de comparar las coordenadas de (Coordenadas_disparo_certero) con las de cada entidad.
 
-; Gestión de ENTIDADES.
+; Gestión de ENTIDADES y CAJAS.
 
 ;Entidades_x_frame db 2									; Nº de entidades que pintaremos en un frame, (excluye a Amadeus).
 Puntero_store_caja defw 0
@@ -188,6 +188,15 @@ Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_en
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
 ;														; _ (Numero_de_malotes)="0".
+Puntero_indice_ENTIDADES defw 0 						; Se desplazará por el índice de entidades para `meterlas' en cajas.
+Datos_de_entidad defw 0									; Contiene los bytes de información de la entidad hacia la que apunta el 
+;														; _ puntero (Indice_entidades).
+
+
+;---------------------------------------------------------------------------------------------------------------
+;
+; Sirven para PINTAR.
+
 Stack defw 0 											; La rutinas de pintado, utilizan esta_
 ;														; _variable para almacenar lo posición del puntero_
 ; 														; _de pila, SP.
@@ -247,6 +256,7 @@ Temp_Raster defw $ff00
 
 ; Gestión de NIVELES.
 
+Nivel db 1												 ; Nivel actual del juego.
 Puntero_indice_NIVELES defw 0
 Datos_de_nivel defw 0
 
@@ -268,22 +278,21 @@ START
 	ld a,%00000111
 	call Cls
 
-	call Inicia_puntero_indice_de_niveles
-
-
+;	call Inicia_punteros_de_nivel_y_entidades
+	call Prepara_cajas
 
 ;	call Pinta_FILAS
 
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
+
+	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en la 1ª entidad del_
+;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.
 	ld hl,Numero_de_entidades
 	ld b,(hl)
 	inc b
 	dec b
 	jr z,3F										   		 ; Si no hay entidades, cargamos AMADEUS.
-
-	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en la 1ª entidad del_
-;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.
 
 ;	Cada vez que iniciamos una entidad, hay que hacer una llamada a (Inicia_Puntero_objeto). 
 ;   Inicialmente tengo cargada la 1ª entidad en DRAW.	
