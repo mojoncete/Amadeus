@@ -1,7 +1,7 @@
 
-; Base de datos de entidades e Índice.
-;
-; 17/02/23
+; Cajas de DRAW y disparos. Índices de disparos y cajas. 
+
+; 13/05/23
 
 ; Control. %00000001 00000001 
 ;
@@ -92,13 +92,13 @@ Disparo_11 defw 0
 
 ; -------------------------------------------------------------------------------------
 
-Indice_de_entidades									; 61 Bytes por entidad.
+Indice_de_cajas									; 61 Bytes por entidad.
 
-	defw Entidad_1
-	defw Entidad_2
-	defw Entidad_3
-	defw Entidad_4
-	defw Entidad_5
+	defw Caja_1
+	defw Caja_2
+	defw Caja_3
+	defw Caja_4
+	defw Caja_5
 
 ;	...
 ;	...
@@ -149,7 +149,7 @@ Amadeus_db db 2,2									; (Filas) / (Columns).
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Entidad_1 db 2,2									; (Filas) / (Columns).
+Caja_1 db 2,2										; (Filas) / (Columns).
 	defw 0											; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
 	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
@@ -189,7 +189,7 @@ Entidad_1 db 2,2									; (Filas) / (Columns).
 
 ; ---------- ---------- ---------- ---------- ----------	
 
-Entidad_2 db 2,2		                            ; (Filas) / (Columns).
+Caja_2 db 2,2		                     		    ; (Filas) / (Columns).
 	defw 0                                          ; (Posicion_actual).
 	defw 0											; (Puntero_objeto).
 	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
@@ -229,7 +229,7 @@ Entidad_2 db 2,2		                            ; (Filas) / (Columns).
 
 ; ---------- ---------- ---------- ---------- ----------	
 
-Entidad_3 db 2,2                                 	; (Filas) / (Columns).
+Caja_3 db 2,2	                                 	; (Filas) / (Columns).
 	defw 0                                          ; (Posicion_actual).
 	defw 0											; (Puntero_objeto).
 	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
@@ -270,7 +270,7 @@ Entidad_3 db 2,2                                 	; (Filas) / (Columns).
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Entidad_4 db 2,2                                  	; (Filas) / (Columns).
+Caja_4 db 2,2	                                  	; (Filas) / (Columns).
 	defw 0                                          ; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
 	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
@@ -311,7 +311,7 @@ Entidad_4 db 2,2                                  	; (Filas) / (Columns).
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Entidad_5 db 2,2                                  	; (Filas) / (Columns).
+Caja_5 db 2,2      	                            	; (Filas) / (Columns).
 	defw 0                                          ; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
 	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).

@@ -179,10 +179,10 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 
 ; Gestión de ENTIDADES.
 
-Entidades_x_frame db 2									; Nº de entidades que pintaremos en un frame, (excluye a Amadeus).
-Puntero_store_entidades defw 0
-Puntero_restore_entidades defw 0
-Indice_restore defw 0
+;Entidades_x_frame db 2									; Nº de entidades que pintaremos en un frame, (excluye a Amadeus).
+Puntero_store_caja defw 0
+Puntero_restore_caja defw 0
+Indice_restore_caja defw 0
 Numero_de_entidades db 1								; Nº de entidades en pantalla, (contando con Amadeus).
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
@@ -248,7 +248,7 @@ Temp_Raster defw $ff00
 ; Gestión de NIVELES.
 
 Puntero_indice_NIVELES defw 0
-
+Datos_de_nivel defw 0
 
 
 ; Y todo comienza aquí .....
@@ -268,7 +268,7 @@ START
 	ld a,%00000111
 	call Cls
 
-
+	call Inicia_puntero_indice_de_niveles
 
 
 
@@ -282,7 +282,7 @@ START
 	dec b
 	jr z,3F										   		 ; Si no hay entidades, cargamos AMADEUS.
 
-	call Inicia_punteros_de_entidades					 ; Sitúa (Puntero_store_entidades) en la 1ª entidad del_
+	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en la 1ª entidad del_
 ;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.
 
 ;	Cada vez que iniciamos una entidad, hay que hacer una llamada a (Inicia_Puntero_objeto). 
@@ -295,7 +295,7 @@ START
  	call Inicia_Puntero_objeto
 	call Draw
 	call Guarda_foto_registros
-	call Store_Restore_entidades 				    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_entidades) en la siguiente.
+	call Store_Restore_cajas	 				    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	pop bc
 	djnz 1B  											; Decremento el contador de entidades.
 
@@ -316,7 +316,7 @@ START
 
 ; Una vez inicializadas las entidades y Amadeus, Cargamos la 1ª entidad en DRAW.
 
-	call Inicia_punteros_de_entidades 
+	call Inicia_punteros_de_cajas 
 	call Restore_entidad
 
 	ld a,(Numero_de_entidades)
@@ -388,13 +388,13 @@ Frame
 	xor a
 	ld (Impacto2),a										; Flag (Impacto2) a "0".
 
-	call Inicia_punteros_de_entidades
-12 call Restore_entidad 								; Vuelca los datos de la entidad, hacia la que apunta (Puntero_store_entidades),_
+	call Inicia_punteros_de_cajas 
+12 call Restore_entidad 								; Vuelca los datos de la entidad, hacia la que apunta (Puntero_store_caja),_
 ; 														; _ en DRAW.
 	ld a,(Filas)
 	and a
 	jr nz,10F 											; Nos situamos en la 1ª entidad NO VACÍA del índice de ENTIDADES.
-	call Incrementa_punteros_entidades
+	call Incrementa_punteros_de_cajas
 	jr 12B
 
 ; ---------------------------------------------------------------------------------------
@@ -448,6 +448,7 @@ Frame
 	inc b
 	dec b
 
+;!!!!!!!!!!!!!!!!! Debuggggiiiiiinnnnnngggggggggggg
 	jr z,$
 
 	jr z,7F 																	
@@ -479,7 +480,7 @@ Frame
 	xor a
 	ld (Obj_dibujado),a
 
-6 call Store_Restore_entidades
+6 call Store_Restore_cajas
 
 	pop bc
 	djnz 2B
@@ -654,21 +655,21 @@ Repone_pintar ld hl,Variables_de_pintado
 ;
 ; 8/1/23
 ;
-; (Puntero_store_entidades) contendrá la dirección donde se encuentran los parámetros de la 1ª entidad del índice.
-; (Indice_restore) se sitúa en la 2ª entidad del índice. 	
-; (Puntero_restore_entidades) contendrá la dirección donde se encuentran los parámetros de la 2ª entidad del índice.
+; (Puntero_store_caja) contendrá la dirección donde se encuentran los parámetros de la 1ª entidad del índice.
+; (Indice_restore_caja) se sitúa en la 2ª entidad del índice. 	
+; (Puntero_restore_caja) contendrá la dirección donde se encuentran los parámetros de la 2ª entidad del índice.
 
 ; Destruye HL y DE !!!!!
  
-Inicia_punteros_de_entidades 
+Inicia_punteros_de_cajas 
 
-	ld hl,Indice_de_entidades
+	ld hl,Indice_de_cajas
     call Extrae_address
-    ld (Puntero_store_entidades),hl
-	ld hl,Indice_de_entidades+2
-	ld (Indice_restore),hl
+    ld (Puntero_store_caja),hl
+	ld hl,Indice_de_cajas+2
+	ld (Indice_restore_caja),hl
 	call Extrae_address
-	ld (Puntero_restore_entidades),hl
+	ld (Puntero_restore_caja),hl
     ret
 
 ; *************************************************************************************************************************************************************
@@ -816,10 +817,10 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 ;	Almacena los datos de la 1ª entidad del Indice_de_entidades, (que tenemos cargado en DRAW), en su respectiva BASE DE DATOS.
 ;	Cargamos en DRAW los datos de la 2ª entidad del Indice_de_entidades, (de su BASE DE DATOS).
 
-;	Modifica (Puntero_store_entidades)  y (Puntero_restore_entidades) con las direcciones donde se encuentran los datos_
+;	Modifica (Puntero_store_caja)  y (Puntero_restore_caja) con las direcciones donde se encuentran los datos_
 ;	_de la 2ª y 3ª entidad respectivamente.
 
-Store_Restore_entidades  
+Store_Restore_cajas  
 
 	ld a,(Numero_de_entidades)
 	and a
@@ -833,7 +834,7 @@ Store_Restore_entidades
 ;	Guarda la entidad cargada en Draw en su correspondiente DB.
 
 	ld hl,Filas
-	ld de,(Puntero_store_entidades) 					; Puntero que se desplaza por las distintas entidades.
+	ld de,(Puntero_store_caja) 					; Puntero que se desplaza por las distintas entidades.
 	ld bc,61
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
@@ -843,7 +844,7 @@ Store_Restore_entidades
 	and a
 	jr z,1F
 
-	ld hl,(Puntero_store_entidades) 					; Si la rutina [Compara_coordenadas_X] detecta que hay_
+	ld hl,(Puntero_store_caja) 					; Si la rutina [Compara_coordenadas_X] detecta que hay_
 	ld bc,25                          					; _ una entidad en zona de Amadeus, guardaremos la direccíon_
 	and a 												; _ donde se encuentra su .db (Impacto) para poder ponerlo a_
 	adc hl,bc 											; _ "0" más adelante.
@@ -851,7 +852,7 @@ Store_Restore_entidades
 	
 ;	Incrementa el puntero STORE. Guarda los datos de `Entidad´+1 en Draw, (Puntero RESTORE).
 
-1 ld hl,(Puntero_restore_entidades)
+1 ld hl,(Puntero_restore_caja)
 	ld a,(hl)
 	and a
 	push af
@@ -861,7 +862,7 @@ Store_Restore_entidades
 	ld bc,61
 	ldir
 
-2 call Incrementa_punteros_entidades
+2 call Incrementa_punteros_de_cajas
 	pop af
 	jr z,1B
 
@@ -875,13 +876,13 @@ Store_Restore_entidades
 ;
 ;	12/05/23
 ;
-;	Cargamos los datos de la entidad señalada por el puntero (Puntero_store_entidades).
+;	Cargamos los datos de la entidad señalada por el puntero (Puntero_store_caja).
 
 Restore_entidad push hl 
 	push de
  	push bc
 
-	ld hl,(Puntero_store_entidades)						; (Puntero_store_entidades) apunta a la dbase de la 1ª entidad.
+	ld hl,(Puntero_store_caja)						; (Puntero_store_caja) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
 	ld bc,61
 	ldir
@@ -898,14 +899,14 @@ Restore_entidad push hl
 ;
 ;	Incrementamos los dos punteros de entidades. (+1).
 
-Incrementa_punteros_entidades ld hl,(Puntero_restore_entidades)
-	ld (Puntero_store_entidades),hl 				
-	ld hl,(Indice_restore)
+Incrementa_punteros_de_cajas ld hl,(Puntero_restore_caja)
+	ld (Puntero_store_caja),hl 				
+	ld hl,(Indice_restore_caja)
 	inc hl
 	inc hl
-	ld (Indice_restore),hl
+	ld (Indice_restore_caja),hl
     call Extrae_address
-    ld (Puntero_restore_entidades),hl
+    ld (Puntero_restore_caja),hl
     ret
 
 ; **************************************************************************************************

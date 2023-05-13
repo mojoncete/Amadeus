@@ -31,7 +31,10 @@ Nivel_5
 ;
 ;   13/5/23
 
+;   Destruye HL y DE
+
 Inicia_puntero_indice_de_niveles ld hl,Indice_de_niveles
     ld (Puntero_indice_NIVELES),hl
+    call Extrae_address   
+    ld (Datos_de_nivel),hl
     ret
-    
