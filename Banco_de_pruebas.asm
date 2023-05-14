@@ -13,8 +13,8 @@
 
 	call Frame
 ; Debugggggg
-;	ld a,(Ctrl_1)
-;	bit 3,a
+	ld a,(Ctrl_1)
+	bit 3,a
 ;	jr nz,$
 ; Debugggggg
 	reti									 
@@ -56,8 +56,8 @@ Album_de_fotos_disparos equ $7060						; En (Album_de_fotos_disparos) vamos a ir
 ;
 ; (Variables_de_borrado) *** (Variables_de_pintado).	8 Bytes.
 
-Filas db 2												; Filas. [DRAW]
-Columns db 2  											; Nº de columnas. [DRAW]
+Filas db 0												; Filas. [DRAW]
+Columns db 0  											; Nº de columnas. [DRAW]
 Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
 Puntero_objeto defw 0									; Donde están los datos para pintar el Sprite.
 Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
@@ -68,7 +68,7 @@ Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos.
 ; 														; El hecho de que este byte sea distinto de "0", indica que se ha modificado el nº de columnas del objeto.
 ; 														; Cuando vamos a imprimir un Sprite en pantalla, la rutina de pintado consultará este byte para situar (Puntero_objeto). [Mov_left]. 
-Attr db %00000100										; Atributos de la entidad:
+Attr db 0												; Atributos de la entidad:
 
 ;	El formato: FBPPPIII (Flash, Brillo, Papel, Tinta).
 ;
@@ -81,20 +81,20 @@ Attr db %00000100										; Atributos de la entidad:
 ;			 6 ..... AMARILLO
 ; 			 7 ..... BLANCO
 
-Indice_Sprite_der defw Indice_Badsat_der
-Indice_Sprite_izq defw Indice_Badsat_izq
+Indice_Sprite_der defw 0
+Indice_Sprite_izq defw 0
 Puntero_DESPLZ_der defw 0
 Puntero_DESPLZ_izq defw 0
 
-Posicion_inicio defw $4781								; Dirección de pantalla donde aparece el objeto. [DRAW].
-Cuad_objeto db 1										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+Posicion_inicio defw 0									; Dirección de pantalla donde aparece el objeto. [DRAW].
+Cuad_objeto db 0										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 
 ; Variables de objeto. (Características).
 
-Vel_left db 1 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
-Vel_right db 2 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
-Vel_up db 1 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
-Vel_down db 2 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
+Vel_left db 0 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
+Vel_right db 0 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
+Vel_up db 0 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
+Vel_down db 0 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
 
 Impacto db 0											; Si después del movimiento de la entidad, (Impacto) se coloca a "1",_
 ;														; _ existen muchas posibilidades de que esta entidad haya colisionado con Amadeus. 
@@ -142,7 +142,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 ; Movimiento.
 
 Autoriza_movimiento db 0                                ; "1" Autoriza el movimiento de la entidad. "0", no hay movimiento.
-Puntero_indice_mov defw Indice_mov_Onda_senoidal	    ; Puntero del patrón de movimiento de la entidad. "0" No hay movimiento.
+Puntero_indice_mov defw 0							    ; Puntero del patrón de movimiento de la entidad. "0" No hay movimiento.
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0
@@ -278,16 +278,16 @@ START
 	ld a,%00000111
 	call Cls
 
-;	call Inicia_punteros_de_nivel_y_entidades
-	call Prepara_cajas
-
 ;	call Pinta_FILAS
 
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
+4 call Prepara_cajas
 
 	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en la 1ª entidad del_
 ;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.
+	call Restore_entidad
+
 	ld hl,Numero_de_entidades
 	ld b,(hl)
 	inc b
@@ -304,9 +304,15 @@ START
  	call Inicia_Puntero_objeto
 	call Draw
 	call Guarda_foto_registros
-	call Store_Restore_cajas	 				    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
+6 call Store_Restore_cajas	 				    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	pop bc
 	djnz 1B  											; Decremento el contador de entidades.
+
+;! Debug
+	ld a,(Ctrl_1)
+	bit 3,a
+	jr nz,5F
+;! Debug
 
 ; 	INICIA AMADEUS !!!!!
 
@@ -325,21 +331,33 @@ START
 
 ; Una vez inicializadas las entidades y Amadeus, Cargamos la 1ª entidad en DRAW.
 
-	call Inicia_punteros_de_cajas 
+5 call Inicia_punteros_de_cajas 
 	call Restore_entidad
 
-	ld a,(Numero_de_entidades)
-	inc a
-	ld (Numero_de_malotes),a
+	ld a,(Ctrl_1)
+	bit 3,a
+	jr z,6F
 
-;	xor a
+	ld hl,Ctrl_1
+	res 3,(hl)
+	ld a,1
+	ld (Numero_de_entidades),a
+	jr 7F
+
+6 ld a,(Numero_de_entidades)
+	inc a
+7 ld (Numero_de_malotes),a
+
+	xor a
 
 2 ei
-	jr 2B
+	jr z,2B
 
-;	ld hl,Ctrl_1
-;	res 3,(hl)
-;	jr START
+	ld a,1
+	ld (Numero_de_entidades),a
+	di
+
+	jr 4B
 
 ;	ret
 ; -----------------------------------------------------------------------------------
@@ -359,22 +377,6 @@ Frame
     out ($fe),a
 
 ; ----------------------------------------------------------------------
-
-; Debugggg para bucle!!!!!
-;	ld a,(Numero_de_entidades)
-;	and a
-;	jr nz,13F
-
-;	ld a,1
-;	ld (Numero_de_entidades),a
-
-;	ld a,(Ctrl_1)
-;	set 3,a
-;	ld (Ctrl_1),a
-
-;	ret
-; Debugggg para bucle!!!!!
-
 
 ; RELOJES.
 
@@ -415,7 +417,11 @@ Frame
 	ld a,(Numero_de_entidades)
     ld b,a
 	and a
-	jr z,4F
+	jr nz,2F
+
+	ld hl,Ctrl_1
+	set 3,(hl)											; Señal de reinicio.
+	jr 4F
 
 ; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- ----- 
 
@@ -435,8 +441,6 @@ Frame
 	call Borra_datos_entidad							; Borramos todos los datos de la entidad.
 	ld hl,Numero_de_entidades							; Una alimaña menos.
 	dec (hl)
-
-	jr 6F
 
 ; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
 ; _con las coordenadas de la entidad almacenada en DRAW.
@@ -821,7 +825,7 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 
 ; *************************************************************************************************************************************************************
 ;
-;	8/1/23
+;	14/5/23
 ;
 ;	Almacena los datos de la 1ª entidad del Indice_de_entidades, (que tenemos cargado en DRAW), en su respectiva BASE DE DATOS.
 ;	Cargamos en DRAW los datos de la 2ª entidad del Indice_de_entidades, (de su BASE DE DATOS).
@@ -831,10 +835,6 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 
 Store_Restore_cajas  
 
-	ld a,(Numero_de_entidades)
-	and a
-	ret z												 ; Salimos de la rutina si no quedan entidades vivitas y coleando.
-
 	push hl 
 	push de
  	push bc
@@ -843,7 +843,7 @@ Store_Restore_cajas
 ;	Guarda la entidad cargada en Draw en su correspondiente DB.
 
 	ld hl,Filas
-	ld de,(Puntero_store_caja) 					; Puntero que se desplaza por las distintas entidades.
+	ld de,(Puntero_store_caja) 							; Puntero que se desplaza por las distintas entidades.
 	ld bc,61
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
@@ -853,7 +853,7 @@ Store_Restore_cajas
 	and a
 	jr z,1F
 
-	ld hl,(Puntero_store_caja) 					; Si la rutina [Compara_coordenadas_X] detecta que hay_
+	ld hl,(Puntero_store_caja) 							; Si la rutina [Compara_coordenadas_X] detecta que hay_
 	ld bc,25                          					; _ una entidad en zona de Amadeus, guardaremos la direccíon_
 	and a 												; _ donde se encuentra su .db (Impacto) para poder ponerlo a_
 	adc hl,bc 											; _ "0" más adelante.

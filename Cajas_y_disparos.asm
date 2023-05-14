@@ -148,22 +148,22 @@ Amadeus_db db 2,2									; (Filas) / (Columns).
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Caja_1 db 2,2										; (Filas) / (Columns).
+Caja_1 db 0,0										; (Filas) / (Columns).
 	defw 0											; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
 	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
 
-	db %00000100 									; (Attr).
+	db %00000000 									; (Attr).
 
-	defw Indice_Badsat_der							; (Indice_Sprite_der).
-	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
+	defw 0											; (Indice_Sprite_der).
+	defw 0											; (Indice_Sprite_izq).
 	defw 0											; (Puntero_DESPLZ_der).
 	defw 0											; (Puntero_DESPLZ_izq).
 
-	defw $4781										; (Posicion_inicio).
-	db 1											; (Cuad_objeto).
+	defw 0											; (Posicion_inicio).
+	db 0											; (Cuad_objeto).
 
-	db 1,2,1,2										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
 	db 0											; Impacto. "1" existe impacto en la entidad.
 
@@ -179,7 +179,7 @@ Caja_1 db 2,2										; (Filas) / (Columns).
 
 	db 0,0,0										; (Ctrl_0) / (Obj_dibujado) / (Autoriza_movimiento).
 
-	defw Indice_mov_Onda_senoidal,0					; (Puntero_indice_mov) / (Puntero_mov).
+	defw 0,0										; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
 
 	db 0 											; (Columnas).									
@@ -188,109 +188,27 @@ Caja_1 db 2,2										; (Filas) / (Columns).
 
 ; ---------- ---------- ---------- ---------- ----------	
 
-Caja_2 db 2,2		                     		    ; (Filas) / (Columns).
-	defw 0                                          ; (Posicion_actual).
-	defw 0											; (Puntero_objeto).
-	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
-
-	db %00000010									; (Attr).
-
-	defw Indice_Badsat_der							; (Indice_Sprite_der).
-	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
-	defw 0											; (Puntero_DESPLZ_der).
-	defw 0											; (Puntero_DESPLZ_izq).
-
-	defw $485e                                      ; (Posicion_inicio).
-	db 2											; (Cuad_objeto).
-
-	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-
-	db 0											; Impacto. "1" existe impacto en la entidad.
-
-	db 0,0											; Variables_de_borrado 
-	defw 0										 	;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
-
-	db 0,0											; Variables_de_pintado 
-	defw 0											;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
-
-	db 0,0,0										; (Ctrl_0) / (Obj_dibujado) / (Autoriza_movimiento).
-
-	defw Indice_mov_Escaloncitos_izquierda_abajo,0	; (Puntero_indice_mov) / (Puntero_mov).
-	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
-
-	db 0 											; (Columnas).									
-	defw 0											; (Limite_horizontal).
-	db 0,0											; (Limite_vertical), (Ctrl_2).
-
-; ---------- ---------- ---------- ---------- ----------	
-
-Caja_3 db 2,2	                                 	; (Filas) / (Columns).
-	defw 0                                          ; (Posicion_actual).
-	defw 0											; (Puntero_objeto).
-	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
-
-	db %00000100									; (Attr).
-
-	defw Indice_Badsat_der							; (Indice_Sprite_der).
-	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
-
-	defw 0											; (Puntero_DESPLZ_der).
-	defw 0											; (Puntero_DESPLZ_izq).
-
-	defw $47a1                                      ; (Posicion_inicio).
-	db 1											; (Cuad_objeto).
-
-	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-
-	db 0											; Impacto. "1" existe impacto en la entidad.
-
-	db 0,0											; Variables_de_borrado 
-	defw 0										 	;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
-
-	db 0,0											; Variables_de_pintado 
-	defw 0											;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
-
-	db 0,0,0										; (Ctrl_0) / (Obj_dibujado) / (Autoriza_movimiento).
-
-	defw Indice_mov_Derecha,0						; (Puntero_indice_mov) / (Puntero_mov).
-	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).								  
-
-	db 0 											; (Columnas).									
-	defw 0											; (Limite_horizontal).
-	db 0,0											; (Limite_vertical), (Ctrl_2).
-
-; ---------- ---------- ---------- ---------- ----------
-
-Caja_4 db 2,2	                                  	; (Filas) / (Columns).
-	defw 0                                          ; (Posicion_actual).
+Caja_2 db 0,0										; (Filas) / (Columns).
+	defw 0											; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
 	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
 
-	db %00000001									; (Attr).
+	db %00000000 									; (Attr).
 
-	defw Indice_Badsat_der							; (Indice_Sprite_der).
-	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
-	
+	defw 0											; (Indice_Sprite_der).
+	defw 0											; (Indice_Sprite_izq).
 	defw 0											; (Puntero_DESPLZ_der).
 	defw 0											; (Puntero_DESPLZ_izq).
 
-	defw $47be                                      ; (Posicion_inicio).
+	defw 0											; (Posicion_inicio).
 	db 0											; (Cuad_objeto).
 
-	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
 	db 0											; Impacto. "1" existe impacto en la entidad.
 
-	db 0,0											; Variables_de_borrado 
-	defw 0										 	;	" " " " " " "
+	db 0,0										    ; Variables_de_borrado 
+	defw 0											;	" " " " " " "
 	defw 0											;	" " " " " " "
 	db 0,0,0,0										;	" " " " " " "
 
@@ -301,8 +219,48 @@ Caja_4 db 2,2	                                  	; (Filas) / (Columns).
 
 	db 0,0,0										; (Ctrl_0) / (Obj_dibujado) / (Autoriza_movimiento).
 
-	defw Indice_mov_Escaloncitos_izquierda_abajo,0  ; (Puntero_indice_mov) / (Puntero_mov).
-	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).							  
+	defw 0,0										; (Puntero_indice_mov) / (Puntero_mov).
+	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
+
+	db 0 											; (Columnas).									
+	defw 0											; (Limite_horizontal).
+	db 0,0											; (Limite_vertical), (Ctrl_2).
+
+; ---------- ---------- ---------- ---------- ----------	
+
+Caja_3 db 0,0										; (Filas) / (Columns).
+	defw 0											; (Posicion_actual).
+	defw 0 											; (Puntero_objeto).
+	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
+
+	db %00000000 									; (Attr).
+
+	defw 0											; (Indice_Sprite_der).
+	defw 0											; (Indice_Sprite_izq).
+	defw 0											; (Puntero_DESPLZ_der).
+	defw 0											; (Puntero_DESPLZ_izq).
+
+	defw 0											; (Posicion_inicio).
+	db 0											; (Cuad_objeto).
+
+	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+
+	db 0											; Impacto. "1" existe impacto en la entidad.
+
+	db 0,0										    ; Variables_de_borrado 
+	defw 0											;	" " " " " " "
+	defw 0											;	" " " " " " "
+	db 0,0,0,0										;	" " " " " " "
+
+	db 0,0											; Variables_de_pintado 
+	defw 0											;	" " " " " " "
+	defw 0											;	" " " " " " "
+	db 0,0,0,0										;	" " " " " " "
+
+	db 0,0,0										; (Ctrl_0) / (Obj_dibujado) / (Autoriza_movimiento).
+
+	defw 0,0										; (Puntero_indice_mov) / (Puntero_mov).
+	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
@@ -310,28 +268,27 @@ Caja_4 db 2,2	                                  	; (Filas) / (Columns).
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Caja_5 db 2,2      	                            	; (Filas) / (Columns).
-	defw 0                                          ; (Posicion_actual).
+Caja_4 db 0,0										; (Filas) / (Columns).
+	defw 0											; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
 	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
 
-	db %00000001									; (Attr).
+	db %00000000 									; (Attr).
 
-	defw Indice_Badsat_der							; (Indice_Sprite_der).
-	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
-	
+	defw 0											; (Indice_Sprite_der).
+	defw 0											; (Indice_Sprite_izq).
 	defw 0											; (Puntero_DESPLZ_der).
 	defw 0											; (Puntero_DESPLZ_izq).
 
-	defw $400a                                      ; (Posicion_inicio).
-	db 1											; (Cuad_objeto).
+	defw 0											; (Posicion_inicio).
+	db 0											; (Cuad_objeto).
 
-	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
 	db 0											; Impacto. "1" existe impacto en la entidad.
 
-	db 0,0											; Variables_de_borrado 
-	defw 0										 	;	" " " " " " "
+	db 0,0										    ; Variables_de_borrado 
+	defw 0											;	" " " " " " "
 	defw 0											;	" " " " " " "
 	db 0,0,0,0										;	" " " " " " "
 
@@ -342,14 +299,54 @@ Caja_5 db 2,2      	                            	; (Filas) / (Columns).
 
 	db 0,0,0										; (Ctrl_0) / (Obj_dibujado) / (Autoriza_movimiento).
 
-	defw Indice_mov_Abajo,0   		                ; (Puntero_indice_mov) / (Puntero_mov).
-	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).							  
+	defw 0,0										; (Puntero_indice_mov) / (Puntero_mov).
+	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
 	db 0,0											; (Limite_vertical), (Ctrl_2).
-	
-; -------------------------------------------------------------------------------------
+
+; ---------- ---------- ---------- ---------- ----------
+
+Caja_5 db 0,0										; (Filas) / (Columns).
+	defw 0											; (Posicion_actual).
+	defw 0 											; (Puntero_objeto).
+	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
+
+	db %00000000 									; (Attr).
+
+	defw 0											; (Indice_Sprite_der).
+	defw 0											; (Indice_Sprite_izq).
+	defw 0											; (Puntero_DESPLZ_der).
+	defw 0											; (Puntero_DESPLZ_izq).
+
+	defw 0											; (Posicion_inicio).
+	db 0											; (Cuad_objeto).
+
+	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+
+	db 0											; Impacto. "1" existe impacto en la entidad.
+
+	db 0,0										    ; Variables_de_borrado 
+	defw 0											;	" " " " " " "
+	defw 0											;	" " " " " " "
+	db 0,0,0,0										;	" " " " " " "
+
+	db 0,0											; Variables_de_pintado 
+	defw 0											;	" " " " " " "
+	defw 0											;	" " " " " " "
+	db 0,0,0,0										;	" " " " " " "
+
+	db 0,0,0										; (Ctrl_0) / (Obj_dibujado) / (Autoriza_movimiento).
+
+	defw 0,0										; (Puntero_indice_mov) / (Puntero_mov).
+	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
+
+	db 0 											; (Columnas).									
+	defw 0											; (Limite_horizontal).
+	db 0,0											; (Limite_vertical), (Ctrl_2).
+
+	; -------------------------------------------------------------------------------------
 ;
 ;	13/05/23
 ;
