@@ -12,11 +12,9 @@
 	org $a101		
 
 	call Frame
-; Debugggggg
-	ld a,(Ctrl_1)
+
+	ld a,(Ctrl_1) 										; Existe Loop?
 	bit 3,a
-;	jr nz,$
-; Debugggggg
 	reti									 
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
@@ -304,15 +302,13 @@ START
  	call Inicia_Puntero_objeto
 	call Draw
 	call Guarda_foto_registros
-6 call Store_Restore_cajas	 				    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
+6 call Store_Restore_cajas	 					    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	pop bc
 	djnz 1B  											; Decremento el contador de entidades.
 
-;! Debug
 	ld a,(Ctrl_1)
 	bit 3,a
-	jr nz,5F
-;! Debug
+	jr nz,5F											; Loop
 
 ; 	INICIA AMADEUS !!!!!
 
@@ -338,12 +334,16 @@ START
 	bit 3,a
 	jr z,6F
 
+; Looop:
+
 	ld hl,Ctrl_1
 	res 3,(hl)
 	ld a,1
 	ld (Numero_de_entidades),a
 	call Calcula_numero_de_malotes 
 	jr 7F
+
+; ----------
 
 6 ld a,(Numero_de_entidades)
 	inc a
@@ -360,7 +360,6 @@ START
 
 	jr 4B
 
-;	ret
 ; -----------------------------------------------------------------------------------
 
 Frame 
@@ -421,7 +420,7 @@ Frame
 	jr nz,2F
 
 	ld hl,Ctrl_1
-	set 3,(hl)											; Señal de reinicio.
+	set 3,(hl)											; Señal de Loop activada.
 	jr 4F
 
 ; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- ----- 
@@ -464,6 +463,7 @@ Frame
 
 ;!!!!!!!!!!!!!!!!! Debuggggiiiiiinnnnnngggggggggggg
 	jr z,$
+;!!!!!!!!!!!!!!!!! Debuggggiiiiiinnnnnngggggggggggg
 
 	jr z,7F 																	
 
