@@ -342,13 +342,14 @@ START
 	res 3,(hl)
 	ld a,1
 	ld (Numero_de_entidades),a
+	call Calcula_numero_de_malotes 
 	jr 7F
 
 6 ld a,(Numero_de_entidades)
 	inc a
-7 ld (Numero_de_malotes),a
+	ld (Numero_de_malotes),a
 
-	xor a
+7 xor a
 
 2 ei
 	jr z,2B
