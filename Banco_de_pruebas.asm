@@ -174,6 +174,8 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 ;														BIT 1, Este bit indica que el disparo sale de la pantalla, ($4000-$57ff).
 ;														BIT 2, Este bit a "1" indica que un disparo de Amadeus ha alcanzado a una entidad. Como no sabemos cual,_
 ;															_ hemos de comparar las coordenadas de (Coordenadas_disparo_certero) con las de cada entidad.
+;														BIT 3, .............
+;														BIT 4, .............
 
 ; Gestión de ENTIDADES y CAJAS.
 
@@ -232,6 +234,10 @@ Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 pos
 
 ; Relojes y temporizaciones.
 
+Contador_de_frames db 0	 								
+Secundero db 0
+Activa_loop db 0										; Esta señal espera (Secundero)+X para habilitar el Loop.
+;														; Repite la oleada de entidades.
 Habilita_disparo_Amadeus db 1
 Tiempo_disparo_Amadeus db 30							; Restaura (Temporiza_disparo_Amadeus). 
 Temporiza_disparo_Amadeus db 30 						; Reloj, decreciente.
@@ -300,6 +306,9 @@ START
 
 1 push bc  												; Guardo el contador de entidades.
  	call Inicia_Puntero_objeto
+;!!!
+	call Mov_left
+;!!!
 	call Draw
 	call Guarda_foto_registros
 6 call Store_Restore_cajas	 					    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
@@ -314,6 +323,7 @@ START
 
 3 call Restore_Amadeus
 	call Inicia_Puntero_objeto
+
 	call Draw
 	call Guarda_foto_registros
 
@@ -354,11 +364,24 @@ START
 2 ei
 	jr z,2B
 
-	ld a,1
+	ld a,(Secundero)
+	ld b,a
+	ld a,(Activa_loop)
+	cp b
+	jr z,8F
+
+	ld hl,Ctrl_1
+	set 4,(hl)
+	xor a
+	jr 2B
+
+8 ld a,1
 	ld (Numero_de_entidades),a
+	ld hl,Ctrl_1
+	res 4,(hl)
 	di
 
-	jr 4B
+	jp 4B
 
 ; -----------------------------------------------------------------------------------
 
@@ -380,7 +403,23 @@ Frame
 
 ; RELOJES.
 
-	ld hl,Habilita_disparo_Amadeus
+	ld hl,Contador_de_frames
+	inc (hl)
+	ld a,60
+	cp (hl)
+	jr nz,13F
+
+	ld (hl),0
+
+	ld hl,Secundero
+	inc (hl)
+	ld a,60
+	cp (hl)
+	jr nz,13F
+
+	ld (hl),0
+
+13 ld hl,Habilita_disparo_Amadeus
 	ld de,Temporiza_disparo_Amadeus
 	call Habilita_disparos 								; 30 Frames como mínimo entre cada disparo de Amadeus.
 
@@ -420,7 +459,17 @@ Frame
 	jr nz,2F
 
 	ld hl,Ctrl_1
+	bit 4,(hl)
+	jr nz,4F
+
+	ld hl,Ctrl_1
 	set 3,(hl)											; Señal de Loop activada.
+
+	ld a,(Secundero)
+	inc a
+	inc a
+	ld (Activa_loop),a									; A los 2 seg. se repite la oleada de entidades.
+
 	jr 4F
 
 ; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- ----- 
@@ -462,7 +511,7 @@ Frame
 	dec b
 
 ;!!!!!!!!!!!!!!!!! Debuggggiiiiiinnnnnngggggggggggg
-	jr z,$
+;	jr z,$
 ;!!!!!!!!!!!!!!!!! Debuggggiiiiiinnnnnngggggggggggg
 
 	jr z,7F 																	
