@@ -1,5 +1,32 @@
 ; ******************************************************************************************************************************************************************************************
 ;
+;   18/05/23
+;
+;	Recompone_posicion_inicio
+;
+; 	La rutina hace una llamada a [Mov_right] o [Mov_left] según su posición de inicio.
+;	Así conseguimios que la entidad esté completamente oculta a la hora de aparecer por la izquierda_
+;	_ o derecha. Tomaremos la columna de (Posicion_inicio) como referencia para hacer la llamada_
+;	_ a una u otra rutina.
+
+Recompone_posicion_inicio 
+
+	ld hl,(Posicion_inicio) 
+	ld a,l
+	and $1f
+	jr z,1F
+
+	cp $1f
+	ret nz
+	call Mov_left
+	jr 2F
+
+1 call Mov_right
+2 ret
+
+
+; ******************************************************************************************************************************************************************************************
+;
 ;   22/01/23
 ;
 ;	Mov_down
