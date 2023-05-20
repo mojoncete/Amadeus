@@ -15,15 +15,42 @@ Indice_de_niveles
 	defw 0
 	defw 0
 
-Nivel_1 db 1,2,3,4,5 							; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
+Nivel_1 db 9                                    ; Nº de entidades.
+	db 1,2,3,4,5 								; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
+Nivel_2 db 12									; Nº de entidades.
+	db 2,1,1,1,1								; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
+Nivel_3 db 15									; Nº de entidades.	 
+	db 3,1,1,1,1 								; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
+Nivel_4 db 17									; Nº de entidades.
+	db 4,1,1,1,1 								; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
+Nivel_5 db 20									; Nº de entidades. 
+	db 5,1,1,1,1 								; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
+	
 
-Nivel_2 db 2,1,1,1,1
+;---------------------------------------------------------------------------------------------------------------
+;
+;   20/5/23
+;
+;	Sitúa (Puntero_indice_NIVELES) en el 1er Nivel del índice.
+;	Asigna el (Numero_de_entidades).
+;	
+;	DESTRUYE HL,DE y A.
 
-Nivel_3 db 3,1,1,1,1
+Inicializa_Punteros_de_nivel 
 
-Nivel_4 db 4,1,1,1,1
+	ld hl,Indice_de_niveles
+	ld (Puntero_indice_NIVELES),hl				 ; Situamos (Puntero_indice_NIVELES) en el 1er Nivel del índice.
+	call Extrae_address   
+	ld a,(hl)
+	ld (Numero_de_entidades),a
+	ret
 
-Nivel_5 db 5,1,1,1,1
+Extrae_Datos_de_entidades ld hl,(Puntero_indice_NIVELES)
+	call Extrae_address   
+	inc hl
+	ld (Datos_de_nivel),hl						 ; Situamos (Datos_de_nivel) en los tipos de entidad que se van a asignar_
+;												 ; _ a cada caja.
+	ret	
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
@@ -42,17 +69,16 @@ Prepara_cajas
 	call Extrae_address   
 	call Avanza_caja
 
-	ld a,(Nivel)
-	call PreparaBC
+	call Admin_num_entidades					; Actualiza (Numero_de_entidades) y (Numero_parcial_de_entidades).
 
-	ld hl,Indice_de_niveles
-	call SBC_HL_con_BC_y_Extrae
-	ld (Datos_de_nivel),hl						; HL está en los datos del nivel correspondiente.
+	ld hl,(Datos_de_nivel)
 
-	ld b,5										; B actuará como contador de cajas.
-1	push bc
+; HL está en los datos del nivel correspondiente.
+; B actuará como contador de cajas.
 
-	ld a,(hl)										; A contiene el TIPO de ENTIDAD que almacenaremos en la 1ª caja.
+1 push bc
+
+	ld a,(hl)									; A contiene el TIPO de ENTIDAD que almacenaremos en la 1ª caja.
 	call PreparaBC								
 
 	ld hl,Indice_de_entidades
@@ -128,3 +154,31 @@ Situa_DE ex de,hl
 	ret
 
 ;---------------------------------------------------------------------------------------------------------------
+;
+;	20/5/23
+
+Admin_num_entidades 
+
+	ld a,(Numero_de_entidades)
+	and a
+; !!!!!!!!!!! NIVEL SUPERADOOOOOOOOOOOOOO !!!!!!!!!!!!!
+	jr z,$	
+; !!!!!!!!!!! NIVEL SUPERADOOOOOOOOOOOOOO !!!!!!!!!!!!!
+	cp 5
+	jr c,1F
+
+	ld b,5
+	sub b 
+	ld (Numero_de_entidades),a
+	ld a,b
+	ld (Numero_parcial_de_entidades),a
+	jr 2F
+
+; El nº total de entidades no llena las 5 cajas DRAW. (Numero_parcial_de_entidades)=(Numero_de_entidades)
+; (Numero_de_entidades)="0".
+
+1 ld b,a
+	ld (Numero_parcial_de_entidades),a
+	xor a
+	ld (Numero_de_entidades),a
+2 ret

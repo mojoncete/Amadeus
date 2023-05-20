@@ -183,7 +183,10 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 Puntero_store_caja defw 0
 Puntero_restore_caja defw 0
 Indice_restore_caja defw 0
-Numero_de_entidades db 1								; Nº de entidades en pantalla, (contando con Amadeus).
+Numero_de_entidades db 0								; Nº de entidades en pantalla, (contando con Amadeus).
+Numero_parcial_de_entidades db 0
+Entidades_en_curso db 0									; Las entidades parciales no se muestran todas a la vez. Se pretende que vayan apareciendo_
+;														; _ poco a poco. (Entidades_en_curso) son el nº de entidades parciales que hay en pantalla.
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -260,9 +263,10 @@ Temp_Raster defw $ff00
 
 ; Gestión de NIVELES.
 
-Nivel db 1												 ; Nivel actual del juego.
+Nivel db 0												 ; Nivel actual del juego.
 Puntero_indice_NIVELES defw 0
-Datos_de_nivel defw 0
+Datos_de_nivel defw 0									 ; Este puntero se va desplazando por los distintos bytes_
+; 														 ; _ que definen el NIVEL.
 
 
 ; Y todo comienza aquí .....
@@ -284,15 +288,17 @@ START
 
 ;	call Pinta_FILAS
 
+	call Inicializa_Punteros_de_nivel					 ; Sitúa los punteros en el nivel 1 y carga el nº de entidades.
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
-4 call Prepara_cajas
+4 call Extrae_Datos_de_entidades
+	call Prepara_cajas
 
 	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en la 1ª entidad del_
 ;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.
 	call Restore_entidad
 
-	ld hl,Numero_de_entidades
+	ld hl,Numero_parcial_de_entidades
 	ld b,(hl)
 	inc b
 	dec b
@@ -310,6 +316,7 @@ START
 	call Draw
 	call Guarda_foto_registros
 6 call Store_Restore_cajas	 					    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
+
 	pop bc
 	djnz 1B  											; Decremento el contador de entidades.
 
@@ -346,14 +353,12 @@ START
 
 	ld hl,Ctrl_1
 	res 3,(hl)
-	ld a,1
-	ld (Numero_de_entidades),a
 	call Calcula_numero_de_malotes 
 	jr 7F
 
 ; ----------
 
-6 ld a,(Numero_de_entidades)
+6 ld a,(Numero_parcial_de_entidades)
 	inc a
 	ld (Numero_de_malotes),a
 
@@ -373,9 +378,7 @@ START
 	xor a
 	jr 2B
 
-8 ld a,1
-	ld (Numero_de_entidades),a
-	ld hl,Ctrl_1
+8 ld hl,Ctrl_1
 	res 4,(hl)
 	di
 
@@ -452,7 +455,7 @@ Frame
 	ld hl,Album_de_fotos
     ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
 ;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
-	ld a,(Numero_de_entidades)
+	ld a,(Numero_parcial_de_entidades)
     ld b,a
 	and a
 	jr nz,2F
@@ -487,7 +490,7 @@ Frame
 
 	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la entidad `impactada´ para borrarla.
 	call Borra_datos_entidad							; Borramos todos los datos de la entidad.
-	ld hl,Numero_de_entidades							; Una alimaña menos.
+	ld hl,Numero_parcial_de_entidades					; Una alimaña menos.
 	dec (hl)
 
 ; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
