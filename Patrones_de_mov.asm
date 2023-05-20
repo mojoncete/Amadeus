@@ -48,7 +48,7 @@ Indice_mov_Escaloncitos_derecha_arriba defw Escaloncitos_derecha_arriba
 Indice_mov_Escaloncitos_derecha_abajo defw Escaloncitos_derecha_abajo
 Indice_mov_Escaloncitos_izquierda_arriba defw Escaloncitos_izquierda_arriba
 Indice_mov_Escaloncitos_izquierda_abajo defw Escaloncitos_izquierda_abajo
-Indice_mov_Onda_senoidal defw Onda_senoidal
+Indice_mov_Onda_senoidal defw Onda_senoidal ; (Es un mov. de izquierda).
 ; ----- ----- ----- ----- -----
 
 Movimiento ld a,(Contador_db_mov)                               ; Hemos iniciado la cadena de movimiento ?. Si (Contador_db_mov) aún es "0" hay que inicializarlo._

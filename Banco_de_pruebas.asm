@@ -306,9 +306,7 @@ START
 
 1 push bc  												; Guardo el contador de entidades.
  	call Inicia_Puntero_objeto
-;!!! !!! !!! !!! !!!
 	call Recompone_posicion_inicio
-;!!! !!! !!! !!! !!!
 	call Draw
 	call Guarda_foto_registros
 6 call Store_Restore_cajas	 					    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
@@ -399,7 +397,7 @@ Frame
     ld a,1
     out ($fe),a
 
-	jr $
+;	jr $
 ; ----------------------------------------------------------------------
 
 ; RELOJES.

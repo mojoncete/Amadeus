@@ -348,9 +348,14 @@ Caja_5 db 0,0										; (Filas) / (Columns).
 
 	; -------------------------------------------------------------------------------------
 ;
-;	13/05/23
+;	20/05/23
 ;
 ;	TIPOS de "Entidades maliciosas". Quieren conquistar la Tierra.	
+;
+	;	Notas de funcionamiento: (Cuad_objeto) siempre será "1" independientemente de su (Posicion_inicio).
+	;		De no ser así, la rutina [Recompone_posicion_inicio] generará problemas a la hora de hacer que_
+	;		_ la entidad aparezca `al píxel', por la parte derecha de la pantalla. Esto se debe a como están_
+	;		_ construidas las rutinas [Mov_right] y [Mov_left].
 
 Indice_de_entidades
 
@@ -366,17 +371,17 @@ Entidad_1 db 2,2		                     		; (Filas) / (Columns).
 	db %00000100									; (Attr).
 	defw Indice_Badsat_der							; (Indice_Sprite_der).
 	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
-	defw $479f	                             	    ; (Posicion_inicio).
-	db 2											; (Cuad_objeto).
-	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-	defw Indice_mov_Izquierda						; (Puntero_indice_mov) 
+	defw $4780	                             	    ; (Posicion_inicio).
+	db 1											; (Cuad_objeto).
+	db 2,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+	defw Indice_mov_Escaloncitos_derecha_abajo  	; (Puntero_indice_mov) 
 
 Entidad_2 db 2,2		                     		; (Filas) / (Columns).
 	db %00000010									; (Attr).
 	defw Indice_Badsat_der							; (Indice_Sprite_der).
 	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
 	defw $485e                                      ; (Posicion_inicio).
-	db 2											; (Cuad_objeto).
+	db 1											; (Cuad_objeto).
 	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 	defw Indice_mov_Escaloncitos_izquierda_abajo    ; (Puntero_indice_mov) 
 
@@ -394,7 +399,7 @@ Entidad_4 db 2,2		                     		; (Filas) / (Columns).
 	defw Indice_Badsat_der							; (Indice_Sprite_der).
 	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
 	defw $47be                                      ; (Posicion_inicio).
-	db 2											; (Cuad_objeto).
+	db 1											; (Cuad_objeto).
 	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 	defw Indice_mov_Escaloncitos_izquierda_abajo	; (Puntero_indice_mov)
 
