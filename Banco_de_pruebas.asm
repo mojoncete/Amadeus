@@ -291,6 +291,7 @@ START
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
 4 call Prepara_cajas
+
 	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en la 1ª entidad del_
 ;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.
 	call Restore_entidad
@@ -387,12 +388,12 @@ Frame
 
 ; PINTAMOS.
 
-    ld a,2
-    out ($fe),a
+;    ld a,2
+;    out ($fe),a
 	call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
 	call Extrae_foto_disparos
-    ld a,1
-    out ($fe),a
+;    ld a,1
+;    out ($fe),a
 
 ; ----------------------------------------------------------------------
 
@@ -405,11 +406,26 @@ Frame
 	cp (hl)
 	jr nz,13F
 
+	ld (hl),0
+
 	ld hl,Secundero
 	inc (hl)
 
-	ld hl,Secundero
-	ld a,60
+	ld a,(hl)
+	and %00000001
+	jr nz,20F
+
+	ld a,(Numero_parcial_de_entidades)
+	ld b,a
+	ld a,(Entidades_en_curso)
+	cp b
+	jr z,20F
+	jr nc,20F
+
+	inc a
+	ld (Entidades_en_curso),a
+
+20 ld a,60
 	cp (hl)
 	jr nz,13F
 
@@ -456,14 +472,13 @@ Frame
 
 	ld hl,Ctrl_1
 	bit 4,(hl)
-	jr nz,4F
+	jp nz,4F
 
 	ld hl,Ctrl_1
 	set 3,(hl)											; Señal de RECARGA de las cajas DRAW activada.
 	ld a,(Secundero)
 	inc a
-	inc a
-	ld (Activa_recarga_cajas),a							; A los 2 seg. se repite la oleada de entidades.
+	ld (Activa_recarga_cajas),a							; Pasado 1 seg. se repite la oleada de entidades.
 
 	jr 4F
 
@@ -488,8 +503,18 @@ Frame
 
 	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la entidad `impactada´ para borrarla.
 	call Borra_datos_entidad							; Borramos todos los datos de la entidad.
+
+; -----
+
 	ld hl,Numero_parcial_de_entidades					; Una alimaña menos.
 	dec (hl)
+	ld hl,Entidades_en_curso
+	dec (hl)
+	ld hl,Numero_de_entidades
+	dec (hl)
+	jr 7F
+
+; -----
 
 ; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
 ; _con las coordenadas de la entidad almacenada en DRAW.
@@ -581,8 +606,8 @@ Frame
 	call Calcula_numero_de_disparotes
 9 call Calcula_numero_de_malotes 
 
-	ld a,4
-	out ($fe),a  
+;	ld a,4
+;	out ($fe),a  
 
 	ret
 

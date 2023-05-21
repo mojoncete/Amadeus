@@ -16,7 +16,7 @@ Indice_de_niveles
 	defw 0
 
 Nivel_1 db 9                                    ; Nº de entidades.
-	db 1,2,3,4,5,1,2,3,4 						; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
+	db 1,1,1,1,1,3,3,3,3 						; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
 Nivel_2 db 12									; Nº de entidades.
 	db 2,1,1,1,1,2								; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
 	db 2,1,1,1,1,2
@@ -188,18 +188,14 @@ Admin_num_entidades
 ; El nº de entidades es superior al que cabe en las cajas DRAW.
 ; Actualizamos variables.
 
-	ld b,5
-	sub b 
-	ld (Numero_de_entidades),a
-	ld a,b
+	ld a,5
 	ld (Numero_parcial_de_entidades),a
+	ld b,a
 	jr 2F
 
 ; El nº total de entidades no llena las 5 cajas DRAW. (Numero_parcial_de_entidades)=(Numero_de_entidades)
 ; (Numero_de_entidades)="0".
 
-1 ld b,a
-	ld (Numero_parcial_de_entidades),a
-	xor a
-	ld (Numero_de_entidades),a
+1 ld (Numero_parcial_de_entidades),a
+	ld b,a
 2 ret
