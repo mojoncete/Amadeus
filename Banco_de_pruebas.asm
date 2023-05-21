@@ -185,8 +185,7 @@ Puntero_restore_caja defw 0
 Indice_restore_caja defw 0
 Numero_de_entidades db 0								; Nº de entidades en pantalla, (contando con Amadeus).
 Numero_parcial_de_entidades db 0
-Entidades_en_curso db 0									; Las entidades parciales no se muestran todas a la vez. Se pretende que vayan apareciendo_
-;														; _ poco a poco. (Entidades_en_curso) son el nº de entidades parciales que hay en pantalla.
+Entidades_en_curso db 0									; ..... ..... .....
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
 ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
@@ -239,7 +238,7 @@ Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 pos
 
 Contador_de_frames db 0	 								
 Secundero db 0
-Activa_loop db 0										; Esta señal espera (Secundero)+X para habilitar el Loop.
+Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
 Habilita_disparo_Amadeus db 1
 Tiempo_disparo_Amadeus db 30							; Restaura (Temporiza_disparo_Amadeus). 
@@ -288,12 +287,10 @@ START
 
 ;	call Pinta_FILAS
 
-	call Inicializa_Punteros_de_nivel					 ; Sitúa los punteros en el nivel 1 y carga el nº de entidades.
+	call Inicializa_Punteros_de_nivel					 ; Inicializa. 1er NIVEL.
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
-4 call Extrae_Datos_de_entidades
-	call Prepara_cajas
-
+4 call Prepara_cajas
 	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en la 1ª entidad del_
 ;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.
 	call Restore_entidad
@@ -309,16 +306,16 @@ START
 ;	Pintamos el resto de entidades:
 
 ;	INICIA ENTIDADES !!!!!
-
 1 push bc  												; Guardo el contador de entidades.
  	call Inicia_Puntero_objeto
 	call Recompone_posicion_inicio
 	call Draw
 	call Guarda_foto_registros
-6 call Store_Restore_cajas	 					    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
-
+	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	pop bc
 	djnz 1B  											; Decremento el contador de entidades.
+
+; Si Amadeus ya está iniciado, saltamos a [Inicia_punteros_de_cajas] y [Restore_entidad].
 
 	ld a,(Ctrl_1)
 	bit 3,a
@@ -328,10 +325,8 @@ START
 
 3 call Restore_Amadeus
 	call Inicia_Puntero_objeto
-
 	call Draw
 	call Guarda_foto_registros
-
 	ld de,Amadeus_db
 	call Store_Amadeus
 
@@ -349,7 +344,7 @@ START
 	bit 3,a
 	jr z,6F
 
-; Looop:
+; Se ha producido `RECARGA' de las cajas DRAW, RES 3(HL).
 
 	ld hl,Ctrl_1
 	res 3,(hl)
@@ -363,13 +358,12 @@ START
 	ld (Numero_de_malotes),a
 
 7 xor a
-
 2 ei
 	jr z,2B
 
 	ld a,(Secundero)
 	ld b,a
-	ld a,(Activa_loop)
+	ld a,(Activa_recarga_cajas)
 	cp b
 	jr z,8F
 
@@ -400,21 +394,21 @@ Frame
     ld a,1
     out ($fe),a
 
-;	jr $
 ; ----------------------------------------------------------------------
 
 ; RELOJES.
 
 	ld hl,Contador_de_frames
-	inc (hl)
+	inc (hl)											; 0 - 255
+
 	ld a,60
 	cp (hl)
 	jr nz,13F
 
-	ld (hl),0
-
 	ld hl,Secundero
 	inc (hl)
+
+	ld hl,Secundero
 	ld a,60
 	cp (hl)
 	jr nz,13F
@@ -465,12 +459,11 @@ Frame
 	jr nz,4F
 
 	ld hl,Ctrl_1
-	set 3,(hl)											; Señal de Loop activada.
-
+	set 3,(hl)											; Señal de RECARGA de las cajas DRAW activada.
 	ld a,(Secundero)
 	inc a
 	inc a
-	ld (Activa_loop),a									; A los 2 seg. se repite la oleada de entidades.
+	ld (Activa_recarga_cajas),a							; A los 2 seg. se repite la oleada de entidades.
 
 	jr 4F
 
@@ -480,7 +473,12 @@ Frame
 
 ; Impacto ???
 
-2 push bc 												; Nº de entidades.
+2 ld a,(Entidades_en_curso)
+	and a
+	jr z,4F
+	ld b,a
+
+15 push bc 												; Nº de entidades en curso.
 
 	ld a,(Impacto)										 
 	and a
@@ -548,7 +546,7 @@ Frame
 6 call Store_Restore_cajas
 
 	pop bc
-	djnz 2B
+	djnz 15B
 
 ; Tras la gestión de las entidades, ... AMADEUS.
 

@@ -16,25 +16,36 @@ Indice_de_niveles
 	defw 0
 
 Nivel_1 db 9                                    ; Nº de entidades.
-	db 1,2,3,4,5 								; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
+	db 1,2,3,4,5,1,2,3,4 						; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
 Nivel_2 db 12									; Nº de entidades.
-	db 2,1,1,1,1								; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
+	db 2,1,1,1,1,2								; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
+	db 2,1,1,1,1,2
 Nivel_3 db 15									; Nº de entidades.	 
 	db 3,1,1,1,1 								; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
+	db 3,1,1,1,1 
+	db 3,1,1,1,1 	
 Nivel_4 db 17									; Nº de entidades.
 	db 4,1,1,1,1 								; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
+	db 4,1,1,1,1
+	db 4,1,1,1,1
+	db 2,3
 Nivel_5 db 20									; Nº de entidades. 
 	db 5,1,1,1,1 								; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
-	
+	db 5,1,1,1,1 
+	db 5,1,1,1,1 								; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
+	db 5,1,1,1,1
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;   20/5/23
+;   21/5/23
 ;
-;	Sitúa (Puntero_indice_NIVELES) en el 1er Nivel del índice.
-;	Asigna el (Numero_de_entidades).
+;	Sitúa (Puntero_indice_NIVELES) en el 1er Nivel del índice de niveles.
+;	Carga el nº de entidades del 1er nivel en (Numero_de_entidades). 
+;	Sitúa el puntero (Datos_de_nivel) en el 1er byte que indica el tipo de entidad que se va a cargar_
+;	_en la caja DRAW correspondiente.
 ;	
-;	DESTRUYE HL,DE y A.
+;	MODIFICA: HL,DE y A. 
+;	ACTUALIZA: (Puntero_indice_NIVELES), (Numero_de_entidades) y (Datos_de_nivel).
 
 Inicializa_Punteros_de_nivel 
 
@@ -43,14 +54,9 @@ Inicializa_Punteros_de_nivel
 	call Extrae_address   
 	ld a,(hl)
 	ld (Numero_de_entidades),a
-	ret
-
-Extrae_Datos_de_entidades ld hl,(Puntero_indice_NIVELES)
-	call Extrae_address   
 	inc hl
-	ld (Datos_de_nivel),hl						 ; Situamos (Datos_de_nivel) en los tipos de entidad que se van a asignar_
-;												 ; _ a cada caja.
-	ret	
+	ld (Datos_de_nivel),hl
+	ret
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
@@ -58,7 +64,7 @@ Extrae_Datos_de_entidades ld hl,(Puntero_indice_NIVELES)
 ;
 ;	Destruye A,BC,HL,DE
 
-;	Esta rutina se encarga de llenar las cajas de DRAW con el tipo de entidad que corresponde según el Nivel_1
+;	Esta rutina se encarga de llenar las cajas de DRAW con el tipo de entidad que corresponde según el Nivel_
 ;	_del juego.
 
 Prepara_cajas
@@ -119,8 +125,7 @@ Avanza_caja	ld (Puntero_store_caja),hl
 
 Datos_de_entidad_a_caja 	
 
-;		; En este punto, HL apunta a los DATOS de la entidad que tenemos que volcar Entidad_
-;		; _ la 1ª caja.
+; En este punto, HL apunta a los DATOS de la entidad que tenemos que volcar en la caja DRAW.
 
 	ld de,(Puntero_store_caja) 					; Datos de la entidad en HL, 1er byte de la caja en DE.
 
@@ -155,9 +160,22 @@ Situa_DE ex de,hl
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;	20/5/23
+;	21/5/23
+;
+;	Las entidades cargadas en las cajas DRAW, se descuentan del total de (Numero_de_entidades).
+;	El contador (Numero_parcial_de_entidades) indica las entidades que hay en las cajas.
+;
+;	Así, un nivel se completa cuando (Numero_de_entidades)="0".
+;	Cuando (Numero_parcial_de_entidades)="0" hay que cargar de nuevo las cajas y restar esta cantidad al_
+;	_ total de entidades que contiene (Numero_de_entidades).
+;
+;	OUTPUT: B contiene la cantidad de entidades que van a ser cargadas en las cajas DRAW.
+;	MODIFICA: A y B. 
+;	ACTUALIZA: (Numero_de_entidades) y (Numero_parcial_de_entidades).
 
 Admin_num_entidades 
+
+;	Si (Numero_de_entidades)="0", hemos superado el nivel actual.
 
 	ld a,(Numero_de_entidades)
 	and a
@@ -166,6 +184,9 @@ Admin_num_entidades
 ; !!!!!!!!!!! NIVEL SUPERADOOOOOOOOOOOOOO !!!!!!!!!!!!!
 	cp 5
 	jr c,1F
+
+; El nº de entidades es superior al que cabe en las cajas DRAW.
+; Actualizamos variables.
 
 	ld b,5
 	sub b 
