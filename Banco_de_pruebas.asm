@@ -388,12 +388,12 @@ Frame
 
 ; PINTAMOS.
 
-;    ld a,2
-;    out ($fe),a
+    ld a,2
+    out ($fe),a
 	call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
 	call Extrae_foto_disparos
-;    ld a,1
-;    out ($fe),a
+    ld a,1
+    out ($fe),a
 
 ; ----------------------------------------------------------------------
 
@@ -606,8 +606,8 @@ Frame
 	call Calcula_numero_de_disparotes
 9 call Calcula_numero_de_malotes 
 
-;	ld a,4
-;	out ($fe),a  
+	ld a,4
+	out ($fe),a  
 
 	ret
 
@@ -1197,6 +1197,7 @@ Bucle_1 push bc
 	include "Relojes_y_temporizaciones.asm"
 
 	SAVESNA "Pruebas.sna", START
+
 
 
 
