@@ -27,7 +27,7 @@
 ; Constantes. 
 ; ****************************************************************************************************************************************************************************************** 
 ;
-; 8/11/22
+; 25/05/23
 ;
 ; Constantes generales.
 ;
@@ -39,8 +39,8 @@ Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_de
 
 Album_de_fotos equ $7000								; En (Album_de_fotos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y las llamadas a las rutinas de impresión.   
-;                               				        ; De momento situamos este almacén en $7000.   
-Album_de_fotos_disparos equ $7060						; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
+;                               				        ; De momento situamos este almacén en $7000. La capacidad del album será de 10 entidades + AMADEUS.  
+Album_de_fotos_disparos equ $7085						; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´. 
 ;                               				        ; De momento situamos este almacén en $7060.  
 
@@ -285,7 +285,7 @@ START
 	ld a,%00000111
 	call Cls
 
-;	call Pinta_FILAS
+;	call Pinta_marco
 
 	call Inicializa_Punteros_de_nivel					 ; Inicializa. 1er NIVEL.
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
@@ -315,6 +315,8 @@ START
 	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	pop bc
 	djnz 1B  											; Decremento el contador de entidades.
+
+;	call Pinta_marco
 
 ; Si Amadeus ya está iniciado, saltamos a [Inicia_punteros_de_cajas] y [Restore_entidad].
 
@@ -395,6 +397,8 @@ Frame
     ld a,1
     out ($fe),a
 
+;	jr $
+
 ; ----------------------------------------------------------------------
 
 ; RELOJES.
@@ -411,9 +415,9 @@ Frame
 	ld hl,Secundero
 	inc (hl)
 
-	ld a,(hl)
-	and %00000001
-	jr nz,20F
+;	ld a,(hl)
+;	and %00000001
+;	jr nz,20F
 
 	ld a,(Numero_parcial_de_entidades)
 	ld b,a
@@ -1143,45 +1147,35 @@ Detecta_disparo_entidad
 
 ; Pinta indicadores de FILAS. ------------------------------------------------------
 
-Pinta_FILAS ld hl,$4000	;$4010
+Pinta_marco ld hl,$4000	
+	push hl
 
-; ----------
-	ld b,32
-2 push hl
-	push bc
-; ----------
-
-	ld b,$bf
-1 ld (hl),%10000000
-	call NextScan
-	djnz 1B
-
-; ----------
-	pop bc 
+	call Pinta_linea
 	pop hl
-	inc l 
-	djnz 2B
-; ----------
+	ld a,$80
+	call Pinta_columna
+	
+	ld hl,$401f
+	ld a,1
+	call Pinta_columna
+	ret
 
-	ld b,3
-    ld hl,$4700
-3 call Bucle_1
-    djnz 3B
-    ret
-
-Bucle_1 push bc 
-        push hl
-        pop de
-        inc de
-        ld bc,255
-        ld (hl),255
-        ldir
-        inc hl
-        ld a,7
-        add a,h
-        ld h,a
-        pop bc
-        ret
+Pinta_columna ld b,191
+	push af
+1 call NextScan
+	pop af
+	ld (hl),a
+	push af
+	djnz 1B
+	pop af
+	ret
+Pinta_linea ld (hl),$ff
+	ld d,h
+	ld e,l
+	inc de
+	ld bc,31
+	ldir 
+	ret
 
 ; ---------------------------------------------------------------
 
