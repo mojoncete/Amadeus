@@ -567,6 +567,11 @@ Indice_de_entidades
 	defw Entidad_3
 	defw Entidad_4
 	defw Entidad_5
+	defw Entidad_6
+	defw Entidad_7
+	defw Entidad_8
+	defw Entidad_9
+	defw Entidad_10
 
 ;	BADSAT, (Satélite malvado).	
 
@@ -610,7 +615,52 @@ Entidad_5 db 2,2		                     		; (Filas) / (Columns).
 	db %00000001									; (Attr).
 	defw Indice_Badsat_der							; (Indice_Sprite_der).
 	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
-	defw $400a                                      ; (Posicion_inicio).
+	defw $4007                                      ; (Posicion_inicio).
+	db 1											; (Cuad_objeto).
+	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+	defw Indice_mov_Abajo							; (Puntero_indice_mov)
+
+Entidad_6 db 2,2		                     		; (Filas) / (Columns).
+	db %00000100									; (Attr).
+	defw Indice_Badsat_der							; (Indice_Sprite_der).
+	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
+	defw $48ff	                             	    ; (Posicion_inicio).
+	db 1											; (Cuad_objeto).
+	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+	defw Indice_mov_Escaloncitos_izquierda_abajo  	; (Puntero_indice_mov) 
+
+Entidad_7 db 2,2		                     		; (Filas) / (Columns).
+	db %00000010									; (Attr).
+	defw Indice_Badsat_der							; (Indice_Sprite_der).
+	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
+	defw $487f                                      ; (Posicion_inicio).
+	db 1											; (Cuad_objeto).
+	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+	defw Indice_mov_Escaloncitos_izquierda_abajo    ; (Puntero_indice_mov) 
+
+Entidad_8 db 2,2		                     		; (Filas) / (Columns).
+	db %00000100									; (Attr).
+	defw Indice_Badsat_der							; (Indice_Sprite_der).
+	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
+	defw $48e0                                      ; (Posicion_inicio).
+	db 1											; (Cuad_objeto).
+	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+	defw Indice_mov_Derecha							; (Puntero_indice_mov)
+
+Entidad_9 db 2,2		                     		; (Filas) / (Columns).
+	db %00000001									; (Attr).
+	defw Indice_Badsat_der							; (Indice_Sprite_der).
+	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
+	defw $503f                                      ; (Posicion_inicio).
+	db 1											; (Cuad_objeto).
+	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+	defw Indice_mov_Escaloncitos_izquierda_abajo	; (Puntero_indice_mov)
+
+Entidad_10 db 2,2		                     		; (Filas) / (Columns).
+	db %00000001									; (Attr).
+	defw Indice_Badsat_der							; (Indice_Sprite_der).
+	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
+	defw $4013                                      ; (Posicion_inicio).
 	db 1											; (Cuad_objeto).
 	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 	defw Indice_mov_Abajo							; (Puntero_indice_mov)

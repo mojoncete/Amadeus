@@ -22,9 +22,11 @@ Recompone_posicion_inicio
 	call Mov_left
 	jr 2F
 
-1 call Mov_right
 
-2 ret
+1 call Mov_right
+2 ld hl,Sprite_vacio
+	ld (Puntero_objeto),hl
+	ret
 
 ; ******************************************************************************************************************************************************************************************
 ;

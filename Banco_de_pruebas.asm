@@ -32,6 +32,7 @@
 ; Constantes generales.
 ;
 
+Sprite_vacio equ $f000
 Centro_arriba equ $0160 								; Emplearemos estas constantes en la rutina de `recolocación´ del objeto:_
 Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto en las dos primeras constantes_
 Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
@@ -176,6 +177,7 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 ;															_ hemos de comparar las coordenadas de (Coordenadas_disparo_certero) con las de cada entidad.
 ;														BIT 3, .............
 ;														BIT 4, .............
+;														BIT 5, .............
 
 ; Gestión de ENTIDADES y CAJAS.
 
@@ -307,12 +309,13 @@ START
 ;	Pintamos el resto de entidades:
 
 ;	INICIA ENTIDADES !!!!!
+
 1 push bc  												; Guardo el contador de entidades.
- 	call Inicia_Puntero_objeto
+	call Inicia_Puntero_objeto
 	call Recompone_posicion_inicio
 	call Draw
 	call Guarda_foto_registros
-	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
+ 	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	pop bc
 	djnz 1B  											; Decremento el contador de entidades.
 
@@ -397,8 +400,6 @@ Frame
     ld a,1
     out ($fe),a
 
-;	jr $
-
 ; ----------------------------------------------------------------------
 
 ; RELOJES.
@@ -415,9 +416,9 @@ Frame
 	ld hl,Secundero
 	inc (hl)
 
-;	ld a,(hl)
-;	and %00000001
-;	jr nz,20F
+	ld a,(hl)
+	and %00000001
+	jr nz,20F
 
 	ld a,(Numero_parcial_de_entidades)
 	ld b,a
