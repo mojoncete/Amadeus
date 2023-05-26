@@ -19,8 +19,8 @@ Recompone_posicion_inicio
 	cp $1f
 	jr z,3F
 
-	ld hl,Ctrl_1
-	set 5,(hl)
+	ld hl,Ctrl_2
+	set 1,(hl)
 	ld hl,(Puntero_objeto)
 	ld (Repone_puntero_objeto),hl
 	jr 2F
@@ -35,14 +35,18 @@ Recompone_posicion_inicio
 
 ; ******************************************************************************************************************************************************************************************
 ;
-;   22/01/23
+;   27/05/23
 ;
 ;	Mov_down
 ;
 ; 	Mueve el Sprite X px hacia abajo.
 ;
 ;
-Mov_down ld hl,Ctrl_0
+Mov_down 
+
+	call Reponne_punntero_objeto
+	
+	ld hl,Ctrl_0
 	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
 ; 																	; _esta información para evitar que la entidad se vuelva borrar/pintar_
 ; 																	; _ en el caso de que no lo haya.
@@ -77,14 +81,18 @@ Mov_down ld hl,Ctrl_0
 
 ; ******************************************************************************************************************************************************************************************
 ;
-;   22/01/23
+;   27/05/23
 ;
 ;	Mov_up
 ;
 ; 	Mueve el Sprite hacia arriba.
 ;
 ;
-Mov_up ld hl,Ctrl_0
+Mov_up 
+
+	call Reponne_punntero_objeto
+
+	ld hl,Ctrl_0
 	set 4,(hl) 															; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
 ; 																		; _esta información para evitar que la entidad se vuelva borrar/pintar_
 ; 																		; _ en el caso de que no lo haya.
@@ -116,6 +124,19 @@ Mov_up ld hl,Ctrl_0
 	ld (Posicion_actual),hl
     djnz 3B
 2 call Genera_coordenadas
+	ret
+
+; -----------------------------
+;
+;	27/5/23
+
+Reponne_punntero_objeto	ld a,(Ctrl_2) 													
+	bit 1,a
+	ret z
+	res 1,a
+	ld (Ctrl_2),a
+	ld hl,(Repone_puntero_objeto)
+	ld (Puntero_objeto),hl
 	ret
 
 ; ******************************************************************************************************************************************************************************************

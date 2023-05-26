@@ -156,8 +156,15 @@ Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta column
 
 ; variables de control general.
 
-Ctrl_2 db 0 											; Byte de control general de la entidad.
-
+Ctrl_2 db 0 											
+;														BIT 1, Los sprites se inician con un `sprite vacío', (sprite formado por "ceros"), cuando la rutina_
+;															_ [Guarda_foto_registros] guarda su 1ª imagen.
+;															_ Más adelante las rutinas [Mov_left] y [Mov_right] restauraran (Puntero_objeto). Si el 1er movimiento
+; 															_ que hace la entidad después de iniciarse es hacia arriba/abajo no se restaurará (Puntero_objeto), pués_
+; 															_ las rutinas [Mov_up] y [Mov_down] no necesitan modificar el sprite.
+;															_ El bit5 a "1" nos indica que el sprite se inicia por arriba o por abajo y por lo tanto hay que restaurar_
+;															_ (Puntero_objeto) con (Repone_puntero_objeto) una vez iniciado y realizada su 1ª `foto'.
+						
 ; 61 Bytes por entidad.
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 ;					         		---------;      ;---------
@@ -177,13 +184,6 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 ;															_ hemos de comparar las coordenadas de (Coordenadas_disparo_certero) con las de cada entidad.
 ;														BIT 3, .............
 ;														BIT 4, .............
-;														BIT 5, Los sprites se inician con un `sprite vacío', (sprite formado por "ceros"), cuando la rutina_
-;															_ [Guarda_foto_registros] guarda su 1ª imagen.
-;															_ Más adelante las rutinas [Mov_left] y [Mov_right] restauraran (Puntero_objeto). Si el 1er movimiento
-; 															_ que hace la entidad después de iniciarse es hacia arriba/abajo no se restaurará (Puntero_objeto), pués_
-; 															_ las rutinas [Mov_up] y [Mov_down] no necesitan modificar el sprite.
-;															_ El bit5 a "1" nos indica que el sprite se inicia por arriba o por abajo y por lo tanto hay que restaurar_
-;															_ (Puntero_objeto) con (Repone_puntero_objeto) una vez iniciado y realizada su 1ª `foto'.
 
 Repone_puntero_objeto defw 0							; Almacena (Puntero_objeto). Cuando el Sprite se inicia por arriba o por abajo,_
 ; 														; _ hay que sustituirlo por un `sprite vacío' para que no se vea el 1er o último scanline.
@@ -328,16 +328,7 @@ START
 	call Recompone_posicion_inicio
 	call Draw
 	call Guarda_foto_registros
- 
-	ld a,(Ctrl_1)
-	bit 5,a
-	jr z,9F
-	res 5,a
-	ld (Ctrl_1),a
-	ld hl,(Repone_puntero_objeto)
-	ld (Puntero_objeto),hl
-
-9 call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
+ 	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	pop bc
 	djnz 1B  											; Decremento el contador de entidades.
 
