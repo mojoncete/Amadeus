@@ -17,11 +17,16 @@ Recompone_posicion_inicio
 	jr z,1F
 
 	cp $1f
-	ret nz
+	jr z,3F
 
-	call Mov_left
+	ld hl,Ctrl_1
+	set 5,(hl)
+	ld hl,(Puntero_objeto)
+	ld (Repone_puntero_objeto),hl
 	jr 2F
 
+3 call Mov_left
+	jr 2F
 
 1 call Mov_right
 2 ld hl,Sprite_vacio
