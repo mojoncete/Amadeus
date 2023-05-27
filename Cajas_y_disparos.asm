@@ -92,7 +92,7 @@ Disparo_11 defw 0
 
 ; -------------------------------------------------------------------------------------
 
-Indice_de_cajas										; 61 Bytes por entidad.
+Indice_de_cajas										; 62 Bytes por entidad.
 
 	defw Caja_1
 	defw Caja_2
@@ -128,7 +128,7 @@ Amadeus_db db 2,2									; (Filas) / (Columns).
 	db 4 											; (Cuad_objeto).
 	db 2,2,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
-	db 0											; Impacto. "1" existe impacto en la entidad.
+	db 0											; Impacto. "1" existe impacto en la entidad./Frames_explosion.
 
 	db 0,0											; Variables_de_borrado 
 	defw 0											;	" " " " " " "
@@ -147,7 +147,7 @@ Amadeus_db db 2,2									; (Filas) / (Columns).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
-	db 0,0											; (Limite_vertical), (Ctrl_2).
+	db 0,0,0										; (Limite_vertical), (Ctrl_2).
 
 ; ---------- ---------- ---------- ---------- ----------
 
@@ -168,7 +168,7 @@ Caja_1 db 0,0										; (Filas) / (Columns).
 
 	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
-	db 0											; Impacto. "1" existe impacto en la entidad.
+	db 0											; Impacto. "1" existe impacto en la entidad./Frames_explosion.
 
 	db 0,0										    ; Variables_de_borrado 
 	defw 0											;	" " " " " " "
@@ -187,7 +187,7 @@ Caja_1 db 0,0										; (Filas) / (Columns).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
-	db 0,0											; (Limite_vertical), (Ctrl_2).
+	db 0,0,0											; (Limite_vertical), (Ctrl_2).
 
 ; ---------- ---------- ---------- ---------- ----------	
 
@@ -208,7 +208,7 @@ Caja_2 db 0,0										; (Filas) / (Columns).
 
 	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
-	db 0											; Impacto. "1" existe impacto en la entidad.
+	db 0											; Impacto. "1" existe impacto en la entidad./Frames_explosion.
 
 	db 0,0										    ; Variables_de_borrado 
 	defw 0											;	" " " " " " "
@@ -227,7 +227,7 @@ Caja_2 db 0,0										; (Filas) / (Columns).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
-	db 0,0											; (Limite_vertical), (Ctrl_2).
+	db 0,0,0											; (Limite_vertical), (Ctrl_2).
 
 ; ---------- ---------- ---------- ---------- ----------	
 
@@ -248,7 +248,7 @@ Caja_3 db 0,0										; (Filas) / (Columns).
 
 	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
-	db 0											; Impacto. "1" existe impacto en la entidad.
+	db 0											; Impacto. "1" existe impacto en la entidad./Frames_explosion.
 
 	db 0,0										    ; Variables_de_borrado 
 	defw 0											;	" " " " " " "
@@ -267,7 +267,7 @@ Caja_3 db 0,0										; (Filas) / (Columns).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
-	db 0,0											; (Limite_vertical), (Ctrl_2).
+	db 0,0,0											; (Limite_vertical), (Ctrl_2).
 
 ; ---------- ---------- ---------- ---------- ----------
 
@@ -288,7 +288,7 @@ Caja_4 db 0,0										; (Filas) / (Columns).
 
 	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
-	db 0											; Impacto. "1" existe impacto en la entidad.
+	db 0											; Impacto. "1" existe impacto en la entidad./Frames_explosion.
 
 	db 0,0										    ; Variables_de_borrado 
 	defw 0											;	" " " " " " "
@@ -307,7 +307,7 @@ Caja_4 db 0,0										; (Filas) / (Columns).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
-	db 0,0											; (Limite_vertical), (Ctrl_2).
+	db 0,0,0											; (Limite_vertical), (Ctrl_2).
 
 ; ---------- ---------- ---------- ---------- ----------
 
@@ -328,7 +328,7 @@ Caja_5 db 0,0										; (Filas) / (Columns).
 
 	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
-	db 0											; Impacto. "1" existe impacto en la entidad.
+	db 0											; Impacto. "1" existe impacto en la entidad./Frames_explosion.
 
 	db 0,0										    ; Variables_de_borrado 
 	defw 0											;	" " " " " " "
@@ -347,7 +347,7 @@ Caja_5 db 0,0										; (Filas) / (Columns).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
-	db 0,0											; (Limite_vertical), (Ctrl_2).
+	db 0,0,0											; (Limite_vertical), (Ctrl_2).
 
 ; ---------- ---------- ---------- ---------- ----------
 
@@ -368,7 +368,7 @@ Caja_6 db 0,0										; (Filas) / (Columns).
 
 	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
-	db 0											; Impacto. "1" existe impacto en la entidad.
+	db 0											; Impacto. "1" existe impacto en la entidad./Frames_explosion.
 
 	db 0,0										    ; Variables_de_borrado 
 	defw 0											;	" " " " " " "
@@ -387,9 +387,9 @@ Caja_6 db 0,0										; (Filas) / (Columns).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
-	db 0,0											; (Limite_vertical), (Ctrl_2).
+	db 0,0,0											; (Limite_vertical), (Ctrl_2).
 
-; ---------- ---------- ---------- ---------- ----------
+; ---------- ---------- ---------- ---------- ----------	
 
 Caja_7 db 0,0										; (Filas) / (Columns).
 	defw 0											; (Posicion_actual).
@@ -408,7 +408,7 @@ Caja_7 db 0,0										; (Filas) / (Columns).
 
 	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
-	db 0											; Impacto. "1" existe impacto en la entidad.
+	db 0											; Impacto. "1" existe impacto en la entidad./Frames_explosion.
 
 	db 0,0										    ; Variables_de_borrado 
 	defw 0											;	" " " " " " "
@@ -427,9 +427,9 @@ Caja_7 db 0,0										; (Filas) / (Columns).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
-	db 0,0											; (Limite_vertical), (Ctrl_2).
+	db 0,0,0											; (Limite_vertical), (Ctrl_2).
 
-; ---------- ---------- ---------- ---------- ----------
+; ---------- ---------- ---------- ---------- ----------	
 
 Caja_8 db 0,0										; (Filas) / (Columns).
 	defw 0											; (Posicion_actual).
@@ -448,7 +448,7 @@ Caja_8 db 0,0										; (Filas) / (Columns).
 
 	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
-	db 0											; Impacto. "1" existe impacto en la entidad.
+	db 0											; Impacto. "1" existe impacto en la entidad./Frames_explosion.
 
 	db 0,0										    ; Variables_de_borrado 
 	defw 0											;	" " " " " " "
@@ -467,7 +467,7 @@ Caja_8 db 0,0										; (Filas) / (Columns).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
-	db 0,0											; (Limite_vertical), (Ctrl_2).
+	db 0,0,0											; (Limite_vertical), (Ctrl_2).
 
 ; ---------- ---------- ---------- ---------- ----------
 
@@ -488,7 +488,7 @@ Caja_9 db 0,0										; (Filas) / (Columns).
 
 	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
-	db 0											; Impacto. "1" existe impacto en la entidad.
+	db 0											; Impacto. "1" existe impacto en la entidad./Frames_explosion.
 
 	db 0,0										    ; Variables_de_borrado 
 	defw 0											;	" " " " " " "
@@ -507,7 +507,7 @@ Caja_9 db 0,0										; (Filas) / (Columns).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
-	db 0,0											; (Limite_vertical), (Ctrl_2).
+	db 0,0,0											; (Limite_vertical), (Ctrl_2).
 
 ; ---------- ---------- ---------- ---------- ----------
 
@@ -528,7 +528,7 @@ Caja_10 db 0,0										; (Filas) / (Columns).
 
 	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
-	db 0											; Impacto. "1" existe impacto en la entidad.
+	db 0											; Impacto. "1" existe impacto en la entidad./Frames_explosion.
 
 	db 0,0										    ; Variables_de_borrado 
 	defw 0											;	" " " " " " "
@@ -547,7 +547,7 @@ Caja_10 db 0,0										; (Filas) / (Columns).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
-	db 0,0											; (Limite_vertical), (Ctrl_2).
+	db 0,0,0										; (Limite_vertical), (Ctrl_2).
 
 ; -------------------------------------------------------------------------------------
 ;
@@ -567,11 +567,6 @@ Indice_de_entidades
 	defw Entidad_3
 	defw Entidad_4
 	defw Entidad_5
-	defw Entidad_6
-	defw Entidad_7
-	defw Entidad_8
-	defw Entidad_9
-	defw Entidad_10
 
 ;	BADSAT, (Satélite malvado).	
 
@@ -579,10 +574,10 @@ Entidad_1 db 2,2		                     		; (Filas) / (Columns).
 	db %00000100									; (Attr).
 	defw Indice_Badsat_der							; (Indice_Sprite_der).
 	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
-	defw $479f	                             	    ; (Posicion_inicio).
+	defw $4760	                             	    ; (Posicion_inicio).
 	db 1											; (Cuad_objeto).
-	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-	defw Indice_mov_Escaloncitos_izquierda_abajo  	; (Puntero_indice_mov) 
+	db 1,2,1,2                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+	defw Indice_mov_Onda_senoidal					; (Puntero_indice_mov) 
 
 Entidad_2 db 2,2		                     		; (Filas) / (Columns).
 	db %00000010									; (Attr).
@@ -616,51 +611,6 @@ Entidad_5 db 2,2		                     		; (Filas) / (Columns).
 	defw Indice_Badsat_der							; (Indice_Sprite_der).
 	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
 	defw $4007                                      ; (Posicion_inicio).
-	db 1											; (Cuad_objeto).
-	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-	defw Indice_mov_Abajo							; (Puntero_indice_mov)
-
-Entidad_6 db 2,2		                     		; (Filas) / (Columns).
-	db %00000100									; (Attr).
-	defw Indice_Badsat_der							; (Indice_Sprite_der).
-	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
-	defw $48ff	                             	    ; (Posicion_inicio).
-	db 1											; (Cuad_objeto).
-	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-	defw Indice_mov_Escaloncitos_izquierda_abajo  	; (Puntero_indice_mov) 
-
-Entidad_7 db 2,2		                     		; (Filas) / (Columns).
-	db %00000010									; (Attr).
-	defw Indice_Badsat_der							; (Indice_Sprite_der).
-	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
-	defw $487f                                      ; (Posicion_inicio).
-	db 1											; (Cuad_objeto).
-	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-	defw Indice_mov_Escaloncitos_izquierda_abajo    ; (Puntero_indice_mov) 
-
-Entidad_8 db 2,2		                     		; (Filas) / (Columns).
-	db %00000100									; (Attr).
-	defw Indice_Badsat_der							; (Indice_Sprite_der).
-	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
-	defw $48e0                                      ; (Posicion_inicio).
-	db 1											; (Cuad_objeto).
-	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-	defw Indice_mov_Derecha							; (Puntero_indice_mov)
-
-Entidad_9 db 2,2		                     		; (Filas) / (Columns).
-	db %00000001									; (Attr).
-	defw Indice_Badsat_der							; (Indice_Sprite_der).
-	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
-	defw $503f                                      ; (Posicion_inicio).
-	db 1											; (Cuad_objeto).
-	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-	defw Indice_mov_Escaloncitos_izquierda_abajo	; (Puntero_indice_mov)
-
-Entidad_10 db 2,2		                     		; (Filas) / (Columns).
-	db %00000001									; (Attr).
-	defw Indice_Badsat_der							; (Indice_Sprite_der).
-	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
-	defw $4013                                      ; (Posicion_inicio).
 	db 1											; (Cuad_objeto).
 	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 	defw Indice_mov_Abajo							; (Puntero_indice_mov)

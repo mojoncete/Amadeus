@@ -98,6 +98,7 @@ Vel_down db 0 											; Velocidad bajada. Nº de píxeles que desplazamos el 
 Impacto db 0											; Si después del movimiento de la entidad, (Impacto) se coloca a "1",_
 ;														; _ existen muchas posibilidades de que esta entidad haya colisionado con Amadeus. 
 ; 														; Hay que comprobar la posible colisión después de mover Amadeus. En este caso, (Impacto2)="3".
+
 Variables_de_borrado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
 	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
 	defw 0
@@ -157,15 +158,17 @@ Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta column
 ; variables de control general.
 
 Ctrl_2 db 0 											
-;														BIT 1, Los sprites se inician con un `sprite vacío', (sprite formado por "ceros"), cuando la rutina_
+;														BIT 0, Los sprites se inician con un `sprite vacío', (sprite formado por "ceros"), cuando la rutina_
 ;															_ [Guarda_foto_registros] guarda su 1ª imagen.
 ;															_ Más adelante las rutinas [Mov_left] y [Mov_right] restauraran (Puntero_objeto). Si el 1er movimiento
 ; 															_ que hace la entidad después de iniciarse es hacia arriba/abajo no se restaurará (Puntero_objeto), pués_
 ; 															_ las rutinas [Mov_up] y [Mov_down] no necesitan modificar el sprite.
 ;															_ El bit5 a "1" nos indica que el sprite se inicia por arriba o por abajo y por lo tanto hay que restaurar_
 ;															_ (Puntero_objeto) con (Repone_puntero_objeto) una vez iniciado y realizada su 1ª `foto'.
-						
-; 61 Bytes por entidad.
+
+Frames_explosion db 0
+
+; 62 Bytes por entidad.
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 ;					         		---------;      ;---------
 
@@ -325,6 +328,10 @@ START
 
 1 push bc  												; Guardo el contador de entidades.
 	call Inicia_Puntero_objeto
+
+	ld a,3
+	ld (Frames_explosion),a
+
 	call Recompone_posicion_inicio
 	call Draw
 	call Guarda_foto_registros
@@ -520,19 +527,31 @@ Frame
 ; Hay Impacto en esta entidad.
 
 	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la entidad `impactada´ para borrarla.
-	call Borra_datos_entidad							; Borramos todos los datos de la entidad.
 
-; -----
+;!!!!!! DEBUGGIN Desintegración/Explosión!!!!!!!!!!!
 
-	ld hl,Numero_parcial_de_entidades					; Una alimaña menos.
-	dec (hl)
-	ld hl,Entidades_en_curso
-	dec (hl)
-	ld hl,Numero_de_entidades
-	dec (hl)
+	ld a,(Ctrl_2)
+	bit 1,a
+	jr nz,7F											; Omitimos si ya hemos imprimido el 1er FRAME de la explosión.
+
+	ld a,(CTRL_DESPLZ)
+;	ld hl,(Puntero_objeto)
+
+	and a
+	jr nz,21F
+
+	jr $
+
+;	ld hl,Explosion_2x2
+;	ld (Puntero_objeto),hl
+;	jr 29F
+
+21 ld hl,Indice_Explosion_3x3-2
+	ld (Puntero_DESPLZ_der),hl
+
+	ld hl,Ctrl_2
+	set 1,(hl)
 	jr 7F
-
-; -----
 
 ; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
 ; _con las coordenadas de la entidad almacenada en DRAW.
@@ -567,7 +586,6 @@ Frame
 	res 2,(hl)
 	ld hl,Coordenadas_disparo_certero
 	ld (hl),0
-
 
 7 call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
 
@@ -631,13 +649,61 @@ Frame
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	27/03/23
+;	27/05/23
 
 Mov_obj 
 
 ; En este punto Draw tiene cargado los 52 bytes, (parámetros), de la primera entidad de Indice_de_entidades.
 
-	xor a
+	ld a,(Ctrl_2)
+	bit 1,a
+	jr z,2F											
+
+; Explosión:
+
+	ld a,(Frames_explosion)
+	and a
+	jr nz,4F
+
+; Una alimaña menos!!!!!!!!!1
+
+
+	call Borra_datos_entidad							; Borramos todos los datos de la entidad.
+
+; -----
+
+	ld hl,Numero_parcial_de_entidades					; Una alimaña menos.
+	dec (hl)
+	ld hl,Entidades_en_curso
+	dec (hl)
+	ld hl,Numero_de_entidades
+	dec (hl)
+
+	jr 3F
+	
+; -----
+
+
+
+
+
+
+
+
+4 ld hl,(Puntero_DESPLZ_der)
+	inc hl
+	inc hl
+	ld (Puntero_DESPLZ_der),hl
+	call Extrae_address
+	ld (Puntero_objeto),hl
+
+	ld hl,Frames_explosion
+	dec (hl)
+
+	call Guarda_foto_entidad_a_borrar
+	jr 3F
+
+2 xor a
 	ld (Obj_dibujado),a
 	ld (Ctrl_0),a 										; El bit4 de (Ctrl_0) puede estar alzado debido al movimiento de Amadeus.
 ;														; Necesito restaurarlo, lo utilizaremos para detectar el movimiento_
@@ -671,7 +737,7 @@ Mov_obj
     call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
     call Repone_borrar                                  ; Si ha habido movimiento de la entidad, borraremos el FRAME anterior.
 1 call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la "ENTIDAD a borrar", pues ha habido movimiento_
-	ret													; _de la misma.
+3 ret													; _de la misma.
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -937,7 +1003,7 @@ Store_Restore_cajas
 
 	ld hl,Filas
 	ld de,(Puntero_store_caja) 							; Puntero que se desplaza por las distintas entidades.
-	ld bc,61
+	ld bc,62
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
 ; 	Entidad_sospechosa. 20/4/23
@@ -961,7 +1027,7 @@ Store_Restore_cajas
 	jr z,2F
 
 	ld de,Filas
-	ld bc,61
+	ld bc,62
 	ldir
 
 2 call Incrementa_punteros_de_cajas
@@ -986,7 +1052,7 @@ Restore_entidad push hl
 
 	ld hl,(Puntero_store_caja)						; (Puntero_store_caja) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,61
+	ld bc,62
 	ldir
 
 	pop bc
@@ -1025,7 +1091,7 @@ Restore_Amadeus	push hl
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Filas
-	ld bc,61
+	ld bc,62
 	ldir
 	pop bc
 	pop de
@@ -1045,7 +1111,7 @@ Restore_Amadeus	push hl
 ;	DESTRUYE: HL y BC y DE.
 
 Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
-	ld bc,61
+	ld bc,62
 	ldir
 	ret
 
@@ -1058,7 +1124,7 @@ Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeu
 ;	Destruye: HL,BC,DE,A
 
 Borra_datos_entidad ld hl,Filas
-	ld bc,60
+	ld bc,61
 	xor a
 	ld (hl),a
 	ld de,Filas+1
@@ -1157,38 +1223,6 @@ Detecta_disparo_entidad
 	and 1
 	ret nz
 	call Genera_disparo
-	ret
-
-; Pinta indicadores de FILAS. ------------------------------------------------------
-
-Pinta_marco ld hl,$4000	
-	push hl
-
-	call Pinta_linea
-	pop hl
-	ld a,$80
-	call Pinta_columna
-	
-	ld hl,$401f
-	ld a,1
-	call Pinta_columna
-	ret
-
-Pinta_columna ld b,191
-	push af
-1 call NextScan
-	pop af
-	ld (hl),a
-	push af
-	djnz 1B
-	pop af
-	ret
-Pinta_linea ld (hl),$ff
-	ld d,h
-	ld e,l
-	inc de
-	ld bc,31
-	ldir 
 	ret
 
 ; ---------------------------------------------------------------

@@ -44,8 +44,8 @@ Recompone_posicion_inicio
 ;
 Mov_down 
 
-	call Reponne_punntero_objeto
-	
+	call Reponne_punntero_objeto									; Si la entidad no se inició en la 1ª o última columna de pantalla,_
+;																	; _ repone (Puntero_objeto).
 	ld hl,Ctrl_0
 	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
 ; 																	; _esta información para evitar que la entidad se vuelva borrar/pintar_
@@ -90,8 +90,8 @@ Mov_down
 ;
 Mov_up 
 
-	call Reponne_punntero_objeto
-
+	call Reponne_punntero_objeto										; Si la entidad no se inició en la 1ª o última columna de pantalla,_
+;																		; _ repone (Puntero_objeto).	call Reponne_punntero_objeto
 	ld hl,Ctrl_0
 	set 4,(hl) 															; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
 ; 																		; _esta información para evitar que la entidad se vuelva borrar/pintar_
@@ -129,6 +129,14 @@ Mov_up
 ; -----------------------------
 ;
 ;	27/5/23
+;
+;	Si la rutina [Recompone_posicion_inicio] no inició la entidad en la 1ª o última columna de pantalla,_
+;	_restaurará (Puntero_objeto) con el contenido de (Repone_puntero_objeto).
+;
+;	Esta rutina sólo será llamada desde las rutinas de movimiento vertical, [Mov_down] y [Mov_up].
+;	Las rutinas [Mov_left] y [Mov_right] modifican (Puntero_objeto) cada vez que se ejecutan.
+;
+;	Modifica: A y (Puntero_objeto).
 
 Reponne_punntero_objeto	ld a,(Ctrl_2) 													
 	bit 1,a

@@ -202,3 +202,33 @@ Amadeus_Fd DEFB	$00,$06,$00,$00,$8F,$10,$00,$99
 	DEFB	$EF,$7C,$02,$2F,$44,$01,$C6,$38 ; $Fd (6º DESPLZ a derecha).
 
 ; ----------------------------------------------------------------------------------------
+Indice_Explosion_3x3 defw Explosion_3x3_1
+	defw Explosion_3x3_2
+	defw Explosion_3x3_3
+
+Explosion_3x3_1 DEFB $0d,$ed,$e0,$0d,$ed,$e0,$0d,$ed
+	DEFB	$e0,$0d,$ed,$e0,$0d,$ed,$e0,$0d
+	DEFB	$ed,$e0,$0d,$ed,$e0,$0d,$ed,$e0
+	DEFB	$0d,$ed,$e0,$0d,$ed,$e0,$0d,$ed
+	DEFB	$e0,$0d,$ed,$e0,$0d,$ed,$e0,$0d
+	DEFB	$ed,$e0,$0d,$ed,$e0,$0d,$ed,$e0
+
+Explosion_3x3_2 DEFB $01,$8f,$80,$01,$8f,$80,$01,$8f
+	DEFB	$80,$01,$8f,$80,$01,$8f,$80,$01
+	DEFB	$8f,$f0,$01,$8f,$80,$01,$8f,$80
+	DEFB	$01,$8f,$80,$01,$8f,$80,$01,$8f
+	DEFB	$80,$01,$8f,$80,$01,$8f,$80,$01
+	DEFB	$8f,$f0,$01,$8f,$80,$01,$8f,$80
+
+Explosion_3x3_3 DEFB $01,$11,$10,$01,$11,$10,$01,$11
+	DEFB	$10,$01,$11,$10,$01,$11,$10,$01
+	DEFB	$11,$10,$01,$11,$10,$01,$11,$10
+	DEFB	$01,$11,$10,$01,$11,$10,$01,$11
+	DEFB	$10,$01,$11,$10,$01,$11,$10,$01
+	DEFB	$11,$10,$01,$11,$10,$01,$11,$10
+
+
+Explosion_2x2 DEFB $de,$de,$de,$de,$de,$de,$de,$de
+	DEFB $de,$de,$de,$de,$de,$de,$de,$de
+	DEFB $de,$de,$de,$de,$de,$de,$de,$de
+	DEFB $de,$de,$de,$de,$de,$de,$de,$de
