@@ -565,7 +565,7 @@ Frame
 	dec b
 
 ;!!!!!!!!!!!!!!!!! Debuggggiiiiiinnnnnngggggggggggg
-;	jr z,$
+	jr z,$
 ;!!!!!!!!!!!!!!!!! Debuggggiiiiiinnnnnngggggggggggg
 
 	jr z,7F 																	
