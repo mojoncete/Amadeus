@@ -47,9 +47,9 @@ Genera_coordenadas push bc
 	ret
 
 ; ------------------------------------------------------------------------
-;	28/03/23
+;	28/05/23
 ;
-;	Proporciona las coordenadas del disparo a imprimir.
+;	Proporciona las coordenadas del disparo a imprimir `sospechoso de colisión'.
 ;	Fila superior "0", Columna izquierda "0".
 ;
 ;	Input: HL contendrá la posición del proyectil en pantalla.

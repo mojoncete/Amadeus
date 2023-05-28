@@ -751,7 +751,7 @@ Motor_de_disparos ld bc,Disparo_3A
     pop hl
     call Elimina_disparo_de_base_de_datos
     ld hl,Impacto2
-    set 0,(hl)                                        ; Indicamos que se ha producido Impacto en una entidad.
+    set 0,(hl)                                           ; Indicamos que se ha producido Impacto en una entidad.
 
     jr 11F
 

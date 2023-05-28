@@ -533,23 +533,15 @@ Frame
 	ld a,(Ctrl_2)
 	bit 1,a
 	jr nz,7F											; Omitimos si ya hemos imprimido el 1er FRAME de la explosión.
-
 	ld a,(CTRL_DESPLZ)
-;	ld hl,(Puntero_objeto)
-
 	and a
 	jr nz,21F
-
-	jr $
-
-;	ld hl,Explosion_2x2
-;	ld (Puntero_objeto),hl
-;	jr 29F
-
+	ld hl,Explosion_2x2
+	ld (Puntero_objeto),hl
+	jr 22F
 21 ld hl,Indice_Explosion_3x3-2
 	ld (Puntero_DESPLZ_der),hl
-
-	ld hl,Ctrl_2
+22 ld hl,Ctrl_2
 	set 1,(hl)
 	jr 7F
 
@@ -667,28 +659,16 @@ Mov_obj
 
 ; Una alimaña menos!!!!!!!!!1
 
-
 	call Borra_datos_entidad							; Borramos todos los datos de la entidad.
-
-; -----
-
 	ld hl,Numero_parcial_de_entidades					; Una alimaña menos.
 	dec (hl)
 	ld hl,Entidades_en_curso
 	dec (hl)
 	ld hl,Numero_de_entidades
 	dec (hl)
-
 	jr 3F
 	
 ; -----
-
-
-
-
-
-
-
 
 4 ld hl,(Puntero_DESPLZ_der)
 	inc hl
