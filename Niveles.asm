@@ -15,9 +15,9 @@ Indice_de_niveles
 	defw 0
 	defw 0
 
-Nivel_1 db 1	                                ; Nº de entidades.
-	db 1										; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
-
+Nivel_1 db 10	                                ; Nº de entidades.
+	db 5,4,3,2,1
+	db 1,2,3,4,5								; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
 Nivel_2 db 12									; Nº de entidades.
 	db 2,1,1,1,1,2								; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
 	db 2,1,1,1,1,2
@@ -128,6 +128,7 @@ Datos_de_entidad_a_caja
 
 ; En este punto, HL apunta a los DATOS de la entidad que tenemos que volcar en la caja DRAW.
 
+
 	ld de,(Puntero_store_caja) 					; Datos de la entidad en HL, 1er byte de la caja en DE.
 
 	ld bc,2
@@ -150,6 +151,12 @@ Datos_de_entidad_a_caja
 
 	ld bc,2
 	ldir 										; Hemos volcado (Puntero_indice_mov).
+
+	ld bc,10
+	call Situa_DE
+
+	ld a,3
+	ld (de),a 									; Vuelco (Frames_explosion).
 
 	ret
 

@@ -49,7 +49,7 @@ Album_de_fotos_disparos equ $7085						; En (Album_de_fotos_disparos) vamos a ir
 ; Variables. 
 ; ****************************************************************************************************************************************************************************************** 
 ;
-; 10/11/22
+; 30/05/23
 ;
 ; Variables de DRAW. (Motor principal).				
 ;
@@ -165,8 +165,10 @@ Ctrl_2 db 0
 ; 															_ las rutinas [Mov_up] y [Mov_down] no necesitan modificar el sprite.
 ;															_ El bit5 a "1" nos indica que el sprite se inicia por arriba o por abajo y por lo tanto hay que restaurar_
 ;															_ (Puntero_objeto) con (Repone_puntero_objeto) una vez iniciado y realizada su 1ª `foto'.
+;														
+;														BIT 1, Este bit a "1" indica que se ha iniciado el proceso de EXPLOSIÓN en una entidad.
 
-Frames_explosion db 0
+Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
 ; 62 Bytes por entidad.
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
@@ -328,10 +330,6 @@ START
 
 1 push bc  												; Guardo el contador de entidades.
 	call Inicia_Puntero_objeto
-
-	ld a,3
-	ld (Frames_explosion),a
-
 	call Recompone_posicion_inicio
 	call Draw
 	call Guarda_foto_registros
@@ -419,6 +417,9 @@ Frame
 	call Extrae_foto_disparos
     ld a,1
     out ($fe),a
+
+
+;    jr $
 
 ; ----------------------------------------------------------------------
 
@@ -533,15 +534,19 @@ Frame
 	ld a,(Ctrl_2)
 	bit 1,a
 	jr nz,7F											; Omitimos si ya hemos imprimido el 1er FRAME de la explosión.
+
 	ld a,(CTRL_DESPLZ)
 	and a
 	jr nz,21F
-	ld hl,Explosion_2x2
-	ld (Puntero_objeto),hl
-	jr 22F
-21 ld hl,Indice_Explosion_3x3-2
+
+	ld hl,Indice_Explosion_2x2-2
 	ld (Puntero_DESPLZ_der),hl
-22 ld hl,Ctrl_2
+	jr 22F
+
+21 ld hl,Indice_Explosion_2x3-2
+	ld (Puntero_DESPLZ_der),hl
+
+22 ld hl,Ctrl_2											; Activamos el proceso de explosión.
 	set 1,(hl)
 	jr 7F
 
@@ -565,7 +570,7 @@ Frame
 	dec b
 
 ;!!!!!!!!!!!!!!!!! Debuggggiiiiiinnnnnngggggggggggg
-	jr z,$
+;	jr z,$
 ;!!!!!!!!!!!!!!!!! Debuggggiiiiiinnnnnngggggggggggg
 
 	jr z,7F 																	
@@ -649,7 +654,7 @@ Mov_obj
 
 	ld a,(Ctrl_2)
 	bit 1,a
-	jr z,2F											
+	jr z,2F												; Se ha iniciado la EXPLOSIÓN???									
 
 ; Explosión:
 

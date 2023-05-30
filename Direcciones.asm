@@ -20,7 +20,7 @@ Recompone_posicion_inicio
 	jr z,3F
 
 	ld hl,Ctrl_2
-	set 1,(hl)
+	set 0,(hl)
 	ld hl,(Puntero_objeto)
 	ld (Repone_puntero_objeto),hl
 	jr 2F
@@ -139,9 +139,9 @@ Mov_up
 ;	Modifica: A y (Puntero_objeto).
 
 Reponne_punntero_objeto	ld a,(Ctrl_2) 													
-	bit 1,a
+	bit 0,a
 	ret z
-	res 1,a
+	res 0,a
 	ld (Ctrl_2),a
 	ld hl,(Repone_puntero_objeto)
 	ld (Puntero_objeto),hl
