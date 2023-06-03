@@ -1135,14 +1135,10 @@ Determina_resultado_comparativa
     ld b,0
  
     call Compara_cositas
-    jr 2F
- 
-1 inc b
-2 ret 
+    ret 
 
 Compara_cositas and a
     jr z,1F
-
     cp $fd
     jr z,1F
     cp $fe
@@ -1153,7 +1149,6 @@ Compara_cositas and a
     jr z,1F
     cp $02
     jr z,1F
-    cp $03
     ret nz
 
 1 inc b

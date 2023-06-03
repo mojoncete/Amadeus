@@ -251,7 +251,6 @@ Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posi
 ;														; _ que puede ocupar el sprite de Amadeus. (Colisión).
 Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 posibles columnas_
 ;														; _ que puede ocupar el sprite de una entidad. (Colisión).
-
 ;---------------------------------------------------------------------------------------------------------------
 
 ; Relojes y temporizaciones.
@@ -560,20 +559,16 @@ Frame
 	ld hl,(Coordenadas_disparo_certero)
 	ex de,hl 											; D contiene la coordenada_y del disparo.
 ;														; E contiene la coordenada_X del disparo.	
-	ld hl,(Coordenada_X) 								; L Coordenada_x de la entidad.
-;														; H Coordenado_y de la entidad.	
+	ld hl,(Coordenada_X) 								; L COLUMNA (Coordenada_x de la entidad).
+;														; H FILA, (Coordenada_y de la entidad).	
 	and a
 	sbc hl,de
 
 	call Determina_resultado_comparativa
-	inc b
-	dec b
 
-;!!!!!!!!!!!!!!!!! Debuggggiiiiiinnnnnngggggggggggg
-;	jr z,$
-;!!!!!!!!!!!!!!!!! Debuggggiiiiiinnnnnngggggggggggg
-
-	jr z,7F 																	
+	ld a,b
+	and a
+	jr z,7F
 
 ; ----- ----- -----
 
@@ -589,6 +584,35 @@ Frame
 	ld a,(Ctrl_0)
 	bit 4,a
 	jr z,6F                                       	    ; Omitimos BORRAR/PINTAR si no hay movimiento.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ; Voy a utilizar una rutina de lectura de teclado para disparar con cualquier entidad.
 ; [[[
@@ -643,6 +667,30 @@ Frame
 	out ($fe),a  
 
 	ret
+
+; --------------------------------------------------------------------------------------------------------------
+;
+;	03/06/23
+;
+;	INPUTS: Las coordenadas de la entidad se generan a partir de su posición actual. La intención de esta_
+;	_ rutina es actualizar su coordenada_Y cuando se encuentran en las cuadrantes 2º y 3º de pantalla.
+;	Necesitamos esta información para comparar las coordenadas de la entidad con las del disparo colisionado.
+;
+;	INPUTS: HL contiene las coordenadas de la entidad cargada en DRAW.
+;
+;		H ..... FILA, (Coordenada_y)
+;		L ..... COLUMNA, (Coordenada_x)
+;
+;	MODIFICA: H y A.
+
+Modifica_coordenada_y 
+
+	ld a,(Cuad_objeto)
+	cp 2
+	jr c,1F
+	jr z,1F
+	inc h
+1 ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;

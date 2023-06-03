@@ -496,6 +496,7 @@ Calcula_puntero_de_impresion ld a,(Cuad_objeto)
 ; Estamos situados en el 1er cuadrante de pantalla. ----- ----- -----
 
 	call Operandos					; (Posicion_actual) en HL y (Columnas)-1 en B.
+
 4 ld a,l
 	and $1f
 	jr z,6F

@@ -585,7 +585,7 @@ Entidad_2 db 2,2		                     		; (Filas) / (Columns).
 	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
 	defw $485f                                      ; (Posicion_inicio).
 	db 1											; (Cuad_objeto).
-	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+	db 1,1,1,2                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 	defw Indice_mov_Escaloncitos_izquierda_abajo    ; (Puntero_indice_mov) 
 
 Entidad_3 db 2,2		                     		; (Filas) / (Columns).
