@@ -573,15 +573,16 @@ Frame
 
 	ld a,1												; Esta entidad ha sido alcanzada por un disparo_
 	ld (Impacto),a 										; _de Amadeus. Lo indicamos activando su .db (Impacto).
-	ld hl,Ctrl_1
-	res 2,(hl)
+
+;	ld hl,Ctrl_1
+;	res 2,(hl)
 
 ; Limpiamos las coordenadas del disparo asesino. Ya tenemos víctima.
 
-	ld hl,Coordenadas_disparo_certero
-	ld (hl),0
-	inc hl
-	ld (hl),0
+;	ld hl,Coordenadas_disparo_certero
+;	ld (hl),0
+;	inc hl
+;	ld (hl),0
 
 7 call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
 
@@ -605,6 +606,23 @@ Frame
 	pop bc
 	djnz 15B
 
+; ------------------------------------
+
+; Hemos gestionado todas las unidades.
+; Desactivamos el flag de impacto en entidad por disparo de amadeus.
+
+	ld hl,Ctrl_1
+	res 2,(hl)
+
+; Limpiamos las coordenadas del disparo asesino. 
+
+	ld hl,Coordenadas_disparo_certero
+	ld (hl),0
+	inc hl
+	ld (hl),0
+
+; ------------------------------------
+
 ; Tras la gestión de las entidades, ... AMADEUS.
 
 4 call Restore_Amadeus
@@ -612,8 +630,6 @@ Frame
 	ld a,(Impacto) 
 	and a
 	jr nz,$
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 	call Mov_Amadeus
 
