@@ -187,8 +187,8 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 ;														BIT 1, Este bit indica que el disparo sale de la pantalla, ($4000-$57ff).
 ;														BIT 2, Este bit a "1" indica que un disparo de Amadeus ha alcanzado a una entidad. Como no sabemos cual,_
 ;															_ hemos de comparar las coordenadas de (Coordenadas_disparo_certero) con las de cada entidad.
-;														BIT 3, .............
-;														BIT 4, .............
+;														BIT 3, Recarga de nueva oleada.
+;														BIT 4, Recarga de nueva oleada.
 
 Repone_puntero_objeto defw 0							; Almacena (Puntero_objeto). Cuando el Sprite se inicia por arriba o por abajo,_
 ; 														; _ hay que sustituirlo por un `sprite vacío' para que no se vea el 1er o último scanline.
@@ -509,14 +509,13 @@ Frame
 
 ; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- ----- 
 
-; Código que ejecutamos con cada entidad:
-
-; Impacto ???
-
 2 ld a,(Entidades_en_curso)
 	and a
-	jr z,4F
-	ld b,a
+	jr z,4F												; Si no hay entidades en curso, RESTORE AMADEUS.
+	ld b,a												; Entidades en curso en B.
+
+; Código que ejecutamos con cada entidad:
+; Impacto ???
 
 15 push bc 												; Nº de entidades en curso.
 
@@ -528,7 +527,7 @@ Frame
 
 	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la entidad `impactada´ para borrarla.
 
-;!!!!!! DEBUGGIN Desintegración/Explosión!!!!!!!!!!!
+;!!!!!! Desintegración/Explosión!!!!!!!!!!!
 
 	ld a,(Ctrl_2)
 	bit 1,a
@@ -568,7 +567,7 @@ Frame
 
 	ld a,b
 	and a
-	jr z,7F
+	jr z,7F												; B="0" significa que esta entidad no es la impactada.
 
 ; ----- ----- -----
 
@@ -576,7 +575,12 @@ Frame
 	ld (Impacto),a 										; _de Amadeus. Lo indicamos activando su .db (Impacto).
 	ld hl,Ctrl_1
 	res 2,(hl)
+
+; Limpiamos las coordenadas del disparo asesino. Ya tenemos víctima.
+
 	ld hl,Coordenadas_disparo_certero
+	ld (hl),0
+	inc hl
 	ld (hl),0
 
 7 call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
@@ -584,35 +588,6 @@ Frame
 	ld a,(Ctrl_0)
 	bit 4,a
 	jr z,6F                                       	    ; Omitimos BORRAR/PINTAR si no hay movimiento.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ; Voy a utilizar una rutina de lectura de teclado para disparar con cualquier entidad.
 ; [[[
@@ -667,30 +642,6 @@ Frame
 	out ($fe),a  
 
 	ret
-
-; --------------------------------------------------------------------------------------------------------------
-;
-;	03/06/23
-;
-;	INPUTS: Las coordenadas de la entidad se generan a partir de su posición actual. La intención de esta_
-;	_ rutina es actualizar su coordenada_Y cuando se encuentran en las cuadrantes 2º y 3º de pantalla.
-;	Necesitamos esta información para comparar las coordenadas de la entidad con las del disparo colisionado.
-;
-;	INPUTS: HL contiene las coordenadas de la entidad cargada en DRAW.
-;
-;		H ..... FILA, (Coordenada_y)
-;		L ..... COLUMNA, (Coordenada_x)
-;
-;	MODIFICA: H y A.
-
-Modifica_coordenada_y 
-
-	ld a,(Cuad_objeto)
-	cp 2
-	jr c,1F
-	jr z,1F
-	inc h
-1 ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
