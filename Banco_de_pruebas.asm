@@ -505,7 +505,7 @@ Frame
 	inc a
 	ld (Activa_recarga_cajas),a							; Pasado 1 seg. se repite la oleada de entidades.
 
-	jr 4F
+	jp 4F
 
 ; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- ----- 
 
@@ -565,9 +565,16 @@ Frame
 
 	call Determina_resultado_comparativa
 
+;! Debug colisiones
 	ld a,b
 	and a
+;	ld a,(Cuad_objeto)
+;	inc b
+;	dec b
 	jr z,7F												; B="0" significa que esta entidad no es la impactada.
+;	jr z,$
+
+;! Debug colisiones
 
 ; ----- ----- -----
 

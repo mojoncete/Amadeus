@@ -1122,10 +1122,29 @@ Determina_resultado_comparativa
 ;
 ;   SBC HL,DE
 
+; 2º Cuad H = "$ff","$00","$01","$02" .......... 1er Cuad H = "$00","$01","$02","$03"
+;         L = "$ff","$00","$01"       ..........          L = "$00","$01","$02"
+
+; 3º Cuad H = "$fe","$ff"             .......... 4º Cuad  H = "$00","$01","$02","$03"
+;         L = "$01","$02","$03"       ..........          L = "$00","$01","$02"
+
+
+    ld a,(Cuad_objeto)
+    cp 2
+    jr z,2F
+    jr c,2F
+
+; Cuadrantes 3º y 4º
+
+    and 1
+    jr z,4F
+
+; Cuadrante 3º
+
     ld a,h
     ld b,0
 
-    call Compara_cositas
+    call Compara_cositas_H3
 
     inc b
     dec b
@@ -1134,15 +1153,71 @@ Determina_resultado_comparativa
     ld a,l                                  ; B="1". La comparación de H es satisfactoria, pasamos a comparar L.
     ld b,0
  
-    call Compara_cositas
+    call Compara_cositas_L3
     ret 
 
-Compara_cositas and a
+; Cuadrante 4º
+
+4 ld a,h
+    ld b,0
+
+    call Compara_cositas_H4
+
+    inc b
+    dec b
+    ret z                                   ; B="0". Indica que H es distinto de "0, $fe, $ff o $01". Salimos de la rutina.
+
+    ld a,l                                  ; B="1". La comparación de H es satisfactoria, pasamos a comparar L.
+    ld b,0
+ 
+    call Compara_cositas_L4
+    ret 
+
+; Cuadrantes 1º y 2º.
+
+2 jr z,3F
+
+; 1er Cuadrante
+
+    ld a,h
+    ld b,0
+
+    call Compara_cositas_H1
+
+    inc b
+    dec b
+    ret z                                   ; B="0". Indica que H es distinto de "0, $fe, $ff o $01". Salimos de la rutina.
+
+    ld a,l                                  ; B="1". La comparación de H es satisfactoria, pasamos a comparar L.
+    ld b,0
+ 
+    call Compara_cositas_L1
+    ret 
+
+
+; 2º Cuadrante
+
+3 ld a,h
+    ld b,0
+
+    call Compara_cositas_H2
+
+    inc b
+    dec b
+    ret z                                   ; B="0". Indica que H es distinto de "0, $fe, $ff o $01". Salimos de la rutina.
+
+    ld a,l                                  ; B="1". La comparación de H es satisfactoria, pasamos a comparar L.
+    ld b,0
+ 
+    call Compara_cositas_L2
+    ret 
+
+Compara_cositas_H2 and a
     jr z,1F
-    cp $fd
-    jr z,1F
-    cp $fe
-    jr z,1F
+;    cp $fd
+;    jr z,1F
+;    cp $fe
+;    jr z,1F
     cp $ff
     jr z,1F
     cp $01
@@ -1150,6 +1225,129 @@ Compara_cositas and a
     cp $02
     jr z,1F
     ret nz
+1 inc b
+    ret
 
+Compara_cositas_L2 and a
+    jr z,1F
+;    cp $fd
+;    jr z,1F
+    cp $fe
+    jr z,1F
+    cp $ff
+    jr z,1F
+    cp $01
+    jr z,1F
+;    cp $02
+;    jr z,1F
+    ret nz
+1 inc b
+    ret
+
+Compara_cositas_H1 and a
+    jr z,1F
+;    cp $fd
+;    jr z,1F
+;    cp $fe
+;    jr z,1F
+    cp $ff
+    jr z,1F
+    cp $01
+    jr z,1F
+    cp $02
+    jr z,1F
+    cp $03
+    jr z,1F
+    ret nz
+1 inc b
+    ret
+
+Compara_cositas_L1 and a
+    jr z,1F
+;    cp $fd
+;    jr z,1F
+;    cp $fe
+;    jr z,1F
+;    cp $ff
+;    jr z,1F
+    cp $01
+    jr z,1F
+    cp $02
+    jr z,1F
+    cp $03
+    jr z,1F
+    ret nz
+1 inc b
+    ret
+
+Compara_cositas_H3 and a
+    jr z,1F
+;    cp $fd
+;    jr z,1F
+    cp $fe
+    jr z,1F
+    cp $ff
+    jr z,1F
+;    cp $01
+;    jr z,1F
+;    cp $02
+;    jr z,1F
+;    cp $03
+;    jr z,1F
+    ret nz
+1 inc b
+    ret
+
+Compara_cositas_L3 and a
+    jr z,1F
+;    cp $fd
+;    jr z,1F
+;    cp $fe
+;    jr z,1F
+;    cp $ff
+;    jr z,1F
+    cp $01
+    jr z,1F
+    cp $02
+    jr z,1F
+    cp $03
+    jr z,1F
+    ret nz
+1 inc b
+    ret
+
+Compara_cositas_H4 and a
+    jr z,1F
+    cp $fd
+    jr z,1F
+    cp $fe
+    jr z,1F
+    cp $ff
+    jr z,1F
+;    cp $01
+;    jr z,1F
+;    cp $02
+;    jr z,1F
+;    cp $03
+;    jr z,1F
+    ret nz
+1 inc b
+    ret
+
+Compara_cositas_L4 and a
+    jr z,1F
+;    cp $fd
+;    jr z,1F
+;    cp $fe
+;    jr z,1F
+    cp $ff
+    jr z,1F
+;    cp $01
+;    jr z,1F
+;    cp $02
+;    jr z,1F
+;    cp $03
+;    jr z,1F
+    ret nz
 1 inc b
     ret
