@@ -623,10 +623,10 @@ Frame
 
 ; Limpiamos las coordenadas del disparo asesino. 
 
-	ld hl,Coordenadas_disparo_certero
-	ld (hl),0
-	inc hl
-	ld (hl),0
+;	ld hl,Coordenadas_disparo_certero
+;	ld (hl),0
+;	inc hl
+;	ld (hl),0
 
 ; ------------------------------------
 

@@ -1125,8 +1125,8 @@ Determina_resultado_comparativa
 ; 2º Cuad H = "$ff","$00","$01","$02" .......... 1er Cuad H = "$00","$01","$02","$03"
 ;         L = "$ff","$00","$01"       ..........          L = "$00","$01","$02"
 
-; 3º Cuad H = "$fe","$ff"             .......... 4º Cuad  H = "$00","$01","$02","$03"
-;         L = "$01","$02","$03"       ..........          L = "$00","$01","$02"
+; 3º Cuad H = "$fe","$ff","$01"             .......... 4º Cuad  H = "$ff",$00","$01","$02","$03"
+;         L = "$01","$02","$03"             ..........          L = "$fe",$00","$01","$02"
 
 
     ld a,(Cuad_objeto)
@@ -1288,8 +1288,8 @@ Compara_cositas_H3 and a
     jr z,1F
     cp $ff
     jr z,1F
-;    cp $01
-;    jr z,1F
+    cp $01
+    jr z,1F
 ;    cp $02
 ;    jr z,1F
 ;    cp $03
@@ -1338,8 +1338,8 @@ Compara_cositas_L4 and a
     jr z,1F
 ;    cp $fd
 ;    jr z,1F
-;    cp $fe
-;    jr z,1F
+    cp $fe
+    jr z,1F
     cp $ff
     jr z,1F
 ;    cp $01

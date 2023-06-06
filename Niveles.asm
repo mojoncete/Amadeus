@@ -16,8 +16,8 @@ Indice_de_niveles
 	defw 0
 
 Nivel_1 db 10	                                ; Nº de entidades.
-	db 1,2,3,4,5
-	db 1,2,3,4,5
+	db 5,3,1,2,4
+	db 1,2,4,5,1
 Nivel_2 db 12									; Nº de entidades.
 	db 2,1,1,1,1,2								; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
 	db 2,1,1,1,1,2
