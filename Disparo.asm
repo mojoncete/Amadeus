@@ -1342,8 +1342,8 @@ Compara_cositas_L4 and a
     jr z,1F
     cp $ff
     jr z,1F
-;    cp $01
-;    jr z,1F
+    cp $01
+    jr z,1F
 ;    cp $02
 ;    jr z,1F
 ;    cp $03

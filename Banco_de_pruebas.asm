@@ -271,11 +271,11 @@ Temporiza_disparo_entidad db 15							; Reloj, decreciente.
 
 ; Gestión de FRAMES.
 
-Switch db 0
+;Switch db 0
 
 ; Variables de Raster y localización en pantalla.
 
-Temp_Raster defw $ff00
+;Temp_Raster defw $ff00
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -399,6 +399,7 @@ START
 	res 4,(hl)
 	di
 
+	jr $
 	jp 4B
 
 ; -----------------------------------------------------------------------------------
@@ -623,10 +624,10 @@ Frame
 
 ; Limpiamos las coordenadas del disparo asesino. 
 
-;	ld hl,Coordenadas_disparo_certero
-;	ld (hl),0
-;	inc hl
-;	ld (hl),0
+	ld hl,Coordenadas_disparo_certero
+	ld (hl),0
+	inc hl
+	ld (hl),0
 
 ; ------------------------------------
 
