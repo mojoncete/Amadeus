@@ -307,8 +307,13 @@ START
 ;	call Pinta_marco
 
 	call Inicializa_Punteros_de_nivel					 ; Inicializa. 1er NIVEL.
-	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
+;!! Aqui llamaremos a la rutina que hace copia de seguridad de las variables generales.
+
+
+
+
+	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 4 call Prepara_cajas
 
 	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en la 1ª entidad del_
