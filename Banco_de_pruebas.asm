@@ -271,7 +271,7 @@ Temporiza_disparo_entidad db 15							; Reloj, decreciente.
 
 ; Gestión de FRAMES.
 
-;Switch db 0
+Switch db 0
 
 ; Variables de Raster y localización en pantalla.
 
@@ -528,6 +528,10 @@ Frame
 
 ; Hay Impacto en esta entidad.
 
+	ld a,(Switch)										; Vamos a animar las explosiones a 25fps. Si el divisor (Switch)_
+	and a 												; _ es <> "0", omitimos animar la explosion , (Mov_obj), y pasamos_ 
+	jr nz,6F											; _ a gestionar la siguiente entidad, JR 6F.
+
 	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la entidad `impactada´ para borrarla.
 
 ;!!!!!! Desintegración/Explosión!!!!!!!!!!!
@@ -569,13 +573,13 @@ Frame
 	call Determina_resultado_comparativa
 
 ;! Debug colisiones
-	ld a,b
-	and a
-;	ld a,(Cuad_objeto)
-;	inc b
-;	dec b
-	jr z,7F												; B="0" significa que esta entidad no es la impactada.
-;	jr z,$
+;	ld a,b
+;	and a
+	ld a,(Cuad_objeto)
+	inc b
+	dec b
+;	jr z,7F												; B="0" significa que esta entidad no es la impactada.
+	jr z,$
 
 ;! Debug colisiones
 
@@ -664,6 +668,10 @@ Frame
 	call Calcula_numero_de_disparotes
 9 call Calcula_numero_de_malotes 
 
+	ld a,(Switch)
+	xor 1
+	ld (Switch),a                                       ; Pulso. (25fps). Lo voy a utilizar para ralentizar la animación de la_
+;														; _ explosión.
 	ld a,4
 	out ($fe),a  
 
@@ -699,6 +707,8 @@ Mov_obj
 	jr 3F
 	
 ; -----
+
+;	`Movemos´ la explosión.
 
 4 ld hl,(Puntero_DESPLZ_der)
 	inc hl
