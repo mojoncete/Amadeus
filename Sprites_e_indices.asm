@@ -207,26 +207,26 @@ Indice_Explosion_2x3 defw Explosion_2x3_1
 	defw Explosion_2x3_2
 	defw Explosion_2x3_3
 
-Explosion_2x3_1 DEFB $0d,$ed,$e0,$0d,$ed,$e0,$0d,$ed
-	DEFB	$e0,$0d,$ed,$e0,$0d,$ed,$e0,$0d
-	DEFB	$ed,$e0,$0d,$ed,$e0,$0d,$ed,$e0
-	DEFB	$0d,$ed,$e0,$0d,$ed,$e0,$0d,$ed
-	DEFB	$e0,$0d,$ed,$e0,$0d,$ed,$e0,$0d
-	DEFB	$ed,$e0,$0d,$ed,$e0,$0d,$ed,$e0
+Explosion_2x3_1 DEFB $00,$10,$00,$08,$10,$00,$04,$38
+	DEFB	$40,$03,$7D,$80,$02,$E6,$80,$01
+	DEFB	$B7,$00,$01,$7F,$00,$03,$DD,$80
+	DEFB	$0F,$FF,$E0,$03,$3B,$80,$01,$9D
+	DEFB	$00,$01,$F6,$00,$02,$FD,$80,$03
+	DEFB	$00,$40,$04,$00,$00,$08,$00,$00
 
-Explosion_2x3_2 DEFB $01,$8f,$80,$01,$8f,$80,$01,$8f
-	DEFB	$80,$01,$8f,$80,$01,$8f,$80,$01
-	DEFB	$8f,$f0,$01,$8f,$80,$01,$8f,$80
-	DEFB	$01,$8f,$80,$01,$8f,$80,$01,$8f
-	DEFB	$80,$01,$8f,$80,$01,$8f,$80,$01
-	DEFB	$8f,$f0,$01,$8f,$80,$01,$8f,$80
+Explosion_2x3_2 DEFB $08,$00,$00,$05,$38,$10,$03,$BC
+	DEFB	$20,$06,$00,$C0,$04,$06,$C0,$00
+	DEFB	$37,$00,$00,$7F,$00,$03,$DD,$80
+	DEFB	$03,$FE,$00,$03,$3A,$70,$01,$9C
+	DEFB	$60,$01,$F6,$40,$04,$F8,$80,$06
+	DEFB	$00,$00,$08,$00,$00,$00,$00,$00
 
-Explosion_2x3_3 DEFB $01,$11,$10,$01,$11,$10,$01,$11
-	DEFB	$10,$01,$11,$10,$01,$11,$10,$01
-	DEFB	$11,$10,$01,$11,$10,$01,$11,$10
-	DEFB	$01,$11,$10,$01,$11,$10,$01,$11
-	DEFB	$10,$01,$11,$10,$01,$11,$10,$01
-	DEFB	$11,$10,$01,$11,$10,$01,$11,$10
+Explosion_2x3_3 DEFB $03,$18,$10,$04,$00,$20,$08,$00
+	DEFB	$40,$00,$00,$C0,$00,$06,$00,$00
+	DEFB	$15,$00,$08,$1E,$00,$00,$14,$30
+	DEFB	$08,$66,$00,$00,$38,$00,$01,$08
+	DEFB	$00,$01,$80,$00,$00,$80,$00,$04
+	DEFB	$03,$20,$06,$00,$10,$08,$00,$20
 
 ; ------------------------------------------
 
@@ -234,18 +234,19 @@ Indice_Explosion_2x2 defw Explosion_2x2_1
 	defw Explosion_2x2_2
 	defw Explosion_2x2_3
 
-Explosion_2x2_1 DEFB $de,$de,$de,$de,$de,$de,$de,$de
-	DEFB $de,$de,$de,$de,$de,$de,$de,$de
-	DEFB $de,$de,$de,$de,$de,$de,$de,$de
-	DEFB $de,$de,$de,$de,$de,$de,$de,$de
+Explosion_2x2_1 DEFB $01,$00,$81,$00,$43,$84,$37,$D8
+	DEFB	$2E,$68,$1B,$70,$17,$F0,$3D,$D8
+	DEFB	$FF,$FE,$33,$B8,$19,$D0,$1F,$60
+	DEFB	$2F,$D8,$30,$04,$40,$00,$80,$00
 
-Explosion_2x2_2	DEFB $de,$de,$de,$de,$de,$de,$de,$de
-	DEFB $de,$de,$de,$de,$de,$de,$de,$de
-	DEFB $de,$de,$de,$de,$de,$de,$de,$de
-	DEFB $de,$de,$de,$de,$de,$de,$de,$de
 
-Explosion_2x2_3	DEFB $de,$de,$de,$de,$de,$de,$de,$de
-	DEFB $de,$de,$de,$de,$de,$de,$de,$de
-	DEFB $de,$de,$de,$de,$de,$de,$de,$de
-	DEFB $de,$de,$de,$de,$de,$de,$de,$de
+Explosion_2x2_2	DEFB $80,$00,$53,$81,$3B,$C2,$60,$0C
+	DEFB	$40,$6C,$03,$70,$07,$F0,$3D,$D8
+	DEFB	$3F,$E0,$33,$A7,$19,$C6,$1F,$64
+	DEFB	$4F,$88,$60,$00,$80,$00,$00,$00
+
+Explosion_2x2_3	DEFB $31,$81,$40,$02,$88,$04,$10,$0C
+	DEFB	$20,$60,$01,$50,$81,$E0,$01,$43
+	DEFB	$86,$60,$03,$80,$10,$80,$18,$00
+	DEFB	$08,$00,$40,$32,$60,$01,$80,$02
 
