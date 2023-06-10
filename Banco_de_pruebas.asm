@@ -270,16 +270,6 @@ Temporiza_disparo_entidad db 15							; Reloj, decreciente.
 
 ;---------------------------------------------------------------------------------------------------------------
 
-; Gestión de FRAMES.
-
-; Switch db 0
-
-; Variables de Raster y localización en pantalla.
-
-; Temp_Raster defw $ff00
-
-;---------------------------------------------------------------------------------------------------------------
-
 ; Gestión de NIVELES.
 
 Nivel db 0												 ; Nivel actual del juego.
@@ -340,9 +330,8 @@ START
 	pop bc
 	djnz 1B  											; Decremento el contador de entidades.
 
-;	call Pinta_marco
-
 ; Si Amadeus ya está iniciado, saltamos a [Inicia_punteros_de_cajas] y [Restore_entidad].
+; (Esto se dá cuando se inicia una nueva oleada).
 
 	ld a,(Ctrl_1)
 	bit 3,a
@@ -403,6 +392,14 @@ START
 	res 4,(hl)
 	di
 
+	ld a,(Contador_de_frames)
+
+;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
+;! _ IMPREDECIBLE !!!!
+
+	add 10
+	ld (Clock_Entidades_en_curso),a
+
 	jp 4B
 
 ; -----------------------------------------------------------------------------------
@@ -420,9 +417,6 @@ Frame
 	call Extrae_foto_disparos
     ld a,1
     out ($fe),a
-
-
-;    jr $
 
 ; ----------------------------------------------------------------------
 
@@ -590,13 +584,6 @@ Frame
 	ld hl,Ctrl_1
 	res 2,(hl)
 
-; Limpiamos las coordenadas del disparo asesino. Ya tenemos víctima.
-
-;	ld hl,Coordenadas_disparo_certero
-;	ld (hl),0
-;	inc hl
-;	ld (hl),0
-
 7 call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
 
 	ld a,(Ctrl_0)
@@ -620,19 +607,12 @@ Frame
 	djnz 15B
 
 ; ------------------------------------
-
+;! Activando estas líneas podemos habilitar 2 explosiones en el mismo FRAME.
 ; Hemos gestionado todas las unidades.
 ; Desactivamos el flag de impacto en entidad por disparo de amadeus.
 
 ;	ld hl,Ctrl_1
 ;	res 2,(hl)
-
-; Limpiamos las coordenadas del disparo asesino. 
-
-;	ld hl,Coordenadas_disparo_certero
-;	ld (hl),0
-;	inc hl
-;	ld (hl),0
 
 ; ------------------------------------
 
