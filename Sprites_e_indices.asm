@@ -14,13 +14,13 @@ Indice_disparo defw Disparo_0
 	defw Disparo_fd
 
 ; Disparo (CTRL_DESPLZ)="0".
-Disparo_0 DEFB $01,$80,$01,$80
+Disparo_0 DEFB $01,$80,$01,$80,$01,$80,$01,$80
 ; Disparo (CTRL_DESPLZ)="f9"
-Disparo_f9 DEFB $00,$60,$00,$60
+Disparo_f9 DEFB $00,$60,$00,$60,$00,$60,$00,$60
 ; Disparo (CTRL_DESPLZ)="fb" 
-Disparo_fb DEFB $18,$00,$18,$00
+Disparo_fb DEFB $18,$00,$18,$00,$18,$00,$18,$00
 ; Disparo (CTRL_DESPLZ)="fd" 
-Disparo_fd DEFB $06,$00,$06,$00
+Disparo_fd DEFB $06,$00,$06,$00,$06,$00,$06,$00
 
 ; ----------------------------------------------------------------------------------------
 

@@ -933,6 +933,7 @@ Mueve_disparo push hl
     call PreviousScan 
     call PreviousScan
     call PreviousScan
+    call PreviousScan
 
 ; Detecta si el disparo de Amadeus sale de pantalla:
 
@@ -979,12 +980,13 @@ Mueve_disparo push hl
 
 ; Disparo hacia abajo, (Entidad).
 
-; Nota: Aquí podemos implementar una variable para modificar la velocidad del disparo en función_
-; _ de la dificultad.
+;! Nota: Aquí podemos implementar una variable para modificar la velocidad del disparo en función_
+;! _ de la dificultad.
 
 2 call NextScan
     call NextScan
     call NextScan
+;    call NextScan
 
 ; Detecta si el disparo de la entidad sale de la pantalla.
 
@@ -1324,8 +1326,8 @@ Compara_cositas_H4 and a
     jr z,1F
     cp $ff
     jr z,1F
-;    cp $01
-;    jr z,1F
+    cp $01
+    jr z,1F
 ;    cp $02
 ;    jr z,1F
 ;    cp $03

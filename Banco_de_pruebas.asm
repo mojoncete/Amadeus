@@ -256,7 +256,8 @@ Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 pos
 ; Relojes y temporizaciones.
 
 Contador_de_frames db 0	 								
-Secundero db 0
+Clock_explosion db 4
+Clock_Entidades_en_curso db 30
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
 Habilita_disparo_Amadeus db 1
@@ -271,11 +272,11 @@ Temporiza_disparo_entidad db 15							; Reloj, decreciente.
 
 ; Gestión de FRAMES.
 
-Switch db 0
+; Switch db 0
 
 ; Variables de Raster y localización en pantalla.
 
-;Temp_Raster defw $ff00
+; Temp_Raster defw $ff00
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -387,7 +388,7 @@ START
 2 ei
 	jr z,2B
 
-	ld a,(Secundero)
+	ld a,(Contador_de_frames)
 	ld b,a
 	ld a,(Activa_recarga_cajas)
 	cp b
@@ -430,34 +431,29 @@ Frame
 	ld hl,Contador_de_frames
 	inc (hl)											; 0 - 255
 
-	ld a,60
-	cp (hl)
+	ld a,(Clock_Entidades_en_curso)
+	ld b,a
+	ld a,(Contador_de_frames)
+	cp b
 	jr nz,13F
-
-	ld (hl),0
-
-	ld hl,Secundero
-	inc (hl)
-
-	ld a,(hl)
-	and %00000001
-	jr nz,20F
 
 	ld a,(Numero_parcial_de_entidades)
 	ld b,a
 	ld a,(Entidades_en_curso)
 	cp b
-	jr z,20F
-	jr nc,20F
+	jr z,13F
+	jr nc,13F
 
 	inc a
 	ld (Entidades_en_curso),a
 
-20 ld a,60
-	cp (hl)
-	jr nz,13F
+	ld a,(Clock_Entidades_en_curso)
 
-	ld (hl),0
+;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
+;! _ IMPREDECIBLE !!!!
+
+	add 100
+	ld (Clock_Entidades_en_curso),a
 
 13 ld hl,Habilita_disparo_Amadeus
 	ld de,Temporiza_disparo_Amadeus
@@ -503,12 +499,11 @@ Frame
 	jp nz,4F
 
 	ld hl,Ctrl_1
-	set 3,(hl)											; Señal de RECARGA de las cajas DRAW activada.
-	ld a,(Secundero)
-	inc a
-	ld (Activa_recarga_cajas),a							; Pasado 1 seg. se repite la oleada de entidades.
+	set 3,(hl)											; Señal de RECARGA de las cajas DRAW activada. NUEVA OLEADA !!!!!!!!
 
-	jp 4F
+	ld a,(Contador_de_frames)
+	inc a
+	ld (Activa_recarga_cajas),a
 
 ; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- ----- 
 
@@ -528,9 +523,13 @@ Frame
 
 ; Hay Impacto en esta entidad.
 
-	ld a,(Switch)										; Vamos a animar las explosiones a 25fps. Si el divisor (Switch)_
-	and a 												; _ es <> "0", omitimos animar la explosion , (Mov_obj), y pasamos_ 
-	jr nz,6F											; _ a gestionar la siguiente entidad, JR 6F.
+	ld hl,Clock_explosion								; _ a gestionar la siguiente entidad, JR 6F.
+	dec (hl)
+
+	jr nz,6F
+
+	ld (hl),4
+
 
 	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la entidad `impactada´ para borrarla.
 
@@ -573,13 +572,13 @@ Frame
 	call Determina_resultado_comparativa
 
 ;! Debug colisiones
-;	ld a,b
-;	and a
-	ld a,(Cuad_objeto)
-	inc b
-	dec b
-;	jr z,7F												; B="0" significa que esta entidad no es la impactada.
-	jr z,$
+	ld a,b
+	and a
+;	ld a,(Cuad_objeto)
+;	inc b
+;	dec b
+	jr z,7F												; B="0" significa que esta entidad no es la impactada.
+;	jr z,$
 
 ;! Debug colisiones
 
@@ -668,10 +667,6 @@ Frame
 	call Calcula_numero_de_disparotes
 9 call Calcula_numero_de_malotes 
 
-	ld a,(Switch)
-	xor 1
-	ld (Switch),a                                       ; Pulso. (25fps). Lo voy a utilizar para ralentizar la animación de la_
-;														; _ explosión.
 	ld a,4
 	out ($fe),a  
 

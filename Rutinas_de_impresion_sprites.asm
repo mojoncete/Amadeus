@@ -385,7 +385,7 @@ Pinta_enemigo_3x2_derecha_1columna ld (Stack),sp
 
 Pinta_Disparo ld (Stack),sp
     ld sp,iy
-    ld b,2
+    ld b,4
 1 pop de
     ld a,e
     xor (hl)
