@@ -519,19 +519,19 @@ Frame
 
 	ld hl,Clock_explosion								; _ a gestionar la siguiente entidad, JR 6F.
 	dec (hl)
-
 	jr nz,6F
 
-	ld (hl),4
-
-
+	ld (hl),4 											; Reiniciamos el temporizador de la explosión,_
+;														; _,(velocidad de la explosión).
 	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la entidad `impactada´ para borrarla.
 
 ;!!!!!! Desintegración/Explosión!!!!!!!!!!!
 
 	ld a,(Ctrl_2)
 	bit 1,a
-	jr nz,7F											; Omitimos si ya hemos imprimido el 1er FRAME de la explosión.
+	jr nz,7F											
+
+; Inicialización del proceso de explosión. Omitimos si ya hemos imprimido el 1er FRAME de la explosión.
 
 	ld a,(CTRL_DESPLZ)
 	and a
@@ -583,6 +583,9 @@ Frame
 
 	ld hl,Ctrl_1
 	res 2,(hl)
+
+;! Aqui consultaremos si (Limitador_de_entidades_a_imprimir)="0".
+;! Si no lo es, activaremos (autorización_de_movimiento) de la entidad y decrementaremos el limitador.
 
 7 call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
 
