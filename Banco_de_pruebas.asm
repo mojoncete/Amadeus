@@ -199,7 +199,7 @@ Repone_puntero_objeto defw 0							; Almacena (Puntero_objeto). Cuando el Sprite
 
 ; Gestión de ENTIDADES y CAJAS.
 
-;Entidades_x_frame db 2									; Nº de entidades que pintaremos en un frame, (excluye a Amadeus).
+Limitador_de_entidades_x_frame db 2						; Nº de entidades que pintaremos en un frame, (excluye a Amadeus).
 Puntero_store_caja defw 0
 Puntero_restore_caja defw 0
 Indice_restore_caja defw 0
@@ -256,7 +256,7 @@ Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 pos
 ; Relojes y temporizaciones.
 
 Contador_de_frames db 0	 								
-Clock_explosion db 4
+Clock_explosion db 3
 Clock_Entidades_en_curso db 30
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
@@ -521,7 +521,9 @@ Frame
 	dec (hl)
 	jr nz,6F
 
-	ld (hl),4 											; Reiniciamos el temporizador de la explosión,_
+;! Velocidad de la animación de la explosión.
+
+	ld (hl),3 											; Reiniciamos el temporizador de la explosión,_
 ;														; _,(velocidad de la explosión).
 	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la entidad `impactada´ para borrarla.
 
@@ -529,7 +531,7 @@ Frame
 
 	ld a,(Ctrl_2)
 	bit 1,a
-	jr nz,7F											
+	jr nz,7F											; Se han iniciado los punteros de explosión???									
 
 ; Inicialización del proceso de explosión. Omitimos si ya hemos imprimido el 1er FRAME de la explosión.
 
@@ -584,10 +586,7 @@ Frame
 	ld hl,Ctrl_1
 	res 2,(hl)
 
-;! Aqui consultaremos si (Limitador_de_entidades_a_imprimir)="0".
-;! Si no lo es, activaremos (autorización_de_movimiento) de la entidad y decrementaremos el limitador.
-
-7 call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
+7 call Mov_obj										; MOVEMOS y decrementamos (Numero_de_malotes)
 
 	ld a,(Ctrl_0)
 	bit 4,a
@@ -608,6 +607,11 @@ Frame
 
 	pop bc
 	djnz 15B
+
+; Hemos gestionado todas las Entidades_en_curso, restauramos el limitador.
+
+	ld a,2
+	ld (Limitador_de_entidades_x_frame),a
 
 ; ------------------------------------
 ;! Activando estas líneas podemos habilitar 2 explosiones en el mismo FRAME.
@@ -701,7 +705,37 @@ Mov_obj
 	call Guarda_foto_entidad_a_borrar
 	jr 3F
 
-2 xor a
+
+
+2 
+
+; debug
+
+;	jr $
+
+	ld a,(Limitador_de_entidades_x_frame)				; Quedan entidades a mover en este frame?
+	and a												; Salimos de la rutina si es "0".
+	ret z
+
+	ld a,(Autoriza_movimiento)							; Hemos desplazado esta entidad en el Frame anterior?
+	and a												; Y si es así, se trata de la primera entidad???
+	jr nz,5F											
+
+	ld a,1												; Esta entidad no se ha movido en el anterior FRAME.
+	ld (Autoriza_movimiento),a 							; Autorizamos movimiento y descontamos el limitador.
+	ld hl,Limitador_de_entidades_x_frame
+	dec (hl)
+	jr 6F
+
+5 ld a,(Entidades_en_curso)
+	ld b,a
+	ld a,(Limitador_de_entidades_x_frame)
+	cp b
+
+	ret z
+	ret c
+
+6 xor a
 	ld (Obj_dibujado),a
 	ld (Ctrl_0),a 										; El bit4 de (Ctrl_0) puede estar alzado debido al movimiento de Amadeus.
 ;														; Necesito restaurarlo, lo utilizaremos para detectar el movimiento_
