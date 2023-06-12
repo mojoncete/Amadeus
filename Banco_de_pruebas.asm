@@ -705,37 +705,7 @@ Mov_obj
 	call Guarda_foto_entidad_a_borrar
 	jr 3F
 
-
-
-2 
-
-; debug
-
-;	jr $
-
-	ld a,(Limitador_de_entidades_x_frame)				; Quedan entidades a mover en este frame?
-	and a												; Salimos de la rutina si es "0".
-	ret z
-
-	ld a,(Autoriza_movimiento)							; Hemos desplazado esta entidad en el Frame anterior?
-	and a												; Y si es así, se trata de la primera entidad???
-	jr nz,5F											
-
-	ld a,1												; Esta entidad no se ha movido en el anterior FRAME.
-	ld (Autoriza_movimiento),a 							; Autorizamos movimiento y descontamos el limitador.
-	ld hl,Limitador_de_entidades_x_frame
-	dec (hl)
-	jr 6F
-
-5 ld a,(Entidades_en_curso)
-	ld b,a
-	ld a,(Limitador_de_entidades_x_frame)
-	cp b
-
-	ret z
-	ret c
-
-6 xor a
+2 xor a
 	ld (Obj_dibujado),a
 	ld (Ctrl_0),a 										; El bit4 de (Ctrl_0) puede estar alzado debido al movimiento de Amadeus.
 ;														; Necesito restaurarlo, lo utilizaremos para detectar el movimiento_
@@ -743,6 +713,10 @@ Mov_obj
     call Prepara_var_pintado_borrado                    ; Almaceno las `VARIABLES DE BORRADO´. de la entidad almacenada en DRAW en (Variables_de_borrado).
 ;														; Obj_dibujado="0".
 ; Movemos Entidades malignas.
+
+	ld a,(Autoriza_movimiento)							; Salimos de la rutina si no estamos autorizados_
+	and a 												; _a movernos. (Limitador_de_entidades).
+	ret z
 
 	ld hl,Puntero_indice_mov			 				; (hl)="0", objeto estático!!!.
 	inc (hl)
