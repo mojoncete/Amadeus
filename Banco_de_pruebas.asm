@@ -503,13 +503,17 @@ Frame
 
 2 ld a,(Entidades_en_curso)
 	and a
-	jr z,4F												; Si no hay entidades en curso, RESTORE AMADEUS.
-	ld b,a												; Entidades en curso en B.
+	jp z,4F												; Si no hay entidades en curso, RESTORE AMADEUS.
+	ld b,a												; (Entidades_en_curso) en A´ y B.
+
+	ex af,af
 
 ; Código que ejecutamos con cada entidad:
 ; Impacto ???
 
 15 push bc 												; Nº de entidades en curso.
+
+	call Autorizacion
 
 	ld a,(Impacto)										 
 	and a
@@ -586,7 +590,7 @@ Frame
 	ld hl,Ctrl_1
 	res 2,(hl)
 
-7 call Mov_obj										; MOVEMOS y decrementamos (Numero_de_malotes)
+7 call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
 
 	ld a,(Ctrl_0)
 	bit 4,a
@@ -1241,8 +1245,10 @@ Detecta_disparo_entidad
 	include "Direcciones.asm"
 	include "Genera_coordenadas.asm"
 	include "Patrones_de_mov.asm"
-	include "Guarda_foto_registros.asm"
 	include "Relojes_y_temporizaciones.asm"
+	include "Autorizacion.asm"
+
+	include "Guarda_foto_registros.asm"
 
 	SAVESNA "Pruebas.sna", START
 
