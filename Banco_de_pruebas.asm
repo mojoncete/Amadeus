@@ -199,7 +199,6 @@ Repone_puntero_objeto defw 0							; Almacena (Puntero_objeto). Cuando el Sprite
 
 ; Gestión de ENTIDADES y CAJAS.
 
-Limitador_de_entidades_x_frame db 2						; Nº de entidades que pintaremos en un frame, (excluye a Amadeus).
 Puntero_store_caja defw 0
 Puntero_restore_caja defw 0
 Indice_restore_caja defw 0
