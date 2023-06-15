@@ -506,14 +506,14 @@ Frame
 	jp z,4F												; Si no hay entidades en curso, RESTORE AMADEUS.
 	ld b,a												; (Entidades_en_curso) en A´ y B.
 
-	ex af,af
+;	ex af,af
 
 ; Código que ejecutamos con cada entidad:
 ; Impacto ???
 
 15 push bc 												; Nº de entidades en curso.
 
-	call Autorizacion
+;	call Autorizacion
 
 	ld a,(Impacto)										 
 	and a
@@ -614,8 +614,8 @@ Frame
 
 ; Hemos gestionado todas las Entidades_en_curso, restauramos el limitador.
 
-	ld a,2
-	ld (Limitador_de_entidades_x_frame),a
+;	ld a,2
+;	ld (Limitador_de_entidades_x_frame),a
 
 ; ------------------------------------
 ;! Activando estas líneas podemos habilitar 2 explosiones en el mismo FRAME.
@@ -718,9 +718,9 @@ Mov_obj
 ;														; Obj_dibujado="0".
 ; Movemos Entidades malignas.
 
-	ld a,(Autoriza_movimiento)							; Salimos de la rutina si no estamos autorizados_
-	and a 												; _a movernos. (Limitador_de_entidades).
-	ret z
+;	ld a,(Autoriza_movimiento)							; Salimos de la rutina si no estamos autorizados_
+;	and a 												; _a movernos. (Limitador_de_entidades).
+;	ret z
 
 	ld hl,Puntero_indice_mov			 				; (hl)="0", objeto estático!!!.
 	inc (hl)
@@ -1246,8 +1246,6 @@ Detecta_disparo_entidad
 	include "Genera_coordenadas.asm"
 	include "Patrones_de_mov.asm"
 	include "Relojes_y_temporizaciones.asm"
-	include "Autorizacion.asm"
-
 	include "Guarda_foto_registros.asm"
 
 	SAVESNA "Pruebas.sna", START

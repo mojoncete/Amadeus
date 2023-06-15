@@ -181,7 +181,7 @@ Caja_1 db 0,0										; (Filas) / (Columns).
 	db 0,0,0,0										;	" " " " " " "
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
-Autoriza_1 db 0										; (Autoriza_movimiento).
+	db 0											; (Autoriza_movimiento).
 
 	defw 0,0										; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
@@ -222,7 +222,7 @@ Caja_2 db 0,0										; (Filas) / (Columns).
 	db 0,0,0,0										;	" " " " " " "
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
-Autoriza_2 db 0										; (Autoriza_movimiento).
+	db 0											; (Autoriza_movimiento).
 
 	defw 0,0										; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
@@ -263,7 +263,7 @@ Caja_3 db 0,0										; (Filas) / (Columns).
 	db 0,0,0,0										;	" " " " " " "
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
-Autoriza_3 db 0										; (Autoriza_movimiento).
+	db 0											; (Autoriza_movimiento).
 
 	defw 0,0										; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
@@ -304,7 +304,7 @@ Caja_4 db 0,0										; (Filas) / (Columns).
 	db 0,0,0,0										;	" " " " " " "
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
-Autoriza_4 db 0										; (Autoriza_movimiento).
+	db 0											; (Autoriza_movimiento).
 
 	defw 0,0										; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
@@ -345,7 +345,7 @@ Caja_5 db 0,0										; (Filas) / (Columns).
 	db 0,0,0,0										;	" " " " " " "
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
-Autoriza_5 db 0										; (Autoriza_movimiento).
+	db 0											; (Autoriza_movimiento).
 
 	defw 0,0										; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
@@ -386,7 +386,7 @@ Caja_6 db 0,0										; (Filas) / (Columns).
 	db 0,0,0,0										;	" " " " " " "
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
-Autoriza_6 db 0										; (Autoriza_movimiento).
+	db 0											; (Autoriza_movimiento).
 
 	defw 0,0										; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
@@ -427,7 +427,7 @@ Caja_7 db 0,0										; (Filas) / (Columns).
 	db 0,0,0,0										;	" " " " " " "
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
-Autoriza_7 db 0										; (Autoriza_movimiento).
+	db 0											; (Autoriza_movimiento).
 
 	defw 0,0										; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
@@ -468,7 +468,7 @@ Caja_8 db 0,0										; (Filas) / (Columns).
 	db 0,0,0,0										;	" " " " " " "
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
-Autoriza_8 db 0										; (Autoriza_movimiento).
+	db 0											; (Autoriza_movimiento).
 
 	defw 0,0										; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
@@ -509,7 +509,7 @@ Caja_9 db 0,0										; (Filas) / (Columns).
 	db 0,0,0,0										;	" " " " " " "
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
-Autoriza_9 db 0										; (Autoriza_movimiento).
+	db 0											; (Autoriza_movimiento).
 
 	defw 0,0										; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
@@ -550,7 +550,7 @@ Caja_10 db 0,0										; (Filas) / (Columns).
 	db 0,0,0,0										;	" " " " " " "
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
-Autoriza_10 db 0									; (Autoriza_movimiento).
+	db 0											; (Autoriza_movimiento).
 
 	defw 0,0										; (Puntero_indice_mov) / (Puntero_mov).
 	db 0,0,0										; (Contador_db_mov) / (Incrementa_puntero) / (Repetimos_db).									  
@@ -624,16 +624,3 @@ Entidad_5 db 2,2		                     		; (Filas) / (Columns).
 	db 1											; (Cuad_objeto).
 	db 1,2,1,2                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 	defw Indice_mov_Escaloncitos_derecha_abajo							; (Puntero_indice_mov)
-
-Indice_de_autorizaciones
-
-	defw Autoriza_1
-	defw Autoriza_2
-	defw Autoriza_3
-	defw Autoriza_4
-	defw Autoriza_5
-	defw Autoriza_6
-	defw Autoriza_7
-	defw Autoriza_8
-	defw Autoriza_9
-	defw Autoriza_10
