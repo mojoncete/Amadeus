@@ -255,7 +255,7 @@ Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 pos
 ; Relojes y temporizaciones.
 
 Contador_de_frames db 0	 								
-Clock_explosion db 3
+Clock_explosion db 4
 Clock_Entidades_en_curso db 30
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
@@ -297,8 +297,6 @@ START
 ;	call Pinta_marco
 
 	call Inicializa_Punteros_de_nivel					 ; Inicializa. 1er NIVEL.
-
-;!! Aqui llamaremos a la rutina que hace copia de seguridad de las variables generales.
 
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
@@ -526,7 +524,7 @@ Frame
 
 ;! Velocidad de la animación de la explosión.
 
-	ld (hl),3 											; Reiniciamos el temporizador de la explosión,_
+	ld (hl),4 											; Reiniciamos el temporizador de la explosión,_
 ;														; _,(velocidad de la explosión).
 	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la entidad `impactada´ para borrarla.
 
