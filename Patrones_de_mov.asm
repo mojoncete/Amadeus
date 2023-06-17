@@ -140,10 +140,10 @@ Decoder
     ld (Repetimos_db),a
     inc hl
     ld (Puntero_mov),hl
-    jr 11B
+    jr 11BReinicia_el_movimiento
 
 
-    ld hl,(Puntero_indice_mov)                                     ; PASAMOS A LA CADENA SIGUIENTE !!!!!!
+7 ld hl,(Puntero_indice_mov)                                     ; PASAMOS A LA CADENA SIGUIENTE !!!!!!
     ld a,(Incrementa_puntero)
     ld b,a
 8 inc hl
@@ -184,7 +184,7 @@ Reinicia_el_movimiento call Prepara_Puntero_mov
     ld (Contador_db_mov),a
     ld (Incrementa_puntero),a
     jp Movimiento
-    ret
+
 ; ---------- --------- --------- ---------- ----------
 
 
