@@ -271,11 +271,16 @@ Temporiza_disparo_entidad db 15							; Reloj, decreciente.
 
 ; Gestión de NIVELES.
 
-Nivel db 0												 ; Nivel actual del juego.
+Nivel db 0												; Nivel actual del juego.
 Puntero_indice_NIVELES defw 0
-Datos_de_nivel defw 0									 ; Este puntero se va desplazando por los distintos bytes_
-; 														 ; _ que definen el NIVEL.
+Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos bytes_
+; 														; _ que definen el NIVEL.
 
+;---------------------------------------------------------------------------------------------------------------
+
+; Pequeño almacén de 4 bytes para guardar los perfiles de velocidad.
+
+Almacen_de_velocidades ds 4 
 
 ; Y todo comienza aquí .....
 ;
@@ -285,10 +290,10 @@ Datos_de_nivel defw 0									 ; Este puntero se va desplazando por los distinto
 
 START 
 
-	ld sp,$ffff											 ; Situamos el inicio de Stack.
-	ld a,$a0 											 ; Habilitamos el modo 2 de interrupciones y fijamos el salto a $a0ff
-	ld i,a 												 ; Byte alto de la dirección donde se encuentra nuestro vector de interrupciones en el registro I. ($90). El byte bajo será siempre $ff.
-	IM 2 											     ; Habilitamos el modo 2 de INTERRUPCIONES.
+	ld sp,$ffff											; Situamos el inicio de Stack.
+	ld a,$a0 											; Habilitamos el modo 2 de interrupciones y fijamos el salto a $a0ff
+	ld i,a 												; Byte alto de la dirección donde se encuentra nuestro vector de interrupciones en el registro I. ($90). El byte bajo será siempre $ff.
+	IM 2 											    ; Habilitamos el modo 2 de INTERRUPCIONES.
 	DI 													 										 
 
 	ld a,%00000111
@@ -300,7 +305,7 @@ START
 
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
-4 call Prepara_cajas
+4 call Prepara_cajas 									 ; (Niveles.asm).
 
 	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en la 1ª entidad del_
 ;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.

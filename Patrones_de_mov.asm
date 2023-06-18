@@ -1,6 +1,6 @@
 
 
-;   11/8/22
+;   17/06/23
 ;
 ;   Base de datos. PATRONES DE MOVIMIENTO.
 ;
@@ -12,7 +12,8 @@
 ;   Codificación:
 ;
 ;   1er Byte ..... Repetición del movimiento. (0-255) pixeles.
-;   2º Byte ..... velocidad del movimiento, (8,4,2,1) ..... % abajo,arriba,derecha,izquierda  
+;   2º Byte (Nibble alto) ..... Velocidad del movimiento (% abajo,arriba,derecha,izquierda).
+;           (Nibble bajo) ..... Dirección del movimiento (% abajo,arriba,derecha,izquierda).  
 
 ;   El "0"; último .db indica que ya hemos terminado de ejecutar todas las cadenas de movimiento.     
 
@@ -37,11 +38,7 @@ Izquierda_y_derecha db 33,%00011111,%00011111,%00011111,%00011111,%00011111,%000
     db %00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111
     db %00101111,%00101111,%00101111,%00101111,%00101111,%00101111,0
 
-Baile_de_BadSat db 3,140,%00011000,0
-
-
-
-
+Baile_de_BadSat db 3,140,%10001000,0
 
 ; ----- ----- ----- ----- -----
 
@@ -61,6 +58,8 @@ Indice_mov_Baile_de_BadSat defw Baile_de_BadSat
 
 
 ; ----- ----- ----- ----- -----
+;
+;   18/06/23
 
 Movimiento 
 
@@ -71,6 +70,7 @@ Movimiento
     jr Decoder                                                  ; Saltamos a [Decoder] si ya hemos iniciado la cadena.
 
 ; Inicializa movimiento, (comienza un movimiento).
+; Nota: Previamente, la rutina [DRAW], ha iniciado la entidad, (Puntero_mov) ya apunta a su cadena de movimiento correspondiente.
 
 1 ld a,(Incrementa_puntero)                                     ; Vamos a inicializar las variables de movimiento. El contador (Incrementa_puntero) es un byte que inicialmente está a "0"._
     add 2                                                       ; _va incrementando su valor en 2 unidades cada vez que iniciamos una cadena. Se utiliza para ir incrementando (Puntero_mov)_
@@ -78,11 +78,13 @@ Movimiento
 ;                                                               ; _ el .db0. (Indica que hemos terminado de leer la secuencia de movimiento completa de la entidad).
     ld hl,(Puntero_mov)
     ld a,(hl)
-    ld (Contador_db_mov),a                                      ; Contador de bytes de la cadena inicializado. (El 1er byte de cada cadena de mov. indica el nº de bytes de_
-    and a
-    call z, Reinicia_el_movimiento                              ; Hemos terminado de ejecutar todas las cadenas de movimiento. Llamamos a [Fin_de_movimiento].
+    ld (Contador_db_mov),a                                      ; Contador de bytes de la cadena inicializado. (El 1er byte de cada cadena de mov. indica el nº de bytes que_
+    and a                                                       ; _ tiene la cadena.
+    call z, Reinicia_el_movimiento                              ; Hemos terminado de ejecutar todas las cadenas de movimiento. 
 
-    inc hl                                                      ; _movimiento que hemos de ejecutar).
+; HL contiene (Puntero_mov) y este se encuentra en el 1er byte de la cadena de movimiento, (Contador_db_mov).
+
+    inc hl                                                      
     ld a,(hl)
     ld (Repetimos_db),a
     inc hl
@@ -92,11 +94,13 @@ Decoder
 
 ; Velocidad del movimiento.
 
-    ld a,(hl)                                                   ; Nos quedamos con el nibble alto del byte, (indica la velocidad del movimiento).
-    and $f0
-    
-; ---
+; Guardo el perfil de velocidad de la entidad.
 
+    call Almacena_perfil_de_velocidad
+
+;    jr $
+
+    ld hl, (Puntero_mov) 
     bit 3,(hl)
     jr z,2F
     call Mov_down
@@ -140,8 +144,7 @@ Decoder
     ld (Repetimos_db),a
     inc hl
     ld (Puntero_mov),hl
-    jr 11BReinicia_el_movimiento
-
+    jr 11B
 
 7 ld hl,(Puntero_indice_mov)                                     ; PASAMOS A LA CADENA SIGUIENTE !!!!!!
     ld a,(Incrementa_puntero)
@@ -186,9 +189,25 @@ Reinicia_el_movimiento call Prepara_Puntero_mov
     jp Movimiento
 
 ; ---------- --------- --------- ---------- ----------
+;
+;   18/06/23
+;
 
+Almacena_perfil_de_velocidad ld hl,Almacen_de_velocidades
+    ld (Stack),sp
+    ld sp,Vel_left
 
+    ld b,2
 
+1 pop de
+    ld (hl),e
+    inc hl
+    ld (hl),d
+    inc hl
+    djnz 1B
+
+    ld sp,(Stack)
+    ret
 
 
 
