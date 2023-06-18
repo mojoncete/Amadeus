@@ -41,7 +41,7 @@ Izquierda_y_derecha db 33,%00011111,%00011111,%00011111,%00011111,%00011111,%000
 ;   2º Byte (Nibble alto) ..... Velocidad del movimiento (% izquierda,derecha,arriba,abajo).
 ;           (Nibble bajo) ..... Dirección del movimiento (% abajo,arriba,derecha,izquierda).  
 
-Baile_de_BadSat db 3,160,%00000010,0
+Baile_de_BadSat db 3,160,%00000001,0
 
 ; ----- ----- ----- ----- -----
 
@@ -99,7 +99,7 @@ Decoder
 
 ; Guardo el perfil de velocidad de la entidad en una cajita y lo modifico hasta que termine este movimiento.
 
-    call Almacena_perfil_de_velocidad_y_aplica_cambios
+    call Velocidad_del_movimiento 
     call Aplica_movimiento
 
 ; ---------- --------- --------- ---------- ----------
@@ -113,14 +113,13 @@ Decoder
 
 11 ret
 
-
 ; Pasamos al sigiente .db de la cadena de movimiento.
 
-6 
-    jr $
-
-    ld hl,Ctrl_2
+6 ld hl,Ctrl_2
     res 2,(hl)
+
+;! Hay que restaurar la velocidad a 1
+
 
     ld hl,Contador_db_mov
     dec (hl)                                                       ; Decrementamos el contador de .db de la cadena, (pués ya hemos ejecutado un byte de la misma).
@@ -180,43 +179,36 @@ Reinicia_el_movimiento call Prepara_Puntero_mov
 ;   18/06/23
 ;
 
-Almacena_perfil_de_velocidad_y_aplica_cambios ld a,(Ctrl_2)
+Velocidad_del_movimiento 
+
+; Salimos de la rutina si ya hemos guardado anteriormente el perfil de velocidad.
+; Salimos porue ya se inició este movimiento de la cadena.
+
+    ld a,(Ctrl_2)
     bit 2,a
     ret nz
-
-    ld hl,Almacen_de_velocidades
-    ld (Stack),sp
-    ld sp,Vel_left
-
-    ld b,2
-
-1 pop de
-    ld (hl),e
-    inc hl
-    ld (hl),d
-    inc hl
-    djnz 1B
-
-    ld sp,(Stack)
 
     ld ix,Vel_left
     ld hl, (Puntero_mov) 
 
-    bit 7,(hl)                              ; Vel_left
-    call nz,Duplica_vel
+    ld a,(hl)
+    and $f0
+    jr z,3F                                 ; RET si no vamos a modifical la velocidad.
+
+    bit 7,(hl)                              
+    call nz,X2_vel                          ; Vel_left
     inc ix
-    bit 6,(hl)                              ; Vel_right
-    call nz,Duplica_vel
+    bit 6,(hl)                              
+    call nz,X2_vel                          ; Vel_right
     inc ix
-2 bit 5,(hl)
-    call nz,Duplica_vel                     ; Vel_up
+    bit 5,(hl)
+    call nz,X2_vel                          ; Vel_up
     inc ix
     bit 4,(hl)
-    call nz,Duplica_vel                     ; Vel_down
-
-    ld hl,Ctrl_2
+    call nz,X2_vel                          ; Vel_down
+    
+3 ld hl,Ctrl_2
     set 2,(hl)
-
     ret
 
 ; ---------- --------- --------- ---------- ----------
@@ -225,8 +217,7 @@ Almacena_perfil_de_velocidad_y_aplica_cambios ld a,(Ctrl_2)
 ;
 ;   Duplica la velocidad.
 
-Duplica_vel ld a,(ix)
-    sla a
+X2_vel ld a,2
     ld (ix),a
     ret
 

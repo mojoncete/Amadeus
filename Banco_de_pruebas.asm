@@ -167,8 +167,8 @@ Ctrl_2 db 0
 ;															_ (Puntero_objeto) con (Repone_puntero_objeto) una vez iniciado y realizada su 1ª `foto'.
 ;														
 ;														BIT 1, Este bit a "1" indica que se ha iniciado el proceso de EXPLOSIÓN en una entidad.
-;														BIT 2, Este bit es activado por la rutina [Almacena_perfil_de_velocidad] para indicar que hemos_
-;															_ guardado el perfil de velocidad de la entidad. Evita que volvamos a ejecutar esta rutina_
+;														BIT 2, Este bit es activado por la rutina [Velocidad_del_movimiento] para indicar que hemos_
+;															_ modificado el perfil de velocidad de la entidad. Evita que volvamos a ejecutar esta rutina_
 ;															_ en las sucesivas repeticiones de un mismo movimiento de la cadena.
 
 

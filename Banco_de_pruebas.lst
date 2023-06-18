@@ -1011,9 +1011,9 @@
  584+ 8842 04           	db %00000100									; (Attr).
  585+ 8843 A8 81        	defw Indice_Badsat_der							; (Indice_Sprite_der).
  586+ 8845 28 80        	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
- 587+ 8847 80 50        	defw $5080	                             	    ; (Posicion_inicio).
+ 587+ 8847 9F 50        	defw $509f	                             	    ; (Posicion_inicio).
  588+ 8849 01           	db 1											; (Cuad_objeto).
- 589+ 884A 01 01 01 01  	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
+ 589+ 884A 02 02 02 02  	db 2,2,2,2                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
  590+ 884E F2 9C        	defw Indice_mov_Baile_de_BadSat					; (Puntero_indice_mov)
  591+ 8850
  592+ 8850 02 02        Entidad_2 db 2,2		                     		; (Filas) / (Columns).
@@ -1430,8 +1430,8 @@
  167  89D7              ;															_ (Puntero_objeto) con (Repone_puntero_objeto) una vez iniciado y realizada su 1ª `foto'.
  168  89D7              ;
  169  89D7              ;														BIT 1, Este bit a "1" indica que se ha iniciado el proceso de EXPLOSIÓN en una entidad.
- 170  89D7              ;														BIT 2, Este bit es activado por la rutina [Almacena_perfil_de_velocidad] para indicar que hemos_
- 171  89D7              ;															_ guardado el perfil de velocidad de la entidad. Evita que volvamos a ejecutar esta rutina_
+ 170  89D7              ;														BIT 2, Este bit es activado por la rutina [Velocidad_del_movimiento] para indicar que hemos_
+ 171  89D7              ;															_ modificado el perfil de velocidad de la entidad. Evita que volvamos a ejecutar esta rutina_
  172  89D7              ;															_ en las sucesivas repeticiones de un mismo movimiento de la cadena.
  173  89D7
  174  89D7
@@ -1720,11 +1720,11 @@
  457  8AE5
  458  8AE5 21 05 8A     13 ld hl,Habilita_disparo_Amadeus
  459  8AE8 11 07 8A     	ld de,Temporiza_disparo_Amadeus
- 460  8AEB CD E9 9D     	call Habilita_disparos 								; 30 Frames como mínimo entre cada disparo de Amadeus.
+ 460  8AEB CD D2 9D     	call Habilita_disparos 								; 30 Frames como mínimo entre cada disparo de Amadeus.
  461  8AEE
  462  8AEE 21 08 8A     	ld hl,Habilita_disparo_entidad 						; El nº de frames mínimo entre disparos de entidad será_
  463  8AF1 11 0A 8A     	ld de,Temporiza_disparo_entidad 					; _ variable y variará en función de la dificultad.
- 464  8AF4 CD E9 9D     	call Habilita_disparos
+ 464  8AF4 CD D2 9D     	call Habilita_disparos
  465  8AF7
  466  8AF7              ; COLISIONES.
  467  8AF7
@@ -3883,7 +3883,7 @@
   15+ 931F 22 9C 89     	ld (Posicion_actual),hl							; Indicamos que (Posicion_actual) = (Posicion_inicio) y saltamos a la subrutina [Inicializacion], (donde asignaremos_
   16+ 9322 CD B1 94     	call Inicializacion   							; _(Limite_horizontal), (Limite_vertical) y (Cuad_objeto). También asignaremos las coordenadas X e Y. (Posición 0,0)_
   17+ 9325              ;													; _la esquina superior izquierda de la pantalla.
-  18+ 9325 CD 57 9D     	call Prepara_Puntero_mov 						; El objeto está inicializado. Antes de salir inicializamos tb el puntero de movimiento del objeto.
+  18+ 9325 CD 55 9D     	call Prepara_Puntero_mov 						; El objeto está inicializado. Antes de salir inicializamos tb el puntero de movimiento del objeto.
   19+ 9328 3A C8 89     1 ld a,(Ctrl_0)
   20+ 932B CB 6F        	bit 5,a
   21+ 932D 20 06        	jr nz,3F										; Si acabamos de inicializar un objeto, NO COMPROBAMOS LÍMITES.
@@ -5988,7 +5988,7 @@
   41+ 9CD8              ;   2º Byte (Nibble alto) ..... Velocidad del movimiento (% izquierda,derecha,arriba,abajo).
   42+ 9CD8              ;           (Nibble bajo) ..... Dirección del movimiento (% abajo,arriba,derecha,izquierda).
   43+ 9CD8
-  44+ 9CD8 03 A0 02 00  Baile_de_BadSat db 3,160,%00000010,0
+  44+ 9CD8 03 A0 01 00  Baile_de_BadSat db 3,160,%00000001,0
   45+ 9CDC
   46+ 9CDC              ; ----- ----- ----- ----- -----
   47+ 9CDC
@@ -6030,7 +6030,7 @@
   83+ 9D07 7E               ld a,(hl)
   84+ 9D08 32 CF 89         ld (Contador_db_mov),a                                      ; Contador de bytes de la cadena inicializado. (El 1er byte de cada cadena de mov. indica el nº de bytes que_
   85+ 9D0B A7               and a                                                       ; _ tiene la cadena.
-  86+ 9D0C CC 66 9D         call z, Reinicia_el_movimiento                              ; Hemos terminado de ejecutar todas las cadenas de movimiento.
+  86+ 9D0C CC 64 9D         call z, Reinicia_el_movimiento                              ; Hemos terminado de ejecutar todas las cadenas de movimiento.
   87+ 9D0F
   88+ 9D0F              ; HL contiene (Puntero_mov) y este se encuentra en el 1er byte de la cadena de movimiento, (Contador_db_mov).
   89+ 9D0F
@@ -6046,8 +6046,8 @@
   99+ 9D18
  100+ 9D18              ; Guardo el perfil de velocidad de la entidad en una cajita y lo modifico hasta que termine este movimiento.
  101+ 9D18
- 102+ 9D18 CD 73 9D         call Almacena_perfil_de_velocidad_y_aplica_cambios
- 103+ 9D1B CD C0 9D         call Aplica_movimiento
+ 102+ 9D18 CD 71 9D         call Velocidad_del_movimiento
+ 103+ 9D1B CD A9 9D         call Aplica_movimiento
  104+ 9D1E
  105+ 9D1E              ; ---------- --------- --------- ---------- ----------
  106+ 9D1E
@@ -6060,216 +6060,207 @@
  113+ 9D2A
  114+ 9D2A C9           11 ret
  115+ 9D2B
- 116+ 9D2B
- 117+ 9D2B              ; Pasamos al sigiente .db de la cadena de movimiento.
- 118+ 9D2B
- 119+ 9D2B              6
- 120+ 9D2B 18 FE            jr $
- 121+ 9D2D
- 122+ 9D2D 21 D6 89         ld hl,Ctrl_2
- 123+ 9D30 CB 96            res 2,(hl)
- 124+ 9D32
- 125+ 9D32 21 CF 89         ld hl,Contador_db_mov
- 126+ 9D35 35               dec (hl)                                                       ; Decrementamos el contador de .db de la cadena, (pués ya hemos ejecutado un byte de la misma).
- 127+ 9D36
- 128+ 9D36 2A CD 89         ld hl,(Puntero_mov)                                            ; No repetimos el mismo byte. Incrementamos (Puntero_mov) y salimos.
- 129+ 9D39 23               inc hl
- 130+ 9D3A 7E               ld a,(hl)
- 131+ 9D3B 32 D1 89         ld (Repetimos_db),a
- 132+ 9D3E 23               inc hl
- 133+ 9D3F 22 CD 89         ld (Puntero_mov),hl
- 134+ 9D42 18 E6            jr 11B
- 135+ 9D44
- 136+ 9D44 2A CB 89     7 ld hl,(Puntero_indice_mov)                                     ; PASAMOS A LA CADENA SIGUIENTE !!!!!!
- 137+ 9D47 3A D0 89         ld a,(Incrementa_puntero)
- 138+ 9D4A 47               ld b,a
- 139+ 9D4B 23           8 inc hl
- 140+ 9D4C 10 FD            djnz 8B                                                        ; Indice_patrones_coracao +2, +4, +6, etc...
- 141+ 9D4E 5E               ld e,(hl)
- 142+ 9D4F 23               inc hl
- 143+ 9D50 56               ld d,(hl)
- 144+ 9D51 EB               ex de,hl
- 145+ 9D52 22 CD 89         ld (Puntero_mov),hl                                            ; (Puntero_mov) situado el el 1er .db de la siguiente cadena de movimiento.
- 146+ 9D55 18 D3            jr 11B
- 147+ 9D57
- 148+ 9D57              ; ---------- --------- --------- ---------- ----------
- 149+ 9D57              ;
- 150+ 9D57              ;   11/8/22
- 151+ 9D57              ;
- 152+ 9D57              ;   Prepara_Puntero_mov
- 153+ 9D57
- 154+ 9D57 E5           Prepara_Puntero_mov push hl
- 155+ 9D58 D5               push de
- 156+ 9D59 2A CB 89         ld hl,(Puntero_indice_mov)
- 157+ 9D5C 5E               ld e,(hl)
- 158+ 9D5D 23               inc hl
- 159+ 9D5E 56               ld d,(hl)
- 160+ 9D5F EB               ex de,hl
- 161+ 9D60 22 CD 89         ld (Puntero_mov),hl
- 162+ 9D63 D1               pop de
- 163+ 9D64 E1               pop hl
- 164+ 9D65 C9               ret
- 165+ 9D66
- 166+ 9D66              ; ---------- --------- --------- ---------- ----------
- 167+ 9D66              ;
- 168+ 9D66              ;   11/8/22
- 169+ 9D66              ;
- 170+ 9D66              ;   Reinicia_el_movimiento
- 171+ 9D66
- 172+ 9D66 CD 57 9D     Reinicia_el_movimiento call Prepara_Puntero_mov
- 173+ 9D69 AF               xor a
- 174+ 9D6A 32 CF 89         ld (Contador_db_mov),a
- 175+ 9D6D 32 D0 89         ld (Incrementa_puntero),a
- 176+ 9D70 C3 F4 9C         jp Movimiento
- 177+ 9D73
- 178+ 9D73              ; ---------- --------- --------- ---------- ----------
- 179+ 9D73              ;
- 180+ 9D73              ;   18/06/23
- 181+ 9D73              ;
- 182+ 9D73
- 183+ 9D73 3A D6 89     Almacena_perfil_de_velocidad_y_aplica_cambios ld a,(Ctrl_2)
- 184+ 9D76 CB 57            bit 2,a
- 185+ 9D78 C0               ret nz
- 186+ 9D79
- 187+ 9D79 21 10 8A         ld hl,Almacen_de_velocidades
- 188+ 9D7C ED 73 E9 89      ld (Stack),sp
- 189+ 9D80 31 AF 89         ld sp,Vel_left
- 190+ 9D83
- 191+ 9D83 06 02            ld b,2
- 192+ 9D85
- 193+ 9D85 D1           1 pop de
- 194+ 9D86 73               ld (hl),e
- 195+ 9D87 23               inc hl
- 196+ 9D88 72               ld (hl),d
- 197+ 9D89 23               inc hl
- 198+ 9D8A 10 F9            djnz 1B
- 199+ 9D8C
- 200+ 9D8C ED 7B E9 89      ld sp,(Stack)
- 201+ 9D90
- 202+ 9D90 DD 21 AF 89      ld ix,Vel_left
- 203+ 9D94 2A CD 89         ld hl, (Puntero_mov)
- 204+ 9D97
- 205+ 9D97 CB 7E            bit 7,(hl)                              ; Vel_left
- 206+ 9D99 C4 B7 9D         call nz,Duplica_vel
- 207+ 9D9C DD 23            inc ix
- 208+ 9D9E CB 76            bit 6,(hl)                              ; Vel_right
- 209+ 9DA0 C4 B7 9D         call nz,Duplica_vel
- 210+ 9DA3 DD 23            inc ix
- 211+ 9DA5 CB 6E        2 bit 5,(hl)
- 212+ 9DA7 C4 B7 9D         call nz,Duplica_vel                     ; Vel_up
- 213+ 9DAA DD 23            inc ix
- 214+ 9DAC CB 66            bit 4,(hl)
- 215+ 9DAE C4 B7 9D         call nz,Duplica_vel                     ; Vel_down
- 216+ 9DB1
- 217+ 9DB1 21 D6 89         ld hl,Ctrl_2
- 218+ 9DB4 CB D6            set 2,(hl)
- 219+ 9DB6
- 220+ 9DB6 C9               ret
- 221+ 9DB7
- 222+ 9DB7              ; ---------- --------- --------- ---------- ----------
- 223+ 9DB7              ;
- 224+ 9DB7              ;   18/06/23
- 225+ 9DB7              ;
- 226+ 9DB7              ;   Duplica la velocidad.
- 227+ 9DB7
- 228+ 9DB7 DD 7E 00     Duplica_vel ld a,(ix)
- 229+ 9DBA CB 27            sla a
- 230+ 9DBC DD 77 00         ld (ix),a
- 231+ 9DBF C9               ret
- 232+ 9DC0
- 233+ 9DC0              ; ---------- --------- --------- ---------- ----------
- 234+ 9DC0              ;
- 235+ 9DC0              ;   18/06/23
- 236+ 9DC0              ;
- 237+ 9DC0              ;   Aplica_movimiento.
- 238+ 9DC0
- 239+ 9DC0 2A CD 89     Aplica_movimiento ld hl, (Puntero_mov)
- 240+ 9DC3 CB 5E            bit 3,(hl)
- 241+ 9DC5 28 03            jr z,1F
- 242+ 9DC7 CD FC 98         call Mov_down
- 243+ 9DCA 2A CD 89     1 ld hl, (Puntero_mov)
- 244+ 9DCD CB 56            bit 2,(hl)
- 245+ 9DCF 28 03            jr z,2F
- 246+ 9DD1 CD 2D 99         call Mov_up
- 247+ 9DD4 2A CD 89     2 ld hl, (Puntero_mov)
- 248+ 9DD7 CB 4E            bit 1,(hl)
- 249+ 9DD9 28 03            jr z,3F
- 250+ 9DDB CD 70 99         call Mov_right
- 251+ 9DDE 2A CD 89     3 ld hl, (Puntero_mov)
- 252+ 9DE1 CB 46            bit 0,(hl)
- 253+ 9DE3 28 03            jr z,4F
- 254+ 9DE5 CD 8E 9A         call Mov_left
- 255+ 9DE8 C9           4 ret
- 256+ 9DE9
- 257+ 9DE9
- 258+ 9DE9
- 259+ 9DE9
- 260+ 9DE9
- 261+ 9DE9
- 262+ 9DE9
+ 116+ 9D2B              ; Pasamos al sigiente .db de la cadena de movimiento.
+ 117+ 9D2B
+ 118+ 9D2B 21 D6 89     6 ld hl,Ctrl_2
+ 119+ 9D2E CB 96            res 2,(hl)
+ 120+ 9D30
+ 121+ 9D30              ;! Hay que restaurar la velocidad a 1
+ 122+ 9D30
+ 123+ 9D30
+ 124+ 9D30 21 CF 89         ld hl,Contador_db_mov
+ 125+ 9D33 35               dec (hl)                                                       ; Decrementamos el contador de .db de la cadena, (pués ya hemos ejecutado un byte de la misma).
+ 126+ 9D34
+ 127+ 9D34 2A CD 89         ld hl,(Puntero_mov)                                            ; No repetimos el mismo byte. Incrementamos (Puntero_mov) y salimos.
+ 128+ 9D37 23               inc hl
+ 129+ 9D38 7E               ld a,(hl)
+ 130+ 9D39 32 D1 89         ld (Repetimos_db),a
+ 131+ 9D3C 23               inc hl
+ 132+ 9D3D 22 CD 89         ld (Puntero_mov),hl
+ 133+ 9D40 18 E8            jr 11B
+ 134+ 9D42
+ 135+ 9D42 2A CB 89     7 ld hl,(Puntero_indice_mov)                                     ; PASAMOS A LA CADENA SIGUIENTE !!!!!!
+ 136+ 9D45 3A D0 89         ld a,(Incrementa_puntero)
+ 137+ 9D48 47               ld b,a
+ 138+ 9D49 23           8 inc hl
+ 139+ 9D4A 10 FD            djnz 8B                                                        ; Indice_patrones_coracao +2, +4, +6, etc...
+ 140+ 9D4C 5E               ld e,(hl)
+ 141+ 9D4D 23               inc hl
+ 142+ 9D4E 56               ld d,(hl)
+ 143+ 9D4F EB               ex de,hl
+ 144+ 9D50 22 CD 89         ld (Puntero_mov),hl                                            ; (Puntero_mov) situado el el 1er .db de la siguiente cadena de movimiento.
+ 145+ 9D53 18 D5            jr 11B
+ 146+ 9D55
+ 147+ 9D55              ; ---------- --------- --------- ---------- ----------
+ 148+ 9D55              ;
+ 149+ 9D55              ;   11/8/22
+ 150+ 9D55              ;
+ 151+ 9D55              ;   Prepara_Puntero_mov
+ 152+ 9D55
+ 153+ 9D55 E5           Prepara_Puntero_mov push hl
+ 154+ 9D56 D5               push de
+ 155+ 9D57 2A CB 89         ld hl,(Puntero_indice_mov)
+ 156+ 9D5A 5E               ld e,(hl)
+ 157+ 9D5B 23               inc hl
+ 158+ 9D5C 56               ld d,(hl)
+ 159+ 9D5D EB               ex de,hl
+ 160+ 9D5E 22 CD 89         ld (Puntero_mov),hl
+ 161+ 9D61 D1               pop de
+ 162+ 9D62 E1               pop hl
+ 163+ 9D63 C9               ret
+ 164+ 9D64
+ 165+ 9D64              ; ---------- --------- --------- ---------- ----------
+ 166+ 9D64              ;
+ 167+ 9D64              ;   11/8/22
+ 168+ 9D64              ;
+ 169+ 9D64              ;   Reinicia_el_movimiento
+ 170+ 9D64
+ 171+ 9D64 CD 55 9D     Reinicia_el_movimiento call Prepara_Puntero_mov
+ 172+ 9D67 AF               xor a
+ 173+ 9D68 32 CF 89         ld (Contador_db_mov),a
+ 174+ 9D6B 32 D0 89         ld (Incrementa_puntero),a
+ 175+ 9D6E C3 F4 9C         jp Movimiento
+ 176+ 9D71
+ 177+ 9D71              ; ---------- --------- --------- ---------- ----------
+ 178+ 9D71              ;
+ 179+ 9D71              ;   18/06/23
+ 180+ 9D71              ;
+ 181+ 9D71
+ 182+ 9D71              Velocidad_del_movimiento
+ 183+ 9D71
+ 184+ 9D71              ; Salimos de la rutina si ya hemos guardado anteriormente el perfil de velocidad.
+ 185+ 9D71              ; Salimos porue ya se inició este movimiento de la cadena.
+ 186+ 9D71
+ 187+ 9D71 3A D6 89         ld a,(Ctrl_2)
+ 188+ 9D74 CB 57            bit 2,a
+ 189+ 9D76 C0               ret nz
+ 190+ 9D77
+ 191+ 9D77 DD 21 AF 89      ld ix,Vel_left
+ 192+ 9D7B 2A CD 89         ld hl, (Puntero_mov)
+ 193+ 9D7E
+ 194+ 9D7E 7E               ld a,(hl)
+ 195+ 9D7F E6 F0            and $f0
+ 196+ 9D81 28 1A            jr z,3F                                 ; RET si no vamos a modifical la velocidad.
+ 197+ 9D83
+ 198+ 9D83 CB 7E            bit 7,(hl)
+ 199+ 9D85 C4 A3 9D         call nz,X2_vel                          ; Vel_left
+ 200+ 9D88 DD 23            inc ix
+ 201+ 9D8A CB 76            bit 6,(hl)
+ 202+ 9D8C C4 A3 9D         call nz,X2_vel                          ; Vel_right
+ 203+ 9D8F DD 23            inc ix
+ 204+ 9D91 CB 6E            bit 5,(hl)
+ 205+ 9D93 C4 A3 9D         call nz,X2_vel                          ; Vel_up
+ 206+ 9D96 DD 23            inc ix
+ 207+ 9D98 CB 66            bit 4,(hl)
+ 208+ 9D9A C4 A3 9D         call nz,X2_vel                          ; Vel_down
+ 209+ 9D9D
+ 210+ 9D9D 21 D6 89     3 ld hl,Ctrl_2
+ 211+ 9DA0 CB D6            set 2,(hl)
+ 212+ 9DA2 C9               ret
+ 213+ 9DA3
+ 214+ 9DA3              ; ---------- --------- --------- ---------- ----------
+ 215+ 9DA3              ;
+ 216+ 9DA3              ;   18/06/23
+ 217+ 9DA3              ;
+ 218+ 9DA3              ;   Duplica la velocidad.
+ 219+ 9DA3
+ 220+ 9DA3 3E 02        X2_vel ld a,2
+ 221+ 9DA5 DD 77 00         ld (ix),a
+ 222+ 9DA8 C9               ret
+ 223+ 9DA9
+ 224+ 9DA9              ; ---------- --------- --------- ---------- ----------
+ 225+ 9DA9              ;
+ 226+ 9DA9              ;   18/06/23
+ 227+ 9DA9              ;
+ 228+ 9DA9              ;   Aplica_movimiento.
+ 229+ 9DA9
+ 230+ 9DA9 2A CD 89     Aplica_movimiento ld hl, (Puntero_mov)
+ 231+ 9DAC CB 5E            bit 3,(hl)
+ 232+ 9DAE 28 03            jr z,1F
+ 233+ 9DB0 CD FC 98         call Mov_down
+ 234+ 9DB3 2A CD 89     1 ld hl, (Puntero_mov)
+ 235+ 9DB6 CB 56            bit 2,(hl)
+ 236+ 9DB8 28 03            jr z,2F
+ 237+ 9DBA CD 2D 99         call Mov_up
+ 238+ 9DBD 2A CD 89     2 ld hl, (Puntero_mov)
+ 239+ 9DC0 CB 4E            bit 1,(hl)
+ 240+ 9DC2 28 03            jr z,3F
+ 241+ 9DC4 CD 70 99         call Mov_right
+ 242+ 9DC7 2A CD 89     3 ld hl, (Puntero_mov)
+ 243+ 9DCA CB 46            bit 0,(hl)
+ 244+ 9DCC 28 03            jr z,4F
+ 245+ 9DCE CD 8E 9A         call Mov_left
+ 246+ 9DD1 C9           4 ret
+ 247+ 9DD2
+ 248+ 9DD2
+ 249+ 9DD2
+ 250+ 9DD2
+ 251+ 9DD2
+ 252+ 9DD2
+ 253+ 9DD2
 # file closed: Patrones_de_mov.asm
-1254  9DE9              	include "Relojes_y_temporizaciones.asm"
+1254  9DD2              	include "Relojes_y_temporizaciones.asm"
 # file opened: Relojes_y_temporizaciones.asm
-   1+ 9DE9              ; Relojes y temporizaciones.
-   2+ 9DE9
-   3+ 9DE9              ; ------------------------------------------------------
-   4+ 9DE9              ;
-   5+ 9DE9              ;	27/04/23
-   6+ 9DE9              ;
-   7+ 9DE9              ;	Cuando se produce un disparo de Amadeus, la variable: (Habilita_disparo_Amadeus) se_
-   8+ 9DE9              ;	_ fija a "0". Con esto, desactivamos la posibilidad de disparo de nuestra nave hasta_
-   9+ 9DE9              ;	_ que dicha variable vualva a fijarse en "1". Para que esto suceda, el contador: _
-  10+ 9DE9              ;	_ (Temporiza_disparo_Amadeus) ha de llegar a "0".
-  11+ 9DE9              ;
-  12+ 9DE9              ;	INPUTS:			HL ..... Habilita_disparo_(Amadeus/entidad).
-  13+ 9DE9              ;					DE ..... Temporiza_disparo_(Amadeus/entidad).
-  14+ 9DE9
-  15+ 9DE9              Habilita_disparos
-  16+ 9DE9
-  17+ 9DE9 7E           	ld a,(hl)
-  18+ 9DEA A7           	and a
-  19+ 9DEB C0           	ret nz
-  20+ 9DEC
-  21+ 9DEC EB           	ex de,hl
-  22+ 9DED
-  23+ 9DED 35           	dec (hl)
-  24+ 9DEE 34           	inc (hl)
-  25+ 9DEF 35           	dec (hl)
-  26+ 9DF0 C0           	ret nz
-  27+ 9DF1
-  28+ 9DF1 2B           	dec hl
-  29+ 9DF2 7E           	ld a,(hl)
-  30+ 9DF3 23           	inc hl
-  31+ 9DF4 77           	ld (hl),a
-  32+ 9DF5
-  33+ 9DF5 EB           	ex de,hl
-  34+ 9DF6 3E 01        	ld a,1
-  35+ 9DF8 77           	ld (hl),a
-  36+ 9DF9 C9           	ret
+   1+ 9DD2              ; Relojes y temporizaciones.
+   2+ 9DD2
+   3+ 9DD2              ; ------------------------------------------------------
+   4+ 9DD2              ;
+   5+ 9DD2              ;	27/04/23
+   6+ 9DD2              ;
+   7+ 9DD2              ;	Cuando se produce un disparo de Amadeus, la variable: (Habilita_disparo_Amadeus) se_
+   8+ 9DD2              ;	_ fija a "0". Con esto, desactivamos la posibilidad de disparo de nuestra nave hasta_
+   9+ 9DD2              ;	_ que dicha variable vualva a fijarse en "1". Para que esto suceda, el contador: _
+  10+ 9DD2              ;	_ (Temporiza_disparo_Amadeus) ha de llegar a "0".
+  11+ 9DD2              ;
+  12+ 9DD2              ;	INPUTS:			HL ..... Habilita_disparo_(Amadeus/entidad).
+  13+ 9DD2              ;					DE ..... Temporiza_disparo_(Amadeus/entidad).
+  14+ 9DD2
+  15+ 9DD2              Habilita_disparos
+  16+ 9DD2
+  17+ 9DD2 7E           	ld a,(hl)
+  18+ 9DD3 A7           	and a
+  19+ 9DD4 C0           	ret nz
+  20+ 9DD5
+  21+ 9DD5 EB           	ex de,hl
+  22+ 9DD6
+  23+ 9DD6 35           	dec (hl)
+  24+ 9DD7 34           	inc (hl)
+  25+ 9DD8 35           	dec (hl)
+  26+ 9DD9 C0           	ret nz
+  27+ 9DDA
+  28+ 9DDA 2B           	dec hl
+  29+ 9DDB 7E           	ld a,(hl)
+  30+ 9DDC 23           	inc hl
+  31+ 9DDD 77           	ld (hl),a
+  32+ 9DDE
+  33+ 9DDE EB           	ex de,hl
+  34+ 9DDF 3E 01        	ld a,1
+  35+ 9DE1 77           	ld (hl),a
+  36+ 9DE2 C9           	ret
 # file closed: Relojes_y_temporizaciones.asm
-1255  9DFA              	include "Guarda_foto_registros.asm"
+1255  9DE3              	include "Guarda_foto_registros.asm"
 # file opened: Guarda_foto_registros.asm
-   1+ 9DFA              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-   2+ 9DFA              ;
-   3+ 9DFA              ;	3/1/23
-   4+ 9DFA              ;
-   5+ 9DFA              ;	Instrucciones donde interviene el Stack Pointer, (SP).
-   6+ 9DFA
-   7+ 9DFA              ;	ADC HL,SP	LD (addr),SP
-   8+ 9DFA              ;	ADD HL,SP	LD SP,(addr)
-   9+ 9DFA              ;	ADD IX,SP	LD SP,nn
-  10+ 9DFA              ; 	ADD IY,SP	LD SP,HL
-  11+ 9DFA              ;				LD SP,IX
-  12+ 9DFA              ;	DEC SP		LD SP,IY
-  13+ 9DFA
-  14+ 9DFA              ;	EX (SP),HL
-  15+ 9DFA              ;	EX (SP),IX
-  16+ 9DFA              ;	EX (SP),IY
-  17+ 9DFA
-  18+ 9DFA              ;	INC SP
-  19+ 9DFA
-  20+ 9DFA
-  21+ 9DFA                  org $7fa0
+   1+ 9DE3              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   2+ 9DE3              ;
+   3+ 9DE3              ;	3/1/23
+   4+ 9DE3              ;
+   5+ 9DE3              ;	Instrucciones donde interviene el Stack Pointer, (SP).
+   6+ 9DE3
+   7+ 9DE3              ;	ADC HL,SP	LD (addr),SP
+   8+ 9DE3              ;	ADD HL,SP	LD SP,(addr)
+   9+ 9DE3              ;	ADD IX,SP	LD SP,nn
+  10+ 9DE3              ; 	ADD IY,SP	LD SP,HL
+  11+ 9DE3              ;				LD SP,IX
+  12+ 9DE3              ;	DEC SP		LD SP,IY
+  13+ 9DE3
+  14+ 9DE3              ;	EX (SP),HL
+  15+ 9DE3              ;	EX (SP),IX
+  16+ 9DE3              ;	EX (SP),IY
+  17+ 9DE3
+  18+ 9DE3              ;	INC SP
+  19+ 9DE3
+  20+ 9DE3
+  21+ 9DE3                  org $7fa0
   22+ 7FA0
   23+ 7FA0              ;   (Stack_snapshot) se sitúa inicialmente en (Album_de_fotos)=$7000.
   24+ 7FA0              ;   Almacenaremos los datos/registros necesarios de la siguiente manera:
