@@ -12,7 +12,7 @@
 ;   Codificación:
 ;
 ;   1er Byte ..... Repetición del movimiento. (0-255) pixeles.
-;   2º Byte (Nibble alto) ..... Velocidad del movimiento (% abajo,arriba,derecha,izquierda).
+;   2º Byte (Nibble alto) ..... Velocidad del movimiento (% izquierda,derecha,arriba,abajo).
 ;           (Nibble bajo) ..... Dirección del movimiento (% abajo,arriba,derecha,izquierda).  
 
 ;   El "0"; último .db indica que ya hemos terminado de ejecutar todas las cadenas de movimiento.     
@@ -38,7 +38,10 @@ Izquierda_y_derecha db 33,%00011111,%00011111,%00011111,%00011111,%00011111,%000
     db %00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111
     db %00101111,%00101111,%00101111,%00101111,%00101111,%00101111,0
 
-Baile_de_BadSat db 3,140,%10001000,0
+;   2º Byte (Nibble alto) ..... Velocidad del movimiento (% izquierda,derecha,arriba,abajo).
+;           (Nibble bajo) ..... Dirección del movimiento (% abajo,arriba,derecha,izquierda).  
+
+Baile_de_BadSat db 3,160,%00000010,0
 
 ; ----- ----- ----- ----- -----
 
@@ -94,29 +97,10 @@ Decoder
 
 ; Velocidad del movimiento.
 
-; Guardo el perfil de velocidad de la entidad.
+; Guardo el perfil de velocidad de la entidad en una cajita y lo modifico hasta que termine este movimiento.
 
-    call Almacena_perfil_de_velocidad
-
-;    jr $
-
-    ld hl, (Puntero_mov) 
-    bit 3,(hl)
-    jr z,2F
-    call Mov_down
-2 ld hl, (Puntero_mov) 
-    bit 2,(hl)
-    jr z,3F
-    call Mov_up
-3 ld hl, (Puntero_mov)
-    bit 1,(hl)
-    jr z,4F
-    call Mov_right
-4 ld hl, (Puntero_mov)
-    bit 0,(hl) 
-    jr z,5F
-    call Mov_left
-
+    call Almacena_perfil_de_velocidad_y_aplica_cambios
+    call Aplica_movimiento
 
 ; ---------- --------- --------- ---------- ----------
 
@@ -134,6 +118,9 @@ Decoder
 
 6 
     jr $
+
+    ld hl,Ctrl_2
+    res 2,(hl)
 
     ld hl,Contador_db_mov
     dec (hl)                                                       ; Decrementamos el contador de .db de la cadena, (pués ya hemos ejecutado un byte de la misma).
@@ -193,7 +180,11 @@ Reinicia_el_movimiento call Prepara_Puntero_mov
 ;   18/06/23
 ;
 
-Almacena_perfil_de_velocidad ld hl,Almacen_de_velocidades
+Almacena_perfil_de_velocidad_y_aplica_cambios ld a,(Ctrl_2)
+    bit 2,a
+    ret nz
+
+    ld hl,Almacen_de_velocidades
     ld (Stack),sp
     ld sp,Vel_left
 
@@ -207,15 +198,61 @@ Almacena_perfil_de_velocidad ld hl,Almacen_de_velocidades
     djnz 1B
 
     ld sp,(Stack)
+
+    ld ix,Vel_left
+    ld hl, (Puntero_mov) 
+
+    bit 7,(hl)                              ; Vel_left
+    call nz,Duplica_vel
+    inc ix
+    bit 6,(hl)                              ; Vel_right
+    call nz,Duplica_vel
+    inc ix
+2 bit 5,(hl)
+    call nz,Duplica_vel                     ; Vel_up
+    inc ix
+    bit 4,(hl)
+    call nz,Duplica_vel                     ; Vel_down
+
+    ld hl,Ctrl_2
+    set 2,(hl)
+
     ret
 
+; ---------- --------- --------- ---------- ----------
+;
+;   18/06/23
+;
+;   Duplica la velocidad.
 
+Duplica_vel ld a,(ix)
+    sla a
+    ld (ix),a
+    ret
 
-
-
-
+; ---------- --------- --------- ---------- ----------
+;
+;   18/06/23
+;
+;   Aplica_movimiento.
     
-
+Aplica_movimiento ld hl, (Puntero_mov) 
+    bit 3,(hl)
+    jr z,1F
+    call Mov_down
+1 ld hl, (Puntero_mov) 
+    bit 2,(hl)
+    jr z,2F
+    call Mov_up
+2 ld hl, (Puntero_mov)
+    bit 1,(hl)
+    jr z,3F
+    call Mov_right
+3 ld hl, (Puntero_mov)
+    bit 0,(hl) 
+    jr z,4F
+    call Mov_left
+4 ret
 
 
 

@@ -584,7 +584,7 @@ Entidad_1 db 2,2		                     		; (Filas) / (Columns).
 	db %00000100									; (Attr).
 	defw Indice_Badsat_der							; (Indice_Sprite_der).
 	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
-	defw $4003	                             	    ; (Posicion_inicio).
+	defw $5080	                             	    ; (Posicion_inicio).
 	db 1											; (Cuad_objeto).
 	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 	defw Indice_mov_Baile_de_BadSat					; (Puntero_indice_mov) 
