@@ -21,6 +21,7 @@ Arriba db 2,%01000000,0
 Abajo db 2,%10000000,0
 Derecha db 2,%00100000,0
 Izquierda db 2,%00010000,0
+
 Onda_senoidal db 44,%01000100,%01100000,%01000010,%01100000,%01000010,%01100000,%01000000,%01100011
     db %00100010,%01100000,%00100101,%10100000,%00100010,%10100011,%10000000,%10100000
     db %10000010,%10100000,%10000010,%10100000,%10000100,%10100000,%10000011,%10100000
@@ -41,7 +42,7 @@ Izquierda_y_derecha db 33,%00011111,%00011111,%00011111,%00011111,%00011111,%000
 ;   2º Byte (Nibble alto) ..... Velocidad del movimiento (% izquierda,derecha,arriba,abajo).
 ;           (Nibble bajo) ..... Dirección del movimiento (% abajo,arriba,derecha,izquierda).  
 
-Baile_de_BadSat db 5,10,%00011000,30,%00001000,0
+Baile_de_BadSat db 3,10,%00011000,30,%00001000,70,%01000010,0
 
 ; ----- ----- ----- ----- -----
 
@@ -76,18 +77,22 @@ Movimiento
 ; Nota: Previamente, la rutina [DRAW], ha iniciado la entidad, (Puntero_mov) ya apunta a su cadena de movimiento correspondiente.
 
 1 
-;    ld a,(Incrementa_puntero)                                     ; Vamos a inicializar las variables de movimiento. El contador (Incrementa_puntero) es un byte que inicialmente está a "0"._
-;    add 2                                                       ; _va incrementando su valor en 2 unidades cada vez que iniciamos una cadena. Se utiliza para ir incrementando (Puntero_mov)_
-;    ld (Incrementa_puntero),a                                   ; _ por el índice de cadenas de movimiento correspondiente. Su valor se restablecerá a "0" cuando encontremos 
+    ld a,(Incrementa_puntero)                                     ; Vamos a inicializar las variables de movimiento. El contador (Incrementa_puntero) es un byte que inicialmente está a "0"._
+    add 2                                                       ; _va incrementando su valor en 2 unidades cada vez que iniciamos una cadena. Se utiliza para ir incrementando (Puntero_mov)_
+    ld (Incrementa_puntero),a                                   ; _ por el índice de cadenas de movimiento correspondiente. Su valor se restablecerá a "0" cuando encontremos 
 ;                                                               ; _ el .db0. (Indica que hemos terminado de leer la secuencia de movimiento completa de la entidad).
     ld hl,(Puntero_mov)
     ld a,(hl)
     ld (Contador_db_mov),a                                      ; Contador de bytes de la cadena inicializado. (El 1er byte de cada cadena de mov. indica el nº de bytes que_
     and a                                                       ; _ tiene la cadena.
-    call z, Reinicia_el_movimiento                              ; Hemos terminado de ejecutar todas las cadenas de movimiento. 
+
+;    jr z,$
+
+    jr z, Reinicia_el_movimiento                              ; Hemos terminado de ejecutar todas las cadenas de movimiento. 
 
 ; HL contiene (Puntero_mov) y este se encuentra en el 1er byte de la cadena de movimiento, (Contador_db_mov).
 
+    inc hl
     call Prepara_siguiente_mov
 
 
@@ -113,18 +118,20 @@ Decoder
 
 ; Pasamos al sigiente .db de la cadena de movimiento.
 
-6 
-
-;    jr $
+6 inc hl
+    ld (Puntero_mov),hl
 
     ld hl,Ctrl_2
     res 2,(hl)
     call Restaura_velocidad
+
     ld hl,Contador_db_mov
     dec (hl)  
- 
-    ld hl,(Puntero_mov)                                            ; No repetimos el mismo byte. Incrementamos (Puntero_mov) y salimos.
+    ret z 
+
+    ld hl,(Puntero_mov)
     call Prepara_siguiente_mov
+
     jr 11B
 
 7 ld hl,(Puntero_indice_mov)                                       ; PASAMOS A LA CADENA SIGUIENTE !!!!!!
@@ -139,9 +146,15 @@ Decoder
     ld (Puntero_mov),hl                                            ; (Puntero_mov) situado el el 1er .db de la siguiente cadena de movimiento.                                   
     jr 11B
 
+Reinicia_el_movimiento 
 
-Prepara_siguiente_mov inc hl                                                      
-    ld a,(hl)
+    call Prepara_Puntero_mov
+    xor a
+    ld (Contador_db_mov),a
+    ld (Incrementa_puntero),a
+    jp Movimiento
+
+Prepara_siguiente_mov ld a,(hl)
     ld (Repetimos_db),a
     inc hl
     ld (Puntero_mov),hl
@@ -167,30 +180,14 @@ Restaura_velocidad ld a,1
 ;
 ;   Prepara_Puntero_mov
 
-Prepara_Puntero_mov push hl
-    push de
-    ld hl,(Puntero_indice_mov)
+Prepara_Puntero_mov ld hl,(Puntero_indice_mov)
     ld e,(hl)
     inc hl
     ld d,(hl)
     ex de,hl
     ld (Puntero_mov),hl
-    pop de
-    pop hl
     ret
     
-; ---------- --------- --------- ---------- ----------
-;
-;   11/8/22
-;
-;   Reinicia_el_movimiento
-
-Reinicia_el_movimiento call Prepara_Puntero_mov
-    xor a
-    ld (Contador_db_mov),a
-    ld (Incrementa_puntero),a
-    jp Movimiento
-
 ; ---------- --------- --------- ---------- ----------
 ;
 ;   18/06/23
