@@ -17,46 +17,20 @@
 
 ;   El "0"; último .db indica que ya hemos terminado de ejecutar todas las cadenas de movimiento.     
 
-Arriba db 2,%01000000,0
-Abajo db 2,%10000000,0
-Derecha db 2,%00100000,0
-Izquierda db 2,%00010000,0
+Baile_de_BadSat 
 
-Onda_senoidal db 44,%01000100,%01100000,%01000010,%01100000,%01000010,%01100000,%01000000,%01100011
-    db %00100010,%01100000,%00100101,%10100000,%00100010,%10100011,%10000000,%10100000
-    db %10000010,%10100000,%10000010,%10100000,%10000100,%10100000,%10000011,%10100000
-    db %10000010,%10100000,%10000010,%10100000,%10000000,%10100011,%00100010,%10100000
-    db %00100101,%01100000,%00100010,%01100011,%01000000,%01100000,%01000010,%01100000
-    db %01000010,%01100000,%01000100,0
+; Baja decelerando.    
+    db 12,30,%00001000 ;(1).                                                            
 
-Escaloncitos_izquierda_arriba db 3,%00010100,%01000100,0
-Escaloncitos_derecha_arriba db 3,%00100100,%01000100,0
-Escaloncitos_derecha_abajo db 5,%00100100,%10000100,%00100100,%10000100,0
-Escaloncitos_izquierda_abajo db 5,%00010100,%10000100,%00010100,%10000100,0
-Derecha_e_izquierda db 3,%00101111,%00011111,0
-Izquierda_y_derecha db 33,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111
-    db %00011111,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111,%00011111
-    db %00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111,%00101111
-    db %00101111,%00101111,%00101111,%00101111,%00101111,%00101111,0
+; Codo: bajo y derecha.
+    db 1,%11111010,1,%11111000,2,%11111010,1,%11110010,1,%11111010,1,%11110010  ;(6).
 
-;   2º Byte (Nibble alto) ..... Velocidad del movimiento (% izquierda,derecha,arriba,abajo).
-;           (Nibble bajo) ..... Dirección del movimiento (% abajo,arriba,derecha,izquierda).  
+; Derecha ligeramente ascendente.
+    db 30,%11110010,1,%00000110,30,%11110010,1,%00000110,30,%11110010,0
 
-Baile_de_BadSat db 3,10,%00011000,30,%00001000,70,%01000010,0
 
+ ;       
 ; ----- ----- ----- ----- -----
-
-Indice_mov_Izquierda_y_derecha defw Izquierda_y_derecha 
-Indice_mov_Derecha_e_izquierda defw Derecha_e_izquierda
-Indice_mov_Izquierda defw Izquierda
-Indice_mov_Derecha defw Derecha
-Indice_mov_Abajo defw Abajo
-Indice_mov_Arriba defw Arriba
-Indice_mov_Escaloncitos_derecha_arriba defw Escaloncitos_derecha_arriba
-Indice_mov_Escaloncitos_derecha_abajo defw Escaloncitos_derecha_abajo
-Indice_mov_Escaloncitos_izquierda_arriba defw Escaloncitos_izquierda_arriba
-Indice_mov_Escaloncitos_izquierda_abajo defw Escaloncitos_izquierda_abajo
-Indice_mov_Onda_senoidal defw Onda_senoidal ; (Es un mov. de izquierda).
 
 Indice_mov_Baile_de_BadSat defw Baile_de_BadSat
 
@@ -86,9 +60,9 @@ Movimiento
     ld (Contador_db_mov),a                                      ; Contador de bytes de la cadena inicializado. (El 1er byte de cada cadena de mov. indica el nº de bytes que_
     and a                                                       ; _ tiene la cadena.
 
-;    jr z,$
+    jr z,$
 
-    jr z, Reinicia_el_movimiento                              ; Hemos terminado de ejecutar todas las cadenas de movimiento. 
+;    jr z, Reinicia_el_movimiento                              ; Hemos terminado de ejecutar todas las cadenas de movimiento. 
 
 ; HL contiene (Puntero_mov) y este se encuentra en el 1er byte de la cadena de movimiento, (Contador_db_mov).
 

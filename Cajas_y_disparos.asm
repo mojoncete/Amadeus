@@ -596,7 +596,7 @@ Entidad_2 db 2,2		                     		; (Filas) / (Columns).
 	defw $5040                                      ; (Posicion_inicio).
 	db 1											; (Cuad_objeto).
 	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-	defw Indice_mov_Onda_senoidal				    ; (Puntero_indice_mov) 
+	defw Indice_mov_Baile_de_BadSat				    ; (Puntero_indice_mov) 
 
 Entidad_3 db 2,2		                     		; (Filas) / (Columns).
 	db %00000100									; (Attr).
@@ -605,7 +605,7 @@ Entidad_3 db 2,2		                     		; (Filas) / (Columns).
 	defw $47a0                                      ; (Posicion_inicio).
 	db 1											; (Cuad_objeto).
 	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-	defw Indice_mov_Onda_senoidal					; (Puntero_indice_mov)
+	defw Indice_mov_Baile_de_BadSat					; (Puntero_indice_mov)
 
 Entidad_4 db 2,2		                     		; (Filas) / (Columns).
 	db %00000001									; (Attr).
@@ -614,7 +614,7 @@ Entidad_4 db 2,2		                     		; (Filas) / (Columns).
 	defw $47bf                                      ; (Posicion_inicio).
 	db 1											; (Cuad_objeto).
 	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-	defw Indice_mov_Escaloncitos_izquierda_abajo	; (Puntero_indice_mov)
+	defw Indice_mov_Baile_de_BadSat					; (Puntero_indice_mov)
 
 Entidad_5 db 2,2		                     		; (Filas) / (Columns).
 	db %00000001									; (Attr).
@@ -623,4 +623,4 @@ Entidad_5 db 2,2		                     		; (Filas) / (Columns).
 	defw $4007                                      ; (Posicion_inicio).
 	db 1											; (Cuad_objeto).
 	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-	defw Indice_mov_Escaloncitos_derecha_abajo		; (Puntero_indice_mov)
+	defw Indice_mov_Baile_de_BadSat					; (Puntero_indice_mov)
