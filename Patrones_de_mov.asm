@@ -20,7 +20,7 @@
 Baile_de_BadSat 
 
 ; Baja decelerando.    
-    db 62,20,%00011000,5,%00001000 ;(2).                                                            
+    db 112,20,%00011000,5,%00001000 ;(2).                                                            
 
 ; Codo: bajo y derecha.
     db 1,%00001010,1,%00001000,2,%00001010,1,%00001000,1,%00001010,1,%00001000,2,%00001010
@@ -36,11 +36,28 @@ Baile_de_BadSat
     db 1,%01000110,8,%00000010  ;(38).
 
 ; Codo: Derecha y bajo.
-    db 1,%00001010,2,%00000010,1,%00001010,1,%00000010,2,%00001010,1,%00001000
-    db 1,%00001010,1,%00001000,1,%00001010,1,%00001000,1,%00001010,0    ;(11).
+    db 1,%00001010,2,%00000010,1,%00001010,1,%00000010,2,%00001010,1,%00000010
+    db 1,%00001010,1,%00001000,1,%00001010,1,%00001000,1,%00001010    ;(11).
 
+; Un poquito para abajo.
+;    db 5,%00001000  ;(1).
 
+; Codo: Abajo e izquierda.
+    db 1,%00001001,2,%00001000,1,%00001001,1,%00001000,2,%00001001,1,%00000001
+    db 1,%00001001,1,%00000001,1,%00001001,1,%00000001,1,%00001001    ;(11).
 
+; Un poquito a la izquierda
+
+    db 3,%00000001
+
+; Izquierda ligeramente ascendente.
+    db 1,%00000101,4,%00000001,1,%10000101,4,%10000001,1,%10000101,4,%10000001
+    db 1,%10000101,4,%10000001,1,%10000101,4,%10000001,1,%10000101,4,%10000001
+    db 1,%10000101,4,%10000001,1,%10000101,4,%10000001,1,%10000101,4,%10000001 
+    db 1,%10000101,4,%10000001,1,%10000101,4,%10000001,1,%10000101,4,%10000001
+    db 1,%10000101,4,%10000001,1,%10000101,4,%10000001,1,%10000101,4,%10000001
+    db 1,%10000101,4,%10000001,1,%10000101,4,%10000001,1,%10000101,4,%10000001
+    db 1,%10000101,4,%10000001,0  ;(38).
 
 ; ----- ----- ----- ----- -----
 
@@ -63,18 +80,18 @@ Movimiento
 ; Nota: Previamente, la rutina [DRAW], ha iniciado la entidad, (Puntero_mov) ya apunta a su cadena de movimiento correspondiente.
 
 1 
-    ld a,(Incrementa_puntero)                                     ; Vamos a inicializar las variables de movimiento. El contador (Incrementa_puntero) es un byte que inicialmente está a "0"._
-    add 2                                                       ; _va incrementando su valor en 2 unidades cada vez que iniciamos una cadena. Se utiliza para ir incrementando (Puntero_mov)_
-    ld (Incrementa_puntero),a                                   ; _ por el índice de cadenas de movimiento correspondiente. Su valor se restablecerá a "0" cuando encontremos 
+;    ld a,(Incrementa_puntero)                                   ; Vamos a inicializar las variables de movimiento. El contador (Incrementa_puntero) es un byte que inicialmente está a "0"._
+;    add 2                                                       ; _va incrementando su valor en 2 unidades cada vez que iniciamos una cadena. Se utiliza para ir incrementando (Puntero_mov)_
+;    ld (Incrementa_puntero),a                                   ; _ por el índice de cadenas de movimiento correspondiente. Su valor se restablecerá a "0" cuando encontremos 
 ;                                                               ; _ el .db0. (Indica que hemos terminado de leer la secuencia de movimiento completa de la entidad).
     ld hl,(Puntero_mov)
     ld a,(hl)
     ld (Contador_db_mov),a                                      ; Contador de bytes de la cadena inicializado. (El 1er byte de cada cadena de mov. indica el nº de bytes que_
     and a                                                       ; _ tiene la cadena.
 
-    jr z,$
+;    jr z,$
 
-;    jr z, Reinicia_el_movimiento                              ; Hemos terminado de ejecutar todas las cadenas de movimiento. 
+    jr z, Reinicia_el_movimiento                              ; Hemos terminado de ejecutar todas las cadenas de movimiento. 
 
 ; HL contiene (Puntero_mov) y este se encuentra en el 1er byte de la cadena de movimiento, (Contador_db_mov).
 
@@ -104,7 +121,9 @@ Decoder
 
 ; Pasamos al sigiente .db de la cadena de movimiento.
 
-6 inc hl
+6 
+    ld hl,(Puntero_mov)
+    inc hl
     ld (Puntero_mov),hl
 
     ld hl,Ctrl_2
