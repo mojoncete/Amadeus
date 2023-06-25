@@ -1,68 +1,64 @@
 
 
-;   17/06/23
+;   25/06/23
 ;
 ;   Base de datos. PATRONES DE MOVIMIENTO.
 ;
-;   Mov_obj.asm
-;
-;   Coordenada_X db 0 									    	; Coordenada X del objeto. (En chars.)
-;   Coordenada_y db 0 									    	; Coordenada Y del objeto. (En chars.)
-;
 ;   Codificación:
 ;
-;   1er Byte ..... Repetición del movimiento. (0-255) pixeles.
-;   2º Byte (Nibble alto) ..... Velocidad del movimiento (% izquierda,derecha,arriba,abajo).
-;           (Nibble bajo) ..... Dirección del movimiento (% abajo,arriba,derecha,izquierda).  
+;   La descripción de un movimiento consta de 5 bytes como mínimo:
+;
+;   db (Contador_db_mov),[(Desplaz.1),(Desplaz2),(Desplaz3),.....],(Repetimos_mov).
+;
+;
+;   (Contador_db_mov) ..... Nº de bytes que componen el desplazamiento, (0-255).
+;
+;                       Hay que tener en cuenta que cada (Desplaz.) está constituido por 3 bytes.
+;                       Así que cada movimiento podrá estar constituido como máximo, por 85 desplazamientos. 
+;
+;   (Desplaz.1),(Desplaz.2),(Desplaz.3) ..... Bytes que describen la velocidad, dirección y repeticiones de cada uno de_
+;                       los desplazamientos que componen el movimiento.                        
+;
+;                       Los bytes 1 y 2 definen la velocidad del desplazamiento.
+;
+;                       (Byte1) ..... % (Vel_up),(Vel_down)  
+;                               ..... %01000010 Vel_up 4
+;                                               Vel_down 2
+;                               ..... $42
+;
+;                       (Byte1) ..... % (Vel_left),(Vel_right)  
+;   
+;                               ..... %01000010 Vel_left 4
+;                                               Vel_right 2
+;                               ..... $42
+;
+;                       El 3er byte describe la dirección y repeticiones del desplazamiento.
+;
+;                       (Byte3) ..... Descripción del desplazamiento.
+;
+;                       % up,down,left,right, Repetición del desplazamiento, (0-15).
+;
+;                                     %01010011 ..... (Abajo-derecha), 3 veces.
+;                                     $53
+;
+;                       Esta tabla nos ayudará a codificar rápido los desplazamientos del mov.
+;                       Supongamos que solo ejecutamos 1 vez, cada desplazamiento:
+;
+;                       Arriba ..... $81
+;                       Arriba - izquierda ..... $a1
+;                       Arriba - derecha ..... $91
+;               
+;                       Abajo ..... $41
+;                       Abajo - izquierda ..... $61
+;                       Abajo - derecha ..... $51
+;
+;   (Repetimos_mov) ..... Nº de veces que repetimos el movimiento completo. (0-255).
 
-;   El "0"; último .db indica que ya hemos terminado de ejecutar todas las cadenas de movimiento.     
-
-Baile_de_BadSat 
-
-; Baja decelerando.    
-    db 112,20,%00011000,5,%00001000 ;(2).                                                            
-
-; Codo: bajo y derecha.
-    db 1,%00001010,1,%00001000,2,%00001010,1,%00001000,1,%00001010,1,%00001000,2,%00001010
-    db 1,%00000010,1,%00001010,2,%00000010,1,%00001010  ;(11).
-
-; Derecha ligeramente ascendente.
-    db 2,%00000110,4,%00000010,1,%01000110,4,%01000010,1,%01000110,4,%01000010
-    db 1,%01000110,4,%01000010,1,%01000110,4,%01000010,1,%01000110,4,%01000010
-    db 1,%01000110,4,%01000010,1,%01000110,4,%01000010,1,%01000110,4,%01000010 
-    db 1,%01000110,4,%01000010,1,%01000110,4,%01000010,1,%01000110,4,%01000010
-    db 1,%01000110,4,%01000010,1,%01000110,4,%01000010,1,%01000110,4,%01000010
-    db 1,%01000110,4,%01000010,1,%01000110,4,%01000010,1,%01000110,4,%01000010
-    db 1,%01000110,8,%00000010  ;(38).
-
-; Codo: Derecha y bajo.
-    db 1,%00001010,2,%00000010,1,%00001010,1,%00000010,2,%00001010,1,%00000010
-    db 1,%00001010,1,%00001000,1,%00001010,1,%00001000,1,%00001010    ;(11).
-
-; Un poquito para abajo.
-;    db 5,%00001000  ;(1).
-
-; Codo: Abajo e izquierda.
-    db 1,%00001001,2,%00001000,1,%00001001,1,%00001000,2,%00001001,1,%00000001
-    db 1,%00001001,1,%00000001,1,%00001001,1,%00000001,1,%00001001    ;(11).
-
-; Un poquito a la izquierda
-
-    db 3,%00000001
-
-; Izquierda ligeramente ascendente.
-    db 1,%00000101,4,%00000001,1,%10000101,4,%10000001,1,%10000101,4,%10000001
-    db 1,%10000101,4,%10000001,1,%10000101,4,%10000001,1,%10000101,4,%10000001
-    db 1,%10000101,4,%10000001,1,%10000101,4,%10000001,1,%10000101,4,%10000001 
-    db 1,%10000101,4,%10000001,1,%10000101,4,%10000001,1,%10000101,4,%10000001
-    db 1,%10000101,4,%10000001,1,%10000101,4,%10000001,1,%10000101,4,%10000001
-    db 1,%10000101,4,%10000001,1,%10000101,4,%10000001,1,%10000101,4,%10000001
-    db 1,%10000101,4,%10000001,0  ;(38).
+Baile_de_BadSat db 5
 
 ; ----- ----- ----- ----- -----
 
 Indice_mov_Baile_de_BadSat defw Baile_de_BadSat
-
 
 ; ----- ----- ----- ----- -----
 ;
@@ -70,7 +66,7 @@ Indice_mov_Baile_de_BadSat defw Baile_de_BadSat
 
 Movimiento 
 
-    ld a,(Contador_db_mov)                                      ; Hemos iniciado la cadena de movimiento ?. Si (Contador_db_mov) aún es "0" hay que inicializarlo._
+    ld a,(Contador_db_mov)                                      ; Hemos iniciado un movimiento ?. Si (Contador_db_mov) aún es "0" hay que inicializarlo._
     and a                                                       ; _Para hacerlo, hemos de fijar antes (Puntero_mov). 
     jr z,1F
 
@@ -79,12 +75,7 @@ Movimiento
 ; Inicializa movimiento, (comienza un movimiento).
 ; Nota: Previamente, la rutina [DRAW], ha iniciado la entidad, (Puntero_mov) ya apunta a su cadena de movimiento correspondiente.
 
-1 
-;    ld a,(Incrementa_puntero)                                   ; Vamos a inicializar las variables de movimiento. El contador (Incrementa_puntero) es un byte que inicialmente está a "0"._
-;    add 2                                                       ; _va incrementando su valor en 2 unidades cada vez que iniciamos una cadena. Se utiliza para ir incrementando (Puntero_mov)_
-;    ld (Incrementa_puntero),a                                   ; _ por el índice de cadenas de movimiento correspondiente. Su valor se restablecerá a "0" cuando encontremos 
-;                                                               ; _ el .db0. (Indica que hemos terminado de leer la secuencia de movimiento completa de la entidad).
-    ld hl,(Puntero_mov)
+1 ld hl,(Puntero_mov)
     ld a,(hl)
     ld (Contador_db_mov),a                                      ; Contador de bytes de la cadena inicializado. (El 1er byte de cada cadena de mov. indica el nº de bytes que_
     and a                                                       ; _ tiene la cadena.
@@ -110,11 +101,11 @@ Decoder
 
 ; ---------- --------- --------- ---------- ----------
 
-5 ld a,(Repetimos_db)
+5 ld a,(Repetimos_mov)
     and a
     jr z,6F
     dec a
-    ld (Repetimos_db),a
+    ld (Repetimos_mov),a
     jr z,6f
 
 11 ret
@@ -160,7 +151,7 @@ Reinicia_el_movimiento
     jp Movimiento
 
 Prepara_siguiente_mov ld a,(hl)
-    ld (Repetimos_db),a
+    ld (Repetimos_mov),a
     inc hl
     ld (Puntero_mov),hl
     ret

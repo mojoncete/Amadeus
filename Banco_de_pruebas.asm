@@ -146,7 +146,7 @@ Puntero_indice_mov defw 0							    ; Puntero del patrón de movimiento de la en
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0
-Repetimos_db db 0
+Repetimos_mov db 0
 
 ; Variables de funcionamiento. [DRAW].
 
@@ -279,13 +279,6 @@ Nivel db 0												; Nivel actual del juego.
 Puntero_indice_NIVELES defw 0
 Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos bytes_
 ; 														; _ que definen el NIVEL.
-
-;---------------------------------------------------------------------------------------------------------------
-
-; Pequeño almacén de 4 bytes para guardar los perfiles de velocidad.
-
-Almacen_de_velocidades ds 4 
-
 ; Y todo comienza aquí .....
 ;
 ; Rutina principal *************************************************************************************************************************************************************************
