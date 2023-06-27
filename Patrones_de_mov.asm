@@ -54,37 +54,31 @@
 ;
 ;   (Repetimos_mov) ..... Nº de veces que repetimos el movimiento completo. (0-255).
 
-Baile_de_BadSat defw Bajo_decelerando
-
-
 ; ----- ----- ----- ----- -----
 
 Indice_mov_Baile_de_BadSat defw Bajo_decelerando
+;    defw Codo_abajo_derecha
 
-
-Bajo_decelerando db 1,$14,$11,$4f,2             
-    db 1,$12,$11,$4f,2
-    db 1,$11,$11,$4f,2,0
-
-
-
+Bajo_decelerando db 1,$14,$11,$48,1             
+    db 1,$12,$11,$4f,2,0
+    db 1,$11,$11,$4f,2
 
 ; ----- ----- ----- ----- -----
 ;
-;   18/06/23
+;   27/06/23
 
 Movimiento 
 
     ld a,(Contador_db_mov)                                      ; Hemos iniciado un movimiento ?. Si (Contador_db_mov) aún es "0" hay que inicializarlo._
     and a                                                       ; _Para hacerlo, hemos de fijar antes (Puntero_mov). 
-    jr z,1F
+    jr z,Inicializa_movimiento
 
     jr Movimiento_iniciado                                      ; Saltamos a [Decoder] si ya hemos iniciado la cadena.
 
 ; Inicializa movimiento, (comienza un movimiento).
 ; Nota: Previamente, la rutina [DRAW], ha iniciado la entidad, (Puntero_mov) ya apunta a su cadena de movimiento correspondiente.
 
-1 ld hl,(Puntero_mov)
+Inicializa_movimiento ld hl,(Puntero_mov)
     ld a,(hl)
     ld (Contador_db_mov),a                                      ; Contador de bytes de la cadena inicializado. (El 1er byte de cada cadena de mov. indica el nº de bytes que_
     and a                                                       ; _ tiene la cadena.
@@ -95,10 +89,11 @@ Movimiento
     inc hl
     call Ajusta_velocidad_desplazamiento
 
-    inc hl
+; Iniciamos (Repetimos_mov).
+
     ld a,(hl)
-    ld (Repetimos_mov),a
-    dec hl
+    and $0f
+    ld (Repetimos_desplazamiento),a
 
 
 ; Hemos ajustado la velocidad del desplazamiento con los 2 primeros bytes del desplazamiento.
@@ -108,59 +103,39 @@ Movimiento_iniciado
 
     call Aplica_movimiento
 
-    ld hl,Repetimos_mov
+    ld hl,Repetimos_desplazamiento
     dec (hl)
     ret nz
 
-    jr $
+; Hemos terminado de ejecutar el desplazamiento y sus repeticiones.
+; Hay más desplazamientos en este movimiento???
 
 ; !!!!!!!!!!!!!!!! Voy por aquí.
 
- 
+    jr $
 
 
-; ---------- --------- --------- ---------- ----------
+; Este movimiento NO CONTIENE más desplazamientos. Saltamos al siguiente movimiento del índice de movimientos_
+; _ de la entidad.
 
-5 ld a,(Repetimos_mov)
-    and a
-    jr z,6F
-    dec a
-    ld (Repetimos_mov),a
-    jr z,6f
+;    call z, Incrementa_Puntero_indice_mov
 
-11 ret
+; !!!!!!!!!!!!!!!! Voy por aquí.
 
-; Pasamos al sigiente .db de la cadena de movimiento.
+; Pasamos al siguiente desplazamiento del movimiento actual.
+; Actualizamos el puntero (Puntero_mov), al comienzo del nuevo desplazamiento e iniciamos.
 
-6 
-    ld hl,(Puntero_mov)
-    inc hl
-    ld (Puntero_mov),hl
+;    jr Inicializa_movimiento
 
-    ld hl,Ctrl_2
-    res 2,(hl)
-    call Restaura_velocidad
 
-    ld hl,Contador_db_mov
-    dec (hl)  
-    ret z 
 
-    ld hl,(Puntero_mov)
-    call Prepara_siguiente_mov
 
-    jr 11B
 
-7 ld hl,(Puntero_indice_mov)                                       ; PASAMOS A LA CADENA SIGUIENTE !!!!!!
-    ld a,(Incrementa_puntero)
-    ld b,a
-8 inc hl
-    djnz 8B                                                        ; Indice_patrones_coracao +2, +4, +6, etc...
-    ld e,(hl) 
-    inc hl
-    ld d,(hl)
-    ex de,hl
-    ld (Puntero_mov),hl                                            ; (Puntero_mov) situado el el 1er .db de la siguiente cadena de movimiento.                                   
-    jr 11B
+
+
+
+
+
 
 Reinicia_el_movimiento 
 
@@ -170,25 +145,11 @@ Reinicia_el_movimiento
     ld (Incrementa_puntero),a
     jp Movimiento
 
-Prepara_siguiente_mov ld a,(hl)
-    ld (Repetimos_mov),a
-    inc hl
-    ld (Puntero_mov),hl
-    ret
-
-; ---------- --------- --------- ---------- ----------
-;
-;   19/6/23
-;
-;   Restaura los perfiles de velocidad a x1
-
-Restaura_velocidad ld a,1
-    ld b,4
-    ld hl,Vel_left
-1 ld (hl),a
-    inc hl
-    djnz 1B
-    ret
+;Prepara_siguiente_mov ld a,(hl)
+;    ld (Repetimos_mov),a
+;    inc hl
+;    ld (Puntero_mov),hl
+;    ret
 
 ; ---------- --------- --------- ---------- ----------
 ;
@@ -208,22 +169,15 @@ Inicia_Puntero_mov ld hl,(Puntero_indice_mov)
     
 ; ---------- --------- --------- ---------- ----------
 ;
-;   26/06/23
+;   27/06/23
 ;
 ;   Aplica_movimiento.
     
 Aplica_movimiento 
 
-; Guardamos las repeticiones del desplazamiento en la pila.
-
-    ld a,(hl)
-    and $0f
-    ld b,a
-    push bc
-
 ; Analizamos (bit a bit) el nibble alto y ejecutamos el desplazamiento.
 
-5 ld hl, (Puntero_mov) 
+    ld hl, (Puntero_mov) 
     bit 7,(hl)
     jr z,1F
     call Mov_up
@@ -237,14 +191,8 @@ Aplica_movimiento
     call Mov_left
 3 ld hl, (Puntero_mov)
     bit 4,(hl) 
-    jr z,4F
+    ret z
     call Mov_right
-
-; Decrementamos contador de repeticiones y salimos.
-
-4 pop bc
-    djnz 5B
-
     ret
 
 ; ---------- --------- --------- ---------- ----------
@@ -289,3 +237,11 @@ Extrae_nibble_alto ld b,4
 1 srl a    
     djnz 1B
     ret
+
+; ---------- --------- --------- ---------- ----------
+;
+;   27/06/23
+;
+;   Incrementa_Puntero_indice_mov
+
+Incrementa_Puntero_indice_mov jr $

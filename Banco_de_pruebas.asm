@@ -146,7 +146,8 @@ Puntero_indice_mov defw 0							    ; Puntero del patrón de movimiento de la en
 Puntero_mov defw 0
 Contador_db_mov db 0
 Incrementa_puntero db 0
-Repetimos_mov db 0
+Repetimos_desplazamiento db 0
+;Repetimos_mov db 0
 
 ; Variables de funcionamiento. [DRAW].
 
