@@ -60,8 +60,8 @@ Indice_mov_Baile_de_BadSat defw Bajo_decelerando
 ;    defw Codo_abajo_derecha
 
 Bajo_decelerando db 1,$14,$11,$48,1             
-    db 1,$12,$11,$4f,2,0
-    db 1,$11,$11,$4f,2
+    db 1,$12,$11,$4f,2
+    db 1,$11,$11,$4f,2,0                                        ; El final del movimiento se indica con un "0" en 
 
 ; ----- ----- ----- ----- -----
 ;
@@ -101,16 +101,22 @@ Inicializa_movimiento ld hl,(Puntero_mov)
 
 Movimiento_iniciado
 
-    call Aplica_movimiento
+    call Aplica_desplazamiento
 
     ld hl,Repetimos_desplazamiento
     dec (hl)
     ret nz
 
-; Hemos terminado de ejecutar el desplazamiento y sus repeticiones.
-; Hay más desplazamientos en este movimiento???
+; Hemos terminado de ejecutar el desplazamiento y sus ($0-$f repeticiones).
+; Hay que volver a ejecutar este desplazamiento ???.
 
-; !!!!!!!!!!!!!!!! Voy por aquí.
+    ld hl,(Puntero_mov)
+    inc hl
+
+    ld a,(hl)
+    and a
+    jr z,$
+
 
     jr $
 
@@ -145,11 +151,6 @@ Reinicia_el_movimiento
     ld (Incrementa_puntero),a
     jp Movimiento
 
-;Prepara_siguiente_mov ld a,(hl)
-;    ld (Repetimos_mov),a
-;    inc hl
-;    ld (Puntero_mov),hl
-;    ret
 
 ; ---------- --------- --------- ---------- ----------
 ;
@@ -173,9 +174,9 @@ Inicia_Puntero_mov ld hl,(Puntero_indice_mov)
 ;
 ;   Aplica_movimiento.
     
-Aplica_movimiento 
+Aplica_desplazamiento 
 
-; Analizamos (bit a bit) el nibble alto y ejecutamos el desplazamiento.
+; Analizamos (bit a bit) el nibble alto del 3er byte que compone el desplazamiento y ejecutamos.
 
     ld hl, (Puntero_mov) 
     bit 7,(hl)
