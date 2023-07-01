@@ -49,7 +49,7 @@ Album_de_fotos_disparos equ $7085						; En (Album_de_fotos_disparos) vamos a ir
 ; Variables. 
 ; ****************************************************************************************************************************************************************************************** 
 ;
-; 30/05/23
+; 01/07/23
 ;
 ; Variables de DRAW. (Motor principal).				
 ;
@@ -139,15 +139,35 @@ Ctrl_0 db 0 											; Byte de control. A través de este byte de control. Las
 
 Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el objeto.	
 
-; Movimiento.
+; Movimiento. ------------------------------------------------------------------------------------------------------
 
 Autoriza_movimiento db 0                                ; "1" Autoriza el movimiento de la entidad. "0", no hay movimiento.
-Puntero_indice_mov defw 0							    ; Puntero del patrón de movimiento de la entidad. "0" No hay movimiento.
-Puntero_mov defw 0
-Contador_db_mov db 0
-Incrementa_puntero db 0
-Repetimos_desplazamiento db 0
-;_mov db 0
+Puntero_indice_mov defw 0							    ; Puntero índice del patrón de movimiento de la entidad. "0" No hay movimiento.
+Puntero_mov defw 0										; Guarda la posición de memoria en la que nos encontramos dentro de la cadena de movimiento.
+Contador_db_mov db 0									; Indica el nº de bytes que tiene la cadena de movimiento,_
+;														; Hay que tener en cuenta que cada (Desplaz.) está constituido por 3 bytes._
+;                   									; Así que cada movimiento podrá estar constituido como máximo, por 85 desplazamientos. 
+Incrementa_puntero db 0									; Byte que iremos sumando a (Puntero_indice_mov) para ir escalando por las_
+;														; _ distintas cadenas de movimiento del índice de movimiento de la entidad._
+;														; Va aumentando su valor en saltos de 2 uds, (0,2,4,6,8).
+Repetimos_desplazamiento db 0							; El nibble bajo del 3er byte que compone un desplazamiento, indica el nº de veces que_
+;														; repetimos dicho desplazamiento. Ese valor se almacena en esta variable, ($0-$f).
+Repetimos_desplazamiento_backup db 0					; Restaura (Repetimos_desplazamiento) cuando este llega a "0".
+Cola_de_desplazamiento db 0								; Este byte indica:
+;
+;														;	"$00" ..... Hemos finalizado la cadena de movimiento.
+;														;				En este caso hemos de incrementar (Puntero_indice_mov)_
+;														;				_ y pasar a la siguiente cadena de movimiento del índice.
+;
+;														;	"$01 - "$fe" ..... Repetición del movimiento. 
+;														;						Nº de veces que vamos a repetir el movimiento completo.
+;														;						En este caso, volveremos a inicializar (Puntero_mov),_	
+;														;						_ con (Puntero_indice_mov) y decrementaremos (Cola_de_desplazamiento).
+;				
+;														;	"$ff" ..... Bucle infinito de repetición. 
+;														;				Nunca vamos a saltar a la siguiente cadena de movimiento del índice,_	
+;														;				,_ (si es que la hay). Volvemos a inicializar (Puntero_mov) con (Puntero_indice_mov).	
+
 
 ; Variables de funcionamiento. [DRAW].
 
@@ -175,7 +195,7 @@ Ctrl_2 db 0
 
 Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
-; 62 Bytes por entidad.
+; 64 Bytes por entidad.
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 ;					         		---------;      ;---------
 
@@ -449,6 +469,8 @@ Frame
 	add 100
 	ld (Clock_Entidades_en_curso),a
 
+; Habilita disparos.
+
 13 ld hl,Habilita_disparo_Amadeus
 	ld de,Temporiza_disparo_Amadeus
 	call Habilita_disparos 								; 30 Frames como mínimo entre cada disparo de Amadeus.
@@ -506,14 +528,12 @@ Frame
 	jp z,4F												; Si no hay entidades en curso, RESTORE AMADEUS.
 	ld b,a												; (Entidades_en_curso) en A´ y B.
 
-;	ex af,af
-
 ; Código que ejecutamos con cada entidad:
 ; Impacto ???
 
 15 push bc 												; Nº de entidades en curso.
 
-;	call Autorizacion
+;	call Autorizacion									; NO todas las entidades se pintan. (25fps).
 
 	ld a,(Impacto)										 
 	and a
@@ -1013,7 +1033,7 @@ Store_Restore_cajas
 
 	ld hl,Filas
 	ld de,(Puntero_store_caja) 							; Puntero que se desplaza por las distintas entidades.
-	ld bc,62
+	ld bc,64
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
 ; 	Entidad_sospechosa. 20/4/23
@@ -1037,7 +1057,7 @@ Store_Restore_cajas
 	jr z,2F
 
 	ld de,Filas
-	ld bc,62
+	ld bc,64
 	ldir
 
 2 call Incrementa_punteros_de_cajas
@@ -1062,7 +1082,7 @@ Restore_entidad push hl
 
 	ld hl,(Puntero_store_caja)						; (Puntero_store_caja) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,62
+	ld bc,64
 	ldir
 
 	pop bc
@@ -1101,7 +1121,7 @@ Restore_Amadeus	push hl
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Filas
-	ld bc,62
+	ld bc,64
 	ldir
 	pop bc
 	pop de
@@ -1121,7 +1141,7 @@ Restore_Amadeus	push hl
 ;	DESTRUYE: HL y BC y DE.
 
 Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
-	ld bc,62
+	ld bc,64
 	ldir
 	ret
 
@@ -1134,7 +1154,7 @@ Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeu
 ;	Destruye: HL,BC,DE,A
 
 Borra_datos_entidad ld hl,Filas
-	ld bc,61
+	ld bc,63
 	xor a
 	ld (hl),a
 	ld de,Filas+1

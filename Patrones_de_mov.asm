@@ -8,10 +8,10 @@
 ;
 ;   La descripción de un movimiento consta de 5 bytes como mínimo:
 ;
-;   db (Contador_db_mov),[(Desplaz.1),(Desplaz2),(Desplaz3),.....],(Repetimos_mov).
+;   db (Contador_db_mov),[(Desplaz.1),(Desplaz2),(Desplaz3),.....],(Cola_de_desplazamiento).
 ;
 ;
-;   (Contador_db_mov) ..... Nº de bytes que componen el desplazamiento, (0-255).
+;   (Contador_db_mov) ..... Nº de bytes que componen el movimiento, (0-255).
 ;
 ;                       Hay que tener en cuenta que cada (Desplaz.) está constituido por 3 bytes.
 ;                       Así que cada movimiento podrá estar constituido como máximo, por 85 desplazamientos. 
@@ -52,14 +52,27 @@
 ;                       Abajo - izquierda ..... $61
 ;                       Abajo - derecha ..... $51
 ;
-;   (Repetimos_mov) ..... Nº de veces que repetimos el movimiento completo. (0-255).
+;   (Cola_de_desplazamiento) db 0			; Este byte indica:
+;
+;											;	"$00" ..... Hemos finalizado la cadena de movimiento.
+;											;				En este caso hemos de incrementar (Puntero_indice_mov)_
+;											;				_ y pasar a la siguiente cadena de movimiento del índice.
+;
+;											;	"$01 - "$fe" ..... Repetición del movimiento. 
+;											;						Nº de veces que vamos a repetir el movimiento completo.
+;											;						En este caso, volveremos a inicializar (Puntero_mov),_	
+;							    			;						_ con (Puntero_indice_mov) y decrementaremos (Cola_de_desplazamiento).
+;				
+;											;	"$ff" ..... Bucle infinito de repetición. 
+;											;				Nunca vamos a saltar a la siguiente cadena de movimiento del índice,_	
+;											;				,_ (si es que la hay). Volvemos a inicializar (Puntero_mov) con (Puntero_indice_mov).	
 
 ; ----- ----- ----- ----- -----
 
 Indice_mov_Baile_de_BadSat defw Bajo_decelerando
 ;    defw Codo_abajo_derecha
 
-Bajo_decelerando db 1,$14,$11,$48,1             
+Bajo_decelerando db 1,$14,$11,$48,0             
     db 1,$12,$11,$4f,2
     db 1,$11,$11,$4f,2,0                                        ; El final del movimiento se indica con un "0" en 
 
@@ -94,7 +107,14 @@ Inicializa_movimiento ld hl,(Puntero_mov)
     ld a,(hl)
     and $0f
     ld (Repetimos_desplazamiento),a
+    ld (Repetimos_desplazamiento_backup),a
 
+; Iniciamos (Cola_de_desplazamiento).
+
+    inc hl
+    ld a,(hl)
+    ld (Cola_de_desplazamiento),a
+    dec hl
 
 ; Hemos ajustado la velocidad del desplazamiento con los 2 primeros bytes del desplazamiento.
 ; El 3er byte indica la dirección del desplz., (nibble alto) y las veces que lo ejecutamos, (nibble bajo).
@@ -107,39 +127,29 @@ Movimiento_iniciado
     dec (hl)
     ret nz
 
+
 ; Hemos terminado de ejecutar el desplazamiento y sus ($0-$f repeticiones).
 ; Hay que volver a ejecutar este desplazamiento ???.
 
-    ld hl,(Puntero_mov)
-    inc hl
-
-    ld a,(hl)
+    ld a,(Cola_de_desplazamiento)
     and a
-    jr z,$
+    call z, Incrementa_Puntero_indice_mov                       ; Fin de la cadena de movimiento ???.
 
+    cp $ff
+    jr z, Reinicia_el_movimiento                                ; Bucle infinito del desplazamiento?.
 
-    jr $
-
-
-; Este movimiento NO CONTIENE más desplazamientos. Saltamos al siguiente movimiento del índice de movimientos_
-; _ de la entidad.
-
-;    call z, Incrementa_Puntero_indice_mov
+    cp 1
+    call z, Siguiente_desplazamiento                            ; Pasamos al siguiente desplazamiento de movimiento?.
+    
+    dec a
+    ld (Cola_de_desplazamiento),a                               
+    
+    ld a,(Repetimos_desplazamiento_backup)                      ; Cuando (Cola_de_desplazamiento) actúa como contador del_
+    ld (Repetimos_desplazamiento),a                             ; _ desplazamiento y este no ha llegado a "0", decrementamos_
+;                                                               ; _ el contador y RESTAURAMOS (Repetimos_desplazamiento).
+    ret
 
 ; !!!!!!!!!!!!!!!! Voy por aquí.
-
-; Pasamos al siguiente desplazamiento del movimiento actual.
-; Actualizamos el puntero (Puntero_mov), al comienzo del nuevo desplazamiento e iniciamos.
-
-;    jr Inicializa_movimiento
-
-
-
-
-
-
-
-
 
 
 
@@ -246,3 +256,12 @@ Extrae_nibble_alto ld b,4
 ;   Incrementa_Puntero_indice_mov
 
 Incrementa_Puntero_indice_mov jr $
+
+; ---------- --------- --------- ---------- ----------
+;
+;   01/07/23
+;
+;   Siguiente_desplazamiento
+
+Siguiente_desplazamiento jr $
+
