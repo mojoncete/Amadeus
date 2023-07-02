@@ -144,9 +144,9 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 Autoriza_movimiento db 0                                ; "1" Autoriza el movimiento de la entidad. "0", no hay movimiento.
 Puntero_indice_mov defw 0							    ; Puntero índice del patrón de movimiento de la entidad. "0" No hay movimiento.
 Puntero_mov defw 0										; Guarda la posición de memoria en la que nos encontramos dentro de la cadena de movimiento.
-Contador_db_mov db 0									; Indica el nº de bytes que tiene la cadena de movimiento,_
-;														; Hay que tener en cuenta que cada (Desplaz.) está constituido por 3 bytes._
-;                   									; Así que cada movimiento podrá estar constituido como máximo, por 85 desplazamientos. 
+Inicio_bucle db 0										;! Ha de ser defw!!!!!
+;														
+;                   									
 Incrementa_puntero db 0									; Byte que iremos sumando a (Puntero_indice_mov) para ir escalando por las_
 ;														; _ distintas cadenas de movimiento del índice de movimiento de la entidad._
 ;														; Va aumentando su valor en saltos de 2 uds, (0,2,4,6,8).
@@ -188,10 +188,8 @@ Ctrl_2 db 0
 ;															_ (Puntero_objeto) con (Repone_puntero_objeto) una vez iniciado y realizada su 1ª `foto'.
 ;														
 ;														BIT 1, Este bit a "1" indica que se ha iniciado el proceso de EXPLOSIÓN en una entidad.
-;														BIT 2, Este bit es activado por la rutina [Velocidad_del_movimiento] para indicar que hemos_
-;															_ modificado el perfil de velocidad de la entidad. Evita que volvamos a ejecutar esta rutina_
-;															_ en las sucesivas repeticiones de un mismo movimiento de la cadena.
-
+;														BIT 2, Este bit es activado por [Movimiento]. Indica que hemos `iniciado un desplazamiento'._
+;															_ Evita que volvamos a iniciar el desplazamiento cada vez que ejecutemos [Movimiento].
 
 Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 

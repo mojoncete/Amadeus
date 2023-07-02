@@ -1,23 +1,16 @@
 
 
-;   25/06/23
+;   02/07/23
 ;
 ;   Base de datos. PATRONES DE MOVIMIENTO.
 ;
 ;   Codificación:
 ;
-;   La descripción de un movimiento consta de 5 bytes como mínimo:
+;   La descripción de un movimiento consta de 1 o más desplazamientos.
 ;
-;   db (Contador_db_mov),[(Desplaz.1),(Desplaz2),(Desplaz3),.....],(Cola_de_desplazamiento).
+;   Un desplazamiento tiene la siguiente estructura:
 ;
-;
-;   (Contador_db_mov) ..... Nº de bytes que componen el movimiento, (0-255).
-;
-;                       Hay que tener en cuenta que cada (Desplaz.) está constituido por 3 bytes.
-;                       Así que cada movimiento podrá estar constituido como máximo, por 85 desplazamientos. 
-;
-;   (Desplaz.1),(Desplaz.2),(Desplaz.3) ..... Bytes que describen la velocidad, dirección y repeticiones de cada uno de_
-;                       los desplazamientos que componen el movimiento.                        
+;   (Byte1),(Byte2),(Byte3),(Cola_de_desplazamiento).   (4 Bytes).
 ;
 ;                       Los bytes 1 y 2 definen la velocidad del desplazamiento.
 ;
@@ -26,7 +19,7 @@
 ;                                               Vel_down 2
 ;                               ..... $42
 ;
-;                       (Byte1) ..... % (Vel_left),(Vel_right)  
+;                       (Byte2) ..... % (Vel_left),(Vel_right)  
 ;   
 ;                               ..... %01000010 Vel_left 4
 ;                                               Vel_right 2
@@ -63,7 +56,7 @@
 ;											;						En este caso, volveremos a inicializar (Puntero_mov),_	
 ;							    			;						_ con (Puntero_indice_mov) y decrementaremos (Cola_de_desplazamiento).
 ;				
-;											;	"$ff" ..... Bucle infinito de repetición. 
+;											;	"$ff" ..... Bucle infinito de repetición del MOVIMIENTO.
 ;											;				Nunca vamos a saltar a la siguiente cadena de movimiento del índice,_	
 ;											;				,_ (si es que la hay). Volvemos a inicializar (Puntero_mov) con (Puntero_indice_mov).	
 
@@ -72,9 +65,10 @@
 Indice_mov_Baile_de_BadSat defw Bajo_decelerando
 ;    defw Codo_abajo_derecha
 
-Bajo_decelerando db 1,$14,$11,$48,1             
-    db 1,$12,$11,$4f,2
-    db 1,$11,$11,$4f,2,0                                        ; El final del movimiento se indica con un "0" en 
+Bajo_decelerando db $14,$11,$4f,1             
+    db $12,$11,$4f,1
+    db $11,$11,$4f,1                                          
+    db 0
 
 ; ----- ----- ----- ----- -----
 ;
@@ -82,24 +76,22 @@ Bajo_decelerando db 1,$14,$11,$48,1
 
 Movimiento 
 
-    ld a,(Contador_db_mov)                                      ; Hemos iniciado un movimiento ?. Si (Contador_db_mov) aún es "0" hay que inicializarlo._
-    and a                                                       ; _Para hacerlo, hemos de fijar antes (Puntero_mov). 
-    jr z,Inicializa_movimiento
-
-    jr Movimiento_iniciado                                      ; Saltamos a [Decoder] si ya hemos iniciado la cadena.
-
-; Inicializa movimiento, (comienza un movimiento).
 ; Nota: Previamente, la rutina [DRAW], ha iniciado la entidad, (Puntero_mov) ya apunta a su cadena de movimiento correspondiente.
 
-Inicializa_movimiento ld hl,(Puntero_mov)
+    ld hl,(Puntero_mov)
     ld a,(hl)
-    ld (Contador_db_mov),a                                      ; Contador de bytes de la cadena inicializado. (El 1er byte de cada cadena de mov. indica el nº de bytes que_
-    and a                                                       ; _ tiene la cadena.
-    jr z, Reinicia_el_movimiento                                ; Hemos terminado de ejecutar todas las cadenas de movimiento. 
+    and a                                                       
+    call z, Inicializa_Puntero_indice_mov                       ; Hemos terminado de ejecutar todas las cadenas de movimiento. 
 
-; HL contiene (Puntero_mov) y este se encuentra en el 1er byte de la cadena de movimiento, (Contador_db_mov).
+    ld a,(Ctrl_2)
+    bit 2,a
+    jr nz, Desplazamiento_iniciado
 
-    inc hl
+
+; HL contiene (Puntero_mov) y este se encuentra en el 1er byte de la cadena de movimiento, (Byte1) ..... % (Vel_up),(Vel_down).
+
+Inicia_desplazamiento.
+
     call Ajusta_velocidad_desplazamiento
 
 ; Iniciamos (Repetimos_mov).
@@ -116,10 +108,13 @@ Inicializa_movimiento ld hl,(Puntero_mov)
     ld (Cola_de_desplazamiento),a
     dec hl
 
+    ld hl,Ctrl_2
+    set 2,(hl)
+
 ; Hemos ajustado la velocidad del desplazamiento con los 2 primeros bytes del desplazamiento.
 ; El 3er byte indica la dirección del desplz., (nibble alto) y las veces que lo ejecutamos, (nibble bajo).
 
-Movimiento_iniciado
+Desplazamiento_iniciado
 
     call Aplica_desplazamiento
 
@@ -127,19 +122,18 @@ Movimiento_iniciado
     dec (hl)
     ret nz
 
-
 ; Hemos terminado de ejecutar el desplazamiento y sus ($0-$f repeticiones).
 ; Hay que volver a ejecutar este desplazamiento ???.
 
     ld a,(Cola_de_desplazamiento)
     and a
-    call z, Incrementa_Puntero_indice_mov                       ; Fin de la cadena de movimiento ???.
+    call z,Incrementa_Puntero_indice_mov                       ; Fin de la cadena de movimiento ???.
 
     cp $ff
-    jr z, Reinicia_el_movimiento                                ; Bucle infinito del desplazamiento?.
+    jr z,Reinicia_el_movimiento                                ; Bucle infinito del desplazamiento?.
 
     cp 1
-    call z, Siguiente_desplazamiento                            ; Pasamos al siguiente desplazamiento de movimiento?.
+    call z,Siguiente_desplazamiento                            ; Pasamos al siguiente desplazamiento de movimiento?.
     
     dec a
     ld (Cola_de_desplazamiento),a                               
@@ -156,9 +150,13 @@ Movimiento_iniciado
 Reinicia_el_movimiento 
 
     call Inicia_Puntero_mov
+
     xor a
-    ld (Contador_db_mov),a
     ld (Incrementa_puntero),a
+
+    ld hl,Ctrl_2
+    res 2,(hl)
+
     jp Movimiento
 
 
@@ -259,9 +257,31 @@ Incrementa_Puntero_indice_mov jr $
 
 ; ---------- --------- --------- ---------- ----------
 ;
-;   01/07/23
+;   2/07/23
+;
+;   Inicializa_Puntero_indice_mov
+
+Inicializa_Puntero_indice_mov jr $
+
+
+; ---------- --------- --------- ---------- ----------
+;
+;   02/07/23
 ;
 ;   Siguiente_desplazamiento
 
-Siguiente_desplazamiento jr $
+Siguiente_desplazamiento 
 
+;   Situamos (Puntero_mov) en el siguiente desplazamiento del movimiento.
+
+    ld hl,(Puntero_mov)
+    inc hl
+    inc hl
+    ld (Puntero_mov),hl
+
+;   Indicamos que hay que iniciar un nuevo desplazamiento.
+
+    ld hl,Ctrl_2
+    res 2,(hl)
+
+    ret
