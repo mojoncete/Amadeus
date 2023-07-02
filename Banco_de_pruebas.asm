@@ -144,7 +144,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 Autoriza_movimiento db 0                                ; "1" Autoriza el movimiento de la entidad. "0", no hay movimiento.
 Puntero_indice_mov defw 0							    ; Puntero índice del patrón de movimiento de la entidad. "0" No hay movimiento.
 Puntero_mov defw 0										; Guarda la posición de memoria en la que nos encontramos dentro de la cadena de movimiento.
-Inicio_bucle db 0										;! Ha de ser defw!!!!!
+Puntero_bucle defw 0									;! Ha de ser defw!!!!!
 ;														
 ;                   									
 Incrementa_puntero db 0									; Byte que iremos sumando a (Puntero_indice_mov) para ir escalando por las_
@@ -1031,7 +1031,7 @@ Store_Restore_cajas
 
 	ld hl,Filas
 	ld de,(Puntero_store_caja) 							; Puntero que se desplaza por las distintas entidades.
-	ld bc,64
+	ld bc,65
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
 ; 	Entidad_sospechosa. 20/4/23
@@ -1055,7 +1055,7 @@ Store_Restore_cajas
 	jr z,2F
 
 	ld de,Filas
-	ld bc,64
+	ld bc,65
 	ldir
 
 2 call Incrementa_punteros_de_cajas
@@ -1080,7 +1080,7 @@ Restore_entidad push hl
 
 	ld hl,(Puntero_store_caja)						; (Puntero_store_caja) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,64
+	ld bc,65
 	ldir
 
 	pop bc
@@ -1119,7 +1119,7 @@ Restore_Amadeus	push hl
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Filas
-	ld bc,64
+	ld bc,65
 	ldir
 	pop bc
 	pop de
@@ -1139,7 +1139,7 @@ Restore_Amadeus	push hl
 ;	DESTRUYE: HL y BC y DE.
 
 Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
-	ld bc,64
+	ld bc,65
 	ldir
 	ret
 
@@ -1152,7 +1152,7 @@ Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeu
 ;	Destruye: HL,BC,DE,A
 
 Borra_datos_entidad ld hl,Filas
-	ld bc,63
+	ld bc,64
 	xor a
 	ld (hl),a
 	ld de,Filas+1
