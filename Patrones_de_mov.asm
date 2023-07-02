@@ -72,7 +72,7 @@
 Indice_mov_Baile_de_BadSat defw Bajo_decelerando
 ;    defw Codo_abajo_derecha
 
-Bajo_decelerando db 1,$14,$11,$48,0             
+Bajo_decelerando db 1,$14,$11,$48,1             
     db 1,$12,$11,$4f,2
     db 1,$11,$11,$4f,2,0                                        ; El final del movimiento se indica con un "0" en 
 
