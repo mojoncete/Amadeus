@@ -29,10 +29,12 @@
 ;
 ;                       (Byte3) ..... Descripción del desplazamiento.
 ;
-;                       % up,down,left,right, Repetición del desplazamiento, (0-15).
+;                       % up,down,left,right, Repetición del desplazamiento, (1-15).
 ;
 ;                                     %01010011 ..... (Abajo-derecha), 3 veces.
 ;                                     $53
+;
+;                       Nota: (Repetimos_desplazamiento) nunca será "0".
 ;
 ;                       Esta tabla nos ayudará a codificar rápido los desplazamientos del mov.
 ;                       Supongamos que solo ejecutamos 1 vez, cada desplazamiento:
@@ -63,13 +65,26 @@
 ; ----- ----- ----- ----- -----
 
 Indice_mov_Baile_de_BadSat defw Bajo_decelerando
-;    defw Codo_abajo_derecha
+    defw Codo_abajo_derecha
+    defw 0                                  ; Fin de patrón de movimiento.
 
-Bajo_decelerando db $14,$11,$4f,1             
-    db $12,$11,$4f,1
-    db $11,$11,$4f,1                                          
-    db 0
-
+Bajo_decelerando db $14,$11,$4f,1           ; Abajo vel.4         
+    db $12,$11,$4f,1                        ; Abajo vel.2
+    db $11,$11,$4f,0                        ; Abajo vel.1 --- Termina movimiento.     
+Codo_abajo_derecha db $11,$11,$51,1         ; Abajo/Derecha. 1rep.
+    db $11,$11,$43,1                        ; Abajo. 3rep.
+    db $11,$11,$52,1                        ; Abajo/Derecha. 2rep.
+    db $11,$11,$41,1                        ; Abajo. 1rep.
+    db $11,$11,$52,1                        ; Abajo/Derecha. 2rep.
+    db $11,$11,$11,1                        ; Derecha. 1rep.
+    db $11,$11,$52,1                        ; Abajo/Derecha. 2rep.
+    db $11,$11,$13,1                        ; Derecha. 3rep.
+    db $11,$11,$51,1                        ; Abajo/Derecha. 1rep.
+    db $11,$11,$13,1                        ; Derecha. 3rep.
+    db $11,$11,$91,1                        ; Arriba/Derecha. 1rep.
+    db $11,$11,$13,1                        ; Derecha. 3rep.
+    db $11,$11,$92,0                        ; Arriba/Derecha. 2rep. --- Termina movimiento.
+    
 ; ----- ----- ----- ----- -----
 ;
 ;   27/06/23
@@ -91,6 +106,8 @@ Movimiento
 ; HL contiene (Puntero_mov) y este se encuentra en el 1er byte de la cadena de movimiento, (Byte1) ..... % (Vel_up),(Vel_down).
 
 Inicia_desplazamiento.
+
+; Preparamos (Incrementa_puntero). Cada vez que iniciemos un nuevo movimiento le sumaremos 2 uds.
 
     call Ajusta_velocidad_desplazamiento
 
@@ -128,13 +145,14 @@ Desplazamiento_iniciado
     ld a,(Cola_de_desplazamiento)
     and a
     call z,Incrementa_Puntero_indice_mov                       ; Fin de la cadena de movimiento ???.
+    jr z,Reinicia_el_movimiento
 
     cp $ff
     jr z,Reinicia_el_movimiento                                ; Bucle infinito del desplazamiento?.
 
     cp 1
-    call z,Siguiente_desplazamiento                            ; Pasamos al siguiente desplazamiento de movimiento?.
-    
+    jp z,Siguiente_desplazamiento                              ; Pasamos al siguiente desplazamiento de movimiento?.
+ 
     dec a
     ld (Cola_de_desplazamiento),a                               
     
@@ -150,9 +168,6 @@ Desplazamiento_iniciado
 Reinicia_el_movimiento 
 
     call Inicia_Puntero_mov
-
-    xor a
-    ld (Incrementa_puntero),a
 
     ld hl,Ctrl_2
     res 2,(hl)
@@ -249,20 +264,52 @@ Extrae_nibble_alto ld b,4
 
 ; ---------- --------- --------- ---------- ----------
 ;
-;   27/06/23
+;   5/7/23
 ;
 ;   Incrementa_Puntero_indice_mov
 
-Incrementa_Puntero_indice_mov jr $
+Incrementa_Puntero_indice_mov 
+
+    ld hl,Incrementa_puntero
+    inc (hl)
+
+    ld hl,(Puntero_indice_mov)
+    ld bc,2
+    and a
+    add hl,bc
+    ld (Puntero_indice_mov),hl
+
+    ld a,(hl)    
+    and a
+    call z,Inicializa_Puntero_indice_mov
+
+    xor a                                   ; Siempre salimos de la rutina con el flag "Z" activo.
+
+    ret
+
 
 ; ---------- --------- --------- ---------- ----------
 ;
-;   2/07/23
+;   5/07/23
 ;
 ;   Inicializa_Puntero_indice_mov
 
-Inicializa_Puntero_indice_mov jr $
+Inicializa_Puntero_indice_mov 
 
+    ld a,(Incrementa_puntero)
+    ld b,a
+
+    ld hl,(Puntero_indice_mov)
+1 dec hl
+    dec hl
+    djnz 1B
+
+    ld (Puntero_indice_mov),hl
+
+    xor a
+    ld (Incrementa_puntero),a
+
+    ret
 
 ; ---------- --------- --------- ---------- ----------
 ;
@@ -273,15 +320,21 @@ Inicializa_Puntero_indice_mov jr $
 Siguiente_desplazamiento 
 
 ;   Situamos (Puntero_mov) en el siguiente desplazamiento del movimiento.
+;   Indicamos que hay que iniciar un nuevo desplazamiento.
+
+    ld hl,Ctrl_2
+    res 2,(hl)
 
     ld hl,(Puntero_mov)
     inc hl
     inc hl
     ld (Puntero_mov),hl
 
-;   Indicamos que hay que iniciar un nuevo desplazamiento.
-
-    ld hl,Ctrl_2
-    res 2,(hl)
+    ld a,(hl)
+    and a
+    call z,Incrementa_Puntero_indice_mov 
+    jp z,Reinicia_el_movimiento 
 
     ret
+
+

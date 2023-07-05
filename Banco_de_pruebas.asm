@@ -151,7 +151,7 @@ Incrementa_puntero db 0									; Byte que iremos sumando a (Puntero_indice_mov)
 ;														; _ distintas cadenas de movimiento del índice de movimiento de la entidad._
 ;														; Va aumentando su valor en saltos de 2 uds, (0,2,4,6,8).
 Repetimos_desplazamiento db 0							; El nibble bajo del 3er byte que compone un desplazamiento, indica el nº de veces que_
-;														; repetimos dicho desplazamiento. Ese valor se almacena en esta variable, ($0-$f).
+;														; repetimos dicho desplazamiento. Ese valor se almacena en esta variable, ($1-$f). NUNCA SERÁ "0".
 Repetimos_desplazamiento_backup db 0					; Restaura (Repetimos_desplazamiento) cuando este llega a "0".
 Cola_de_desplazamiento db 0								; Este byte indica:
 ;
