@@ -153,6 +153,7 @@ Incrementa_puntero db 0									; Byte que iremos sumando a (Puntero_indice_mov)
 Repetimos_desplazamiento db 0							; El nibble bajo del 3er byte que compone un desplazamiento, indica el nº de veces que_
 ;														; repetimos dicho desplazamiento. Ese valor se almacena en esta variable, ($1-$f). NUNCA SERÁ "0".
 Repetimos_desplazamiento_backup db 0					; Restaura (Repetimos_desplazamiento) cuando este llega a "0".
+Repetimos_movimiento db 0								; Byte que indica el nº de veces que repetimos el último MOVIMIENTO.
 Cola_de_desplazamiento db 0								; Este byte indica:
 ;
 ;														;	"$00" ..... Hemos finalizado la cadena de movimiento.
@@ -190,10 +191,15 @@ Ctrl_2 db 0
 ;														BIT 1, Este bit a "1" indica que se ha iniciado el proceso de EXPLOSIÓN en una entidad.
 ;														BIT 2, Este bit es activado por [Movimiento]. Indica que hemos `iniciado un desplazamiento'._
 ;															_ Evita que volvamos a iniciar el desplazamiento cada vez que ejecutemos [Movimiento].
+;														BIT 3, Indica que (Cola_de_desplazamiento)="254". Esto quiere decir que repetiremos (1-255 veces),_
+;															_ el último MOVIMIENTO que hayamos ejecutado.
+
+
 
 Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
-; 64 Bytes por entidad.
+;! 66 Bytes por entidad.
+
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 ;					         		---------;      ;---------
 
@@ -1031,7 +1037,7 @@ Store_Restore_cajas
 
 	ld hl,Filas
 	ld de,(Puntero_store_caja) 							; Puntero que se desplaza por las distintas entidades.
-	ld bc,65
+	ld bc,66
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
 ; 	Entidad_sospechosa. 20/4/23
@@ -1055,7 +1061,7 @@ Store_Restore_cajas
 	jr z,2F
 
 	ld de,Filas
-	ld bc,65
+	ld bc,66
 	ldir
 
 2 call Incrementa_punteros_de_cajas
@@ -1080,7 +1086,7 @@ Restore_entidad push hl
 
 	ld hl,(Puntero_store_caja)						; (Puntero_store_caja) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,65
+	ld bc,66
 	ldir
 
 	pop bc
@@ -1119,7 +1125,7 @@ Restore_Amadeus	push hl
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Filas
-	ld bc,65
+	ld bc,66
 	ldir
 	pop bc
 	pop de
@@ -1139,7 +1145,7 @@ Restore_Amadeus	push hl
 ;	DESTRUYE: HL y BC y DE.
 
 Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
-	ld bc,65
+	ld bc,66
 	ldir
 	ret
 
@@ -1152,7 +1158,7 @@ Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeu
 ;	Destruye: HL,BC,DE,A
 
 Borra_datos_entidad ld hl,Filas
-	ld bc,64
+	ld bc,65
 	xor a
 	ld (hl),a
 	ld de,Filas+1

@@ -92,7 +92,7 @@ Disparo_11 defw 0
 
 ; -------------------------------------------------------------------------------------
 
-Indice_de_cajas										; 64 Bytes por entidad.
+Indice_de_cajas										 ;! 66 Bytes por entidad.
 
 	defw Caja_1
 	defw Caja_2
@@ -145,7 +145,7 @@ Amadeus_db db 2,2									; (Filas) / (Columns).
 	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0											; (Incrementa_puntero) / (Repetimos_desplazamiento).
-	db 0											; (Repetimos_desplazamiento_backup)
+	db 0,0											; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
 	db 0											; (Cola_de_desplazamiento).
 
 	db 0 											; (Columnas).									
@@ -188,7 +188,7 @@ Caja_1 db 0,0										; (Filas) / (Columns).
 	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0											; (Incrementa_puntero) / (Repetimos_desplazamiento).
-	db 0											; (Repetimos_desplazamiento_backup)
+	db 0,0											; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
 	db 0											; (Cola_de_desplazamiento).
 
 	db 0 											; (Columnas).									
@@ -231,7 +231,7 @@ Caja_2 db 0,0										; (Filas) / (Columns).
 	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0											; (Incrementa_puntero) / (Repetimos_desplazamiento).
-	db 0											; (Repetimos_desplazamiento_backup)
+	db 0,0											; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
 	db 0											; (Cola_de_desplazamiento).
 
 	db 0 											; (Columnas).									
@@ -274,7 +274,7 @@ Caja_3 db 0,0										; (Filas) / (Columns).
 	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0											; (Incrementa_puntero) / (Repetimos_desplazamiento).
-	db 0											; (Repetimos_desplazamiento_backup)
+	db 0,0											; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
 	db 0											; (Cola_de_desplazamiento).
 
 	db 0 											; (Columnas).									
@@ -317,7 +317,7 @@ Caja_4 db 0,0										; (Filas) / (Columns).
 	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0											; (Incrementa_puntero) / (Repetimos_desplazamiento).
-	db 0											; (Repetimos_desplazamiento_backup)
+	db 0,0											; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
 	db 0											; (Cola_de_desplazamiento).
 
 	db 0 											; (Columnas).									
@@ -360,7 +360,7 @@ Caja_5 db 0,0										; (Filas) / (Columns).
 	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0											; (Incrementa_puntero) / (Repetimos_desplazamiento).
-	db 0											; (Repetimos_desplazamiento_backup)
+	db 0,0											; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
 	db 0											; (Cola_de_desplazamiento).
 
 	db 0 											; (Columnas).									
@@ -403,7 +403,7 @@ Caja_6 db 0,0										; (Filas) / (Columns).
 	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0											; (Incrementa_puntero) / (Repetimos_desplazamiento).
-	db 0											; (Repetimos_desplazamiento_backup)
+	db 0,0											; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
 	db 0											; (Cola_de_desplazamiento).
 
 	db 0 											; (Columnas).									
@@ -446,7 +446,7 @@ Caja_7 db 0,0										; (Filas) / (Columns).
 	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0											; (Incrementa_puntero) / (Repetimos_desplazamiento).
-	db 0											; (Repetimos_desplazamiento_backup)
+	db 0,0											; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
 	db 0											; (Cola_de_desplazamiento).
 
 	db 0 											; (Columnas).									
@@ -489,7 +489,7 @@ Caja_8 db 0,0										; (Filas) / (Columns).
 	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0											; (Incrementa_puntero) / (Repetimos_desplazamiento).
-	db 0											; (Repetimos_desplazamiento_backup)
+	db 0,0											; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
 	db 0											; (Cola_de_desplazamiento).
 
 	db 0 											; (Columnas).									
@@ -532,7 +532,7 @@ Caja_9 db 0,0										; (Filas) / (Columns).
 	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0											; (Incrementa_puntero) / (Repetimos_desplazamiento).
-	db 0											; (Repetimos_desplazamiento_backup)
+	db 0,0											; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
 	db 0											; (Cola_de_desplazamiento).
 
 	db 0 											; (Columnas).									
@@ -575,7 +575,7 @@ Caja_10 db 0,0										; (Filas) / (Columns).
 	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0											; (Incrementa_puntero) / (Repetimos_desplazamiento).
-	db 0											; (Repetimos_desplazamiento_backup)
+	db 0,0											; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
 	db 0											; (Cola_de_desplazamiento).
 
 	db 0 											; (Columnas).									

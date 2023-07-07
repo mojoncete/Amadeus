@@ -1,6 +1,6 @@
 
 
-;   02/07/23
+;   07/07/23
 ;
 ;   Base de datos. PATRONES DE MOVIMIENTO.
 ;
@@ -49,26 +49,27 @@
 ;
 ;   (Cola_de_desplazamiento) db 0			; Este byte indica:
 ;
-;											;	"$00" ..... Hemos finalizado la cadena de movimiento.
+;											;	"$00" , "0" ..... Hemos finalizado la cadena de movimiento.
 ;											;				En este caso hemos de incrementar (Puntero_indice_mov)_
 ;											;				_ y pasar a la siguiente cadena de movimiento del índice.
 ;
-;											;	"$01 - "$fe" ..... Repetición del movimiento. 
-;											;						Nº de veces que vamos a repetir el movimiento completo.
-;											;						En este caso, volveremos a inicializar (Puntero_mov),_	
-;							    			;						_ con (Puntero_indice_mov) y decrementaremos (Cola_de_desplazamiento).
+;											;	"$01 - "$fd" , "1-253" ..... Repetición del DESPLAZAMIENTO. 
+;											;						         Nº de veces que vamos a repetir el movimiento completo.
+;											;					             En este caso, volveremos a inicializar (Puntero_mov),_	
+;							    			;						         _ con (Puntero_indice_mov) y decrementaremos (Cola_de_desplazamiento).
 ;				
-;											;	"$ff" ..... Bucle infinito de repetición del MOVIMIENTO.
-;											;				Nunca vamos a saltar a la siguiente cadena de movimiento del índice,_	
-;											;				,_ (si es que la hay). Volvemos a inicializar (Puntero_mov) con (Puntero_indice_mov).	
+;											;	"$ff"  , "255" ..... Bucle infinito de repetición del MOVIMIENTO.
+;											;				         Nunca vamos a saltar a la siguiente cadena de movimiento del índice,_	
+;											;				         _ (si es que la hay). Volvemos a inicializar (Puntero_mov) con (Puntero_indice_mov).	
 
 ; ----- ----- ----- ----- -----
 
 Indice_mov_Baile_de_BadSat defw Bajo_decelerando
     defw Codo_abajo_derecha
+    defw Derecha_y_subiendo
     defw 0                                  ; Fin de patrón de movimiento.
 
-Bajo_decelerando db $14,$11,$4f,1           ; Abajo vel.4         
+Bajo_decelerando db $14,$11,$4a,1           ; Abajo. 10rep. vel.4         
     db $12,$11,$4f,1                        ; Abajo vel.2
     db $11,$11,$4f,0                        ; Abajo vel.1 --- Termina movimiento.     
 Codo_abajo_derecha db $11,$11,$51,1         ; Abajo/Derecha. 1rep.
@@ -84,7 +85,11 @@ Codo_abajo_derecha db $11,$11,$51,1         ; Abajo/Derecha. 1rep.
     db $11,$11,$91,1                        ; Arriba/Derecha. 1rep.
     db $11,$11,$13,1                        ; Derecha. 3rep.
     db $11,$11,$92,0                        ; Arriba/Derecha. 2rep. --- Termina movimiento.
-    
+Derecha_y_subiendo db $11,$11,$18,1         ; Derecha. 6rep.
+    db $11,$11,$91,254,12,0                 ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
+
+
+
 ; ----- ----- ----- ----- -----
 ;
 ;   27/06/23
@@ -141,17 +146,37 @@ Desplazamiento_iniciado
 
 ; Hemos terminado de ejecutar el desplazamiento y sus ($0-$f repeticiones).
 ; Hay que volver a ejecutar este desplazamiento ???.
+; Analiza (Cola_de_desplazamiento).
 
-    ld a,(Cola_de_desplazamiento)
+Cola ld a,(Cola_de_desplazamiento)
     and a
-    call z,Incrementa_Puntero_indice_mov                       ; Fin de la cadena de movimiento ???.
+    call z,Incrementa_Puntero_indice_mov                        ; Fin de la cadena de MOVIMIENTO ???.
     jr z,Reinicia_el_movimiento
 
     cp $ff
-    jr z,Reinicia_el_movimiento                                ; Bucle infinito del desplazamiento?.
+    jr z,Reinicia_el_movimiento                                 ; Bucle infinito del MOVIMIENTO?.
 
-    cp 1
-    jp z,Siguiente_desplazamiento                              ; Pasamos al siguiente desplazamiento de movimiento?.
+    cp $fe
+    jr nz,1F
+
+; ---
+; Ya estamos ejecutando una repetición del último MOVIMIENTO ???.
+
+    ld a,(Ctrl_2)
+    bit 3,a
+    jr nz,Reinicia_el_movimiento
+
+; Si no es así, iniciamos la REPETICIÓN del movimiento activando el BIT 3 de Ctrl_2.
+
+    ld hl,Ctrl_2                                                ; Vamos a indicar con este BIT a la rutina [Reinicia_el_movimiento],_
+    set 3,(hl)                                                  ; _ que (Cola_de_desplazamiento)="$fe", por lo que vamos a REINICIAR el_ 
+
+    call Inicia_Repetimos_movimiento
+    jr z,Reinicia_el_movimiento                                 ; _ MOVIMIENTO (X nº de veces), siendo X un valor comprendido entre (1-255).                                
+; ---
+
+1 cp 1
+    jp z,Siguiente_desplazamiento                               ; Pasamos al siguiente desplazamiento del movimiento?.
  
     dec a
     ld (Cola_de_desplazamiento),a                               
@@ -161,19 +186,79 @@ Desplazamiento_iniciado
 ;                                                               ; _ el contador y RESTAURAMOS (Repetimos_desplazamiento).
     ret
 
-; !!!!!!!!!!!!!!!! Voy por aquí.
-
-
-
 Reinicia_el_movimiento 
 
-    call Inicia_Puntero_mov
+    ld a,(Ctrl_2)
+    bit 3,a
+    jr z,2F
+
+; (Cola_de_desplazamiento)="254".
+
+    ld hl,Repetimos_movimiento                                  ; Decrementamos (Repetimos_movimiento) hasta completar repeticiones.
+    dec (hl)
+    jr nz,2F
+
+; Fin de las repeticiones del último movimiento.
+
+    ld hl,Ctrl_2
+    res 3,(hl)                                                  ; Decrementamos el BIT de repeticiones de movimiento.
+    
+    ld hl,(Puntero_mov)
+    inc hl
+    inc hl
+    inc hl
+    ld (Puntero_mov),hl                                         ; Situamos (Puntero_mov) en (Cola_de_desplazamiento) y saltamos a `Cola'_
+;                                                               ; _ para ejecutar su mandato. :)
+    ld a,(hl)
+    ld (Cola_de_desplazamiento),a        
+
+    jp Cola
+
+
+2 call Inicia_Puntero_mov
 
     ld hl,Ctrl_2
     res 2,(hl)
 
     jp Movimiento
 
+Siguiente_desplazamiento 
+
+;   Situamos (Puntero_mov) en el siguiente desplazamiento del movimiento.
+;   Indicamos que hay que iniciar un nuevo desplazamiento.
+
+    ld hl,Ctrl_2
+    res 2,(hl)
+
+    ld hl,(Puntero_mov)
+    inc hl
+    inc hl
+    ld (Puntero_mov),hl
+
+    ld a,(hl)
+    and a
+    call z,Incrementa_Puntero_indice_mov 
+    jp z,Reinicia_el_movimiento 
+
+    ret
+
+; ---------- --------- --------- ---------- ----------
+;
+;   07/7/23
+;
+;   Inicia_Repetimos_movimiento
+;
+;   
+
+Inicia_Repetimos_movimiento
+
+; Iniciamos (Repetimos_movimiento).
+
+    ld ix,(Puntero_mov)
+    ld a,(ix+2)
+    ld (Repetimos_movimiento),a
+
+    ret
 
 ; ---------- --------- --------- ---------- ----------
 ;
@@ -281,6 +366,12 @@ Incrementa_Puntero_indice_mov
 
     ld a,(hl)    
     and a
+
+;! STOP. Fin del patrón de movimiento de la entidad.
+;    jr z,$
+
+;! Reinicia el Patrón de movimiento.    
+
     call z,Inicializa_Puntero_indice_mov
 
     xor a                                   ; Siempre salimos de la rutina con el flag "Z" activo.
@@ -311,30 +402,5 @@ Inicializa_Puntero_indice_mov
 
     ret
 
-; ---------- --------- --------- ---------- ----------
-;
-;   02/07/23
-;
-;   Siguiente_desplazamiento
-
-Siguiente_desplazamiento 
-
-;   Situamos (Puntero_mov) en el siguiente desplazamiento del movimiento.
-;   Indicamos que hay que iniciar un nuevo desplazamiento.
-
-    ld hl,Ctrl_2
-    res 2,(hl)
-
-    ld hl,(Puntero_mov)
-    inc hl
-    inc hl
-    ld (Puntero_mov),hl
-
-    ld a,(hl)
-    and a
-    call z,Incrementa_Puntero_indice_mov 
-    jp z,Reinicia_el_movimiento 
-
-    ret
 
 

@@ -154,7 +154,7 @@ Datos_de_entidad_a_caja
 ; Nota importante: Si vamos a añadir nuevas variables a `cada entidad',(después de (Puntero_indice_mov)), hay que aumentar el valor de BC_
 ; _con el nº de bytes que ocupe dicha variable/s. (Frames_explosion) es la última variable general de cada entidad.
 
-	ld bc,13									; *****							
+	ld bc,14									; *****							
 	call Situa_DE
 
 	ld a,3
