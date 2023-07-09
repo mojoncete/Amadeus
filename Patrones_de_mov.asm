@@ -67,6 +67,7 @@
 Indice_mov_Baile_de_BadSat defw Bajo_decelerando
     defw Codo_abajo_derecha
     defw Derecha_y_subiendo
+    defw Medio_circulo_bajando_ed_si
     defw 0                                  ; Fin de patrón de movimiento.
 
 Bajo_decelerando db $14,$11,$4a,1           ; Abajo. 10rep. vel.4         
@@ -86,9 +87,17 @@ Codo_abajo_derecha db $11,$11,$51,1         ; Abajo/Derecha. 1rep.
     db $11,$11,$13,1                        ; Derecha. 3rep.
     db $11,$11,$92,0                        ; Arriba/Derecha. 2rep. --- Termina movimiento.
 Derecha_y_subiendo db $11,$11,$18,1         ; Derecha. 6rep.
-    db $11,$11,$91,254,12,0                 ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
+    db $11,$11,$91,254,18,0                 ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
 
+; Medio círculo bajando. Entra de izq. a derecha y sale de derecha a izq.
+Medio_circulo_bajando_ed_si db $11,$11,$51,1         ; Abajo/Derecha. 1rep.
+    db $11,$11,$13,1                        ; Derecha. 3rep.
+    db $11,$11,$51,1                        ; Abajo/Derecha. 1rep.
+    db $11,$11,$12,1                        ; Derecha. 2rep.
 
+; Hay que repetir estos dos desplazamientos 3 veces.
+    db $ff,$11,$11,$51,1                    ; (Marca-repetición)-Abajo/Derecha. 1rep.
+    db $11,$11,$11,1                        ; Derecha. 1rep.
 
 ; ----- ----- ----- ----- -----
 ;
@@ -240,6 +249,9 @@ Siguiente_desplazamiento
     call z,Incrementa_Puntero_indice_mov 
     jp z,Reinicia_el_movimiento 
 
+    cp $ff
+    jr z,$  ; Marca y 
+
     ret
 
 ; ---------- --------- --------- ---------- ----------
@@ -368,7 +380,8 @@ Incrementa_Puntero_indice_mov
     and a
 
 ;! STOP. Fin del patrón de movimiento de la entidad.
-;    jr z,$
+
+    jr z,$
 
 ;! Reinicia el Patrón de movimiento.    
 
