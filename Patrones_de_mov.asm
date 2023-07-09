@@ -69,6 +69,11 @@ Indice_mov_Baile_de_BadSat defw Bajo_decelerando
     defw Derecha_y_subiendo
     defw Medio_circulo_bajando_ed_si
     defw Medio_circulo_bajando_ed_si_2
+    defw Medio_circulo_bajando_ed_si_3
+    defw Medio_circulo_bajando_ed_si_4
+    defw Medio_circulo_bajando_ed_si_5
+;    defw Medio_circulo_bajando_ed_si_6
+;    defw Medio_circulo_bajando_ed_si_7
     defw 0                                  ; Fin de patrón de movimiento.
 
 Bajo_decelerando db $14,$11,$4a,1           ; Abajo. 10rep. vel.4         
@@ -92,15 +97,38 @@ Derecha_y_subiendo db $11,$11,$18,1         ; Derecha. 6rep.
 
 ; Medio círculo bajando. Entra de izq. a derecha y sale de derecha a izq.
 Medio_circulo_bajando_ed_si db $11,$11,$51,1   ; Abajo/Derecha. 1rep.
-    db $11,$11,$13,1                        ; Derecha. 3rep.
-    db $11,$11,$51,1                        ; Abajo/Derecha. 1rep.
-    db $11,$11,$12,1                        ; Derecha. 2rep.
+    db $11,$11,$13,1                           ; Derecha. 3rep.
+    db $11,$11,$51,1                           ; Abajo/Derecha. 1rep.
+    db $11,$11,$12,0                           ; Derecha. 2rep.
 
 ; Hay que repetir estos dos desplazamientos 3 veces.
-Medio_circulo_bajando_ed_si_2 
-    db $11,$11,$51,1                        ; Abajo/Derecha. 1rep.
-    db $11,$11,$11,254,3,1                  ; Derecha. 1rep. --- Repite Mov 3rep. --- Termina movimiento.
+Medio_circulo_bajando_ed_si_2 db $11,$11,$51,1  ; Abajo/Derecha. 1rep.
+    db $11,$11,$11,254,3,0                      ; Derecha. 1rep. --- Repite Mov 3rep. --- Siguiente movimiento.
  
+Medio_circulo_bajando_ed_si_3 db $11,$11,$52,1 ; Abajo/Derecha. 1rep.
+    db $11,$11,$11,1                           ; Derecha. 1rep. 
+    db $11,$11,$55,1                           ; Abajo/Derecha. 5rep.
+    db $11,$11,$41,0                           ; Abajo. 1rep.
+
+Medio_circulo_bajando_ed_si_4 db $11,$11,$52,1 ; Abajo/Derecha. 2rep.
+    db $11,$11,$41,254,3,0                     ; Abajo. 1rep. --- Repite Mov 3rep. --- Siguiente movimiento.
+ 
+Medio_circulo_bajando_ed_si_5 db $11,$11,$51,1 ; Abajo/Derecha. 1rep.
+    db $11,$11,$42,1                           ; Abajo. 2rep.
+    db $11,$11,$51,1                           ; Abajo/Derecha. 1rep.
+    db $11,$11,$43,1                           ; Abajo. 3rep.
+    db $11,$11,$51,1                           ; Abajo/Derecha. 1rep. 
+    db $11,$11,$49,1                           ; Abajo. 9rep.
+    db $11,$11,$61,1                           ; Abajo/Izq. 1rep.
+    db $11,$11,$43,1                           ; Abajo. 3rep.
+    db $11,$11,$61,1                           ; Abajo/Izq. 1rep.
+    db $11,$11,$42,0                           ; Abajo. 2rep.
+
+;Medio_circulo_bajando_ed_si_6 db $11,$11,$61,1 ; Abajo/Izq. 1rep.
+;    db $11,$11,$41,254,3,0                     ; Abajo. 1rep. --- Repite Mov 3rep. --- Siguiente movimiento.
+
+;Medio_circulo_bajando_ed_si_7 db $11,$11,$62,0 ; Abajo/Izq. 2rep.
+;    db 0
 
 ; ----- ----- ----- ----- -----
 ;

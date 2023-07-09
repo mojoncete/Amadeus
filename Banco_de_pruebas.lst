@@ -1777,11 +1777,11 @@
  477  8B11
  478  8B11 21 35 8A     13 ld hl,Habilita_disparo_Amadeus
  479  8B14 11 37 8A     	ld de,Temporiza_disparo_Amadeus
- 480  8B17 CD 36 9E     	call Habilita_disparos 								; 30 Frames como mínimo entre cada disparo de Amadeus.
+ 480  8B17 CD 7E 9E     	call Habilita_disparos 								; 30 Frames como mínimo entre cada disparo de Amadeus.
  481  8B1A
  482  8B1A 21 38 8A     	ld hl,Habilita_disparo_entidad 						; El nº de frames mínimo entre disparos de entidad será_
  483  8B1D 11 3A 8A     	ld de,Temporiza_disparo_entidad 					; _ variable y variará en función de la dificultad.
- 484  8B20 CD 36 9E     	call Habilita_disparos
+ 484  8B20 CD 7E 9E     	call Habilita_disparos
  485  8B23
  486  8B23              ; COLISIONES.
  487  8B23
@@ -2051,7 +2051,7 @@
  751  8C52 35           	dec (hl)                                            ; Salimos de la rutina.
  752  8C53 C8           	ret z
  753  8C54
- 754  8C54 CD 01 9D     	call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
+ 754  8C54 CD 49 9D     	call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
  755  8C57
  756  8C57 3A F4 89     	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
  757  8C5A CB 67        	bit 4,a
@@ -3938,7 +3938,7 @@
   15+ 934B 22 C8 89     	ld (Posicion_actual),hl							; Indicamos que (Posicion_actual) = (Posicion_inicio) y saltamos a la subrutina [Inicializacion], (donde asignaremos_
   16+ 934E CD DD 94     	call Inicializacion   							; _(Limite_horizontal), (Limite_vertical) y (Cuad_objeto). También asignaremos las coordenadas X e Y. (Posición 0,0)_
   17+ 9351              ;													; _la esquina superior izquierda de la pantalla.
-  18+ 9351 CD AF 9D     	call  Inicia_Puntero_mov						; El objeto está inicializado. Antes de salir inicializamos tb el puntero de movimiento de la entidad.
+  18+ 9351 CD F7 9D     	call  Inicia_Puntero_mov						; El objeto está inicializado. Antes de salir inicializamos tb el puntero de movimiento de la entidad.
   19+ 9354 3A F4 89     1 ld a,(Ctrl_0)
   20+ 9357 CB 6F        	bit 5,a
   21+ 9359 20 06        	jr nz,3F										; Si acabamos de inicializar un objeto, NO COMPROBAMOS LÍMITES.
@@ -6052,424 +6052,453 @@
   64+ 9C91
   65+ 9C91              ; ----- ----- ----- ----- -----
   66+ 9C91
-  67+ 9C91 9D 9C        Indice_mov_Baile_de_BadSat defw Bajo_decelerando
-  68+ 9C93 A9 9C            defw Codo_abajo_derecha
-  69+ 9C95 DD 9C            defw Derecha_y_subiendo
-  70+ 9C97 E7 9C            defw Medio_circulo_bajando_ed_si
-  71+ 9C99 F7 9C            defw Medio_circulo_bajando_ed_si_2
-  72+ 9C9B 00 00            defw 0                                  ; Fin de patrón de movimiento.
-  73+ 9C9D
-  74+ 9C9D 14 11 4A 01  Bajo_decelerando db $14,$11,$4a,1           ; Abajo. 10rep. vel.4
-  75+ 9CA1 12 11 4F 01      db $12,$11,$4f,1                        ; Abajo vel.2
-  76+ 9CA5 11 11 4F 00      db $11,$11,$4f,0                        ; Abajo vel.1 --- Termina movimiento.
-  77+ 9CA9 11 11 51 01  Codo_abajo_derecha db $11,$11,$51,1         ; Abajo/Derecha. 1rep.
-  78+ 9CAD 11 11 43 01      db $11,$11,$43,1                        ; Abajo. 3rep.
-  79+ 9CB1 11 11 52 01      db $11,$11,$52,1                        ; Abajo/Derecha. 2rep.
-  80+ 9CB5 11 11 41 01      db $11,$11,$41,1                        ; Abajo. 1rep.
-  81+ 9CB9 11 11 52 01      db $11,$11,$52,1                        ; Abajo/Derecha. 2rep.
-  82+ 9CBD 11 11 11 01      db $11,$11,$11,1                        ; Derecha. 1rep.
-  83+ 9CC1 11 11 52 01      db $11,$11,$52,1                        ; Abajo/Derecha. 2rep.
-  84+ 9CC5 11 11 13 01      db $11,$11,$13,1                        ; Derecha. 3rep.
-  85+ 9CC9 11 11 51 01      db $11,$11,$51,1                        ; Abajo/Derecha. 1rep.
-  86+ 9CCD 11 11 13 01      db $11,$11,$13,1                        ; Derecha. 3rep.
-  87+ 9CD1 11 11 91 01      db $11,$11,$91,1                        ; Arriba/Derecha. 1rep.
-  88+ 9CD5 11 11 13 01      db $11,$11,$13,1                        ; Derecha. 3rep.
-  89+ 9CD9 11 11 92 00      db $11,$11,$92,0                        ; Arriba/Derecha. 2rep. --- Termina movimiento.
-  90+ 9CDD 11 11 18 01  Derecha_y_subiendo db $11,$11,$18,1         ; Derecha. 6rep.
-  91+ 9CE1 11 11 91 FE      db $11,$11,$91,254,18,0                 ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
-  91+ 9CE5 12 00
-  92+ 9CE7
-  93+ 9CE7              ; Medio círculo bajando. Entra de izq. a derecha y sale de derecha a izq.
-  94+ 9CE7 11 11 51 01  Medio_circulo_bajando_ed_si db $11,$11,$51,1   ; Abajo/Derecha. 1rep.
-  95+ 9CEB 11 11 13 01      db $11,$11,$13,1                        ; Derecha. 3rep.
-  96+ 9CEF 11 11 51 01      db $11,$11,$51,1                        ; Abajo/Derecha. 1rep.
-  97+ 9CF3 11 11 12 01      db $11,$11,$12,1                        ; Derecha. 2rep.
-  98+ 9CF7
-  99+ 9CF7              ; Hay que repetir estos dos desplazamientos 3 veces.
- 100+ 9CF7              Medio_circulo_bajando_ed_si_2
- 101+ 9CF7 11 11 51 01      db $11,$11,$51,1                        ; Abajo/Derecha. 1rep.
- 102+ 9CFB 11 11 11 FE      db $11,$11,$11,254,3,1                  ; Derecha. 1rep. --- Repite Mov 3rep. --- Termina movimiento.
- 102+ 9CFF 03 01
- 103+ 9D01
- 104+ 9D01
- 105+ 9D01              ; ----- ----- ----- ----- -----
- 106+ 9D01              ;
- 107+ 9D01              ;   27/06/23
- 108+ 9D01
- 109+ 9D01              Movimiento
- 110+ 9D01
- 111+ 9D01              ; Nota: Previamente, la rutina [DRAW], ha iniciado la entidad, (Puntero_mov) ya apunta a su cadena de movimiento correspondiente.
- 112+ 9D01
- 113+ 9D01 2A F9 89         ld hl,(Puntero_mov)
- 114+ 9D04 7E               ld a,(hl)
- 115+ 9D05 A7               and a
- 116+ 9D06 CC 23 9E         call z, Inicializa_Puntero_indice_mov                       ; Hemos terminado de ejecutar todas las cadenas de movimiento.
- 117+ 9D09
- 118+ 9D09 3A 06 8A         ld a,(Ctrl_2)
- 119+ 9D0C CB 57            bit 2,a
- 120+ 9D0E 20 17            jr nz, Desplazamiento_iniciado
- 121+ 9D10
- 122+ 9D10
- 123+ 9D10              ; HL contiene (Puntero_mov) y este se encuentra en el 1er byte de la cadena de movimiento, (Byte1) ..... % (Vel_up),(Vel_down).
- 124+ 9D10
- 125+ 9D10              Inicia_desplazamiento.
- 126+ 9D10
- 127+ 9D10              ; Preparamos (Incrementa_puntero). Cada vez que iniciemos un nuevo movimiento le sumaremos 2 uds.
- 128+ 9D10
- 129+ 9D10 CD E2 9D         call Ajusta_velocidad_desplazamiento
- 130+ 9D13
- 131+ 9D13              ; Iniciamos (Repetimos_mov).
- 132+ 9D13
- 133+ 9D13 7E               ld a,(hl)
- 134+ 9D14 E6 0F            and $0f
- 135+ 9D16 32 FE 89         ld (Repetimos_desplazamiento),a
- 136+ 9D19 32 FF 89         ld (Repetimos_desplazamiento_backup),a
- 137+ 9D1C
- 138+ 9D1C              ; Iniciamos (Cola_de_desplazamiento).
- 139+ 9D1C
- 140+ 9D1C 23               inc hl
- 141+ 9D1D 7E               ld a,(hl)
- 142+ 9D1E 32 01 8A         ld (Cola_de_desplazamiento),a
- 143+ 9D21 2B               dec hl
- 144+ 9D22
- 145+ 9D22 21 06 8A         ld hl,Ctrl_2
- 146+ 9D25 CB D6            set 2,(hl)
- 147+ 9D27
- 148+ 9D27              ; Hemos ajustado la velocidad del desplazamiento con los 2 primeros bytes del desplazamiento.
- 149+ 9D27              ; El 3er byte indica la dirección del desplz., (nibble alto) y las veces que lo ejecutamos, (nibble bajo).
- 150+ 9D27
- 151+ 9D27              Desplazamiento_iniciado
- 152+ 9D27
- 153+ 9D27 CD BA 9D         call Aplica_desplazamiento
- 154+ 9D2A
- 155+ 9D2A 21 FE 89         ld hl,Repetimos_desplazamiento
- 156+ 9D2D 35               dec (hl)
- 157+ 9D2E C0               ret nz
- 158+ 9D2F
- 159+ 9D2F              ; Hemos terminado de ejecutar el desplazamiento y sus ($0-$f repeticiones).
- 160+ 9D2F              ; Hay que volver a ejecutar este desplazamiento ???.
- 161+ 9D2F              ; Analiza (Cola_de_desplazamiento).
- 162+ 9D2F
- 163+ 9D2F 3A 01 8A     Cola ld a,(Cola_de_desplazamiento)
- 164+ 9D32 A7               and a
- 165+ 9D33 CC 0B 9E         call z,Incrementa_Puntero_indice_mov                        ; Fin de la cadena de MOVIMIENTO ???.
- 166+ 9D36 28 29            jr z,Reinicia_el_movimiento
- 167+ 9D38
- 168+ 9D38 FE FF            cp $ff
- 169+ 9D3A 28 25            jr z,Reinicia_el_movimiento                                 ; Bucle infinito del MOVIMIENTO?.
- 170+ 9D3C
- 171+ 9D3C FE FE            cp $fe
- 172+ 9D3E 20 11            jr nz,1F
- 173+ 9D40
- 174+ 9D40              ; ---
- 175+ 9D40              ; Ya estamos ejecutando una repetición del último MOVIMIENTO ???.
- 176+ 9D40
- 177+ 9D40 3A 06 8A         ld a,(Ctrl_2)
- 178+ 9D43 CB 5F            bit 3,a
- 179+ 9D45 20 1A            jr nz,Reinicia_el_movimiento
- 180+ 9D47
- 181+ 9D47              ; Si no es así, iniciamos la REPETICIÓN del movimiento activando el BIT 3 de Ctrl_2.
- 182+ 9D47
- 183+ 9D47 21 06 8A         ld hl,Ctrl_2                                                ; Vamos a indicar con este BIT a la rutina [Reinicia_el_movimiento],_
- 184+ 9D4A CB DE            set 3,(hl)                                                  ; _ que (Cola_de_desplazamiento)="$fe", por lo que vamos a REINICIAR el_
- 185+ 9D4C
- 186+ 9D4C CD A4 9D         call Inicia_Repetimos_movimiento
- 187+ 9D4F 28 10            jr z,Reinicia_el_movimiento                                 ; _ MOVIMIENTO (X nº de veces), siendo X un valor comprendido entre (1-255).
- 188+ 9D51              ; ---
- 189+ 9D51
- 190+ 9D51 FE 01        1 cp 1
- 191+ 9D53 CA 8E 9D         jp z,Siguiente_desplazamiento                               ; Pasamos al siguiente desplazamiento del movimiento?.
- 192+ 9D56
- 193+ 9D56 3D               dec a
- 194+ 9D57 32 01 8A         ld (Cola_de_desplazamiento),a
- 195+ 9D5A
- 196+ 9D5A 3A FF 89         ld a,(Repetimos_desplazamiento_backup)                      ; Cuando (Cola_de_desplazamiento) actúa como contador del_
- 197+ 9D5D 32 FE 89         ld (Repetimos_desplazamiento),a                             ; _ desplazamiento y este no ha llegado a "0", decrementamos_
- 198+ 9D60              ;                                                               ; _ el contador y RESTAURAMOS (Repetimos_desplazamiento).
- 199+ 9D60 C9               ret
- 200+ 9D61
- 201+ 9D61              Reinicia_el_movimiento
- 202+ 9D61
- 203+ 9D61 3A 06 8A         ld a,(Ctrl_2)
- 204+ 9D64 CB 5F            bit 3,a
- 205+ 9D66 28 1B            jr z,2F
- 206+ 9D68
- 207+ 9D68              ; (Cola_de_desplazamiento)="254".
- 208+ 9D68
- 209+ 9D68 21 00 8A         ld hl,Repetimos_movimiento                                  ; Decrementamos (Repetimos_movimiento) hasta completar repeticiones.
- 210+ 9D6B 35               dec (hl)
- 211+ 9D6C 20 15            jr nz,2F
- 212+ 9D6E
- 213+ 9D6E              ; Fin de las repeticiones del último movimiento.
- 214+ 9D6E
- 215+ 9D6E 21 06 8A         ld hl,Ctrl_2
- 216+ 9D71 CB 9E            res 3,(hl)                                                  ; Decrementamos el BIT de repeticiones de movimiento.
- 217+ 9D73
- 218+ 9D73 2A F9 89         ld hl,(Puntero_mov)
- 219+ 9D76 23               inc hl
- 220+ 9D77 23               inc hl
- 221+ 9D78 23               inc hl
- 222+ 9D79 22 F9 89         ld (Puntero_mov),hl                                         ; Situamos (Puntero_mov) en (Cola_de_desplazamiento) y saltamos a `Cola'_
- 223+ 9D7C              ;                                                               ; _ para ejecutar su mandato. :)
- 224+ 9D7C 7E               ld a,(hl)
- 225+ 9D7D 32 01 8A         ld (Cola_de_desplazamiento),a
- 226+ 9D80
- 227+ 9D80 C3 2F 9D         jp Cola
- 228+ 9D83
- 229+ 9D83
- 230+ 9D83 CD AF 9D     2 call Inicia_Puntero_mov
- 231+ 9D86
- 232+ 9D86 21 06 8A         ld hl,Ctrl_2
- 233+ 9D89 CB 96            res 2,(hl)
- 234+ 9D8B
- 235+ 9D8B C3 01 9D         jp Movimiento
- 236+ 9D8E
- 237+ 9D8E              Siguiente_desplazamiento
- 238+ 9D8E
- 239+ 9D8E              ;   Situamos (Puntero_mov) en el siguiente desplazamiento del movimiento.
- 240+ 9D8E              ;   Indicamos que hay que iniciar un nuevo desplazamiento.
- 241+ 9D8E
- 242+ 9D8E 21 06 8A         ld hl,Ctrl_2
- 243+ 9D91 CB 96            res 2,(hl)
- 244+ 9D93
- 245+ 9D93 2A F9 89         ld hl,(Puntero_mov)
- 246+ 9D96 23               inc hl
- 247+ 9D97 23               inc hl
- 248+ 9D98 22 F9 89         ld (Puntero_mov),hl
- 249+ 9D9B
- 250+ 9D9B 7E               ld a,(hl)
- 251+ 9D9C A7               and a
- 252+ 9D9D CC 0B 9E         call z,Incrementa_Puntero_indice_mov
- 253+ 9DA0 CA 61 9D         jp z,Reinicia_el_movimiento
- 254+ 9DA3
- 255+ 9DA3 C9               ret
- 256+ 9DA4
- 257+ 9DA4              ; ---------- --------- --------- ---------- ----------
- 258+ 9DA4              ;
- 259+ 9DA4              ;   07/7/23
- 260+ 9DA4              ;
- 261+ 9DA4              ;   Inicia_Repetimos_movimiento
- 262+ 9DA4              ;
- 263+ 9DA4              ;
- 264+ 9DA4
- 265+ 9DA4              Inicia_Repetimos_movimiento
- 266+ 9DA4
- 267+ 9DA4              ; Iniciamos (Repetimos_movimiento).
- 268+ 9DA4
- 269+ 9DA4 DD 2A F9 89      ld ix,(Puntero_mov)
- 270+ 9DA8 DD 7E 02         ld a,(ix+2)
- 271+ 9DAB 32 00 8A         ld (Repetimos_movimiento),a
- 272+ 9DAE
- 273+ 9DAE C9               ret
- 274+ 9DAF
- 275+ 9DAF              ; ---------- --------- --------- ---------- ----------
- 276+ 9DAF              ;
- 277+ 9DAF              ;   26/6/23
- 278+ 9DAF              ;
- 279+ 9DAF              ;   Inicia_Puntero_mov
- 280+ 9DAF              ;
- 281+ 9DAF              ;
- 282+ 9DAF
- 283+ 9DAF 2A F7 89     Inicia_Puntero_mov ld hl,(Puntero_indice_mov)
- 284+ 9DB2 5E               ld e,(hl)
- 285+ 9DB3 23               inc hl
- 286+ 9DB4 56               ld d,(hl)
- 287+ 9DB5 EB               ex de,hl
- 288+ 9DB6 22 F9 89         ld (Puntero_mov),hl
- 289+ 9DB9 C9               ret
- 290+ 9DBA
- 291+ 9DBA              ; ---------- --------- --------- ---------- ----------
- 292+ 9DBA              ;
- 293+ 9DBA              ;   27/06/23
- 294+ 9DBA              ;
- 295+ 9DBA              ;   Aplica_movimiento.
- 296+ 9DBA
- 297+ 9DBA              Aplica_desplazamiento
- 298+ 9DBA
- 299+ 9DBA              ; Analizamos (bit a bit) el nibble alto del 3er byte que compone el desplazamiento y ejecutamos.
- 300+ 9DBA
- 301+ 9DBA 2A F9 89         ld hl, (Puntero_mov)
- 302+ 9DBD CB 7E            bit 7,(hl)
- 303+ 9DBF 28 03            jr z,1F
- 304+ 9DC1 CD 59 99         call Mov_up
- 305+ 9DC4 2A F9 89     1 ld hl, (Puntero_mov)
- 306+ 9DC7 CB 76            bit 6,(hl)
- 307+ 9DC9 28 03            jr z,2F
- 308+ 9DCB CD 28 99         call Mov_down
- 309+ 9DCE 2A F9 89     2 ld hl, (Puntero_mov)
- 310+ 9DD1 CB 6E            bit 5,(hl)
- 311+ 9DD3 28 03            jr z,3F
- 312+ 9DD5 CD BA 9A         call Mov_left
- 313+ 9DD8 2A F9 89     3 ld hl, (Puntero_mov)
- 314+ 9DDB CB 66            bit 4,(hl)
- 315+ 9DDD C8               ret z
- 316+ 9DDE CD 9C 99         call Mov_right
- 317+ 9DE1 C9               ret
- 318+ 9DE2
- 319+ 9DE2              ; ---------- --------- --------- ---------- ----------
- 320+ 9DE2              ;
- 321+ 9DE2              ;   26/06/23
- 322+ 9DE2              ;
- 323+ 9DE2              ;   Ajusta_velocidad_desplazamiento.
- 324+ 9DE2
- 325+ 9DE2              Ajusta_velocidad_desplazamiento
- 326+ 9DE2
- 327+ 9DE2              ; 1er byte de la cadena de movimiento.
- 328+ 9DE2              ; Indica (Vel_up), (nibble alto) y (Vel_down) el nibble bajo.
- 329+ 9DE2
- 330+ 9DE2 CD 00 9E         call Extrae_nibble_alto
- 331+ 9DE5
- 332+ 9DE5 32 DD 89         ld (Vel_up),a
- 333+ 9DE8 79               ld a,c
- 334+ 9DE9 E6 0F            and $0f
- 335+ 9DEB 32 DE 89         ld (Vel_down),a
- 336+ 9DEE
- 337+ 9DEE              ; Saltamos al 2º byte de la cadena de movimiento.
- 338+ 9DEE              ; Indica (Vel_left), (nibble alto) y (Vel_right) el nibble bajo.
- 339+ 9DEE
- 340+ 9DEE 23               inc hl
- 341+ 9DEF CD 00 9E         call Extrae_nibble_alto
- 342+ 9DF2
- 343+ 9DF2 32 DB 89         ld (Vel_left),a
- 344+ 9DF5 79               ld a,c
- 345+ 9DF6 E6 0F            and $0f
- 346+ 9DF8 32 DC 89         ld (Vel_right),a
- 347+ 9DFB
- 348+ 9DFB              ; Nos situamos en el 3er byte del desplazamiento. Actualizamos (Puntero_mov).
- 349+ 9DFB
- 350+ 9DFB 23               inc hl
- 351+ 9DFC 22 F9 89         ld (Puntero_mov),hl
- 352+ 9DFF C9               ret
- 353+ 9E00
- 354+ 9E00 06 04        Extrae_nibble_alto ld b,4
- 355+ 9E02 7E               ld a,(hl)
- 356+ 9E03 4F               ld c,a
- 357+ 9E04 E6 F0            and $f0
- 358+ 9E06 CB 3F        1 srl a
- 359+ 9E08 10 FC            djnz 1B
- 360+ 9E0A C9               ret
- 361+ 9E0B
- 362+ 9E0B              ; ---------- --------- --------- ---------- ----------
- 363+ 9E0B              ;
- 364+ 9E0B              ;   5/7/23
- 365+ 9E0B              ;
- 366+ 9E0B              ;   Incrementa_Puntero_indice_mov
- 367+ 9E0B
- 368+ 9E0B              Incrementa_Puntero_indice_mov
- 369+ 9E0B
- 370+ 9E0B 21 FD 89         ld hl,Incrementa_puntero
- 371+ 9E0E 34               inc (hl)
- 372+ 9E0F
- 373+ 9E0F 2A F7 89         ld hl,(Puntero_indice_mov)
- 374+ 9E12 01 02 00         ld bc,2
- 375+ 9E15 A7               and a
- 376+ 9E16 09               add hl,bc
- 377+ 9E17 22 F7 89         ld (Puntero_indice_mov),hl
- 378+ 9E1A
- 379+ 9E1A 7E               ld a,(hl)
- 380+ 9E1B A7               and a
- 381+ 9E1C
- 382+ 9E1C              ;! STOP. Fin del patrón de movimiento de la entidad.
- 383+ 9E1C
- 384+ 9E1C 28 FE            jr z,$
- 385+ 9E1E
- 386+ 9E1E              ;! Reinicia el Patrón de movimiento.
- 387+ 9E1E
- 388+ 9E1E CC 23 9E         call z,Inicializa_Puntero_indice_mov
- 389+ 9E21
- 390+ 9E21 AF               xor a                                   ; Siempre salimos de la rutina con el flag "Z" activo.
- 391+ 9E22
- 392+ 9E22 C9               ret
- 393+ 9E23
- 394+ 9E23
- 395+ 9E23              ; ---------- --------- --------- ---------- ----------
- 396+ 9E23              ;
- 397+ 9E23              ;   5/07/23
- 398+ 9E23              ;
- 399+ 9E23              ;   Inicializa_Puntero_indice_mov
- 400+ 9E23
- 401+ 9E23              Inicializa_Puntero_indice_mov
- 402+ 9E23
- 403+ 9E23 3A FD 89         ld a,(Incrementa_puntero)
- 404+ 9E26 47               ld b,a
- 405+ 9E27
- 406+ 9E27 2A F7 89         ld hl,(Puntero_indice_mov)
- 407+ 9E2A 2B           1 dec hl
- 408+ 9E2B 2B               dec hl
- 409+ 9E2C 10 FC            djnz 1B
- 410+ 9E2E
- 411+ 9E2E 22 F7 89         ld (Puntero_indice_mov),hl
- 412+ 9E31
- 413+ 9E31 AF               xor a
- 414+ 9E32 32 FD 89         ld (Incrementa_puntero),a
- 415+ 9E35
- 416+ 9E35 C9               ret
- 417+ 9E36
- 418+ 9E36
- 419+ 9E36
+  67+ 9C91 A3 9C        Indice_mov_Baile_de_BadSat defw Bajo_decelerando
+  68+ 9C93 AF 9C            defw Codo_abajo_derecha
+  69+ 9C95 E3 9C            defw Derecha_y_subiendo
+  70+ 9C97 ED 9C            defw Medio_circulo_bajando_ed_si
+  71+ 9C99 FD 9C            defw Medio_circulo_bajando_ed_si_2
+  72+ 9C9B 07 9D            defw Medio_circulo_bajando_ed_si_3
+  73+ 9C9D 17 9D            defw Medio_circulo_bajando_ed_si_4
+  74+ 9C9F 21 9D            defw Medio_circulo_bajando_ed_si_5
+  75+ 9CA1              ;    defw Medio_circulo_bajando_ed_si_6
+  76+ 9CA1              ;    defw Medio_circulo_bajando_ed_si_7
+  77+ 9CA1 00 00            defw 0                                  ; Fin de patrón de movimiento.
+  78+ 9CA3
+  79+ 9CA3 14 11 4A 01  Bajo_decelerando db $14,$11,$4a,1           ; Abajo. 10rep. vel.4
+  80+ 9CA7 12 11 4F 01      db $12,$11,$4f,1                        ; Abajo vel.2
+  81+ 9CAB 11 11 4F 00      db $11,$11,$4f,0                        ; Abajo vel.1 --- Termina movimiento.
+  82+ 9CAF 11 11 51 01  Codo_abajo_derecha db $11,$11,$51,1         ; Abajo/Derecha. 1rep.
+  83+ 9CB3 11 11 43 01      db $11,$11,$43,1                        ; Abajo. 3rep.
+  84+ 9CB7 11 11 52 01      db $11,$11,$52,1                        ; Abajo/Derecha. 2rep.
+  85+ 9CBB 11 11 41 01      db $11,$11,$41,1                        ; Abajo. 1rep.
+  86+ 9CBF 11 11 52 01      db $11,$11,$52,1                        ; Abajo/Derecha. 2rep.
+  87+ 9CC3 11 11 11 01      db $11,$11,$11,1                        ; Derecha. 1rep.
+  88+ 9CC7 11 11 52 01      db $11,$11,$52,1                        ; Abajo/Derecha. 2rep.
+  89+ 9CCB 11 11 13 01      db $11,$11,$13,1                        ; Derecha. 3rep.
+  90+ 9CCF 11 11 51 01      db $11,$11,$51,1                        ; Abajo/Derecha. 1rep.
+  91+ 9CD3 11 11 13 01      db $11,$11,$13,1                        ; Derecha. 3rep.
+  92+ 9CD7 11 11 91 01      db $11,$11,$91,1                        ; Arriba/Derecha. 1rep.
+  93+ 9CDB 11 11 13 01      db $11,$11,$13,1                        ; Derecha. 3rep.
+  94+ 9CDF 11 11 92 00      db $11,$11,$92,0                        ; Arriba/Derecha. 2rep. --- Termina movimiento.
+  95+ 9CE3 11 11 18 01  Derecha_y_subiendo db $11,$11,$18,1         ; Derecha. 6rep.
+  96+ 9CE7 11 11 91 FE      db $11,$11,$91,254,18,0                 ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
+  96+ 9CEB 12 00
+  97+ 9CED
+  98+ 9CED              ; Medio círculo bajando. Entra de izq. a derecha y sale de derecha a izq.
+  99+ 9CED 11 11 51 01  Medio_circulo_bajando_ed_si db $11,$11,$51,1   ; Abajo/Derecha. 1rep.
+ 100+ 9CF1 11 11 13 01      db $11,$11,$13,1                           ; Derecha. 3rep.
+ 101+ 9CF5 11 11 51 01      db $11,$11,$51,1                           ; Abajo/Derecha. 1rep.
+ 102+ 9CF9 11 11 12 00      db $11,$11,$12,0                           ; Derecha. 2rep.
+ 103+ 9CFD
+ 104+ 9CFD              ; Hay que repetir estos dos desplazamientos 3 veces.
+ 105+ 9CFD 11 11 51 01  Medio_circulo_bajando_ed_si_2 db $11,$11,$51,1  ; Abajo/Derecha. 1rep.
+ 106+ 9D01 11 11 11 FE      db $11,$11,$11,254,3,0                      ; Derecha. 1rep. --- Repite Mov 3rep. --- Siguiente movimiento.
+ 106+ 9D05 03 00
+ 107+ 9D07
+ 108+ 9D07 11 11 52 01  Medio_circulo_bajando_ed_si_3 db $11,$11,$52,1 ; Abajo/Derecha. 1rep.
+ 109+ 9D0B 11 11 11 01      db $11,$11,$11,1                           ; Derecha. 1rep.
+ 110+ 9D0F 11 11 55 01      db $11,$11,$55,1                           ; Abajo/Derecha. 5rep.
+ 111+ 9D13 11 11 41 00      db $11,$11,$41,0                           ; Abajo. 1rep.
+ 112+ 9D17
+ 113+ 9D17 11 11 52 01  Medio_circulo_bajando_ed_si_4 db $11,$11,$52,1 ; Abajo/Derecha. 2rep.
+ 114+ 9D1B 11 11 41 FE      db $11,$11,$41,254,3,0                     ; Abajo. 1rep. --- Repite Mov 3rep. --- Siguiente movimiento.
+ 114+ 9D1F 03 00
+ 115+ 9D21
+ 116+ 9D21 11 11 51 01  Medio_circulo_bajando_ed_si_5 db $11,$11,$51,1 ; Abajo/Derecha. 1rep.
+ 117+ 9D25 11 11 42 01      db $11,$11,$42,1                           ; Abajo. 2rep.
+ 118+ 9D29 11 11 51 01      db $11,$11,$51,1                           ; Abajo/Derecha. 1rep.
+ 119+ 9D2D 11 11 43 01      db $11,$11,$43,1                           ; Abajo. 3rep.
+ 120+ 9D31 11 11 51 01      db $11,$11,$51,1                           ; Abajo/Derecha. 1rep.
+ 121+ 9D35 11 11 49 01      db $11,$11,$49,1                           ; Abajo. 9rep.
+ 122+ 9D39 11 11 61 01      db $11,$11,$61,1                           ; Abajo/Izq. 1rep.
+ 123+ 9D3D 11 11 43 01      db $11,$11,$43,1                           ; Abajo. 3rep.
+ 124+ 9D41 11 11 61 01      db $11,$11,$61,1                           ; Abajo/Izq. 1rep.
+ 125+ 9D45 11 11 42 00      db $11,$11,$42,0                           ; Abajo. 2rep.
+ 126+ 9D49
+ 127+ 9D49              ;Medio_circulo_bajando_ed_si_6 db $11,$11,$61,1 ; Abajo/Izq. 1rep.
+ 128+ 9D49              ;    db $11,$11,$41,254,3,0                     ; Abajo. 1rep. --- Repite Mov 3rep. --- Siguiente movimiento.
+ 129+ 9D49
+ 130+ 9D49              ;Medio_circulo_bajando_ed_si_7 db $11,$11,$62,0 ; Abajo/Izq. 2rep.
+ 131+ 9D49              ;    db 0
+ 132+ 9D49
+ 133+ 9D49              ; ----- ----- ----- ----- -----
+ 134+ 9D49              ;
+ 135+ 9D49              ;   27/06/23
+ 136+ 9D49
+ 137+ 9D49              Movimiento
+ 138+ 9D49
+ 139+ 9D49              ; Nota: Previamente, la rutina [DRAW], ha iniciado la entidad, (Puntero_mov) ya apunta a su cadena de movimiento correspondiente.
+ 140+ 9D49
+ 141+ 9D49 2A F9 89         ld hl,(Puntero_mov)
+ 142+ 9D4C 7E               ld a,(hl)
+ 143+ 9D4D A7               and a
+ 144+ 9D4E CC 6B 9E         call z, Inicializa_Puntero_indice_mov                       ; Hemos terminado de ejecutar todas las cadenas de movimiento.
+ 145+ 9D51
+ 146+ 9D51 3A 06 8A         ld a,(Ctrl_2)
+ 147+ 9D54 CB 57            bit 2,a
+ 148+ 9D56 20 17            jr nz, Desplazamiento_iniciado
+ 149+ 9D58
+ 150+ 9D58
+ 151+ 9D58              ; HL contiene (Puntero_mov) y este se encuentra en el 1er byte de la cadena de movimiento, (Byte1) ..... % (Vel_up),(Vel_down).
+ 152+ 9D58
+ 153+ 9D58              Inicia_desplazamiento.
+ 154+ 9D58
+ 155+ 9D58              ; Preparamos (Incrementa_puntero). Cada vez que iniciemos un nuevo movimiento le sumaremos 2 uds.
+ 156+ 9D58
+ 157+ 9D58 CD 2A 9E         call Ajusta_velocidad_desplazamiento
+ 158+ 9D5B
+ 159+ 9D5B              ; Iniciamos (Repetimos_mov).
+ 160+ 9D5B
+ 161+ 9D5B 7E               ld a,(hl)
+ 162+ 9D5C E6 0F            and $0f
+ 163+ 9D5E 32 FE 89         ld (Repetimos_desplazamiento),a
+ 164+ 9D61 32 FF 89         ld (Repetimos_desplazamiento_backup),a
+ 165+ 9D64
+ 166+ 9D64              ; Iniciamos (Cola_de_desplazamiento).
+ 167+ 9D64
+ 168+ 9D64 23               inc hl
+ 169+ 9D65 7E               ld a,(hl)
+ 170+ 9D66 32 01 8A         ld (Cola_de_desplazamiento),a
+ 171+ 9D69 2B               dec hl
+ 172+ 9D6A
+ 173+ 9D6A 21 06 8A         ld hl,Ctrl_2
+ 174+ 9D6D CB D6            set 2,(hl)
+ 175+ 9D6F
+ 176+ 9D6F              ; Hemos ajustado la velocidad del desplazamiento con los 2 primeros bytes del desplazamiento.
+ 177+ 9D6F              ; El 3er byte indica la dirección del desplz., (nibble alto) y las veces que lo ejecutamos, (nibble bajo).
+ 178+ 9D6F
+ 179+ 9D6F              Desplazamiento_iniciado
+ 180+ 9D6F
+ 181+ 9D6F CD 02 9E         call Aplica_desplazamiento
+ 182+ 9D72
+ 183+ 9D72 21 FE 89         ld hl,Repetimos_desplazamiento
+ 184+ 9D75 35               dec (hl)
+ 185+ 9D76 C0               ret nz
+ 186+ 9D77
+ 187+ 9D77              ; Hemos terminado de ejecutar el desplazamiento y sus ($0-$f repeticiones).
+ 188+ 9D77              ; Hay que volver a ejecutar este desplazamiento ???.
+ 189+ 9D77              ; Analiza (Cola_de_desplazamiento).
+ 190+ 9D77
+ 191+ 9D77 3A 01 8A     Cola ld a,(Cola_de_desplazamiento)
+ 192+ 9D7A A7               and a
+ 193+ 9D7B CC 53 9E         call z,Incrementa_Puntero_indice_mov                        ; Fin de la cadena de MOVIMIENTO ???.
+ 194+ 9D7E 28 29            jr z,Reinicia_el_movimiento
+ 195+ 9D80
+ 196+ 9D80 FE FF            cp $ff
+ 197+ 9D82 28 25            jr z,Reinicia_el_movimiento                                 ; Bucle infinito del MOVIMIENTO?.
+ 198+ 9D84
+ 199+ 9D84 FE FE            cp $fe
+ 200+ 9D86 20 11            jr nz,1F
+ 201+ 9D88
+ 202+ 9D88              ; ---
+ 203+ 9D88              ; Ya estamos ejecutando una repetición del último MOVIMIENTO ???.
+ 204+ 9D88
+ 205+ 9D88 3A 06 8A         ld a,(Ctrl_2)
+ 206+ 9D8B CB 5F            bit 3,a
+ 207+ 9D8D 20 1A            jr nz,Reinicia_el_movimiento
+ 208+ 9D8F
+ 209+ 9D8F              ; Si no es así, iniciamos la REPETICIÓN del movimiento activando el BIT 3 de Ctrl_2.
+ 210+ 9D8F
+ 211+ 9D8F 21 06 8A         ld hl,Ctrl_2                                                ; Vamos a indicar con este BIT a la rutina [Reinicia_el_movimiento],_
+ 212+ 9D92 CB DE            set 3,(hl)                                                  ; _ que (Cola_de_desplazamiento)="$fe", por lo que vamos a REINICIAR el_
+ 213+ 9D94
+ 214+ 9D94 CD EC 9D         call Inicia_Repetimos_movimiento
+ 215+ 9D97 28 10            jr z,Reinicia_el_movimiento                                 ; _ MOVIMIENTO (X nº de veces), siendo X un valor comprendido entre (1-255).
+ 216+ 9D99              ; ---
+ 217+ 9D99
+ 218+ 9D99 FE 01        1 cp 1
+ 219+ 9D9B CA D6 9D         jp z,Siguiente_desplazamiento                               ; Pasamos al siguiente desplazamiento del movimiento?.
+ 220+ 9D9E
+ 221+ 9D9E 3D               dec a
+ 222+ 9D9F 32 01 8A         ld (Cola_de_desplazamiento),a
+ 223+ 9DA2
+ 224+ 9DA2 3A FF 89         ld a,(Repetimos_desplazamiento_backup)                      ; Cuando (Cola_de_desplazamiento) actúa como contador del_
+ 225+ 9DA5 32 FE 89         ld (Repetimos_desplazamiento),a                             ; _ desplazamiento y este no ha llegado a "0", decrementamos_
+ 226+ 9DA8              ;                                                               ; _ el contador y RESTAURAMOS (Repetimos_desplazamiento).
+ 227+ 9DA8 C9               ret
+ 228+ 9DA9
+ 229+ 9DA9              Reinicia_el_movimiento
+ 230+ 9DA9
+ 231+ 9DA9 3A 06 8A         ld a,(Ctrl_2)
+ 232+ 9DAC CB 5F            bit 3,a
+ 233+ 9DAE 28 1B            jr z,2F
+ 234+ 9DB0
+ 235+ 9DB0              ; (Cola_de_desplazamiento)="254".
+ 236+ 9DB0
+ 237+ 9DB0 21 00 8A         ld hl,Repetimos_movimiento                                  ; Decrementamos (Repetimos_movimiento) hasta completar repeticiones.
+ 238+ 9DB3 35               dec (hl)
+ 239+ 9DB4 20 15            jr nz,2F
+ 240+ 9DB6
+ 241+ 9DB6              ; Fin de las repeticiones del último movimiento.
+ 242+ 9DB6
+ 243+ 9DB6 21 06 8A         ld hl,Ctrl_2
+ 244+ 9DB9 CB 9E            res 3,(hl)                                                  ; Decrementamos el BIT de repeticiones de movimiento.
+ 245+ 9DBB
+ 246+ 9DBB 2A F9 89         ld hl,(Puntero_mov)
+ 247+ 9DBE 23               inc hl
+ 248+ 9DBF 23               inc hl
+ 249+ 9DC0 23               inc hl
+ 250+ 9DC1 22 F9 89         ld (Puntero_mov),hl                                         ; Situamos (Puntero_mov) en (Cola_de_desplazamiento) y saltamos a `Cola'_
+ 251+ 9DC4              ;                                                               ; _ para ejecutar su mandato. :)
+ 252+ 9DC4 7E               ld a,(hl)
+ 253+ 9DC5 32 01 8A         ld (Cola_de_desplazamiento),a
+ 254+ 9DC8
+ 255+ 9DC8 C3 77 9D         jp Cola
+ 256+ 9DCB
+ 257+ 9DCB
+ 258+ 9DCB CD F7 9D     2 call Inicia_Puntero_mov
+ 259+ 9DCE
+ 260+ 9DCE 21 06 8A         ld hl,Ctrl_2
+ 261+ 9DD1 CB 96            res 2,(hl)
+ 262+ 9DD3
+ 263+ 9DD3 C3 49 9D         jp Movimiento
+ 264+ 9DD6
+ 265+ 9DD6              Siguiente_desplazamiento
+ 266+ 9DD6
+ 267+ 9DD6              ;   Situamos (Puntero_mov) en el siguiente desplazamiento del movimiento.
+ 268+ 9DD6              ;   Indicamos que hay que iniciar un nuevo desplazamiento.
+ 269+ 9DD6
+ 270+ 9DD6 21 06 8A         ld hl,Ctrl_2
+ 271+ 9DD9 CB 96            res 2,(hl)
+ 272+ 9DDB
+ 273+ 9DDB 2A F9 89         ld hl,(Puntero_mov)
+ 274+ 9DDE 23               inc hl
+ 275+ 9DDF 23               inc hl
+ 276+ 9DE0 22 F9 89         ld (Puntero_mov),hl
+ 277+ 9DE3
+ 278+ 9DE3 7E               ld a,(hl)
+ 279+ 9DE4 A7               and a
+ 280+ 9DE5 CC 53 9E         call z,Incrementa_Puntero_indice_mov
+ 281+ 9DE8 CA A9 9D         jp z,Reinicia_el_movimiento
+ 282+ 9DEB
+ 283+ 9DEB C9               ret
+ 284+ 9DEC
+ 285+ 9DEC              ; ---------- --------- --------- ---------- ----------
+ 286+ 9DEC              ;
+ 287+ 9DEC              ;   07/7/23
+ 288+ 9DEC              ;
+ 289+ 9DEC              ;   Inicia_Repetimos_movimiento
+ 290+ 9DEC              ;
+ 291+ 9DEC              ;
+ 292+ 9DEC
+ 293+ 9DEC              Inicia_Repetimos_movimiento
+ 294+ 9DEC
+ 295+ 9DEC              ; Iniciamos (Repetimos_movimiento).
+ 296+ 9DEC
+ 297+ 9DEC DD 2A F9 89      ld ix,(Puntero_mov)
+ 298+ 9DF0 DD 7E 02         ld a,(ix+2)
+ 299+ 9DF3 32 00 8A         ld (Repetimos_movimiento),a
+ 300+ 9DF6
+ 301+ 9DF6 C9               ret
+ 302+ 9DF7
+ 303+ 9DF7              ; ---------- --------- --------- ---------- ----------
+ 304+ 9DF7              ;
+ 305+ 9DF7              ;   26/6/23
+ 306+ 9DF7              ;
+ 307+ 9DF7              ;   Inicia_Puntero_mov
+ 308+ 9DF7              ;
+ 309+ 9DF7              ;
+ 310+ 9DF7
+ 311+ 9DF7 2A F7 89     Inicia_Puntero_mov ld hl,(Puntero_indice_mov)
+ 312+ 9DFA 5E               ld e,(hl)
+ 313+ 9DFB 23               inc hl
+ 314+ 9DFC 56               ld d,(hl)
+ 315+ 9DFD EB               ex de,hl
+ 316+ 9DFE 22 F9 89         ld (Puntero_mov),hl
+ 317+ 9E01 C9               ret
+ 318+ 9E02
+ 319+ 9E02              ; ---------- --------- --------- ---------- ----------
+ 320+ 9E02              ;
+ 321+ 9E02              ;   27/06/23
+ 322+ 9E02              ;
+ 323+ 9E02              ;   Aplica_movimiento.
+ 324+ 9E02
+ 325+ 9E02              Aplica_desplazamiento
+ 326+ 9E02
+ 327+ 9E02              ; Analizamos (bit a bit) el nibble alto del 3er byte que compone el desplazamiento y ejecutamos.
+ 328+ 9E02
+ 329+ 9E02 2A F9 89         ld hl, (Puntero_mov)
+ 330+ 9E05 CB 7E            bit 7,(hl)
+ 331+ 9E07 28 03            jr z,1F
+ 332+ 9E09 CD 59 99         call Mov_up
+ 333+ 9E0C 2A F9 89     1 ld hl, (Puntero_mov)
+ 334+ 9E0F CB 76            bit 6,(hl)
+ 335+ 9E11 28 03            jr z,2F
+ 336+ 9E13 CD 28 99         call Mov_down
+ 337+ 9E16 2A F9 89     2 ld hl, (Puntero_mov)
+ 338+ 9E19 CB 6E            bit 5,(hl)
+ 339+ 9E1B 28 03            jr z,3F
+ 340+ 9E1D CD BA 9A         call Mov_left
+ 341+ 9E20 2A F9 89     3 ld hl, (Puntero_mov)
+ 342+ 9E23 CB 66            bit 4,(hl)
+ 343+ 9E25 C8               ret z
+ 344+ 9E26 CD 9C 99         call Mov_right
+ 345+ 9E29 C9               ret
+ 346+ 9E2A
+ 347+ 9E2A              ; ---------- --------- --------- ---------- ----------
+ 348+ 9E2A              ;
+ 349+ 9E2A              ;   26/06/23
+ 350+ 9E2A              ;
+ 351+ 9E2A              ;   Ajusta_velocidad_desplazamiento.
+ 352+ 9E2A
+ 353+ 9E2A              Ajusta_velocidad_desplazamiento
+ 354+ 9E2A
+ 355+ 9E2A              ; 1er byte de la cadena de movimiento.
+ 356+ 9E2A              ; Indica (Vel_up), (nibble alto) y (Vel_down) el nibble bajo.
+ 357+ 9E2A
+ 358+ 9E2A CD 48 9E         call Extrae_nibble_alto
+ 359+ 9E2D
+ 360+ 9E2D 32 DD 89         ld (Vel_up),a
+ 361+ 9E30 79               ld a,c
+ 362+ 9E31 E6 0F            and $0f
+ 363+ 9E33 32 DE 89         ld (Vel_down),a
+ 364+ 9E36
+ 365+ 9E36              ; Saltamos al 2º byte de la cadena de movimiento.
+ 366+ 9E36              ; Indica (Vel_left), (nibble alto) y (Vel_right) el nibble bajo.
+ 367+ 9E36
+ 368+ 9E36 23               inc hl
+ 369+ 9E37 CD 48 9E         call Extrae_nibble_alto
+ 370+ 9E3A
+ 371+ 9E3A 32 DB 89         ld (Vel_left),a
+ 372+ 9E3D 79               ld a,c
+ 373+ 9E3E E6 0F            and $0f
+ 374+ 9E40 32 DC 89         ld (Vel_right),a
+ 375+ 9E43
+ 376+ 9E43              ; Nos situamos en el 3er byte del desplazamiento. Actualizamos (Puntero_mov).
+ 377+ 9E43
+ 378+ 9E43 23               inc hl
+ 379+ 9E44 22 F9 89         ld (Puntero_mov),hl
+ 380+ 9E47 C9               ret
+ 381+ 9E48
+ 382+ 9E48 06 04        Extrae_nibble_alto ld b,4
+ 383+ 9E4A 7E               ld a,(hl)
+ 384+ 9E4B 4F               ld c,a
+ 385+ 9E4C E6 F0            and $f0
+ 386+ 9E4E CB 3F        1 srl a
+ 387+ 9E50 10 FC            djnz 1B
+ 388+ 9E52 C9               ret
+ 389+ 9E53
+ 390+ 9E53              ; ---------- --------- --------- ---------- ----------
+ 391+ 9E53              ;
+ 392+ 9E53              ;   5/7/23
+ 393+ 9E53              ;
+ 394+ 9E53              ;   Incrementa_Puntero_indice_mov
+ 395+ 9E53
+ 396+ 9E53              Incrementa_Puntero_indice_mov
+ 397+ 9E53
+ 398+ 9E53 21 FD 89         ld hl,Incrementa_puntero
+ 399+ 9E56 34               inc (hl)
+ 400+ 9E57
+ 401+ 9E57 2A F7 89         ld hl,(Puntero_indice_mov)
+ 402+ 9E5A 01 02 00         ld bc,2
+ 403+ 9E5D A7               and a
+ 404+ 9E5E 09               add hl,bc
+ 405+ 9E5F 22 F7 89         ld (Puntero_indice_mov),hl
+ 406+ 9E62
+ 407+ 9E62 7E               ld a,(hl)
+ 408+ 9E63 A7               and a
+ 409+ 9E64
+ 410+ 9E64              ;! STOP. Fin del patrón de movimiento de la entidad.
+ 411+ 9E64
+ 412+ 9E64 28 FE            jr z,$
+ 413+ 9E66
+ 414+ 9E66              ;! Reinicia el Patrón de movimiento.
+ 415+ 9E66
+ 416+ 9E66 CC 6B 9E         call z,Inicializa_Puntero_indice_mov
+ 417+ 9E69
+ 418+ 9E69 AF               xor a                                   ; Siempre salimos de la rutina con el flag "Z" activo.
+ 419+ 9E6A
+ 420+ 9E6A C9               ret
+ 421+ 9E6B
+ 422+ 9E6B
+ 423+ 9E6B              ; ---------- --------- --------- ---------- ----------
+ 424+ 9E6B              ;
+ 425+ 9E6B              ;   5/07/23
+ 426+ 9E6B              ;
+ 427+ 9E6B              ;   Inicializa_Puntero_indice_mov
+ 428+ 9E6B
+ 429+ 9E6B              Inicializa_Puntero_indice_mov
+ 430+ 9E6B
+ 431+ 9E6B 3A FD 89         ld a,(Incrementa_puntero)
+ 432+ 9E6E 47               ld b,a
+ 433+ 9E6F
+ 434+ 9E6F 2A F7 89         ld hl,(Puntero_indice_mov)
+ 435+ 9E72 2B           1 dec hl
+ 436+ 9E73 2B               dec hl
+ 437+ 9E74 10 FC            djnz 1B
+ 438+ 9E76
+ 439+ 9E76 22 F7 89         ld (Puntero_indice_mov),hl
+ 440+ 9E79
+ 441+ 9E79 AF               xor a
+ 442+ 9E7A 32 FD 89         ld (Incrementa_puntero),a
+ 443+ 9E7D
+ 444+ 9E7D C9               ret
+ 445+ 9E7E
+ 446+ 9E7E
+ 447+ 9E7E
 # file closed: Patrones_de_mov.asm
-1272  9E36              	include "Relojes_y_temporizaciones.asm"
+1272  9E7E              	include "Relojes_y_temporizaciones.asm"
 # file opened: Relojes_y_temporizaciones.asm
-   1+ 9E36              ; Relojes y temporizaciones.
-   2+ 9E36
-   3+ 9E36              ; ------------------------------------------------------
-   4+ 9E36              ;
-   5+ 9E36              ;	27/04/23
-   6+ 9E36              ;
-   7+ 9E36              ;	Cuando se produce un disparo de Amadeus, la variable: (Habilita_disparo_Amadeus) se_
-   8+ 9E36              ;	_ fija a "0". Con esto, desactivamos la posibilidad de disparo de nuestra nave hasta_
-   9+ 9E36              ;	_ que dicha variable vualva a fijarse en "1". Para que esto suceda, el contador: _
-  10+ 9E36              ;	_ (Temporiza_disparo_Amadeus) ha de llegar a "0".
-  11+ 9E36              ;
-  12+ 9E36              ;	INPUTS:			HL ..... Habilita_disparo_(Amadeus/entidad).
-  13+ 9E36              ;					DE ..... Temporiza_disparo_(Amadeus/entidad).
-  14+ 9E36
-  15+ 9E36              Habilita_disparos
-  16+ 9E36
-  17+ 9E36 7E           	ld a,(hl)
-  18+ 9E37 A7           	and a
-  19+ 9E38 C0           	ret nz
-  20+ 9E39
-  21+ 9E39 EB           	ex de,hl
-  22+ 9E3A
-  23+ 9E3A 35           	dec (hl)
-  24+ 9E3B 34           	inc (hl)
-  25+ 9E3C 35           	dec (hl)
-  26+ 9E3D C0           	ret nz
-  27+ 9E3E
-  28+ 9E3E 2B           	dec hl
-  29+ 9E3F 7E           	ld a,(hl)
-  30+ 9E40 23           	inc hl
-  31+ 9E41 77           	ld (hl),a
-  32+ 9E42
-  33+ 9E42 EB           	ex de,hl
-  34+ 9E43 3E 01        	ld a,1
-  35+ 9E45 77           	ld (hl),a
-  36+ 9E46 C9           	ret
+   1+ 9E7E              ; Relojes y temporizaciones.
+   2+ 9E7E
+   3+ 9E7E              ; ------------------------------------------------------
+   4+ 9E7E              ;
+   5+ 9E7E              ;	27/04/23
+   6+ 9E7E              ;
+   7+ 9E7E              ;	Cuando se produce un disparo de Amadeus, la variable: (Habilita_disparo_Amadeus) se_
+   8+ 9E7E              ;	_ fija a "0". Con esto, desactivamos la posibilidad de disparo de nuestra nave hasta_
+   9+ 9E7E              ;	_ que dicha variable vualva a fijarse en "1". Para que esto suceda, el contador: _
+  10+ 9E7E              ;	_ (Temporiza_disparo_Amadeus) ha de llegar a "0".
+  11+ 9E7E              ;
+  12+ 9E7E              ;	INPUTS:			HL ..... Habilita_disparo_(Amadeus/entidad).
+  13+ 9E7E              ;					DE ..... Temporiza_disparo_(Amadeus/entidad).
+  14+ 9E7E
+  15+ 9E7E              Habilita_disparos
+  16+ 9E7E
+  17+ 9E7E 7E           	ld a,(hl)
+  18+ 9E7F A7           	and a
+  19+ 9E80 C0           	ret nz
+  20+ 9E81
+  21+ 9E81 EB           	ex de,hl
+  22+ 9E82
+  23+ 9E82 35           	dec (hl)
+  24+ 9E83 34           	inc (hl)
+  25+ 9E84 35           	dec (hl)
+  26+ 9E85 C0           	ret nz
+  27+ 9E86
+  28+ 9E86 2B           	dec hl
+  29+ 9E87 7E           	ld a,(hl)
+  30+ 9E88 23           	inc hl
+  31+ 9E89 77           	ld (hl),a
+  32+ 9E8A
+  33+ 9E8A EB           	ex de,hl
+  34+ 9E8B 3E 01        	ld a,1
+  35+ 9E8D 77           	ld (hl),a
+  36+ 9E8E C9           	ret
 # file closed: Relojes_y_temporizaciones.asm
-1273  9E47              	include "Guarda_foto_registros.asm"
+1273  9E8F              	include "Guarda_foto_registros.asm"
 # file opened: Guarda_foto_registros.asm
-   1+ 9E47              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-   2+ 9E47              ;
-   3+ 9E47              ;	3/1/23
-   4+ 9E47              ;
-   5+ 9E47              ;	Instrucciones donde interviene el Stack Pointer, (SP).
-   6+ 9E47
-   7+ 9E47              ;	ADC HL,SP	LD (addr),SP
-   8+ 9E47              ;	ADD HL,SP	LD SP,(addr)
-   9+ 9E47              ;	ADD IX,SP	LD SP,nn
-  10+ 9E47              ; 	ADD IY,SP	LD SP,HL
-  11+ 9E47              ;				LD SP,IX
-  12+ 9E47              ;	DEC SP		LD SP,IY
-  13+ 9E47
-  14+ 9E47              ;	EX (SP),HL
-  15+ 9E47              ;	EX (SP),IX
-  16+ 9E47              ;	EX (SP),IY
-  17+ 9E47
-  18+ 9E47              ;	INC SP
-  19+ 9E47
-  20+ 9E47
-  21+ 9E47                  org $7fa0
+   1+ 9E8F              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   2+ 9E8F              ;
+   3+ 9E8F              ;	3/1/23
+   4+ 9E8F              ;
+   5+ 9E8F              ;	Instrucciones donde interviene el Stack Pointer, (SP).
+   6+ 9E8F
+   7+ 9E8F              ;	ADC HL,SP	LD (addr),SP
+   8+ 9E8F              ;	ADD HL,SP	LD SP,(addr)
+   9+ 9E8F              ;	ADD IX,SP	LD SP,nn
+  10+ 9E8F              ; 	ADD IY,SP	LD SP,HL
+  11+ 9E8F              ;				LD SP,IX
+  12+ 9E8F              ;	DEC SP		LD SP,IY
+  13+ 9E8F
+  14+ 9E8F              ;	EX (SP),HL
+  15+ 9E8F              ;	EX (SP),IX
+  16+ 9E8F              ;	EX (SP),IY
+  17+ 9E8F
+  18+ 9E8F              ;	INC SP
+  19+ 9E8F
+  20+ 9E8F
+  21+ 9E8F                  org $7fa0
   22+ 7FA0
   23+ 7FA0              ;   (Stack_snapshot) se sitúa inicialmente en (Album_de_fotos)=$7000.
   24+ 7FA0              ;   Almacenaremos los datos/registros necesarios de la siguiente manera:
