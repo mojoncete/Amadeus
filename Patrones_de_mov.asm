@@ -65,15 +65,25 @@
 ; ----- ----- ----- ----- -----
 
 Indice_mov_Baile_de_BadSat defw Bajo_decelerando
+
     defw Codo_abajo_derecha
+
     defw Derecha_y_subiendo
+
     defw Medio_circulo_bajando_ed_si
     defw Medio_circulo_bajando_ed_si_2
     defw Medio_circulo_bajando_ed_si_3
     defw Medio_circulo_bajando_ed_si_4
     defw Medio_circulo_bajando_ed_si_5
-;    defw Medio_circulo_bajando_ed_si_6
-;    defw Medio_circulo_bajando_ed_si_7
+    defw Medio_circulo_bajando_ed_si_6
+    defw Medio_circulo_bajando_ed_si_7
+    defw Medio_circulo_bajando_ed_si_8
+    defw Medio_circulo_bajando_ed_si_9
+
+    defw Izquierda_y_subiendo
+
+    defw Codo_izquierda_abajo
+
     defw 0                                  ; Fin de patrón de movimiento.
 
 Bajo_decelerando db $14,$11,$4a,1           ; Abajo. 10rep. vel.4         
@@ -93,7 +103,7 @@ Codo_abajo_derecha db $11,$11,$51,1         ; Abajo/Derecha. 1rep.
     db $11,$11,$13,1                        ; Derecha. 3rep.
     db $11,$11,$92,0                        ; Arriba/Derecha. 2rep. --- Termina movimiento.
 Derecha_y_subiendo db $11,$11,$18,1         ; Derecha. 6rep.
-    db $11,$11,$91,254,18,0                 ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
+    db $11,$11,$91,254,18,0                 ; Arriba/Derecha. 1rep. --- Repite Mov 18rep. --- Termina movimiento.
 
 ; Medio círculo bajando. Entra de izq. a derecha y sale de derecha a izq.
 Medio_circulo_bajando_ed_si db $11,$11,$51,1   ; Abajo/Derecha. 1rep.
@@ -124,11 +134,28 @@ Medio_circulo_bajando_ed_si_5 db $11,$11,$51,1 ; Abajo/Derecha. 1rep.
     db $11,$11,$61,1                           ; Abajo/Izq. 1rep.
     db $11,$11,$42,0                           ; Abajo. 2rep.
 
-;Medio_circulo_bajando_ed_si_6 db $11,$11,$61,1 ; Abajo/Izq. 1rep.
-;    db $11,$11,$41,254,3,0                     ; Abajo. 1rep. --- Repite Mov 3rep. --- Siguiente movimiento.
+Medio_circulo_bajando_ed_si_6 db $11,$11,$61,1 ; Abajo/Izq. 1rep.
+    db $11,$11,$41,254,3,0                     ; Abajo. 1rep. --- Repite Mov 3rep. --- Siguiente movimiento.
 
-;Medio_circulo_bajando_ed_si_7 db $11,$11,$62,0 ; Abajo/Izq. 2rep.
-;    db 0
+Medio_circulo_bajando_ed_si_7 db $11,$11,$62,1 ; Abajo/Izq. 2rep.
+    db $11,$11,$41,1                           ; Abajo. 1rep.
+    db $11,$11,$65,1                           ; Abajo/Izq. 5rep.                      
+    db $11,$11,$21,0                           ; Izq. 1rep.
+
+Medio_circulo_bajando_ed_si_8 db $11,$11,$62,1 ; Abajo/Izq. 2rep.
+    db $11,$11,$21,254,3,0                     ; Izq. 1rep.
+
+Medio_circulo_bajando_ed_si_9 db $11,$11,$61,1 ; Abajo/Izq. 1rep.
+    db $11,$11,$22,1                           ; Izq. 2rep.    
+    db $11,$11,$61,1                           ; Abajo/Izq. 1rep. 
+    db $11,$11,$23,0                           ; Izq. 3rep.
+
+Izquierda_y_subiendo db $11,$11,$28,1          ; Derecha. 6rep.
+    db $11,$11,$a1,254,18,0                    ; Arriba/Izq. 1rep. --- Repite Mov 18rep. --- Termina movimiento.
+
+Codo_izquierda_abajo db $11,$11,$a1,0          ; Arriba/Izq. 1rep.
+
+
 
 ; ----- ----- ----- ----- -----
 ;
