@@ -69,6 +69,7 @@ Indice_mov_Baile_de_BadSat defw Bajo_decelerando
     defw Codo_abajo_derecha
 
     defw Derecha_y_subiendo
+    defw Derecha_y_subiendo_1
 
     defw Medio_circulo_bajando_ed_si
     defw Medio_circulo_bajando_ed_si_2
@@ -86,9 +87,10 @@ Indice_mov_Baile_de_BadSat defw Bajo_decelerando
 
     defw 0                                  ; Fin de patrón de movimiento.
 
-Bajo_decelerando db $14,$11,$4a,1           ; Abajo. 10rep. vel.4         
-    db $12,$11,$4f,1                        ; Abajo vel.2
-    db $11,$11,$4f,0                        ; Abajo vel.1 --- Termina movimiento.     
+Bajo_decelerando db $14,$11,$45,1           ; Abajo. 5rep. vel.4         
+    db $12,$11,$47,1                        ; Abajo. 7rep. vel.2
+    db $11,$11,$47,0                        ; Abajo  7rep. --- Termina movimiento.     
+
 Codo_abajo_derecha db $11,$11,$51,1         ; Abajo/Derecha. 1rep.
     db $11,$11,$43,1                        ; Abajo. 3rep.
     db $11,$11,$52,1                        ; Abajo/Derecha. 2rep.
@@ -98,12 +100,16 @@ Codo_abajo_derecha db $11,$11,$51,1         ; Abajo/Derecha. 1rep.
     db $11,$11,$52,1                        ; Abajo/Derecha. 2rep.
     db $11,$11,$13,1                        ; Derecha. 3rep.
     db $11,$11,$51,1                        ; Abajo/Derecha. 1rep.
-    db $11,$11,$13,1                        ; Derecha. 3rep.
+    db $11,$12,$12,1                        ; Derecha. 2rep. vel.2
     db $11,$11,$91,1                        ; Arriba/Derecha. 1rep.
-    db $11,$11,$13,1                        ; Derecha. 3rep.
+    db $11,$12,$12,1                        ; Derecha. 2rep. vel.2
     db $11,$11,$92,0                        ; Arriba/Derecha. 2rep. --- Termina movimiento.
-Derecha_y_subiendo db $11,$11,$18,1         ; Derecha. 6rep.
-    db $11,$11,$91,254,18,0                 ; Arriba/Derecha. 1rep. --- Repite Mov 18rep. --- Termina movimiento.
+
+
+Derecha_y_subiendo db $11,$12,$14,1         ; Derecha. 4rep. vel.2
+    db $11,$11,$91,254,12,0                 ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
+Derecha_y_subiendo_1 db $11,$11,$18,1       ; Derecha. 8rep.
+    db $11,$11,$91,254,7,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 7rep. --- Termina movimiento.
 
 ; Medio círculo bajando. Entra de izq. a derecha y sale de derecha a izq.
 Medio_circulo_bajando_ed_si db $11,$11,$51,1   ; Abajo/Derecha. 1rep.
@@ -151,11 +157,20 @@ Medio_circulo_bajando_ed_si_9 db $11,$11,$61,1 ; Abajo/Izq. 1rep.
     db $11,$11,$23,0                           ; Izq. 3rep.
 
 Izquierda_y_subiendo db $11,$11,$28,1          ; Derecha. 6rep.
-    db $11,$11,$a1,254,18,0                    ; Arriba/Izq. 1rep. --- Repite Mov 18rep. --- Termina movimiento.
+    db $11,$11,$a1,254,20,0                    ; Arriba/Izq. 1rep. --- Repite Mov 18rep. --- Termina movimiento.
 
-Codo_izquierda_abajo db $11,$11,$a1,0          ; Arriba/Izq. 1rep.
-
-
+Codo_izquierda_abajo db $11,$11,$a1,1          ; Arriba/Izq. 1rep.
+    db $11,$11,$23,1                           ; Izq. 3rep.
+    db $11,$11,$61,1                           ; Abajo/Izq. 1rep.
+    db $11,$11,$23,1                           ; Izq. 3rep.
+    db $11,$11,$62,1                           ; Abajo/Izq. 2rep.
+    db $11,$11,$21,1                           ; Izq. 1rep.
+    db $11,$11,$62,1                           ; Abajo/Izq. 2rep.
+    db $11,$11,$41,1                           ; Abajo. 1rep.
+    db $11,$11,$62,1                           ; Abajo/Izq. 2rep.
+    db $11,$11,$43,1                           ; Abajo. 3rep.        
+    db $11,$11,$61,1                           ; Abajo/Izq. 1rep.
+    db $11,$11,$43,0                           ; Abajo. 3rep.
 
 ; ----- ----- ----- ----- -----
 ;
@@ -436,7 +451,7 @@ Incrementa_Puntero_indice_mov
 
 ;! STOP. Fin del patrón de movimiento de la entidad.
 
-    jr z,$
+;    jr z,$
 
 ;! Reinicia el Patrón de movimiento.    
 

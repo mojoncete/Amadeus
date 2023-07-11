@@ -68,8 +68,8 @@ Mov_down
 	jr nc,1F 														
 
 ; ------------------------------
-	call Reaparece_arriba
-;	call Reinicio
+;	call Reaparece_arriba
+	call Reinicio
 ; ------------------------------
 
 	jr 3F
@@ -715,3 +715,4 @@ Reaparece_arriba ld bc,$17e0
 Reinicio ld hl,(Posicion_inicio)
 	ld (Posicion_actual),hl
 	ret
+	
