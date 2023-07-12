@@ -53,14 +53,19 @@
 ;											;				En este caso hemos de incrementar (Puntero_indice_mov)_
 ;											;				_ y pasar a la siguiente cadena de movimiento del índice.
 ;
-;											;	"$01 - "$fd" , "1-253" ..... Repetición del DESPLAZAMIENTO. 
+;											;	"$fd" , "1-253" ..... Repetición del MOVIMIENTO. 
 ;											;						         Nº de veces que vamos a repetir el movimiento completo.
 ;											;					             En este caso, volveremos a inicializar (Puntero_mov),_	
 ;							    			;						         _ con (Puntero_indice_mov) y decrementaremos (Cola_de_desplazamiento).
 ;				
-;											;	"$ff"  , "255" ..... Bucle infinito de repetición del MOVIMIENTO.
+;											;	"$ff"  , "255" ..... Bucle infinito de repetición del DESPLAZAMIENTO.
 ;											;				         Nunca vamos a saltar a la siguiente cadena de movimiento del índice,_	
 ;											;				         _ (si es que la hay). Volvemos a inicializar (Puntero_mov) con (Puntero_indice_mov).	
+;
+;                                           ;   "$fe" ..... Activamos el bucle principal del patrón de movimiento. La direccíon de memoria_  
+;                                           ;               _ del siguiente MOVIMIENTO del índice se almacenará en la variable (Puntero_indice_mov_bucle).                 
+;                                           ;               La subrutina [Inicializa_Puntero_indice_mov] inicializará (Puntero_indice_mov) con_ 
+;                                           ;               _ esta dirección y no se situará al comienzo del índice del patrón de movimiento.         
 
 ; ----- ----- ----- ----- -----
 
@@ -71,17 +76,11 @@ Indice_mov_Baile_de_BadSat defw Bajo_decelerando
     defw Derecha_y_subiendo
     defw Derecha_y_subiendo_1
 
-    defw Medio_circulo_bajando_ed_si
-    defw Medio_circulo_bajando_ed_si_2
-    defw Medio_circulo_bajando_ed_si_3
-    defw Medio_circulo_bajando_ed_si_4
-    defw Medio_circulo_bajando_ed_si_5
-    defw Medio_circulo_bajando_ed_si_6
-    defw Medio_circulo_bajando_ed_si_7
-    defw Medio_circulo_bajando_ed_si_8
-    defw Medio_circulo_bajando_ed_si_9
+    defw Codo_derecha_abajo
+    defw Codo_abajo_izq.
 
     defw Izquierda_y_subiendo
+    defw Izquierda_y_subiendo_1
 
     defw Codo_izquierda_abajo
 
@@ -89,7 +88,7 @@ Indice_mov_Baile_de_BadSat defw Bajo_decelerando
 
 Bajo_decelerando db $14,$11,$45,1           ; Abajo. 5rep. vel.4         
     db $12,$11,$47,1                        ; Abajo. 7rep. vel.2
-    db $11,$11,$47,0                        ; Abajo  7rep. --- Termina movimiento.     
+    db $11,$11,$47,254                      ; Abajo  7rep. --- Termina movimiento.     
 
 Codo_abajo_derecha db $11,$11,$51,1         ; Abajo/Derecha. 1rep.
     db $11,$11,$43,1                        ; Abajo. 3rep.
@@ -103,61 +102,48 @@ Codo_abajo_derecha db $11,$11,$51,1         ; Abajo/Derecha. 1rep.
     db $11,$12,$12,1                        ; Derecha. 2rep. vel.2
     db $11,$11,$91,1                        ; Arriba/Derecha. 1rep.
     db $11,$12,$12,1                        ; Derecha. 2rep. vel.2
-    db $11,$11,$92,0                        ; Arriba/Derecha. 2rep. --- Termina movimiento.
+    db $11,$11,$92,253,20,0                       ; Arriba/Derecha. 2rep. --- Termina movimiento.
 
 
 Derecha_y_subiendo db $11,$12,$14,1         ; Derecha. 4rep. vel.2
-    db $11,$11,$91,254,12,0                 ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
-Derecha_y_subiendo_1 db $11,$11,$18,1       ; Derecha. 8rep.
-    db $11,$11,$91,254,7,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 7rep. --- Termina movimiento.
+    db $11,$11,$91,253,12,0                 ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
+Derecha_y_subiendo_1 db $11,$11,$1a,1       ; Derecha. 8rep.
+    db $11,$11,$91,253,6,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 7rep. --- Termina movimiento.
 
 ; Medio círculo bajando. Entra de izq. a derecha y sale de derecha a izq.
-Medio_circulo_bajando_ed_si db $11,$11,$51,1   ; Abajo/Derecha. 1rep.
-    db $11,$11,$13,1                           ; Derecha. 3rep.
-    db $11,$11,$51,1                           ; Abajo/Derecha. 1rep.
-    db $11,$11,$12,0                           ; Derecha. 2rep.
 
-; Hay que repetir estos dos desplazamientos 3 veces.
-Medio_circulo_bajando_ed_si_2 db $11,$11,$51,1  ; Abajo/Derecha. 1rep.
-    db $11,$11,$11,254,3,0                      ; Derecha. 1rep. --- Repite Mov 3rep. --- Siguiente movimiento.
- 
-Medio_circulo_bajando_ed_si_3 db $11,$11,$52,1 ; Abajo/Derecha. 1rep.
-    db $11,$11,$11,1                           ; Derecha. 1rep. 
-    db $11,$11,$55,1                           ; Abajo/Derecha. 5rep.
-    db $11,$11,$41,0                           ; Abajo. 1rep.
 
-Medio_circulo_bajando_ed_si_4 db $11,$11,$52,1 ; Abajo/Derecha. 2rep.
-    db $11,$11,$41,254,3,0                     ; Abajo. 1rep. --- Repite Mov 3rep. --- Siguiente movimiento.
- 
-Medio_circulo_bajando_ed_si_5 db $11,$11,$51,1 ; Abajo/Derecha. 1rep.
-    db $11,$11,$42,1                           ; Abajo. 2rep.
-    db $11,$11,$51,1                           ; Abajo/Derecha. 1rep.
-    db $11,$11,$43,1                           ; Abajo. 3rep.
-    db $11,$11,$51,1                           ; Abajo/Derecha. 1rep. 
-    db $11,$11,$49,1                           ; Abajo. 9rep.
-    db $11,$11,$61,1                           ; Abajo/Izq. 1rep.
-    db $11,$11,$43,1                           ; Abajo. 3rep.
-    db $11,$11,$61,1                           ; Abajo/Izq. 1rep.
-    db $11,$11,$42,0                           ; Abajo. 2rep.
+Codo_derecha_abajo db $11,$11,$51,1         ; Abajo/Derecha. 1rep.
+    db $11,$11,$13,1                        ; Derecha. 3rep.
+    db $11,$11,$51,1                        ; Abajo/Derecha. 1rep.
+    db $11,$11,$13,1                        ; Derecha. 3rep.
+    db $11,$11,$52,1                        ; Abajo/Derecha. 2rep.
+    db $11,$11,$11,1                        ; Derecha. 1rep.
+    db $11,$11,$52,1                        ; Abajo/Derecha. 2rep.
+    db $11,$11,$41,1                        ; Abajo. 1rep.
+    db $11,$11,$52,1                        ; Abajo/Derecha. 2rep.
+    db $11,$11,$43,1                        ; Abajo. 3rep.        
+    db $11,$11,$51,1                        ; Abajo/Derecha. 1rep.
+    db $11,$11,$43,0                        ; Abajo. 3rep.
 
-Medio_circulo_bajando_ed_si_6 db $11,$11,$61,1 ; Abajo/Izq. 1rep.
-    db $11,$11,$41,254,3,0                     ; Abajo. 1rep. --- Repite Mov 3rep. --- Siguiente movimiento.
+Codo_abajo_izq. db $11,$11,$61,1            ; Abajo/izq. 1rep.
+    db $11,$11,$43,1                        ; Abajo. 3rep.
+    db $11,$11,$62,1                        ; Abajo/izq. 2rep.
+    db $11,$11,$41,1                        ; Abajo. 1rep.
+    db $11,$11,$62,1                        ; Abajo/izq. 2rep.
+    db $11,$11,$21,1                        ; izq. 1rep.
+    db $11,$11,$62,1                        ; Abajo/izq. 2rep.
+    db $11,$11,$23,1                        ; izq. 3rep.
+    db $11,$11,$61,1                        ; Abajo/izq. 1rep.
+    db $11,$21,$22,1                        ; izq. 2rep. vel.2
+    db $11,$11,$a1,1                        ; Arriba/izq. 1rep.
+    db $11,$21,$22,1                        ; izq. 2rep. vel.2
+    db $11,$11,$a2,0                        ; Arriba/izq. 2rep. --- Termina movimiento.
 
-Medio_circulo_bajando_ed_si_7 db $11,$11,$62,1 ; Abajo/Izq. 2rep.
-    db $11,$11,$41,1                           ; Abajo. 1rep.
-    db $11,$11,$65,1                           ; Abajo/Izq. 5rep.                      
-    db $11,$11,$21,0                           ; Izq. 1rep.
-
-Medio_circulo_bajando_ed_si_8 db $11,$11,$62,1 ; Abajo/Izq. 2rep.
-    db $11,$11,$21,254,3,0                     ; Izq. 1rep.
-
-Medio_circulo_bajando_ed_si_9 db $11,$11,$61,1 ; Abajo/Izq. 1rep.
-    db $11,$11,$22,1                           ; Izq. 2rep.    
-    db $11,$11,$61,1                           ; Abajo/Izq. 1rep. 
-    db $11,$11,$23,0                           ; Izq. 3rep.
-
-Izquierda_y_subiendo db $11,$11,$28,1          ; Derecha. 6rep.
-    db $11,$11,$a1,254,20,0                    ; Arriba/Izq. 1rep. --- Repite Mov 18rep. --- Termina movimiento.
+Izquierda_y_subiendo db $11,$21,$24,1          ; Izq. 4rep.
+    db $11,$11,$a1,253,12,0                    ; Arriba/Izq. 1rep. --- Repite Mov 18rep. --- Termina movimiento.
+Izquierda_y_subiendo_1 db $11,$11,$2a,1        ; Izq. 6rep.
+    db $11,$11,$a1,253,6,0                     ; Arriba/Izq. 1rep. --- Repite Mov 18rep. --- Termina movimiento.
 
 Codo_izquierda_abajo db $11,$11,$a1,1          ; Arriba/Izq. 1rep.
     db $11,$11,$23,1                           ; Izq. 3rep.
@@ -179,6 +165,12 @@ Codo_izquierda_abajo db $11,$11,$a1,1          ; Arriba/Izq. 1rep.
 Movimiento 
 
 ; Nota: Previamente, la rutina [DRAW], ha iniciado la entidad, (Puntero_mov) ya apunta a su cadena de movimiento correspondiente.
+
+    ld a,(Ctrl_2)
+    bit 4,a
+;    jr nz,$
+
+    call nz, Inicializa_Puntero_indice_mov
 
     ld hl,(Puntero_mov)
     ld a,(hl)
@@ -239,6 +231,10 @@ Cola ld a,(Cola_de_desplazamiento)
     jr z,Reinicia_el_movimiento                                 ; Bucle infinito del MOVIMIENTO?.
 
     cp $fe
+    call z,Fijamos_bucle
+    jr z,Reinicia_el_movimiento
+
+    cp $fd
     jr nz,1F
 
 ; ---
@@ -322,6 +318,19 @@ Siguiente_desplazamiento
     call z,Incrementa_Puntero_indice_mov 
     jp z,Reinicia_el_movimiento 
 
+    ret
+; Subrutinas -----------------------------------------
+; ---------- --------- --------- ---------- ----------
+;
+;   12/07/23
+;
+;   Fijamos_bucle
+;
+;   
+
+Fijamos_bucle call Incrementa_Puntero_indice_mov
+    ld hl,(Puntero_indice_mov)
+    ld (Puntero_indice_mov_bucle),hl
     ret
 
 ; ---------- --------- --------- ---------- ----------
@@ -464,13 +473,32 @@ Incrementa_Puntero_indice_mov
 
 ; ---------- --------- --------- ---------- ----------
 ;
-;   5/07/23
+;   12/07/23
 ;
 ;   Inicializa_Puntero_indice_mov
 
 Inicializa_Puntero_indice_mov 
 
-    ld a,(Incrementa_puntero)
+; Existe etiqueta de bucle principal???
+
+    jr $
+
+    ld hl,Ctrl_2
+    res 4,(hl)
+ 
+    ld hl,(Puntero_indice_mov_bucle)
+    inc h
+    dec h
+    jr z,2F
+
+    ld (Puntero_indice_mov),hl
+    jr 3F
+
+
+
+; Inicializamos (Puntero_indice_mov) con la 1ª dirección del índice del patrón de movimiento.
+
+2 ld a,(Incrementa_puntero)
     ld b,a
 
     ld hl,(Puntero_indice_mov)
@@ -480,7 +508,7 @@ Inicializa_Puntero_indice_mov
 
     ld (Puntero_indice_mov),hl
 
-    xor a
+3 xor a
     ld (Incrementa_puntero),a
 
     ret

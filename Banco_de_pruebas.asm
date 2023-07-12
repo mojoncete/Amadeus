@@ -144,7 +144,7 @@ Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el obje
 Autoriza_movimiento db 0                                ; "1" Autoriza el movimiento de la entidad. "0", no hay movimiento.
 Puntero_indice_mov defw 0							    ; Puntero índice del patrón de movimiento de la entidad. "0" No hay movimiento.
 Puntero_mov defw 0										; Guarda la posición de memoria en la que nos encontramos dentro de la cadena de movimiento.
-Puntero_indice_mov_backup defw 0						; 
+Puntero_indice_mov_bucle defw 0							; 
 ;														
 ;                   									
 Incrementa_puntero db 0									; Byte que iremos sumando a (Puntero_indice_mov) para ir escalando por las_
@@ -193,7 +193,7 @@ Ctrl_2 db 0
 ;															_ Evita que volvamos a iniciar el desplazamiento cada vez que ejecutemos [Movimiento].
 ;														BIT 3, Indica que (Cola_de_desplazamiento)="254". Esto quiere decir que repetiremos (1-255 veces),_
 ;															_ el último MOVIMIENTO que hayamos ejecutado.
-
+;!														BIT 4,xxx
 
 
 Frames_explosion db 0 									; Nº de Frames que tiene la explosión.

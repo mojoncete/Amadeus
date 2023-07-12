@@ -711,8 +711,26 @@ Reaparece_arriba ld bc,$17e0
 	ret
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;
+;	12/07/23
 
-Reinicio ld hl,(Posicion_inicio)
+Reinicio 
+
+	xor a
+	ld hl,Puntero_indice_mov_bucle
+	call Limpia_contenido_hl
+
+	ld hl,(Posicion_inicio)
 	ld (Posicion_actual),hl
+
+	ld hl,Ctrl_2
+	set 4,(hl)
+
 	ret
+
+Limpia_contenido_hl	ld (hl),a
+	inc hl
+	ld (hl),a
+	ret	
+	
 	
