@@ -166,21 +166,25 @@ Movimiento
 
 ; Nota: Previamente, la rutina [DRAW], ha iniciado la entidad, (Puntero_mov) ya apunta a su cadena de movimiento correspondiente.
 
+;    jr $
+
     ld a,(Ctrl_2)
     bit 4,a
-;    jr nz,$
+    jr nz,$
 
-    call nz, Inicializa_Puntero_indice_mov
+;    call nz, Inicializa_Puntero_indice_mov
 
-    ld hl,(Puntero_mov)
-    ld a,(hl)
-    and a                                                       
-    call z, Inicializa_Puntero_indice_mov                       ; Hemos terminado de ejecutar todas las cadenas de movimiento. 
+;    ld hl,(Puntero_mov)
+;    ld a,(hl)
+;    and a                                                       
+;    call z, Inicializa_Puntero_indice_mov                       ; Hemos terminado de ejecutar todas las cadenas de movimiento. 
 
     ld a,(Ctrl_2)
     bit 2,a
     jr nz, Desplazamiento_iniciado
 
+    ld hl,(Puntero_mov)
+    ld a,(hl)
 
 ; HL contiene (Puntero_mov) y este se encuentra en el 1er byte de la cadena de movimiento, (Byte1) ..... % (Vel_up),(Vel_down).
 
@@ -214,7 +218,11 @@ Desplazamiento_iniciado
 
     call Aplica_desplazamiento
 
-    ld hl,Repetimos_desplazamiento
+    ld a,(Ctrl_2)
+    bit 4,a
+    ret nz                              ; Salimos si se ha producido reinicio.
+
+3 ld hl,Repetimos_desplazamiento
     dec (hl)
     ret nz
 
@@ -385,6 +393,11 @@ Aplica_desplazamiento
     bit 6,(hl)
     jr z,2F
     call Mov_down
+
+    ld a,(Ctrl_2)   ; Salimos de la rutina si se produce REINICIO.
+    bit 4,a
+    ret nz
+
 2 ld hl, (Puntero_mov)
     bit 5,(hl)
     jr z,3F
@@ -481,10 +494,10 @@ Inicializa_Puntero_indice_mov
 
 ; Existe etiqueta de bucle principal???
 
-    jr $
+;    jr $
 
-    ld hl,Ctrl_2
-    res 4,(hl)
+;    ld hl,Ctrl_2
+;    res 4,(hl)
  
     ld hl,(Puntero_indice_mov_bucle)
     inc h

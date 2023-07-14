@@ -13,6 +13,10 @@
 
 	call Frame
 
+	ld a,(Ctrl_2)
+	bit 4,a
+	jr nz,$
+
 	ld a,(Ctrl_1) 										; Existe Loop?
 	bit 3,a
 	reti									 
@@ -346,11 +350,9 @@ START
 ;	INICIA ENTIDADES !!!!!
 
 1 push bc  												; Guardo el contador de entidades.
-	call Inicia_Puntero_objeto
-	call Recompone_posicion_inicio
-	call Draw
-	call Guarda_foto_registros
- 	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
+
+	call Inicia_entidad
+
 	pop bc
 	djnz 1B  											; Decremento el contador de entidades.
 
@@ -425,6 +427,15 @@ START
 	ld (Clock_Entidades_en_curso),a
 
 	jp 4B
+
+; -----------------------------------------------------------------------------------
+
+Inicia_entidad	call Inicia_Puntero_objeto
+	call Recompone_posicion_inicio
+	call Draw
+	call Guarda_foto_registros
+ 	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
+	ret
 
 ; -----------------------------------------------------------------------------------
 
@@ -533,13 +544,13 @@ Frame
 	ld b,a												; (Entidades_en_curso) en A´ y B.
 
 ; Código que ejecutamos con cada entidad:
-; Impacto ???
+
 
 15 push bc 												; Nº de entidades en curso.
 
-;	call Autorizacion									; NO todas las entidades se pintan. (25fps).
+; Impacto ???
 
-	ld a,(Impacto)										 
+33 ld a,(Impacto)										 
 	and a
 	jr z,8F
 
@@ -631,6 +642,8 @@ Frame
 	xor a
 	ld (Obj_dibujado),a
 
+
+
 6 call Store_Restore_cajas
 
 	pop bc
@@ -660,6 +673,10 @@ Frame
 	jr nz,$
 
 	call Mov_Amadeus
+
+	ld a,(Ctrl_2)
+	bit 4,a
+	jr nz,3F
 
 	ld a,(Ctrl_0)
 	bit 4,a
@@ -745,11 +762,6 @@ Mov_obj
 ;	ld a,(Autoriza_movimiento)							; Salimos de la rutina si no estamos autorizados_
 ;	and a 												; _a movernos. (Limitador_de_entidades).
 ;	ret z
-
-	ld hl,Puntero_indice_mov			 				; (hl)="0", objeto estático!!!.
-	inc (hl)
-	dec (hl)                                            ; Salimos de la rutina.
-	ret z
 
 	call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
 

@@ -716,15 +716,32 @@ Reaparece_arriba ld bc,$17e0
 
 Reinicio 
 
+; Vamos a reiniciar los punteros y variables de movimiento.
+
 	xor a
 	ld hl,Puntero_indice_mov_bucle
 	call Limpia_contenido_hl
 
-	ld hl,(Posicion_inicio)
-	ld (Posicion_actual),hl
+	ld hl,Posicion_actual
+	call Limpia_contenido_hl
+
+	call Inicializa_Puntero_indice_mov
+	call Inicia_Puntero_mov
+
+	ld hl,Incrementa_puntero
+	ld b,5
+1 ld (hl),a
+	inc hl
+	djnz 1B
+
+
+	call Inicia_Puntero_objeto
+	call Recompone_posicion_inicio
+
 
 	ld hl,Ctrl_2
-	set 4,(hl)
+	res 2,(hl)							; El movimiento de la entidad, deja de estar iniciado.
+	set 4,(hl)							; Indica que se produce reinicio.
 
 	ret
 
