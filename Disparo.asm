@@ -793,8 +793,10 @@ Motor_de_disparos ld bc,Disparo_3A
     and 1
     jr z,10F
 
-; La colisión se produce con Amadeus??? 
-; Amadeus siempre tiene (Coordenada_y)="$16".
+    jr $ ;! STOP si el disparo tiene colisión.
+
+;! La colisión se produce con Amadeus??? 
+;! Amadeus siempre tiene (Coordenada_y)="$16".
 
     push hl
 

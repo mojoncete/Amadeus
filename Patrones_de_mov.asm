@@ -102,7 +102,7 @@ Codo_abajo_derecha db $11,$11,$51,1         ; Abajo/Derecha. 1rep.
     db $11,$12,$12,1                        ; Derecha. 2rep. vel.2
     db $11,$11,$91,1                        ; Arriba/Derecha. 1rep.
     db $11,$12,$12,1                        ; Derecha. 2rep. vel.2
-    db $11,$11,$92,253,20,0                       ; Arriba/Derecha. 2rep. --- Termina movimiento.
+    db $11,$11,$92,0                        ; Arriba/Derecha. 2rep. --- Termina movimiento.
 
 
 Derecha_y_subiendo db $11,$12,$14,1         ; Derecha. 4rep. vel.2
@@ -165,19 +165,6 @@ Codo_izquierda_abajo db $11,$11,$a1,1          ; Arriba/Izq. 1rep.
 Movimiento 
 
 ; Nota: Previamente, la rutina [DRAW], ha iniciado la entidad, (Puntero_mov) ya apunta a su cadena de movimiento correspondiente.
-
-;    jr $
-
-    ld a,(Ctrl_2)
-    bit 4,a
-    jr nz,$
-
-;    call nz, Inicializa_Puntero_indice_mov
-
-;    ld hl,(Puntero_mov)
-;    ld a,(hl)
-;    and a                                                       
-;    call z, Inicializa_Puntero_indice_mov                       ; Hemos terminado de ejecutar todas las cadenas de movimiento. 
 
     ld a,(Ctrl_2)
     bit 2,a
@@ -393,11 +380,6 @@ Aplica_desplazamiento
     bit 6,(hl)
     jr z,2F
     call Mov_down
-
-    ld a,(Ctrl_2)   ; Salimos de la rutina si se produce REINICIO.
-    bit 4,a
-    ret nz
-
 2 ld hl, (Puntero_mov)
     bit 5,(hl)
     jr z,3F

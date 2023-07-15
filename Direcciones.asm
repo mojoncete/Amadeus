@@ -712,7 +712,7 @@ Reaparece_arriba ld bc,$17e0
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
-;	12/07/23
+;	15/07/23
 
 Reinicio 
 
@@ -734,14 +734,8 @@ Reinicio
 	inc hl
 	djnz 1B
 
-
-	call Inicia_Puntero_objeto
-	call Recompone_posicion_inicio
-
-
 	ld hl,Ctrl_2
 	res 2,(hl)							; El movimiento de la entidad, deja de estar iniciado.
-	set 4,(hl)							; Indica que se produce reinicio.
 
 	ret
 

@@ -197,8 +197,6 @@ Ctrl_2 db 0
 ;															_ Evita que volvamos a iniciar el desplazamiento cada vez que ejecutemos [Movimiento].
 ;														BIT 3, Indica que (Cola_de_desplazamiento)="254". Esto quiere decir que repetiremos (1-255 veces),_
 ;															_ el último MOVIMIENTO que hayamos ejecutado.
-;!														BIT 4,xxx
-
 
 Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
@@ -673,10 +671,6 @@ Frame
 	jr nz,$
 
 	call Mov_Amadeus
-
-	ld a,(Ctrl_2)
-	bit 4,a
-	jr nz,3F
 
 	ld a,(Ctrl_0)
 	bit 4,a
