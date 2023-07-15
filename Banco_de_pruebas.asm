@@ -296,7 +296,7 @@ Temporiza_disparo_Amadeus db 30 						; Reloj, decreciente.
 
 Habilita_disparo_entidad db 1
 Tiempo_disparo_entidad db 15							; Restaura (Temporiza_disparo_entidad). 
-Temporiza_disparo_entidad db 15							; Reloj, decreciente.
+Temporiza_disparo_entidad db 255						; Reloj, decreciente.
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -542,7 +542,7 @@ Frame
 	ld b,a												; (Entidades_en_curso) en A´ y B.
 
 ; Código que ejecutamos con cada entidad:
-
+;	--------------------------------------- GESTIÓN DE ENTIDADES. !!!!!!!!!!
 
 15 push bc 												; Nº de entidades en curso.
 
@@ -1258,10 +1258,12 @@ Detecta_disparo_entidad
 	ld a,(Habilita_disparo_entidad)
 	and a
 	ret z
+
 	ld a,$7f
 	in a,($fe)
 	and 1
 	ret nz
+
 	call Genera_disparo
 	ret
 
