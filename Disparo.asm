@@ -1,6 +1,6 @@
 ; ******************************************************************************************************************************************************************************************
 ;
-;   17/04/23
+;   16/07/23
 ;
 ; 	La rutina determina si es factible, o no, `generar' un disparo.
 ;   En el caso de generar disparo la rutina proporciona 4 variables:
@@ -85,12 +85,12 @@ Genera_disparo
 ;	Se cumplen las condiciones necesarias para generar un disparo.
 ;   Las variables de disparo varían en función del cuadrante en el que se encuentre la entidad/Amadeus.
 
-    ld a,(Ctrl_0)
+    ld a,(Ctrl_0)                       ; bit 6 NZ = "Amadeus". 
     bit 6,a
     jr nz,19F
 
     xor a
-    ld (Habilita_disparo_entidad),a
+    ld (Disparo_entidad),a              ; Deshabilitamos el disparo de entidades.
 
 19 ld a,(Cuad_objeto)
     cp 2

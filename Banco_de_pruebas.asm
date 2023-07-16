@@ -290,13 +290,13 @@ Clock_explosion db 4
 Clock_Entidades_en_curso db 30
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
-Habilita_disparo_Amadeus db 1
-Tiempo_disparo_Amadeus db 30							; Restaura (Temporiza_disparo_Amadeus). 
-Temporiza_disparo_Amadeus db 30 						; Reloj, decreciente.
+Disparo_Amadeus db 1									; A "1", se puede generar disparo.
+CLOCK_repone_disparo_Amadeus_BACKUP db 30				; Restaura (CLOCK_repone_disparo_Amadeus). 
+CLOCK_repone_disparo_Amadeus db 30 						; Reloj, decreciente.
 
-Habilita_disparo_entidad db 1
-Tiempo_disparo_entidad db 15							; Restaura (Temporiza_disparo_entidad). 
-Temporiza_disparo_entidad db 255						; Reloj, decreciente.
+Disparo_entidad db 1									; A "1", se puede generar disparo.
+CLOCK_repone_disparo_entidad_BACKUP db 20				; Restaura (CLOCK_repone_disparo_entidad). 
+CLOCK_repone_disparo_entidad db 20						; Reloj, decreciente.
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -484,12 +484,18 @@ Frame
 
 ; Habilita disparos.
 
-13 ld hl,Habilita_disparo_Amadeus
-	ld de,Temporiza_disparo_Amadeus
+13 ld hl,Disparo_Amadeus
+	ld de,CLOCK_repone_disparo_Amadeus
 	call Habilita_disparos 								; 30 Frames como mínimo entre cada disparo de Amadeus.
 
-	ld hl,Habilita_disparo_entidad 						; El nº de frames mínimo entre disparos de entidad será_
-	ld de,Temporiza_disparo_entidad 					; _ variable y variará en función de la dificultad.
+; Disparos de entidades.
+
+; Habilita_disparo_entidad db 1
+; CLOCK_repone_disparo_entidad_BACKUP db 15							; Restaura (CLOCK_repone_disparo_entidad). 
+; CLOCK_repone_disparo_entidad db 127						; Reloj, decreciente.
+
+	ld hl,Disparo_entidad 								; El nº de frames mínimo entre disparos de entidad será_
+	ld de,CLOCK_repone_disparo_entidad 					; _ variable y variará en función de la dificultad.
 	call Habilita_disparos 								
 
 ; COLISIONES.
@@ -1216,7 +1222,7 @@ Movimiento_Amadeus
 
 ; Disparo.
 
-	ld a,(Habilita_disparo_Amadeus)
+	ld a,(Disparo_Amadeus)
 	and a
 	jr nz,1F
 	jr 2F
@@ -1230,9 +1236,9 @@ Movimiento_Amadeus
 	pop af
 	jr nz,2F
 
-	ld a,(Habilita_disparo_Amadeus)
+	ld a,(Disparo_Amadeus)
 	xor 1
-	ld (Habilita_disparo_Amadeus),a
+	ld (Disparo_Amadeus),a
 
 2 ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
 	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
@@ -1255,14 +1261,16 @@ Movimiento_Amadeus
 
 Detecta_disparo_entidad 
 
-	ld a,(Habilita_disparo_entidad)
+	ld a,(Disparo_entidad)
 	and a
 	ret z
 
-	ld a,$7f
-	in a,($fe)
-	and 1
-	ret nz
+;! Aquí hemos de implementar la rutina/s que generan disparo...
+
+;	ld a,$7f
+;	in a,($fe)
+;	and 1
+;	ret nz
 
 	call Genera_disparo
 	ret
