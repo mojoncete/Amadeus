@@ -1261,7 +1261,7 @@ Detecta_disparo_entidad
 
 ;! Aquí hemos de implementar la rutina/s que generan disparo...
 
-;	ld a,$7f
+;	ld a,$7f				; Detecta SPACE.
 ;	in a,($fe)
 ;	and 1
 ;	ret nz
