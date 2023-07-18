@@ -488,19 +488,13 @@ Frame
 	ld de,CLOCK_repone_disparo_Amadeus
 	call Habilita_disparos 								; 30 Frames como mínimo entre cada disparo de Amadeus.
 
-; Disparos de entidades.
-
-; Habilita_disparo_entidad db 1
-; CLOCK_repone_disparo_entidad_BACKUP db 15							; Restaura (CLOCK_repone_disparo_entidad). 
-; CLOCK_repone_disparo_entidad db 127						; Reloj, decreciente.
-
 	ld hl,Disparo_entidad 								; El nº de frames mínimo entre disparos de entidad será_
 	ld de,CLOCK_repone_disparo_entidad 					; _ variable y variará en función de la dificultad.
 	call Habilita_disparos 								
 
 ; COLISIONES.
 
-	call Selector_de_impactos
+	call Selector_de_impactos							; Analizamos el contenido de (Impacto2).
 
 ; Bit 0 a "1" Impacto en entidad por disparo. ($01)
 ; Bit 1 a "1" Impacto en Amadeus por disparo. ($02)

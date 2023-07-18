@@ -695,11 +695,15 @@ Limpia_album_disparos ld hl,Album_de_fotos_disparos
 
 ; -------------------------------------------------------------------------------------------------------------
 ;
-;   28/03/23
+;   18/07/23
 ;
 
-Motor_de_disparos ld bc,Disparo_3A
-    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)               ; Avanza disparo.
+Motor_de_disparos 
+
+; Gestiona DISPAROS DE AMADEUS.
+
+    ld bc,Disparo_3A                                     ; Último disparo del índice.
+    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)               ; Puntero del índice de disparos de Amadeus.
 
 2 call Extrae_address
     ld a,(hl)
@@ -765,12 +769,17 @@ Motor_de_disparos ld bc,Disparo_3A
 
 1 sbc hl,bc
     jr z,3F                                              ; Hemos llegado al final del índice de disparos de Amadeus??
-7 ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)                 ; Avanza disparo.
+
+7 ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)                 ; Nos situamos en el 2º disparo de Amadeus.
     inc hl
     inc hl
     ld (Puntero_DESPLZ_DISPARO_AMADEUS),hl
     jr 2B
-3 call Inicia_Puntero_Disparo_Amadeus
+
+3 call Inicia_Puntero_Disparo_Amadeus                    ; (Banco_de_pruebas.asm). Sitúa el puntero del índice_
+;                                                        ; _ de disparos de Amadeus en el 1er disparo de nuestra nave.
+
+; Gestiona DISPAROS DE ENTIDADES.
 
     ld bc,Disparo_11
     ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
@@ -798,11 +807,16 @@ Motor_de_disparos ld bc,Disparo_3A
 ;! La colisión se produce con Amadeus??? 
 ;! Amadeus siempre tiene (Coordenada_y)="$16".
 
+;! debug martes 18/7/23
+
+    jr $    ; 18/7/23
+
     push hl
 
     ld b,4
 16 inc hl
     djnz 16B                                             ; Sitúa HL en el Puntero_de_impresion del disparo.
+
     call Extrae_address
     call Genera_coordenadas_disparo
 
@@ -853,8 +867,6 @@ Motor_de_disparos ld bc,Disparo_3A
     dec hl
     jr 10F
 
-; -----------------------debug
-
 ; Elimino el disparo de la base de datos, indicamos el impacto, SET1,(Impacto2) y limpiamos el_
 ; _ almacén de coordenadas_X de Amadeus.
 
@@ -866,6 +878,8 @@ Motor_de_disparos ld bc,Disparo_3A
 
     pop hl
     jr 12F
+
+; No existe colisión con este disparo, MOVEMOS DISPARO.
 
 10 call Mueve_disparo
     call foto_disparo_a_borrar 
@@ -914,18 +928,44 @@ foto_disparo_a_borrar
     pop hl
     ret
 
-Mueve_disparo push hl
-    ld a,(hl)
+;---------------------------------------------------
+;
+;   18/07/23
+;
+
+Mueve_disparo 
+
+;   HL apunta al 1er byte, (Control), del disparo en curso.
+;   El 1er byte indica dirección, el 2º, IMPACTO. 
+;   Dirección del disparo en A. ("$80" hacia abajo, "$81" hacia arriba). 
+
+    push hl
+
+    ld c,(hl)
+    inc hl
+    ld b,(hl)
+    dec hl
+
+    push bc
+    exx
+    pop bc
+    exx                                 ; BC'. B contiene `Dirección del disparo'.
+;                                              C contiene `Impacto'.
+    ld a,(hl)                           
+    push af
+    ex af,af'
+    pop af                              ; A y A' contienen la dirección del disparo.
+
     ld b,4
 1 inc hl
     djnz 1B
 
-; HL apunta a la dirección donde se encuentra el puntero de impresión en pantalla.
+;   HL apunta ahora a la dirección donde se encuentra el puntero de impresión del disparo.
 
     call Extrae_address
 
     and 1
-    jr z,2F
+    jr z,2F                             ; Disparamos hacia arriba o abajo???
 
 ; Disparo hacia arriba, (Amadeus).    
 
@@ -959,18 +999,39 @@ Mueve_disparo push hl
 3 push de
     push bc
 
-    call Comprueba_Colision
+; HL contiene el puntero de impresión del disparo en curso.
+
+    ex af,af
+    and 1
+    jr nz,9F                                             ; SIEMPRE comprobamos Colisión si se trata de un disparo de Amadeus.
+
+    exx
+    push bc
+    exx
+
+    call Genera_coordenadas_disparo                      ; Entrega en D la coordenada X del disparo y en E la coordenada Y.
+
+    pop bc
+
+    ld a,e                                               ; Fila en la que se encuentra el disparo en A.
+    cp $16
+    jr c,8F
+
+    jr $
+
+
+9 call Comprueba_Colision
 
 ; B="$80", no hay colisión. B="$81", existe colisión. 
 
-    ld a,b
+8 ld a,b
 
     pop bc
     pop de
 
     ex de,hl
 
-    ld (hl),e
+    ld (hl),e                                   ; Acualizamos (Puntero_de_impresion) del disparo.
     inc hl
     ld (hl),d
 
