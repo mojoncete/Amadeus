@@ -802,14 +802,8 @@ Motor_de_disparos
     and 1
     jr z,10F
 
-;!    jr $ ;! STOP si el disparo tiene colisión.
-
 ;! La colisión se produce con Amadeus??? 
 ;! Amadeus siempre tiene (Coordenada_y)="$16".
-
-;! debug martes 18/7/23
-
-    jr $    ; 18/7/23
 
     push hl
 
@@ -824,19 +818,24 @@ Motor_de_disparos
     cp $16
     jr c,15F
 
-; (Colisiones en filas 16 y 17).
+; EXISTE COLISIÓN EN ZONA DE AMADEUS. -------------------------------------
 
     push de                                              ; DE contiene las coordenadas del disparo que ha colisionado.
 
 ; Preparamos los registros para llamar a [Guarda_coordenadas_X]. Necesitamos averiguar que columnas ocupa Amadeus.
 
-    ld hl,Amadeus_db+6
-    ld d,(hl)                                           ; Coordenada_X de Amadeus en D.
-    inc hl
-    inc hl
-    ld e,(hl)                                           ; (CTRL_DESPLZ) de Amadeus en E.
-    ld hl,Amadeus_db+20
-    ld c,(hl)                                           ; (Cuad_objeto) de Amadeus en C.
+
+    ld hl,(Puntero_de_impresion_Amadeus)
+
+; Coordenada X de Amadeus en D.
+
+    ld a,l
+    and $1F
+    ld d,a
+
+    ld hl,Amadeus_db+8
+    ld e,(hl)                                            ; (CTRL_DESPLZ) de Amadeus en E.
+
     ld hl,Coordenadas_X_Amadeus
     call Guarda_coordenadas_X
 
@@ -941,20 +940,7 @@ Mueve_disparo
 
     push hl
 
-    ld c,(hl)
-    inc hl
-    ld b,(hl)
-    dec hl
-
-    push bc
-    exx
-    pop bc
-    exx                                 ; BC'. B contiene `Dirección del disparo'.
-;                                              C contiene `Impacto'.
     ld a,(hl)                           
-    push af
-    ex af,af'
-    pop af                              ; A y A' contienen la dirección del disparo.
 
     ld b,4
 1 inc hl
@@ -994,51 +980,34 @@ Mueve_disparo
     pop hl
     jr 7F
 
-; Se ha desplazado la bala, compruebo colisión.
+; Se ha desplazado la bala actualizo el puntero de impresión y compruebo colisión.
+; HL contiene el puntero de impresión del disparo.
+; DE contiene la dirección donde se encuentra el puntero de impresión del disparo.
 
-3 push de
-    push bc
+3 push bc
+    push de
 
-; HL contiene el puntero de impresión del disparo en curso.
-
-    ex af,af
-    and 1
-    jr nz,9F                                             ; SIEMPRE comprobamos Colisión si se trata de un disparo de Amadeus.
-
-    exx
-    push bc
-    exx
-
-    call Genera_coordenadas_disparo                      ; Entrega en D la coordenada X del disparo y en E la coordenada Y.
-
-    pop bc
-
-    ld a,e                                               ; Fila en la que se encuentra el disparo en A.
-    cp $16
-    jr c,8F
-
-    jr $
-
-
-9 call Comprueba_Colision
+    call Comprueba_Colision
 
 ; B="$80", no hay colisión. B="$81", existe colisión. 
 
-8 ld a,b
+    ld a,b
 
-    pop bc
     pop de
+    pop bc
 
     ex de,hl
 
-    ld (hl),e                                   ; Acualizamos (Puntero_de_impresion) del disparo.
-    inc hl
+    ld (hl),e                                   ; Acualizamos el (Puntero_de_impresion) del disparo tras el_
+    inc hl                                      ; _ movimiento.
     ld (hl),d
 
-4 pop hl
-    inc hl
+    pop hl                                      ; Volvemos a situarnos en el 1er byte, (Control), del disparo_
+
+    inc hl                                      ; _ en curso.
     ld (hl),a                                   ; Modificamos el byte "impacto" de la base de datos del disparo si es necesario.
     dec hl
+
 7 ret
 
 ; Disparo hacia abajo, (Entidad).
@@ -1089,12 +1058,18 @@ Elimina_disparo_de_base_de_datos ld bc,7
 ;   INPUTS:
 ;
 ;   DE contiene (Coordenada_X)/(CTRL_DESPLZ) de la Entidad/Amadeus respectivamente.
-;   C contiene (Cuad_objeto) de la Entidad/Amadeus.
 ;   HL contiene la dirección del 1er byte de los almacenes de 3 bytes, (Coordenadas_X_Amadeus) o (Coordenadas_X_Entidad). 
 
 ;   MODIFICA: A, HL, DE y C
 
-Guarda_coordenadas_X ld (hl),d                          ; Cargamos la 1ª Coordenada_X en su almacen.
+Guarda_coordenadas_X 
+
+
+;! DEBUG!!!!!!!!! 19/7/23
+
+    jr $
+
+    ld (hl),d                          ; Cargamos la 1ª Coordenada_X en su almacen.
     ld a,c
     and 1
     jr nz,1F

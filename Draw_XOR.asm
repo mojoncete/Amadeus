@@ -460,12 +460,14 @@ calcula_CColumnass ld a,(Cuad_objeto)
 
 ; --------------------------------------------------------------------------------------------------------------------
 ;
-; 7/1/23
+;   19/7/23
 ;
 ;	Calcula el puntero de impresión del sprite, (arriba-izquierda).
 ;	Almacena en IY (Puntero_objeto). La rutina de impresión requiere de esta dirección para situar el SP a la hora de pintar.
 ;
-;	OUTPUT: HL e IX Contienen el puntero de impresión.
+;	OUTPUT: IX Contienen el puntero de impresión.
+;			HL e IY Contienen (Puntero_objeto).
+;
 ;	DESTRUYE: HL,B Y A.	
 
 Calcula_puntero_de_impresion ld a,(Cuad_objeto)
@@ -520,6 +522,17 @@ Calcula_puntero_de_impresion ld a,(Cuad_objeto)
 	ld hl,(Puntero_objeto)
 	push hl
 	pop iy
+
+; Hemos calculado el puntero_de_impresion de Amadeus ????.	
+
+	ld a,(Ctrl_0)
+	bit 6,a
+	ret z
+
+; Almacenaremos el puntero de impresión de Amadeus para usarlo en la rutina de colisión `disparo de_
+; _ entidad / Amadeus´.
+
+	ld (Puntero_de_impresion_Amadeus),ix
 
 	ret
 

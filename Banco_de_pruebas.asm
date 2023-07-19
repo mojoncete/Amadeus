@@ -281,6 +281,8 @@ Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posi
 ;														; _ que puede ocupar el sprite de Amadeus. (Colisión).
 Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 posibles columnas_
 ;														; _ que puede ocupar el sprite de una entidad. (Colisión).
+Puntero_de_impresion_Amadeus defw 0						; Lo utilizaremos en la rutina de colisiones.
+
 ;---------------------------------------------------------------------------------------------------------------
 
 ; Relojes y temporizaciones.
