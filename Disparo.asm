@@ -843,6 +843,9 @@ Motor_de_disparos
 
 ; Comparamos la coordenada_X del disparo con las coordenadas_X de Amadeus.
 
+    ld b,2
+20 push bc
+
     ld b,3
     ld hl,Coordenadas_X_Amadeus
 18 ld a,(hl) 
@@ -851,11 +854,21 @@ Motor_de_disparos
 
 ; Colisión Amadeus !!!!!!!!!!
 
+    call Limpia_Coordenadas_X
+
+    jr $
+
     pop hl
     jr 14F
 
 17 inc hl
     djnz 18B
+
+    inc d                       ; 2ª Coordenada_X del disparo.
+
+    pop bc
+    djnz 20B
+
 
 ; No hay colisión. Amadeus se encuentra en una línea inferior.
 ; Restauramos el indicador de colisión y movemos el disparo, (JR 10F).
@@ -1048,6 +1061,8 @@ Elimina_disparo_de_base_de_datos ld bc,7
 
 ; -----------------------------------------------------------------
 ;
+;   19/7/23
+;
 ;   Guarda las Coordenadas_X que ocupa Amadeus/Entidad en la pantalla.
 ;
 ;   2 Coordenadas_X, (si CTRL_DESPLZ es "0").
@@ -1060,36 +1075,24 @@ Elimina_disparo_de_base_de_datos ld bc,7
 ;   DE contiene (Coordenada_X)/(CTRL_DESPLZ) de la Entidad/Amadeus respectivamente.
 ;   HL contiene la dirección del 1er byte de los almacenes de 3 bytes, (Coordenadas_X_Amadeus) o (Coordenadas_X_Entidad). 
 
-;   MODIFICA: A, HL, DE y C
+;   MODIFICA: A, HL, BC y DE.
 
 Guarda_coordenadas_X 
 
-
-;! DEBUG!!!!!!!!! 19/7/23
-
-    jr $
-
-    ld (hl),d                          ; Cargamos la 1ª Coordenada_X en su almacen.
-    ld a,c
-    and 1
+    ld a,e
+    and a
     jr nz,1F
-    inc d
-    jr 2F                                               ; Amadeus se compone como mínimo de 2 chars.:
 
-;   (Coordenada_X) de (Posicion_actual) + (Coordenada_X) de (Posicion_actual)-1 cuando estamos en los cuadrantes 1º y 3º de pantalla.
-;   (Coordenada_X) de (Posicion_actual) + (Coordenada_X) de (Posicion_actual)-1 cuando estamos en los cuadrantes 1º y 3º de pantalla.   
+    ld b,2
+    jr 2F
 
-1 dec d
-2 inc hl
-    ld (hl),d
+1 ld b,3  
+2 ld (hl),d
+    inc hl
+    inc d                         
+    djnz 2B
 
-    ld a,e                                              ; Si (CTRL_DESPLZ) de Amadeus es distinto de "0", Amadeus estará formado por 3 chars. y_
-    and a                                               ; _ por lo tanto tendrá 3 coordenadas X.
-    ret z
-
-    xor a
-    ld e,a
-    jr Guarda_coordenadas_X
+    ret
 
 ; -----------------------------------------------------------------
 ;
@@ -1136,8 +1139,9 @@ Selector_de_impactos ld a,(Impacto2)
 
 ; -----------------------------------------------------------------
 ;
-;   16/04/23
+;   19/7/23
 ;
+;   Limpia las coordenadas_x de Amadeus y entidad.
 
 Limpia_Coordenadas_X xor a
     ld b,6
