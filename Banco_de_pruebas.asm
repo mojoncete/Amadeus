@@ -282,6 +282,7 @@ Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posi
 Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 posibles columnas_
 ;														; _ que puede ocupar el sprite de una entidad. (Colisión).
 Puntero_de_impresion_Amadeus defw 0						; Lo utilizaremos en la rutina de colisiones.
+Velocidad_disparo_entidades db 2	  					; Nº de scanlines, (NextScan) que avanza el disparo de las entidades.
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -606,16 +607,9 @@ Frame
 
 	call Determina_resultado_comparativa
 
-;! Debug colisiones
 	ld a,b
 	and a
-;	ld a,(Cuad_objeto)
-;	inc b
-;	dec b
 	jr z,7F												; B="0" significa que esta entidad no es la impactada.
-;	jr z,$
-
-;! Debug colisiones
 
 ; ----- ----- -----
 
@@ -641,8 +635,6 @@ Frame
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
 	xor a
 	ld (Obj_dibujado),a
-
-
 
 6 call Store_Restore_cajas
 
@@ -1268,7 +1260,7 @@ Detecta_disparo_entidad
 ;	and 1
 ;	ret nz
 
-	call Genera_disparo
+;	call Genera_disparo
 	ret
 
 ; ---------------------------------------------------------------

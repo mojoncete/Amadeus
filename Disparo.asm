@@ -1,6 +1,6 @@
 ; ******************************************************************************************************************************************************************************************
 ;
-;   16/07/23
+;   21/07/23
 ;
 ; 	La rutina determina si es factible, o no, `generar' un disparo.
 ;   En el caso de generar disparo la rutina proporciona 4 variables:
@@ -37,6 +37,11 @@ Genera_disparo
 
 ; Exclusiones:
 
+    ld a,(Vel_down)
+    ld b,a
+    ld a,(Velocidad_disparo_entidades)  ; No se genera disparo si (Vel_down) de la entidad es superior a_
+    cp b                                ; _ la velocidad del disparo de las entidades. La entidad se _
+    ret c                               ; _ atropellaría con su propio disparo.                               
     ld a,(Columnas)
     ld b,a
     ld a,(Columns)
@@ -451,30 +456,36 @@ Comprueba_Colision
     push iy                                        ; Puntero objeto (disparo).
     push hl                                        ; Puntero de impresión (disparo).                                 
 
+    call Modifica_H_Velocidad_disparo
+
+    ld a,h                                         ; Si (Velocidad_disparo_entidades)="2", hemos incrementado H.
+    cp $58                                         ; Se puede dar el caso de que nos hayamos metido en zona de attr.
+    jr z,1F                                        ; En ese caso salimos de la rutina sin comprobar colisión.
+
     ld e,$80                                       ; E,(Impacto)="$80".
     call Bucle_2                                   ; Comprobamos el 1er scanline.
 
     ld a,e
     and 1
-    jr z,2F    ;""""                               ; Salimos si E="$81". Hay colisión.
-
+    jr nz,1F    ;""""                              ; Salimos si E="$80". Necesitamos colisión en los 2 scanlines_
+;                                                  ; _ para activar IMPACTO.
     pop hl
     push hl
     call NextScan
 
     ld a,h                                         ; El 1er scanline de la bala se pinta en pantalla.
     cp $58                                         ; El 2º scanline indica colisión porque entra en zona_
-    jr z,2F                                        ; _ de atributos. Evitamos comprobar colisión en el _
+    jr z,1F                                        ; _ de atributos. Evitamos comprobar colisión en el _
 ;                                                  ; _ 2º scanline si esto es así.    
     ld e,$80                                       ; ----- ( ) ----- ----- 
     call Bucle_2      
 
-2 ld b,e
+1 ld b,e
     pop hl                                         ; Puntero de impresión en HL e indicador de Impacto en B.
     pop iy
     ret                                            
 
- ; ---------- ----------
+; ---------- ----------
 
 Bucle_2 ld b,2 
 2 ld a,(iy)
@@ -485,6 +496,19 @@ Bucle_2 ld b,2
     inc iy
     djnz 2B
     ret                                         
+
+; ---------- ----------
+;
+;   21/7/23
+
+Modifica_H_Velocidad_disparo 
+
+    ld a,(Velocidad_disparo_entidades)             ; Si avanzamos menos scanlines de los que ocupa_  
+    cp 3                                           ; _ un disparo, siempre habrá IMPACTO. Para evitar esto_
+    ret nc                                         ; _ incrementamos H.
+    inc h
+ 
+    ret
 
 ; -------------------------------------------------------------------------------------------------------------
 ;
@@ -820,9 +844,8 @@ Motor_de_disparos
 
     ld a,e                                               ; Fila en la que se encuentra el disparo en A.
     cp $16
-
-;    jr c,15F
-    jr nz,15F
+    jr c,15F
+ 
 
 ; EXISTE COLISIÓN EN ZONA DE AMADEUS. -------------------------------------
 
@@ -858,10 +881,9 @@ Motor_de_disparos
     cp d
     jr nz,17F
 
-; Colisión Amadeus !!!!!!!!!!
+;! Colisión Amadeus !!!!!!!!!!
 
-    jr $
-
+    pop bc
     pop hl
     jr 14F
 
@@ -890,9 +912,6 @@ Motor_de_disparos
     call Elimina_disparo_de_base_de_datos
     ld hl,Impacto2
     set 1,(hl)
-
-;    call Limpia_Coordenadas_X
-
     pop hl
     jr 12F
 
@@ -1003,8 +1022,8 @@ Mueve_disparo
 ; HL contiene el puntero de impresión del disparo.
 ; DE contiene la dirección donde se encuentra el puntero de impresión del disparo.
 
-3 push bc
-    push de
+3 push de
+    push bc
 
     call Comprueba_Colision
 
@@ -1012,13 +1031,8 @@ Mueve_disparo
 
     ld a,b
 
-; debuggg
-    and 1
-    jr nz,$
-; debuggg
-
-    pop de
     pop bc
+    pop de
 
     ex de,hl
 
@@ -1036,13 +1050,11 @@ Mueve_disparo
 
 ; Disparo hacia abajo, (Entidad).
 
-;! Nota: Aquí podemos implementar una variable para modificar la velocidad del disparo en función_
-;! _ de la dificultad.
-
-2 call NextScan
-    call NextScan
-    call NextScan
-;    call NextScan
+2 ld a,(Velocidad_disparo_entidades)
+    ld b,a
+    
+4 call NextScan
+    djnz 4B 
 
 ; Detecta si el disparo de la entidad sale de la pantalla.
 

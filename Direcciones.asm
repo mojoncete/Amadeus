@@ -63,6 +63,7 @@ Mov_down
 	ld a,h
 	cp $57
 	jr nz,1F
+
 	ld a,l
 	add $20
 	jr nc,1F 														
@@ -717,6 +718,8 @@ Reaparece_arriba ld bc,$17e0
 Reinicio 
 
 ; Vamos a reiniciar los punteros y variables de movimiento.
+
+;	jr $
 
 	xor a
 	ld hl,Puntero_indice_mov_bucle
