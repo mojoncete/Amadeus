@@ -439,20 +439,24 @@ Almacena_disparo
 ;
 ;       "$80" ..... No se produce colisión.
 ;       "$81" ..... Se produce colisión.
+;
+;   Nota: A fecha de 21/7/23, es necesario que se produzca IMPACTO en los dos primeros scanlines_
+;         _ que forman el disparo.
 
-;   Nota: Es necesario que se produzca colisión en los dos scanlines que forman el disparo.
-;         La sensibilidad la puedo ajustar eliminando la segunda línea "ld e,$80" de [Comprueba_Colision].
 
+Comprueba_Colision
 
-Comprueba_Colision push iy                         ; Puntero objeto (disparo).
-    push hl                                        ; Puntero de impresión.                                 
+; Siempre que ejecutemos esta rutina, será Amadeus el que esté alojado en DRAW. 
+
+    push iy                                        ; Puntero objeto (disparo).
+    push hl                                        ; Puntero de impresión (disparo).                                 
 
     ld e,$80                                       ; E,(Impacto)="$80".
     call Bucle_2                                   ; Comprobamos el 1er scanline.
 
     ld a,e
     and 1
-    jr nz,2F                                       ; Salimos si E="$81". Hay colisión.
+    jr z,2F    ;""""                               ; Salimos si E="$81". Hay colisión.
 
     pop hl
     push hl
@@ -816,7 +820,9 @@ Motor_de_disparos
 
     ld a,e                                               ; Fila en la que se encuentra el disparo en A.
     cp $16
-    jr c,15F
+
+;    jr c,15F
+    jr nz,15F
 
 ; EXISTE COLISIÓN EN ZONA DE AMADEUS. -------------------------------------
 
@@ -854,8 +860,6 @@ Motor_de_disparos
 
 ; Colisión Amadeus !!!!!!!!!!
 
-    call Limpia_Coordenadas_X
-
     jr $
 
     pop hl
@@ -886,7 +890,8 @@ Motor_de_disparos
     call Elimina_disparo_de_base_de_datos
     ld hl,Impacto2
     set 1,(hl)
-    call Limpia_Coordenadas_X
+
+;    call Limpia_Coordenadas_X
 
     pop hl
     jr 12F
@@ -911,6 +916,7 @@ Motor_de_disparos
     jr 5B
 
 6 call Inicia_Puntero_Disparo_Entidades
+    call Limpia_Coordenadas_X
     ret
 
 ; ------------------------------------------------------------------
@@ -1005,6 +1011,11 @@ Mueve_disparo
 ; B="$80", no hay colisión. B="$81", existe colisión. 
 
     ld a,b
+
+; debuggg
+    and 1
+    jr nz,$
+; debuggg
 
     pop de
     pop bc
