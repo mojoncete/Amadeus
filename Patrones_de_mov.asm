@@ -70,21 +70,27 @@
 ; ----- ----- ----- ----- -----
 
 Indice_mov_Baile_de_BadSat defw Bajo_decelerando
+
+    defw F_1
+    defw F_2
+
     defw Codo_abajo_derecha
 
     defw Derecha_y_subiendo
     defw Derecha_y_subiendo_1
 
-    defw Quieto
-    defw Quieto_1
-;    defw Quieto_2
-
+    defw F_4
+    defw F_5
+    defw F_6
 
     defw Derecha_y_bajando
     defw Derecha_y_bajando_1
+    defw Derecha_y_bajando_2
 
-;    defw Codo_derecha_abajo
-;    defw Codo_abajo_izq.
+    defw 0
+ 
+    defw Codo_derecha_abajo
+    defw Codo_abajo_izq.
 
 ;    defw Izquierda_y_subiendo
 ;    defw Izquierda_y_subiendo_1
@@ -93,9 +99,13 @@ Indice_mov_Baile_de_BadSat defw Bajo_decelerando
 
     defw 0                                  ; Fin de patrón de movimiento.
 
-Bajo_decelerando db $14,$11,$45,1           ; Abajo. 5rep. vel.4         
-    db $12,$11,$47,1                        ; Abajo. 7rep. vel.2
-    db $11,$11,$47,254                      ; Abajo  7rep. --- Termina movimiento.     
+Bajo_decelerando db $12,$11,$4f,1           ; Abajo. 5rep. vel.4         
+    db $11,$11,$42,0                        ; Abajo. 7rep. vel.2
+
+F_1 db $11,$11,$41,1
+    db $11,$11,$01,253,8,0
+F_2 db $11,$11,$41,1                          ; Abajo  7rep. --- Termina movimiento.     
+    db $11,$11,$02,253,15,0
 
 Codo_abajo_derecha db $11,$11,$51,1         ; Abajo/Derecha. 1rep.
     db $11,$11,$43,1                        ; Abajo. 3rep.
@@ -112,28 +122,26 @@ Codo_abajo_derecha db $11,$11,$51,1         ; Abajo/Derecha. 1rep.
     db $11,$11,$92,0                        ; Arriba/Derecha. 2rep. --- Termina movimiento.
 
 Derecha_y_subiendo db $11,$12,$11,1         ; Derecha. 4rep. vel.2
-    db $11,$11,$91,253,16,0                 ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
+    db $11,$11,$91,253,10,0                 ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
 
-Derecha_y_subiendo_1 db $11,$11,$15,1       ; Derecha. 4rep. vel.2
-    db $11,$11,$91,253,5,0                 ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
+Derecha_y_subiendo_1 db $11,$11,$14,1       ; Derecha. 4rep. vel.2
+    db $11,$11,$91,253,2,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
 
-Quieto db $11,$11,$11,1
-    db $11,$11,$01,253,15,0
+F_4 db $11,$11,$11,1
+    db $11,$11,$01,253,8,0
+F_5 db $11,$11,$11,1
+    db $11,$11,$02,253,17,0
+F_6 db $11,$11,$11,1
+    db $11,$11,$01,253,10,0
 
-Quieto_1 db $11,$11,$11,1
-    db $11,$11,$02,253,20,0
+Derecha_y_bajando db $11,$11,$14,1          ; Derecha. 4rep. vel.2
+    db $11,$11,$51,253,8,0                      ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
 
-Quieto_2 db $11,$11,$11,1
-    db $11,$11,$03,253,2,0
+Derecha_y_bajando_1 db $11,$12,$11,1        ; Derecha. 4rep. vel.2
+    db $11,$11,$51,253,6,0
 
-
-Derecha_y_bajando db $11,$11,$15,1          ; Derecha. 4rep. vel.2
-    db $11,$11,$51,253,9,0                 ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
-Derecha_y_bajando_1 db $11,$11,$11,1        ; Derecha. 4rep. vel.2
-    db $11,$11,$51,253,13,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
-
-
-
+Derecha_y_bajando_2 db $11,$11,$14,1          ; Derecha. 4rep. vel.2
+    db $11,$11,$51,253,10,0        
 
 
 
@@ -482,7 +490,7 @@ Incrementa_Puntero_indice_mov
 
 ;! STOP. Fin del patrón de movimiento de la entidad.
 
-;    jr z,$
+    jr z,$
 
 ;! Reinicia el Patrón de movimiento.    
 
