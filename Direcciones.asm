@@ -719,8 +719,6 @@ Reinicio
 
 ; Vamos a reiniciar los punteros y variables de movimiento.
 
-;	jr $
-
 	xor a
 	ld hl,Puntero_indice_mov_bucle
 	call Limpia_contenido_hl
