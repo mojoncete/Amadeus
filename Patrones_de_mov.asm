@@ -204,6 +204,8 @@ Movimiento
 
 ; Nota: Previamente, la rutina [DRAW], ha iniciado la entidad, (Puntero_mov) ya apunta a su cadena de movimiento correspondiente.
 
+;    ld hl,(Posicion_actual)
+
     ld a,(Ctrl_2)
     bit 2,a
     jr nz, Desplazamiento_iniciado
