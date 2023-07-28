@@ -29,6 +29,8 @@
 
 Guarda_foto_registros 
 
+    call Selecciona_punteros
+
     ld (Stack),sp                                 ; Guardo SP en (Stack).
     ld sp,Guarda_foto_registros                   ; Sitúo el Stack Pointer en la dirección actual -1
 
@@ -62,6 +64,71 @@ Guarda_foto_registros
 
 5 ld (Stack_snapshot),hl
 6 ld sp,(Stack)
-3 ret                                             ; Antes de salir de la rutina recuperamos SP y actualizamos,(o no), (Stack_snapshot).
+    call Actualiza_punteros                         ; Antes de salir de la rutina recuperamos SP y actualizamos,(o no), (Stack_snapshot).
+    ret
 
+; ------------------------------------------------
+;
+;   28/07/23
+;
+;   Seleccionamos el primer Album_de_fotos y disparos si (Resorte)="1".   
+;   Seleccionamos el segundo Album_de_fotos y disparos si (Resorte)="0".
 
+Selecciona_punteros 
+
+    push ix
+    push iy
+
+    ld a,(Resorte)
+    and a
+    jr z,1F
+
+; 1er Album.
+    ld ix,(Stack_snapshot_1)
+    ld iy,(Stack_snapshot_disparos_1)
+    ld (Stack_snapshot),ix
+    ld (Stack_snapshot_disparos),iy
+    jr 2F
+
+; 2º Album.
+1 ld ix,(Stack_snapshot_2)
+    ld iy,(Stack_snapshot_disparos_2)
+    ld (Stack_snapshot),ix
+    ld (Stack_snapshot_disparos),iy
+
+2 pop iy
+    pop ix
+    ret
+
+; ------------------------------------------------
+;
+;   28/07/23
+;
+;   Actualizamos los punteros del 1er album de fotos y disparos, si (Resorte)="1".   
+;   Actualizamos los punteros del 2º album de fotos y disparos, si (Resorte)="0".
+
+Actualiza_punteros 
+
+    push ix
+    push iy
+
+    ld a,(Resorte)
+    and a
+    jr z,1F
+
+; 1er Album.
+    ld ix,(Stack_snapshot)
+    ld iy,(Stack_snapshot_disparos)
+    ld (Stack_snapshot_1),ix
+    ld (Stack_snapshot_disparos_1),iy
+    jr 2F
+
+; 2º Album.
+1 ld ix,(Stack_snapshot)
+    ld iy,(Stack_snapshot_disparos)
+    ld (Stack_snapshot_2),ix
+    ld (Stack_snapshot_disparos_2),iy
+
+2 pop iy
+    pop ix
+    ret
