@@ -45,11 +45,15 @@ Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_de
 Album_de_fotos equ $7000								; En (Album_de_fotos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y las llamadas a las rutinas de impresión.   
 ;                               				        ; De momento situamos este almacén en $7000. La capacidad del album será de 10 entidades + AMADEUS.  
-Album_de_fotos_disparos equ $7109						; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
+Album_de_fotos_disparos equ $7211						; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´. 
 ;                               				        ; De momento situamos este almacén en $7060.  
-Album_de_fotos_2 equ $7085
-Album_de_fotos_disparos_2 equ $7182						;Termina en 71fah (10 disparos).
+Album_de_fotos_1 equ $7085
+Album_de_fotos_disparos_1 equ $7295						;Termina en 71fah (10 disparos).
+Album_de_fotos_2 equ $7109
+Album_de_fotos_disparos_2 equ $7319
+Album_de_fotos_3 equ $718d
+Album_de_fotos_disparos_3 equ $739d
 
 ; 84h es el espacio necesario en (Album_de_fotos) para 10 entidades en pantalla.
 ; 78h es el espacio necesario en (Album_de_fotos_disparos) para 10 disparos en pantalla.
@@ -260,17 +264,18 @@ Stack defw 0 												; La rutinas de pintado, utilizan esta_
 ; 															; _de pila, SP.
 Stack_2 defw 0												; 2º variable destinada a almacenar el puntero de pila, SP.
 ;															; La utiliza la rutina [Extrae_foto_registros].
-Stack_snapshot defw 0										; Puntero que indica la posición de memoria donde vamos a guardar_
+Stack_snapshot defw Album_de_fotos							; Puntero que indica la posición de memoria donde vamos a guardar_
 ;															; _el snapshot de los registros de la siguiente entidad.
 ;															; Inicialmente está situado el la posición $7000, Album_de_fotos.
-Stack_snapshot_disparos defw 0								; Puntero que indica la posición de memoria donde vamos a guardar_
+Stack_snapshot_disparos defw Album_de_fotos_disparos		; Puntero que indica la posición de memoria donde vamos a guardar_
 ;															; _el snapshot de los registros del siguiente disparo.
 ;															; Inicialmente está situado en la posición $7060, Album_de_fotos_disparos.
-Resorte db 1
-Stack_snapshot_1 defw Album_de_fotos
-Stack_snapshot_disparos_1 defw Album_de_fotos_disparos
+Stack_snapshot_1 defw Album_de_fotos_1
+Stack_snapshot_disparos_1 defw Album_de_fotos_disparos_1
 Stack_snapshot_2 defw Album_de_fotos_2
 Stack_snapshot_disparos_2 defw Album_de_fotos_disparos_2
+Stack_snapshot_3 defw Album_de_fotos_3
+Stack_snapshot_disparos_3 defw Album_de_fotos_disparos_3
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -413,11 +418,7 @@ START
 
 ; Cambiamos el rsorte de "1" a "0". Esto evitará que se imprima el siguiente cuadro.
 
-7 ld a,(Resorte)
-	xor 1
-	ld (Resorte),a
-
-	xor a
+7 xor a
 ; ------------------------------------
 
 2 ei
@@ -475,15 +476,18 @@ Frame
     ld a,1
     out ($fe),a
 
-
-    jr $
-
 ; ----------------------------------------------------------------------
 
+	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
+	ld hl,Album_de_fotos
+    ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
+;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
 ; RELOJES.
 
 	ld hl,Contador_de_frames
 	inc (hl)											; 0 - 255
+
+; ----------------------------------------------------------------------
 
 	ld a,(Clock_Entidades_en_curso)
 	ld b,a
@@ -541,11 +545,7 @@ Frame
 
 ; ---------------------------------------------------------------------------------------
 
-10 call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
-	ld hl,Album_de_fotos
-    ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
-;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
-	ld a,(Numero_parcial_de_entidades)
+10 ld a,(Numero_parcial_de_entidades)
     ld b,a
 	and a
 	jr nz,2F
