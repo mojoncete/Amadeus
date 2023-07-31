@@ -13,12 +13,13 @@
 
 	call Frame
 
-	ld a,(Ctrl_2)
-	bit 4,a
-	jr nz,$
+;	ld a,(Ctrl_2)
+;	bit 4,a
+;	jr nz,$
 
 	ld a,(Ctrl_1) 										; Existe Loop?
 	bit 3,a
+
 	reti									 
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
@@ -416,14 +417,22 @@ START
 	inc a
 	ld (Numero_de_malotes),a
 
-; Cambiamos el rsorte de "1" a "0". Esto evitará que se imprima el siguiente cuadro.
+7 	
+	
+;	push bc
+;	push de
+;	push hl
 
-7 xor a
+	call Gestiona_albumes_de_fotos
+
+;	pop bc
+;	pop de
+;	pop hl
+
 ; ------------------------------------
-
-2 ei
+	xor a
+2 ei ; Interrupciones habilitadas.
 	jr z,2B
-
 ; ------------------------------------
 
 	ld a,(Contador_de_frames)
@@ -451,16 +460,8 @@ START
 
 	jp 4B
 
-; -----------------------------------------------------------------------------------
 
-Inicia_entidad	call Inicia_Puntero_objeto
-	call Recompone_posicion_inicio
-	call Draw
-	call Guarda_foto_registros
- 	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
-	ret
-
-; -----------------------------------------------------------------------------------
+; ----------------------------------------------------------------------
 
 Frame 
 
@@ -470,11 +471,11 @@ Frame
 ; PINTAMOS.
 
     ld a,2
-    out ($fe),a
+    out ($fe),a											; Rojo.
 	call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
 	call Extrae_foto_disparos
     ld a,1
-    out ($fe),a
+    out ($fe),a											; Azul.
 
 ; ----------------------------------------------------------------------
 
@@ -486,8 +487,6 @@ Frame
 
 	ld hl,Contador_de_frames
 	inc (hl)											; 0 - 255
-
-; ----------------------------------------------------------------------
 
 	ld a,(Clock_Entidades_en_curso)
 	ld b,a
@@ -711,10 +710,22 @@ Frame
 	call Calcula_numero_de_disparotes
 9 call Calcula_numero_de_malotes 
 
+;	push bc
+;	push de
+;	push hl
+
+	call Gestiona_albumes_de_fotos
+
+;	pop bc
+;	pop de
+;	pop hl
+
 	ld a,4
 	out ($fe),a  
 
 	ret
+
+; -----------------------------------------------------------------------------------
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -822,6 +833,15 @@ Mov_Amadeus
     call Repone_borrar                                  ; Si ha habido movimiento de la entidad, borraremos el FRAME anterior.
 	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen a borrar de Amadeus, pues ha habido movimiento_
 	ret													; _de la nave.
+
+; -----------------------------------------------------------------------------------
+
+Inicia_entidad	call Inicia_Puntero_objeto
+	call Recompone_posicion_inicio
+	call Draw
+	call Guarda_foto_registros
+ 	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
+	ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
