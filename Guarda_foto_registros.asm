@@ -81,7 +81,7 @@ Gestiona_albumes_de_fotos
     ld a,(hl)
     and a
 
-;   Salimos. --- X --- X --- 0
+;   Salimos. X --- X --- 0
 
     ret z
 
@@ -92,58 +92,65 @@ Gestiona_albumes_de_fotos
     and a
     jr nz,1F
 
-; (Album_de_fotos_2) está vacío. Pasamos los datos de (Album_de_fotos_3) a (Album_de_fotos_2) y_ 
-; _ limpiamos (Album_de_fotos_3).
-; Para ambas cosas ejecutaremos la rutina [Trasbase_de_datos].
+    call Album_3_a_Album_2
 
-;   Datos de álbum_3 a álbum_2.
+;   Salimos. X -- 1 -- 0
 
-    ld de,Album_de_fotos_2
-    call Trasbase_3a2
-    
-;   Actualizamos (Stack_snapshot_2).   
-
-    ex de,hl
-    ld (Stack_snapshot_2),hl
-
-;   Limpiamos álbum_3 y actualizamos (Stack_snapshot_3).
-
-    ld de,Album_de_fotos_3+1
-    call Trasbase_3a2
-
-    ld hl,Album_de_fotos_3
-    ld (Stack_snapshot_3),hl
- 
-;   Salimos. --- 0 --- 1 --- 0
-
-    ret
+2 ret
 
 ; (Álbumes_2 y 3) contienen datos, ( 0 --- 1 --- 1).
-; Pasamos los datos del álbum_2 al 1.
 
- 
+; Comprobamos si (Album_de_fotos_1) está vacío.
+
+1 ld hl,Album_de_fotos_1+1
+    ld a,(hl)
+    and a
+    jr nz,3F  
+
 ;   Datos de álbum_2 a álbum_1.
 
-1 ld de,Album_de_fotos_1
-    call Trasbase_2a1
+    call Album_2_a_Album_1
 
-;   Actualizamos (Stack_snapshot_1).   
-
-    ex de,hl
-    ld (Stack_snapshot_1),hl
-
-;   Limpiamos álbum_2 y actualizamos (Stack_snapshot_2).
-
-    ld de,Album_de_fotos_2+1
-    call Trasbase_2a1
-
-    ld hl,Album_de_fotos_2
-    ld (Stack_snapshot_2),hl
-
-;! Tengo 1--0--1. Tengo que pasar los datos del álbum_3 al álbum2. Limpiar el álbum3 y salir. 
+;   Tengo 1--0--1. Hay que pasar los datos del álbum_3 al álbum_2, limpiar los datos del álbum_3,_ 
+;   _ actualizar (Stack_snapshot_3) y salir.
  
-    ld a,(Contador_de_frames)
-    jr $
+    call Album_3_a_Album_2
+
+;   Ahora tendremos: 1--1--0
+
+    jr 2B
+
+;   Tenemos los 3 álbumes de fotos completos. 1 -- 1 -- 1.
+;   Tenemos que pasar los datos de Album_de_fotos_1 a Album_de_fotos.   
+;   Limpiar los datos del álbum_1, actualizar (Stack_snapshot_1) y salir.
+
+;   Datos de álbum_1 a álbum_de_fotos
+
+3 call Album_1_a_Album_de_fotos
+
+;   Ahora tendremos: 1 ... 0 -- 1 -- 1
+
+    call Album_2_a_Album_1
+
+;   Ahora tendremos: 1 ... 1 -- 0 -- 1
+
+    call Album_3_a_Album_2 
+
+;   Ahora tendremos: 1 ... 1 -- 1 -- 0
+
+    jr 2B
+
+
+
+
+
+
+
+
+
+
+
+ 
 
 ; ----------------------------------------------
 ;
@@ -178,5 +185,70 @@ Trasbase_2a1 ld hl,(Stack_snapshot_2)
     call Trasbase_de_datos
     ret 
 
+Trasbase_1a0 ld hl,(Stack_snapshot_1)
+    ld bc,Album_de_fotos_1
+    call Trasbase_de_datos
+    ret 
+
 ; ----------------------------------------------
 
+; (Album_de_fotos_2) está vacío. Pasamos los datos de (Album_de_fotos_3) a (Album_de_fotos_2) y_ 
+; _ limpiamos (Album_de_fotos_3).
+; Para ambas cosas ejecutaremos la rutina [Trasbase_de_datos].
+
+;   Datos de álbum_3 a álbum_2.
+
+Album_3_a_Album_2 ld de,Album_de_fotos_2
+    call Trasbase_3a2
+    
+;   Actualizamos (Stack_snapshot_2).   
+
+    ex de,hl
+    ld (Stack_snapshot_2),hl
+
+;   Limpiamos álbum_3 y actualizamos (Stack_snapshot_3).
+
+    xor a
+    ld (Album_de_fotos_3),a
+    ld de,Album_de_fotos_3+1
+    call Trasbase_3a2
+
+    ld hl,Album_de_fotos_3
+    ld (Stack_snapshot_3),hl
+    ret
+
+Album_2_a_Album_1 ld de,Album_de_fotos_1
+    call Trasbase_2a1
+
+;   Actualizamos (Stack_snapshot_1).   
+
+    ex de,hl
+    ld (Stack_snapshot_1),hl
+
+;   Limpiamos álbum_2 y actualizamos (Stack_snapshot_2).
+
+    ld de,Album_de_fotos_2+1
+    call Trasbase_2a1
+
+    ld hl,Album_de_fotos_2
+    ld (Stack_snapshot_2),hl
+    ret
+
+Album_1_a_Album_de_fotos ld de,Album_de_fotos
+    call Trasbase_1a0
+
+;   Actualizamos (Stack_snapshot).   
+
+    ex de,hl
+    ld (Stack_snapshot),hl
+
+ ;   Limpiamos álbum_1 y actualizamos (Stack_snapshot_1).
+
+    ld de,Album_de_fotos_1+1
+    call Trasbase_1a0
+
+    ld hl,Album_de_fotos_1
+    ld (Stack_snapshot_1),hl
+    ret
+
+; ----------------------------------------------

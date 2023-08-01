@@ -6872,7 +6872,7 @@
   81+ 7FD8 7E               ld a,(hl)
   82+ 7FD9 A7               and a
   83+ 7FDA
-  84+ 7FDA              ;   Salimos. --- X --- X --- 0
+  84+ 7FDA              ;   Salimos. X --- X --- 0
   85+ 7FDA
   86+ 7FDA C8               ret z
   87+ 7FDB
@@ -6881,101 +6881,173 @@
   90+ 7FDB 21 0A 71         ld hl,Album_de_fotos_2+1
   91+ 7FDE 7E               ld a,(hl)
   92+ 7FDF A7               and a
-  93+ 7FE0 20 17            jr nz,1F
+  93+ 7FE0 20 04            jr nz,1F
   94+ 7FE2
-  95+ 7FE2              ; (Album_de_fotos_2) está vacío. Pasamos los datos de (Album_de_fotos_3) a (Album_de_fotos_2) y_
-  96+ 7FE2              ; _ limpiamos (Album_de_fotos_3).
-  97+ 7FE2              ; Para ambas cosas ejecutaremos la rutina [Trasbase_de_datos].
-  98+ 7FE2
-  99+ 7FE2              ;   Datos de álbum_3 a álbum_2.
- 100+ 7FE2
- 101+ 7FE2 11 09 71         ld de,Album_de_fotos_2
- 102+ 7FE5 CD 1E 80         call Trasbase_3a2
- 103+ 7FE8
- 104+ 7FE8              ;   Actualizamos (Stack_snapshot_2).
- 105+ 7FE8
- 106+ 7FE8 EB               ex de,hl
- 107+ 7FE9 22 29 8A         ld (Stack_snapshot_2),hl
- 108+ 7FEC
- 109+ 7FEC              ;   Limpiamos álbum_3 y actualizamos (Stack_snapshot_3).
- 110+ 7FEC
- 111+ 7FEC 11 8E 71         ld de,Album_de_fotos_3+1
- 112+ 7FEF CD 1E 80         call Trasbase_3a2
- 113+ 7FF2
- 114+ 7FF2 21 8D 71         ld hl,Album_de_fotos_3
- 115+ 7FF5 22 2D 8A         ld (Stack_snapshot_3),hl
- 116+ 7FF8
- 117+ 7FF8              ;   Salimos. --- 0 --- 1 --- 0
- 118+ 7FF8
- 119+ 7FF8 C9               ret
- 120+ 7FF9
- 121+ 7FF9              ; (Álbumes_2 y 3) contienen datos, ( 0 --- 1 --- 1).
- 122+ 7FF9              ; Pasamos los datos del álbum_2 al 1.
- 123+ 7FF9
- 124+ 7FF9
- 125+ 7FF9              ;   Datos de álbum_2 a álbum_1.
- 126+ 7FF9
- 127+ 7FF9 11 85 70     1 ld de,Album_de_fotos_1
- 128+ 7FFC CD 28 80         call Trasbase_2a1
- 129+ 7FFF
- 130+ 7FFF              ;   Actualizamos (Stack_snapshot_1).
- 131+ 7FFF
- 132+ 7FFF EB               ex de,hl
- 133+ 8000 22 25 8A         ld (Stack_snapshot_1),hl
- 134+ 8003
- 135+ 8003              ;   Limpiamos álbum_2 y actualizamos (Stack_snapshot_2).
- 136+ 8003
- 137+ 8003 11 0A 71         ld de,Album_de_fotos_2+1
- 138+ 8006 CD 28 80         call Trasbase_2a1
- 139+ 8009
- 140+ 8009 21 09 71         ld hl,Album_de_fotos_2
- 141+ 800C 22 29 8A         ld (Stack_snapshot_2),hl
- 142+ 800F
- 143+ 800F              ;! Tengo 1--0--1. Tengo que pasar los datos del álbum_3 al álbum2. Limpiar el álbum3 y salir.
- 144+ 800F
- 145+ 800F 3A 44 8A         ld a,(Contador_de_frames)
- 146+ 8012 18 FE            jr $
- 147+ 8014
- 148+ 8014              ; ----------------------------------------------
- 149+ 8014              ;
- 150+ 8014              ;   31/7/23
- 151+ 8014              ;
- 152+ 8014              ;   Esta rutina sirve tanto para pasar datos de un album a otro, como para limpiarlo.
- 153+ 8014              ;
- 154+ 8014              ;   Para pasar datos de un album a otro:
- 155+ 8014              ;
- 156+ 8014              ;       INPUTS: HL contiene (Stack_snapshot_X), siendo X el álbum ORIGEN.
- 157+ 8014              ;               BC contendrá la dirección de inicio del álbum ORIGEN. Ej. Album_de_fotos_3.
- 158+ 8014              ;               DE contendrá la dirección de inicio del álbum DESTINO. Ej. Album_de_fotos_2.
- 159+ 8014
- 160+ 8014 C5           Trasbase_de_datos push bc
- 161+ 8015 A7               and a
- 162+ 8016 ED 42            sbc hl,bc
- 163+ 8018 E5               push hl
- 164+ 8019 C1               pop bc                          ; BC contiene el nº de bytes que ocupan los datos almacenados en el álbum.
- 165+ 801A E1               pop hl
- 166+ 801B ED B0            ldir
- 167+ 801D C9               ret
- 168+ 801E
- 169+ 801E              ; Paquetitos.
- 170+ 801E
- 171+ 801E 2A 2D 8A     Trasbase_3a2 ld hl,(Stack_snapshot_3)
- 172+ 8021 01 8D 71         ld bc,Album_de_fotos_3
- 173+ 8024 CD 14 80         call Trasbase_de_datos
- 174+ 8027 C9               ret
- 175+ 8028
- 176+ 8028 2A 29 8A     Trasbase_2a1 ld hl,(Stack_snapshot_2)
- 177+ 802B 01 09 71         ld bc,Album_de_fotos_2
- 178+ 802E CD 14 80         call Trasbase_de_datos
- 179+ 8031 C9               ret
- 180+ 8032
- 181+ 8032              ; ----------------------------------------------
- 182+ 8032
+  95+ 7FE2 CD 28 80         call Album_3_a_Album_2
+  96+ 7FE5
+  97+ 7FE5              ;   Salimos. X -- 1 -- 0
+  98+ 7FE5
+  99+ 7FE5 C9           2 ret
+ 100+ 7FE6
+ 101+ 7FE6              ; (Álbumes_2 y 3) contienen datos, ( 0 --- 1 --- 1).
+ 102+ 7FE6
+ 103+ 7FE6              ; Comprobamos si (Album_de_fotos_1) está vacío.
+ 104+ 7FE6
+ 105+ 7FE6 21 86 70     1 ld hl,Album_de_fotos_1+1
+ 106+ 7FE9 7E               ld a,(hl)
+ 107+ 7FEA A7               and a
+ 108+ 7FEB 20 08            jr nz,3F
+ 109+ 7FED
+ 110+ 7FED              ;   Datos de álbum_2 a álbum_1.
+ 111+ 7FED
+ 112+ 7FED CD 43 80         call Album_2_a_Album_1
+ 113+ 7FF0
+ 114+ 7FF0              ;   Tengo 1--0--1. Hay que pasar los datos del álbum_3 al álbum_2, limpiar los datos del álbum_3,_
+ 115+ 7FF0              ;   _ actualizar (Stack_snapshot_3) y salir.
+ 116+ 7FF0
+ 117+ 7FF0 CD 28 80         call Album_3_a_Album_2
+ 118+ 7FF3
+ 119+ 7FF3              ;   Ahora tendremos: 1--1--0
+ 120+ 7FF3
+ 121+ 7FF3 18 F0            jr 2B
+ 122+ 7FF5
+ 123+ 7FF5              ;   Tenemos los 3 álbumes de fotos completos. 1 -- 1 -- 1.
+ 124+ 7FF5              ;   Tenemos que pasar los datos de Album_de_fotos_1 a Album_de_fotos.
+ 125+ 7FF5              ;   Limpiar los datos del álbum_1, actualizar (Stack_snapshot_1) y salir.
+ 126+ 7FF5
+ 127+ 7FF5              ;   Datos de álbum_1 a álbum_de_fotos
+ 128+ 7FF5
+ 129+ 7FF5 CD 5A 80     3 call Album_1_a_Album_de_fotos
+ 130+ 7FF8
+ 131+ 7FF8              ;   Ahora tendremos: 1 ... 0 -- 1 -- 1
+ 132+ 7FF8
+ 133+ 7FF8 CD 43 80         call Album_2_a_Album_1
+ 134+ 7FFB
+ 135+ 7FFB              ;   Ahora tendremos: 1 ... 1 -- 0 -- 1
+ 136+ 7FFB
+ 137+ 7FFB CD 28 80         call Album_3_a_Album_2
+ 138+ 7FFE
+ 139+ 7FFE              ;   Ahora tendremos: 1 ... 1 -- 1 -- 0
+ 140+ 7FFE
+ 141+ 7FFE 18 E5            jr 2B
+ 142+ 8000
+ 143+ 8000
+ 144+ 8000
+ 145+ 8000
+ 146+ 8000
+ 147+ 8000
+ 148+ 8000
+ 149+ 8000
+ 150+ 8000
+ 151+ 8000
+ 152+ 8000
+ 153+ 8000
+ 154+ 8000
+ 155+ 8000              ; ----------------------------------------------
+ 156+ 8000              ;
+ 157+ 8000              ;   31/7/23
+ 158+ 8000              ;
+ 159+ 8000              ;   Esta rutina sirve tanto para pasar datos de un album a otro, como para limpiarlo.
+ 160+ 8000              ;
+ 161+ 8000              ;   Para pasar datos de un album a otro:
+ 162+ 8000              ;
+ 163+ 8000              ;       INPUTS: HL contiene (Stack_snapshot_X), siendo X el álbum ORIGEN.
+ 164+ 8000              ;               BC contendrá la dirección de inicio del álbum ORIGEN. Ej. Album_de_fotos_3.
+ 165+ 8000              ;               DE contendrá la dirección de inicio del álbum DESTINO. Ej. Album_de_fotos_2.
+ 166+ 8000
+ 167+ 8000 C5           Trasbase_de_datos push bc
+ 168+ 8001 A7               and a
+ 169+ 8002 ED 42            sbc hl,bc
+ 170+ 8004 E5               push hl
+ 171+ 8005 C1               pop bc                          ; BC contiene el nº de bytes que ocupan los datos almacenados en el álbum.
+ 172+ 8006 E1               pop hl
+ 173+ 8007 ED B0            ldir
+ 174+ 8009 C9               ret
+ 175+ 800A
+ 176+ 800A              ; Paquetitos.
+ 177+ 800A
+ 178+ 800A 2A 2D 8A     Trasbase_3a2 ld hl,(Stack_snapshot_3)
+ 179+ 800D 01 8D 71         ld bc,Album_de_fotos_3
+ 180+ 8010 CD 00 80         call Trasbase_de_datos
+ 181+ 8013 C9               ret
+ 182+ 8014
+ 183+ 8014 2A 29 8A     Trasbase_2a1 ld hl,(Stack_snapshot_2)
+ 184+ 8017 01 09 71         ld bc,Album_de_fotos_2
+ 185+ 801A CD 00 80         call Trasbase_de_datos
+ 186+ 801D C9               ret
+ 187+ 801E
+ 188+ 801E 2A 25 8A     Trasbase_1a0 ld hl,(Stack_snapshot_1)
+ 189+ 8021 01 85 70         ld bc,Album_de_fotos_1
+ 190+ 8024 CD 00 80         call Trasbase_de_datos
+ 191+ 8027 C9               ret
+ 192+ 8028
+ 193+ 8028              ; ----------------------------------------------
+ 194+ 8028
+ 195+ 8028              ; (Album_de_fotos_2) está vacío. Pasamos los datos de (Album_de_fotos_3) a (Album_de_fotos_2) y_
+ 196+ 8028              ; _ limpiamos (Album_de_fotos_3).
+ 197+ 8028              ; Para ambas cosas ejecutaremos la rutina [Trasbase_de_datos].
+ 198+ 8028
+ 199+ 8028              ;   Datos de álbum_3 a álbum_2.
+ 200+ 8028
+ 201+ 8028 11 09 71     Album_3_a_Album_2 ld de,Album_de_fotos_2
+ 202+ 802B CD 0A 80         call Trasbase_3a2
+ 203+ 802E
+ 204+ 802E              ;   Actualizamos (Stack_snapshot_2).
+ 205+ 802E
+ 206+ 802E EB               ex de,hl
+ 207+ 802F 22 29 8A         ld (Stack_snapshot_2),hl
+ 208+ 8032
+ 209+ 8032              ;   Limpiamos álbum_3 y actualizamos (Stack_snapshot_3).
+ 210+ 8032
+ 211+ 8032 AF               xor a
+ 212+ 8033 32 8D 71         ld (Album_de_fotos_3),a
+ 213+ 8036 11 8E 71         ld de,Album_de_fotos_3+1
+ 214+ 8039 CD 0A 80         call Trasbase_3a2
+ 215+ 803C
+ 216+ 803C 21 8D 71         ld hl,Album_de_fotos_3
+ 217+ 803F 22 2D 8A         ld (Stack_snapshot_3),hl
+ 218+ 8042 C9               ret
+ 219+ 8043
+ 220+ 8043 11 85 70     Album_2_a_Album_1 ld de,Album_de_fotos_1
+ 221+ 8046 CD 14 80         call Trasbase_2a1
+ 222+ 8049
+ 223+ 8049              ;   Actualizamos (Stack_snapshot_1).
+ 224+ 8049
+ 225+ 8049 EB               ex de,hl
+ 226+ 804A 22 25 8A         ld (Stack_snapshot_1),hl
+ 227+ 804D
+ 228+ 804D              ;   Limpiamos álbum_2 y actualizamos (Stack_snapshot_2).
+ 229+ 804D
+ 230+ 804D 11 0A 71         ld de,Album_de_fotos_2+1
+ 231+ 8050 CD 14 80         call Trasbase_2a1
+ 232+ 8053
+ 233+ 8053 21 09 71         ld hl,Album_de_fotos_2
+ 234+ 8056 22 29 8A         ld (Stack_snapshot_2),hl
+ 235+ 8059 C9               ret
+ 236+ 805A
+ 237+ 805A 11 00 70     Album_1_a_Album_de_fotos ld de,Album_de_fotos
+ 238+ 805D CD 1E 80         call Trasbase_1a0
+ 239+ 8060
+ 240+ 8060              ;   Actualizamos (Stack_snapshot).
+ 241+ 8060
+ 242+ 8060 EB               ex de,hl
+ 243+ 8061 22 21 8A         ld (Stack_snapshot),hl
+ 244+ 8064
+ 245+ 8064               ;   Limpiamos álbum_1 y actualizamos (Stack_snapshot_1).
+ 246+ 8064
+ 247+ 8064 11 86 70         ld de,Album_de_fotos_1+1
+ 248+ 8067 CD 1E 80         call Trasbase_1a0
+ 249+ 806A
+ 250+ 806A 21 85 70         ld hl,Album_de_fotos_1
+ 251+ 806D 22 25 8A         ld (Stack_snapshot_1),hl
+ 252+ 8070 C9               ret
+ 253+ 8071
+ 254+ 8071              ; ----------------------------------------------
 # file closed: Guarda_foto_registros.asm
-1322  8032
-1323  8032              	SAVESNA "Pruebas.sna", START
-1324  8032
-1325  8032
-1326  8032
-1327  8032
+1322  8071
+1323  8071              	SAVESNA "Pruebas.sna", START
+1324  8071
+1325  8071
+1326  8071
+1327  8071
 # file closed: Banco_de_pruebas.asm
