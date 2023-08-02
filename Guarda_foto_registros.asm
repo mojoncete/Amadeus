@@ -17,7 +17,6 @@
 
 ;	INC SP
 
-
     org $7fa0
 
 ;   (Stack_snapshot) se sitúa inicialmente en (Album_de_fotos)=$7000.
@@ -70,6 +69,10 @@ Guarda_foto_registros
 ;
 ;   31/07/23
 ;
+;   La rutina estará situada justo después de los álbumes de fotos.
+
+    org $741a
+
 Gestiona_albumes_de_fotos 
 
 ; Desplazamos álbumes.
@@ -275,3 +278,209 @@ Album_1_a_Album_de_fotos ld de,Album_de_fotos
     ld (Stack_snapshot_1),hl
     ret
 
+; -------------------- ------------------------------------
+
+Gestiona_albumes_de_fotos_disparos
+
+; Desplazamos álbumes.
+
+; (Album_de_fotos_1) --- (Album_de_fotos).
+
+;   El álbum_1 contiene datos?
+
+    ld hl,Album_de_fotos_disparos_1+1
+    ld a,(hl)
+    and a
+    jr z,1F
+
+;   El álbum_1 contiene datos. Volcamos los datos a Album_de_fotos.
+
+    call Album_1_a_Album_de_fotos_disparos
+    jr 2F
+
+; El álbum_1 está vacío. 
+; Album_de_fotos contiene datos?
+
+1 ld hl,Album_de_fotos_disparos+1
+    ld a,(hl)
+    and a
+    jr z,2F
+
+; Limpiamos Album_de_fotos.
+
+    ld hl,Album_de_fotos_disparos
+    ld (hl),0
+    ld de,Album_de_fotos_disparos+1
+    ld bc,$83
+    ldir    
+    ld hl,Album_de_fotos_disparos
+    ld (Stack_snapshot_disparos),hl
+
+; (Album_de_fotos_2) --- (Album_de_fotos_1).
+
+;   El álbum_2 contiene datos?
+
+2 ld hl,Album_de_fotos_disparos_2+1
+    ld a,(hl)
+    and a
+    jr z,3F
+
+;   El álbum_1 contiene datos. Volcamos los datos a Album_de_fotos.
+
+    call Album_2_a_Album_1_disparos
+    jr 4F
+
+; El álbum_2 está vacío. 
+; álbum_1 contiene datos?
+
+3 ld hl,Album_de_fotos_disparos_1+1
+    ld a,(hl)
+    and a
+    jr z,4F
+
+; Limpiamos Album_de_fotos_1.
+
+    ld hl,Album_de_fotos_disparos_1
+    ld (hl),0
+    ld de,Album_de_fotos_disparos_1+1
+    ld bc,$83
+    ldir    
+    ld hl,Album_de_fotos_disparos_1
+    ld (Stack_snapshot_disparos_1),hl
+
+; (Album_de_fotos_3) --- (Album_de_fotos_2).
+
+;   El álbum_3 contiene datos?
+
+4 ld hl,Album_de_fotos_disparos_3+1
+    ld a,(hl)
+    and a
+    jr z,5F
+
+;   El álbum_1 contiene datos. Volcamos los datos a Album_de_fotos.
+
+    call Album_3_a_Album_2_disparos
+    jr 6F
+
+; El álbum_3 está vacío. 
+; álbum_2 contiene datos?
+
+5 ld hl,Album_de_fotos_disparos_2+1
+    ld a,(hl)
+    and a
+    jr z,6F
+
+; Limpiamos Album_de_fotos_2.
+
+    ld hl,Album_de_fotos_disparos_2
+    ld (hl),0
+    ld de,Album_de_fotos_disparos_2+1
+    ld bc,$83
+    ldir    
+    ld hl,Album_de_fotos_disparos_2
+    ld (Stack_snapshot_disparos_2),hl
+
+6 ret
+
+; ----------------------------------------------
+;
+;   31/7/23
+;
+;   Esta rutina sirve tanto para pasar datos de un album a otro, como para limpiarlo.
+;
+;   Para pasar datos de un album a otro:
+;
+;       INPUTS: HL contiene (Stack_snapshot_X), siendo X el álbum ORIGEN.
+;               BC contendrá la dirección de inicio del álbum ORIGEN. Ej. Album_de_fotos_3.
+;               DE contendrá la dirección de inicio del álbum DESTINO. Ej. Album_de_fotos_2.
+
+Trasbase_de_datos_disparos push bc
+    and a
+    sbc hl,bc
+    push hl
+    pop bc                          ; BC contiene el nº de bytes que ocupan los datos almacenados en el álbum. 
+    pop hl
+    ldir
+    ret
+
+; Paquetitos.
+
+Trasbase_3a2_disparos ld hl,(Stack_snapshot_disparos_3)
+    ld bc,Album_de_fotos_disparos_3
+    call Trasbase_de_datos_disparos
+    ret 
+
+Trasbase_2a1_disparos ld hl,(Stack_snapshot_disparos_2)
+    ld bc,Album_de_fotos_disparos_2
+    call Trasbase_de_datos_disparos
+    ret 
+
+Trasbase_1a0_disparos ld hl,(Stack_snapshot_disparos_1)
+    ld bc,Album_de_fotos_disparos_1
+    call Trasbase_de_datos_disparos
+    ret 
+
+; ----------------------------------------------
+
+; (Album_de_fotos_2) está vacío. Pasamos los datos de (Album_de_fotos_3) a (Album_de_fotos_2) y_ 
+; _ limpiamos (Album_de_fotos_3).
+; Para ambas cosas ejecutaremos la rutina [Trasbase_de_datos].
+
+;   Datos de álbum_3 a álbum_2.
+
+Album_3_a_Album_2_disparos ld de,Album_de_fotos_disparos_2
+    call Trasbase_3a2_disparos
+    
+;   Actualizamos (Stack_snapshot_2).   
+
+    ex de,hl
+    ld (Stack_snapshot_disparos_2),hl
+
+;   Limpiamos álbum_3 y actualizamos (Stack_snapshot_3).
+
+    xor a
+    ld (Album_de_fotos_disparos_3),a
+    ld de,Album_de_fotos_disparos_3+1
+    call Trasbase_3a2_disparos
+
+    ld hl,Album_de_fotos_disparos_3
+    ld (Stack_snapshot_disparos_3),hl
+    ret
+
+Album_2_a_Album_1_disparos ld de,Album_de_fotos_disparos_1
+    call Trasbase_2a1_disparos
+
+;   Actualizamos (Stack_snapshot_1).   
+
+    ex de,hl
+    ld (Stack_snapshot_disparos_1),hl
+
+;   Limpiamos álbum_2 y actualizamos (Stack_snapshot_2).
+
+    xor a
+    ld (Album_de_fotos_disparos_2),a
+    ld de,Album_de_fotos_disparos_2+1
+    call Trasbase_2a1_disparos
+
+    ld hl,Album_de_fotos_disparos_2
+    ld (Stack_snapshot_disparos_2),hl
+    ret
+
+Album_1_a_Album_de_fotos_disparos ld de,Album_de_fotos_disparos
+    call Trasbase_1a0_disparos
+
+;   Actualizamos (Stack_snapshot).   
+
+    ex de,hl
+    ld (Stack_snapshot_disparos),hl
+
+ ;   Limpiamos álbum_1 y actualizamos (Stack_snapshot_1).
+
+    xor a
+    ld (Album_de_fotos_disparos_1),a
+    ld de,Album_de_fotos_disparos_1+1
+    call Trasbase_1a0_disparos
+
+    ld hl,Album_de_fotos_disparos_1
+    ld (Stack_snapshot_disparos_1),hl
+    ret

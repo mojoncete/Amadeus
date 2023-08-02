@@ -769,6 +769,11 @@ Imprime db 0,0,0
 
 Extrae_foto_disparos
 
+	ld hl,Album_de_fotos_disparos+1
+    ld a,(hl)
+    and a
+    ret z		
+
 	ld a,(Numero_de_disparotes)
 	and a
 	ret z

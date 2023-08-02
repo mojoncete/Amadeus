@@ -43,21 +43,20 @@ Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto e
 Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
 
-Album_de_fotos equ $7000								; En (Album_de_fotos) vamos a ir almacenando los valores_
+Album_de_fotos equ $7000	;	(7000h - 7083h).		; En (Album_de_fotos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y las llamadas a las rutinas de impresión.   
 ;                               				        ; De momento situamos este almacén en $7000. La capacidad del album será de 10 entidades + AMADEUS.  
-Album_de_fotos_disparos equ $7211						; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
+Album_de_fotos_disparos equ $720d ; (720dh - 728fh).	; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´. 
 ;                               				        ; De momento situamos este almacén en $7060.  
-Album_de_fotos_1 equ $7085
-Album_de_fotos_disparos_1 equ $7295						;Termina en 71fah (10 disparos).
-Album_de_fotos_2 equ $7109
-Album_de_fotos_disparos_2 equ $7319
-Album_de_fotos_3 equ $718d
-Album_de_fotos_disparos_3 equ $739d
+Album_de_fotos_1 equ $7084	; (7084h - 7106h).
+Album_de_fotos_disparos_1 equ $7290	; (7290h - 7312h).					
+Album_de_fotos_2 equ $7107	; (7107h - 7189h).
+Album_de_fotos_disparos_2 equ $7319	; (7313h - 7395h).
+Album_de_fotos_3 equ $718a	; (718ah - 720ch).
+Album_de_fotos_disparos_3 equ $739d	; (7396h - 7418h).
 
 ; 84h es el espacio necesario en (Album_de_fotos) para 10 entidades en pantalla.
-; 78h es el espacio necesario en (Album_de_fotos_disparos) para 10 disparos en pantalla.
 
 ; ******************************************************************************************************************************************************************************************
 ; Variables. 
@@ -489,6 +488,7 @@ Frame
 ; Gestiona los álbumes de fotos.	
 
 	call Gestiona_albumes_de_fotos
+	call Gestiona_albumes_de_fotos_disparos
 
 ; RELOJES.
 
