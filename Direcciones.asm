@@ -481,6 +481,8 @@ DESPLZ_IZQ
 
 Desplaza_izquierda 
 
+	jr $
+
 	ld a,(Vel_left)
 	ld b,a
 	ld hl,(Puntero_DESPLZ_izq)

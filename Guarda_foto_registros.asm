@@ -64,93 +64,113 @@ Guarda_foto_registros
 5 ld (Stack_snapshot_3),hl
 6 ld sp,(Stack)
 
-;    call Actualiza_punteros                         ; Antes de salir de la rutina recuperamos SP y actualizamos,(o no), (Stack_snapshot).
-
     ret
 
 ; ------------------------------------------------
 ;
 ;   31/07/23
 ;
-Gestiona_albumes_de_fotos
+Gestiona_albumes_de_fotos 
 
-; Comprobamos si en el frame anterior hemos escrito en (Album_de_fotos_3).
-; Si no es así, salimos, (no ha habido movimiento).
+; Desplazamos álbumes.
 
-    ld hl,Album_de_fotos_3+1
+; (Album_de_fotos_1) --- (Album_de_fotos).
+
+;   El álbum_1 contiene datos?
+
+    ld hl,Album_de_fotos_1+1
     ld a,(hl)
     and a
+    jr z,1F
 
-;   Salimos. X --- X --- 0
+;   El álbum_1 contiene datos. Volcamos los datos a Album_de_fotos.
 
-    ret z
+    call Album_1_a_Album_de_fotos
+    jr 2F
 
-; Comprobamos si (Album_de_fotos_2) está vacío.
+; El álbum_1 está vacío. 
+; Album_de_fotos contiene datos?
 
-    ld hl,Album_de_fotos_2+1
+1 ld hl,Album_de_fotos+1
     ld a,(hl)
     and a
-    jr nz,1F
+    jr z,2F
 
-    call Album_3_a_Album_2
+; Limpiamos Album_de_fotos.
 
-;   Salimos. X -- 1 -- 0
+    ld hl,Album_de_fotos
+    ld (hl),0
+    ld de,Album_de_fotos+1
+    ld bc,$83
+    ldir    
+    ld hl,Album_de_fotos
+    ld (Stack_snapshot),hl
 
-2 ret
+; (Album_de_fotos_2) --- (Album_de_fotos_1).
 
-; (Álbumes_2 y 3) contienen datos, ( 0 --- 1 --- 1).
+;   El álbum_2 contiene datos?
 
-; Comprobamos si (Album_de_fotos_1) está vacío.
-
-1 ld hl,Album_de_fotos_1+1
+2 ld hl,Album_de_fotos_2+1
     ld a,(hl)
     and a
-    jr nz,3F  
+    jr z,3F
 
-;   Datos de álbum_2 a álbum_1.
+;   El álbum_1 contiene datos. Volcamos los datos a Album_de_fotos.
 
     call Album_2_a_Album_1
+    jr 4F
 
-;   Tengo 1--0--1. Hay que pasar los datos del álbum_3 al álbum_2, limpiar los datos del álbum_3,_ 
-;   _ actualizar (Stack_snapshot_3) y salir.
- 
+; El álbum_2 está vacío. 
+; álbum_1 contiene datos?
+
+3 ld hl,Album_de_fotos_1+1
+    ld a,(hl)
+    and a
+    jr z,4F
+
+; Limpiamos Album_de_fotos_1.
+
+    ld hl,Album_de_fotos_1
+    ld (hl),0
+    ld de,Album_de_fotos_1+1
+    ld bc,$83
+    ldir    
+    ld hl,Album_de_fotos_1
+    ld (Stack_snapshot_1),hl
+
+; (Album_de_fotos_3) --- (Album_de_fotos_2).
+
+;   El álbum_3 contiene datos?
+
+4 ld hl,Album_de_fotos_3+1
+    ld a,(hl)
+    and a
+    jr z,5F
+
+;   El álbum_1 contiene datos. Volcamos los datos a Album_de_fotos.
+
     call Album_3_a_Album_2
+    jr 6F
 
-;   Ahora tendremos: 1--1--0
+; El álbum_3 está vacío. 
+; álbum_2 contiene datos?
 
-    jr 2B
+5 ld hl,Album_de_fotos_2+1
+    ld a,(hl)
+    and a
+    jr z,6F
 
-;   Tenemos los 3 álbumes de fotos completos. 1 -- 1 -- 1.
-;   Tenemos que pasar los datos de Album_de_fotos_1 a Album_de_fotos.   
-;   Limpiar los datos del álbum_1, actualizar (Stack_snapshot_1) y salir.
+; Limpiamos Album_de_fotos_2.
 
-;   Datos de álbum_1 a álbum_de_fotos
+    ld hl,Album_de_fotos_2
+    ld (hl),0
+    ld de,Album_de_fotos_2+1
+    ld bc,$83
+    ldir    
+    ld hl,Album_de_fotos_2
+    ld (Stack_snapshot_2),hl
 
-3 call Album_1_a_Album_de_fotos
-
-;   Ahora tendremos: 1 ... 0 -- 1 -- 1
-
-    call Album_2_a_Album_1
-
-;   Ahora tendremos: 1 ... 1 -- 0 -- 1
-
-    call Album_3_a_Album_2 
-
-;   Ahora tendremos: 1 ... 1 -- 1 -- 0
-
-    jr 2B
-
-
-
-
-
-
-
-
-
-
-
- 
+6 ret
 
 ; ----------------------------------------------
 ;
@@ -227,6 +247,8 @@ Album_2_a_Album_1 ld de,Album_de_fotos_1
 
 ;   Limpiamos álbum_2 y actualizamos (Stack_snapshot_2).
 
+    xor a
+    ld (Album_de_fotos_2),a
     ld de,Album_de_fotos_2+1
     call Trasbase_2a1
 
@@ -244,6 +266,8 @@ Album_1_a_Album_de_fotos ld de,Album_de_fotos
 
  ;   Limpiamos álbum_1 y actualizamos (Stack_snapshot_1).
 
+    xor a
+    ld (Album_de_fotos_1),a
     ld de,Album_de_fotos_1+1
     call Trasbase_1a0
 
@@ -251,4 +275,3 @@ Album_1_a_Album_de_fotos ld de,Album_de_fotos
     ld (Stack_snapshot_1),hl
     ret
 
-; ----------------------------------------------

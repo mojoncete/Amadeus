@@ -13,9 +13,9 @@
 
 	call Frame
 
-;	ld a,(Ctrl_2)
-;	bit 4,a
-;	jr nz,$
+	ld a,(Ctrl_2)
+	bit 4,a
+	jr nz,$
 
 	ld a,(Ctrl_1) 										; Existe Loop?
 	bit 3,a
@@ -345,6 +345,7 @@ START
 
 ;	call Pinta_marco
 
+
 	call Inicializa_Punteros_de_nivel					 ; Inicializa. 1er NIVEL.
 
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
@@ -417,17 +418,18 @@ START
 	inc a
 	ld (Numero_de_malotes),a
 
-7 	
-	
-;	push bc
-;	push de
-;	push hl
+; --- el 1er FRAME, (inicio).
 
-	call Gestiona_albumes_de_fotos
+7 
+;	ld de,Album_de_fotos									; Vamos a imprimir el 1er FRAME. Volcamos los datos_
+;	call Imprime_inicio 									; _ de Album_de_fotos_3 a Album_de_fotos.								
 
-;	pop bc
-;	pop de
-;	pop hl
+;	ld hl,(Stack_snapshot_2)
+;	ld (Stack_snapshot),hl
+
+;	ld hl,Album_de_fotos_2
+;	ld (Stack_snapshot_2),hl
+; ------------------
 
 ; ------------------------------------
 	xor a
@@ -480,9 +482,14 @@ Frame
 ; ----------------------------------------------------------------------
 
 	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
+
 	ld hl,Album_de_fotos
     ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
 ;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
+; Gestiona los álbumes de fotos.	
+
+	call Gestiona_albumes_de_fotos
+
 ; RELOJES.
 
 	ld hl,Contador_de_frames
@@ -709,16 +716,6 @@ Frame
 
 	call Calcula_numero_de_disparotes
 9 call Calcula_numero_de_malotes 
-
-;	push bc
-;	push de
-;	push hl
-
-	call Gestiona_albumes_de_fotos
-
-;	pop bc
-;	pop de
-;	pop hl
 
 	ld a,4
 	out ($fe),a  
