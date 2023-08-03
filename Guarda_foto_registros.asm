@@ -69,9 +69,9 @@ Guarda_foto_registros
 ;
 ;   31/07/23
 ;
-;   La rutina estará situada justo después de los álbumes de fotos.
+;   La rutina estará situada justo después de la Caja_de_disparotes.
 
-    org $741a
+    org $7421 
 
 Gestiona_albumes_de_fotos 
 

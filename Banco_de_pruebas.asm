@@ -13,13 +13,6 @@
 
 	call Frame
 
-	ld a,(Ctrl_2)
-	bit 4,a
-	jr nz,$
-
-	ld a,(Ctrl_1) 										; Existe Loop?
-	bit 3,a
-
 	reti									 
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
@@ -54,7 +47,10 @@ Album_de_fotos_disparos_1 equ $7290	; (7290h - 7312h).
 Album_de_fotos_2 equ $7107	; (7107h - 7189h).
 Album_de_fotos_disparos_2 equ $7319	; (7313h - 7395h).
 Album_de_fotos_3 equ $718a	; (718ah - 720ch).
-Album_de_fotos_disparos_3 equ $739d	; (7396h - 7418h).
+Album_de_fotos_disparos_3 equ $7396	; (7396h - 7418h).
+
+Caja_de_malotes equ $7419 ; (7419h - 741ch) 4 bytes.
+Caja_de_disparotes equ $741d ; (741dh - 7420h) 4 bytes.
 
 ; 84h es el espacio necesario en (Album_de_fotos) para 10 entidades en pantalla.
 
@@ -228,6 +224,7 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 ;														BIT 1, Este bit indica que el disparo sale de la pantalla, ($4000-$57ff).
 ;														BIT 2, Este bit a "1" indica que un disparo de Amadeus ha alcanzado a una entidad. Como no sabemos cual,_
 ;															_ hemos de comparar las coordenadas de (Coordenadas_disparo_certero) con las de cada entidad.
+
 ;														BIT 3, Recarga de nueva oleada.
 ;														BIT 4, Recarga de nueva oleada.
 
@@ -355,6 +352,8 @@ START
 ;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.
 	call Restore_entidad
 
+	jr $
+
 	ld hl,Numero_parcial_de_entidades
 	ld b,(hl)
 	inc b
@@ -409,7 +408,7 @@ START
 	ld hl,Ctrl_1
 	res 3,(hl)
 	call Calcula_numero_de_malotes 
-	jr 7F
+	jr 2F
 
 ; ----------
 
@@ -417,85 +416,16 @@ START
 	inc a
 	ld (Numero_de_malotes),a
 
-; --- el 1er FRAME, (inicio).
-
-7 
-;	ld de,Album_de_fotos									; Vamos a imprimir el 1er FRAME. Volcamos los datos_
-;	call Imprime_inicio 									; _ de Album_de_fotos_3 a Album_de_fotos.								
-
-;	ld hl,(Stack_snapshot_2)
-;	ld (Stack_snapshot),hl
-
-;	ld hl,Album_de_fotos_2
-;	ld (Stack_snapshot_2),hl
-; ------------------
-
 ; ------------------------------------
-	xor a
+
 2 ei ; Interrupciones habilitadas.
-	jr z,2B
-; ------------------------------------
-
-	ld a,(Contador_de_frames)
-	ld b,a
-	ld a,(Activa_recarga_cajas)
-	cp b
-	jr z,8F
-
-	ld hl,Ctrl_1
-	set 4,(hl)
-	xor a
-	jr 2B
-
-8 ld hl,Ctrl_1
-	res 4,(hl)
-	di
-
-	ld a,(Contador_de_frames)
-
-;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
-;! _ IMPREDECIBLE !!!!
-
-	add 10
-	ld (Clock_Entidades_en_curso),a
-
-	jp 4B
 
 
-; ----------------------------------------------------------------------
+; -----------------------------------------------------------------------
+;
+;	3/8/23
 
-Frame 
-
-; He de imprimir sólo el nº de fotos que he hecho. Sólo BORRAMOS/PINTAMOS los objetos que se han desplazado.
-; Necesito calcular nª de malotes, para ello utilizaré (Stack_snapshot)-(Album_de_fotos).
-
-; PINTAMOS.
-
-    ld a,2
-    out ($fe),a											; Rojo.
-	call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
-	call Extrae_foto_disparos
-    ld a,1
-    out ($fe),a											; Azul.
-
-; ----------------------------------------------------------------------
-
-	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
-
-	ld hl,Album_de_fotos
-    ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
-;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
-; Gestiona los álbumes de fotos.	
-
-	call Gestiona_albumes_de_fotos
-	call Gestiona_albumes_de_fotos_disparos
-
-; RELOJES.
-
-	ld hl,Contador_de_frames
-	inc (hl)											; 0 - 255
-
-	ld a,(Clock_Entidades_en_curso)
+Main ld a,(Clock_Entidades_en_curso)
 	ld b,a
 	ld a,(Contador_de_frames)
 	cp b
@@ -554,11 +484,11 @@ Frame
 10 ld a,(Numero_parcial_de_entidades)
     ld b,a
 	and a
-	jr nz,2F
+	jr nz,11F
 
 	ld hl,Ctrl_1
 	bit 4,(hl)
-	jp nz,4F
+	jp nz,16F
 
 	ld hl,Ctrl_1
 	set 3,(hl)											; Señal de RECARGA de las cajas DRAW activada. NUEVA OLEADA !!!!!!!!
@@ -569,9 +499,9 @@ Frame
 
 ; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- ----- 
 
-2 ld a,(Entidades_en_curso)
+11 ld a,(Entidades_en_curso)
 	and a
-	jp z,4F												; Si no hay entidades en curso, RESTORE AMADEUS.
+	jp z,16F												; Si no hay entidades en curso, RESTORE AMADEUS.
 	ld b,a												; (Entidades_en_curso) en A´ y B.
 
 ; Código que ejecutamos con cada entidad:
@@ -581,7 +511,7 @@ Frame
 
 ; Impacto ???
 
-33 ld a,(Impacto)										 
+	ld a,(Impacto)										 
 	and a
 	jr z,8F
 
@@ -589,7 +519,7 @@ Frame
 
 	ld hl,Clock_explosion								; _ a gestionar la siguiente entidad, JR 6F.
 	dec (hl)
-	jr nz,6F
+	jr nz,17F
 
 ;! Velocidad de la animación de la explosión.
 
@@ -607,16 +537,16 @@ Frame
 
 	ld a,(CTRL_DESPLZ)
 	and a
-	jr nz,21F
+	jr nz,18F
 
 	ld hl,Indice_Explosion_2x2-2
 	ld (Puntero_DESPLZ_der),hl
-	jr 22F
+	jr 19F
 
-21 ld hl,Indice_Explosion_2x3-2
+18 ld hl,Indice_Explosion_2x3-2
 	ld (Puntero_DESPLZ_der),hl
 
-22 ld hl,Ctrl_2											; Activamos el proceso de explosión.
+19 ld hl,Ctrl_2											; Activamos el proceso de explosión.
 	set 1,(hl)
 	jr 7F
 
@@ -653,7 +583,7 @@ Frame
 
 	ld a,(Ctrl_0)
 	bit 4,a
-	jr z,6F                                       	    ; Omitimos BORRAR/PINTAR si no hay movimiento.
+	jr z,17F                                       	    ; Omitimos BORRAR/PINTAR si no hay movimiento.
 
 ; Voy a utilizar una rutina de lectura de teclado para disparar con cualquier entidad.
 ; [[[
@@ -666,15 +596,10 @@ Frame
 	xor a
 	ld (Obj_dibujado),a
 
-6 call Store_Restore_cajas
+17 call Store_Restore_cajas
 
 	pop bc
 	djnz 15B
-
-; Hemos gestionado todas las Entidades_en_curso, restauramos el limitador.
-
-;	ld a,2
-;	ld (Limitador_de_entidades_x_frame),a
 
 ; ------------------------------------
 ;! Activando estas líneas podemos habilitar 2 explosiones en el mismo FRAME.
@@ -688,7 +613,7 @@ Frame
 
 ; Tras la gestión de las entidades, ... AMADEUS.
 
-4 call Restore_Amadeus
+16 call Restore_Amadeus
 
 	ld a,(Impacto) 
 	and a
@@ -698,11 +623,11 @@ Frame
 
 	ld a,(Ctrl_0)
 	bit 4,a
-	jr z,3F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
+	jr z,14F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
 
 	call Guarda_foto_entidad_a_pintar
 
-3 ld hl,Ctrl_0	
+14 ld hl,Ctrl_0	
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
 	xor a
 	ld (Obj_dibujado),a
@@ -720,9 +645,40 @@ Frame
 	ld a,4
 	out ($fe),a  
 
-	ret
+; ----------------------------------------
 
-; -----------------------------------------------------------------------------------
+	ld a,(Ctrl_1) 										; Existe Loop?
+	bit 3,a												; Si este bit es "1". Hay recarga de nueva oleada.
+	jp z,Main
+
+; -----
+;	((( 
+
+	ld a,(Contador_de_frames)
+	ld b,a
+	ld a,(Activa_recarga_cajas)
+	cp b
+	jr z,20F
+
+	ld hl,Ctrl_1
+	set 4,(hl)
+	jp Main
+
+20 ld hl,Ctrl_1
+	res 4,(hl)
+	di
+
+	ld a,(Contador_de_frames)
+
+;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
+;! _ IMPREDECIBLE !!!!
+
+	add 10
+	ld (Clock_Entidades_en_curso),a
+
+	jp 4B
+
+	ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -1302,6 +1258,41 @@ Detecta_disparo_entidad
 ;	ret nz
 
 ;	call Genera_disparo
+	ret
+
+; ----------------------------------------------------------------------
+;
+;	3/8/23
+
+Frame 
+
+; He de imprimir sólo el nº de fotos que he hecho. Sólo BORRAMOS/PINTAMOS los objetos que se han desplazado.
+; Necesito calcular nª de malotes, para ello utilizaré (Stack_snapshot)-(Album_de_fotos).
+
+; PINTAMOS.
+
+    ld a,2
+    out ($fe),a											; Rojo.
+	call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
+	call Extrae_foto_disparos
+    ld a,1
+    out ($fe),a											; Azul.
+
+; Gestiona los álbumes de fotos.	
+
+	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
+
+	ld hl,Album_de_fotos
+    ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
+;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
+	call Gestiona_albumes_de_fotos
+	call Gestiona_albumes_de_fotos_disparos
+
+; RELOJES.
+
+	ld hl,Contador_de_frames
+	inc (hl)											; 0 - 255
+
 	ret
 
 ; ---------------------------------------------------------------
