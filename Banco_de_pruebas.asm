@@ -11,7 +11,13 @@
 
 	org $a101		
 
+	push af
+	push hl
+
 	call Frame
+
+	pop hl
+	pop af
 
 	reti									 
 
@@ -352,8 +358,6 @@ START
 ;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.
 	call Restore_entidad
 
-	jr $
-
 	ld hl,Numero_parcial_de_entidades
 	ld b,(hl)
 	inc b
@@ -415,6 +419,15 @@ START
 6 ld a,(Numero_parcial_de_entidades)
 	inc a
 	ld (Numero_de_malotes),a
+
+; Guardamos el nº de malotes en su caja, Caja_de_malotes+3.
+
+	ld hl,Caja_de_malotes+3
+	ld (hl),a
+
+	call Gestiona_albumes_de_fotos
+;	call Gestiona_albumes_de_fotos_disparos
+	call Gestiona_cajas_de_malotes
 
 ; ------------------------------------
 
@@ -641,6 +654,13 @@ Main ld a,(Clock_Entidades_en_curso)
 
 	call Calcula_numero_de_disparotes
 9 call Calcula_numero_de_malotes 
+
+	ld a,(Contador_de_frames)
+	jr $
+
+	call Gestiona_albumes_de_fotos
+	call Gestiona_albumes_de_fotos_disparos
+	call Gestiona_cajas_de_malotes
 
 	ld a,4
 	out ($fe),a  
@@ -890,7 +910,7 @@ Inicia_Puntero_Disparo_Amadeus ld hl,Indice_de_disparos_Amadeus
 
 ; -------------------------------------------------------------------------------------------------------------
 ;
-; 28/2/23 
+; 3/8/23 
 ;
 
 Calcula_numero_de_malotes 
@@ -913,6 +933,10 @@ Calcula_numero_de_malotes
 	ld a,b
 
 1 ld (Numero_de_malotes),a
+
+	ld hl,Caja_de_malotes+3
+	ld (hl),a
+
 	ret
 
 ; -------------------------------------------------------------------------------------------------------------
@@ -1285,9 +1309,6 @@ Frame
 	ld hl,Album_de_fotos
     ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
 ;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
-	call Gestiona_albumes_de_fotos
-	call Gestiona_albumes_de_fotos_disparos
-
 ; RELOJES.
 
 	ld hl,Contador_de_frames

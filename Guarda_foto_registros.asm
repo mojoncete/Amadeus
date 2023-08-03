@@ -39,11 +39,11 @@ Guarda_foto_registros
     bit 0,a
     jr z,2F
 
-    ld hl,(Stack_snapshot_disparos_3)
+    ld hl,(Stack_snapshot_disparos)
 
     jr 4F
 
-2 ld hl,(Stack_snapshot_3)                        ; Album_de_fotos contiene la imagen de los registros implicados en el_
+2 ld hl,(Stack_snapshot)                          ; Album_de_fotos contiene la imagen de los registros implicados en el_
 
 4 ld b,3                                          ; _correcto funcionamiento de las distintas rutinas de impresión.
 
@@ -57,21 +57,111 @@ Guarda_foto_registros
     bit 0,a
     jr z,5F
 
-    ld (Stack_snapshot_disparos_3),hl
+    ld (Stack_snapshot_disparos),hl
     jr 6F
 
-5 ld (Stack_snapshot_3),hl
+5 ld (Stack_snapshot),hl
 6 ld sp,(Stack)
 
     ret
+; ------------------------------------------------
+;
+;   3/08/23
+;
+;   La rutina estará situada justo después de la Caja_de_disparotes.
+
+    org $7421 
+
+Gestiona_cajas_de_malotes 
+
+; Desplazamos cajas.
+
+;   Byte1 - Byte0
+
+    ld hl,Caja_de_malotes+1
+    ld a,(hl)
+    and a
+    jr z,1F
+
+;   El Byte1 contiene datos. Transferimos al byte0.
+
+    dec hl
+    ld (hl),a
+    jr 2F
+
+; Byte1="0". 
+; Byte0 contiene datos?.
+
+1 ld hl,Caja_de_malotes
+    ld a,(hl)
+    and a
+    jr z,2F
+
+; Limpiamos Byte0 si contiene datos.
+
+    ld (hl),0
+ 
+;   Byte2 - Byte1
+
+;   El byte2 contiene datos?
+
+2 ld hl,Caja_de_malotes+2
+    ld a,(hl)
+    and a
+    jr z,3F
+
+;   El Byte2 contiene datos. Transferimos al byte1.  
+
+    dec hl
+    ld (hl),a
+    jr 4F
+
+; Byte2="0". 
+; Byte1 contiene datos?.
+
+3 ld hl,Caja_de_malotes+1
+    ld a,(hl)
+    and a
+    jr z,4F
+
+; Limpiamos Byte1 si contiene datos.
+
+    ld (hl),0
+
+;   Byte3 - Byte2
+
+;   El byte3 contiene datos?
+
+4 ld hl,Caja_de_malotes+3
+    ld a,(hl)
+    and a
+    jr z,5F
+
+;   El Byte3 contiene datos. Transferimos al byte2.  
+
+    dec hl
+    ld (hl),a
+    jr 6F
+
+; Byte3="0". 
+; Byte2 contiene datos?.
+
+5 ld hl,Caja_de_malotes+2
+    ld a,(hl)
+    and a
+    ret z
+
+; Limpiamos Byte2 si contiene datos.
+
+    ld (hl),0
+
+6 ret
 
 ; ------------------------------------------------
 ;
 ;   31/07/23
 ;
 ;   La rutina estará situada justo después de la Caja_de_disparotes.
-
-    org $7421 
 
 Gestiona_albumes_de_fotos 
 

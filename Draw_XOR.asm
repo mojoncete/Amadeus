@@ -721,7 +721,9 @@ Extrae_foto_entidades
     and a
     ret z																	; Salimos si no hay DATOS en el álbum. 
 
-	ld a,(Numero_de_malotes)												; Salimos si no hay MOVIMIENTO. 
+	ld hl,Caja_de_malotes
+	ld a,(hl)
+	ld (Numero_de_malotes),a												; Salimos si no hay MOVIMIENTO. 
 	and a
 	ret z
 
