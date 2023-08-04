@@ -925,6 +925,9 @@ Inicia_punteros_de_albumes ld hl,Indice_album_de_fotos
 
 Avanza_puntero_de_album_de_fotos 
 
+;	Primero tengo que actualizar el Stack_snapshot correspondiente y después desplazar el puntero_
+;	_ por el índice.
+
 	ret
 
 ; *************************************************************************************************************************************************************
