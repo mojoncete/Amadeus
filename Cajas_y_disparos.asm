@@ -608,9 +608,6 @@ Indice_de_entidades
 
 	defw Entidad_1
 	defw Entidad_2
-	defw Entidad_3
-	defw Entidad_4
-	defw Entidad_5
 
 ;	BADSAT, (Satélite malvado).	
 
@@ -631,30 +628,3 @@ Entidad_2 db 2,2		                     		; (Filas) / (Columns).
 	db 1											; (Cuad_objeto).
 	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 	defw Indice_mov_Baile_de_BadSat				    ; (Puntero_indice_mov) 
-
-Entidad_3 db 2,2		                     		; (Filas) / (Columns).
-	db %00000100									; (Attr).
-	defw Indice_Badsat_der							; (Indice_Sprite_der).
-	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
-	defw $47a0                                      ; (Posicion_inicio).
-	db 1											; (Cuad_objeto).
-	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-	defw Indice_mov_Baile_de_BadSat					; (Puntero_indice_mov)
-
-Entidad_4 db 2,2		                     		; (Filas) / (Columns).
-	db %00000001									; (Attr).
-	defw Indice_Badsat_der							; (Indice_Sprite_der).
-	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
-	defw $47bf                                      ; (Posicion_inicio).
-	db 1											; (Cuad_objeto).
-	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-	defw Indice_mov_Baile_de_BadSat					; (Puntero_indice_mov)
-
-Entidad_5 db 2,2		                     		; (Filas) / (Columns).
-	db %00000001									; (Attr).
-	defw Indice_Badsat_der							; (Indice_Sprite_der).
-	defw Indice_Badsat_izq							; (Indice_Sprite_izq).
-	defw $4007                                      ; (Posicion_inicio).
-	db 1											; (Cuad_objeto).
-	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-	defw Indice_mov_Baile_de_BadSat					; (Puntero_indice_mov)

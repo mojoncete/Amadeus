@@ -260,7 +260,9 @@ Datos_de_entidad defw 0									; Contiene los bytes de información de la entid
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
-; Sirven para PINTAR.
+;	4/8/23
+;
+;	Álbumes.
 
 Stack defw 0 												; La rutinas de pintado, utilizan esta_
 ;															; _variable para almacenar lo posición del puntero_
@@ -279,6 +281,12 @@ Stack_snapshot_2 defw Album_de_fotos_2
 Stack_snapshot_disparos_2 defw Album_de_fotos_disparos_2
 Stack_snapshot_3 defw Album_de_fotos_3
 Stack_snapshot_disparos_3 defw Album_de_fotos_disparos_3
+
+Puntero_indice_album_de_fotos defw 0
+Puntero_indice_album_de_fotos_disparos defw 0
+
+Puntero_de_album_de_fotos defw 0
+Puntero_de_album_de_fotos_de_disparos defw 0
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -345,17 +353,20 @@ START
 	ld a,%00000111
 	call Cls
 
-;	call Pinta_marco
+	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
+; INICIALIZACIÓN.
 
 	call Inicializa_Punteros_de_nivel					 ; Inicializa. 1er NIVEL.
-
-	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
 4 call Prepara_cajas 									 ; (Niveles.asm).
 
 	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en la 1ª entidad del_
 ;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.
+	call Inicia_punteros_de_albumes
+
+; ----------
+
 	call Restore_entidad
 
 	ld hl,Numero_parcial_de_entidades
@@ -894,6 +905,27 @@ Inicia_punteros_de_cajas
 	call Extrae_address
 	ld (Puntero_restore_caja),hl
     ret
+
+; ---------------------------------------------------------------
+;
+;	4/8/23
+;
+
+Inicia_punteros_de_albumes ld hl,Indice_album_de_fotos
+	ld (Puntero_indice_album_de_fotos),hl
+	call Extrae_address
+	ld (Puntero_de_album_de_fotos),hl
+
+	ld hl,Indice_album_de_fotos_disparos
+	ld (Puntero_indice_album_de_fotos_disparos),hl
+	call Extrae_address
+	ld (Puntero_de_album_de_fotos_de_disparos),hl
+
+	ret
+
+Avanza_puntero_de_album_de_fotos 
+
+	ret
 
 ; *************************************************************************************************************************************************************
 ;

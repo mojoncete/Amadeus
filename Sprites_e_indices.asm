@@ -250,3 +250,20 @@ Explosion_2x2_3	DEFB $31,$81,$40,$02,$88,$04,$10,$0C
 	DEFB	$86,$60,$03,$80,$10,$80,$18,$00
 	DEFB	$08,$00,$40,$32,$60,$01,$80,$02
 
+; ------------------------------------------ 4/8/23
+
+Indice_album_de_fotos defw Album_de_fotos
+	defw Album_de_fotos_1
+	defw Album_de_fotos_2
+	defw Album_de_fotos_3
+Indice_album_de_fotos_disparos defw Album_de_fotos_disparos
+	defw Album_de_fotos_disparos_1
+	defw Album_de_fotos_disparos_2
+ 	defw Album_de_fotos_disparos_3
+
+
+
+
+
+			
+
