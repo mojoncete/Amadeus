@@ -39,11 +39,11 @@ Guarda_foto_registros
     bit 0,a
     jr z,2F
 
-    ld hl,(Puntero_de_album_de_fotos_de_disparos)
+    ld hl,(Stack_snapshot_disparos)
 
     jr 4F
 
-2 ld hl,(Puntero_de_album_de_fotos)               ; Album_de_fotos contiene la imagen de los registros implicados en el_
+2 ld hl,(Stack_snapshot)                          ; Album_de_fotos contiene la imagen de los registros implicados en el_
 
 4 ld b,3                                          ; _correcto funcionamiento de las distintas rutinas de impresión.
 
@@ -57,10 +57,10 @@ Guarda_foto_registros
     bit 0,a
     jr z,5F
 
-    ld (Puntero_de_album_de_fotos_de_disparos),hl
+    ld (Stack_snapshot_disparos),hl
     jr 6F
 
-5 ld (Puntero_de_album_de_fotos),hl
+5 ld (Stack_snapshot),hl
 6 ld sp,(Stack)
 
     ret
@@ -171,6 +171,8 @@ Gestiona_albumes_de_fotos
 ; (Album_de_fotos_1) --- (Album_de_fotos).
 
 ;   El álbum_1 contiene datos?
+
+    jr $
 
     ld hl,Album_de_fotos_1+1
     ld a,(hl)

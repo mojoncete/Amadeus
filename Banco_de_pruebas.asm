@@ -269,10 +269,10 @@ Stack defw 0 												; La rutinas de pintado, utilizan esta_
 ; 															; _de pila, SP.
 Stack_2 defw 0												; 2º variable destinada a almacenar el puntero de pila, SP.
 ;															; La utiliza la rutina [Extrae_foto_registros].
-Stack_snapshot defw Album_de_fotos							; Puntero que indica la posición de memoria donde vamos a guardar_
+Stack_snapshot defw 0										; Puntero que indica la posición de memoria donde vamos a guardar_
 ;															; _el snapshot de los registros de la siguiente entidad.
 ;															; Inicialmente está situado el la posición $7000, Album_de_fotos.
-Stack_snapshot_disparos defw Album_de_fotos_disparos		; Puntero que indica la posición de memoria donde vamos a guardar_
+Stack_snapshot_disparos defw 0								; Puntero que indica la posición de memoria donde vamos a guardar_
 ;															; _el snapshot de los registros del siguiente disparo.
 ;															; Inicialmente está situado en la posición $7060, Album_de_fotos_disparos.
 Stack_snapshot_1 defw Album_de_fotos_1
@@ -287,6 +287,9 @@ Puntero_indice_album_de_fotos_disparos defw 0
 
 Puntero_de_album_de_fotos defw 0
 Puntero_de_album_de_fotos_de_disparos defw 0
+
+Puntero_de_caja_de_malotes defw 0
+Puntero_de_caja_de_disparotes defw 0
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -363,8 +366,8 @@ START
 
 	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en la 1ª entidad del_
 ;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.
-	call Inicia_punteros_de_albumes
-
+	call Inicia_punteros_de_albumes_y_malotes			 ; Iniciamos los punteros de los álbumes de fotos y cajas de_
+;													     ; _ malotes antes de guardar ninguna foto.
 ; ----------
 
 	call Restore_entidad
@@ -423,7 +426,7 @@ START
 	ld hl,Ctrl_1
 	res 3,(hl)
 	call Calcula_numero_de_malotes 
-	jr 2F
+	jr 21F
 
 ; ----------
 
@@ -431,19 +434,20 @@ START
 	inc a
 	ld (Numero_de_malotes),a
 
-; Guardamos el nº de malotes en su caja, Caja_de_malotes+3.
-
-	ld hl,Caja_de_malotes+3
+21 ld hl,(Puntero_de_caja_de_malotes)
 	ld (hl),a
 
-	call Gestiona_albumes_de_fotos
-;	call Gestiona_albumes_de_fotos_disparos
-	call Gestiona_cajas_de_malotes
+; En este punto tenemos el 1er FRAME preparado. Los datos del FRAME se encuentran en Album_de_fotos y_
+; _ (Numero_de_malotes) en (Caja_de_malotes).
+
+; Después del guardado de cada FRAME hemos de llamar a [Avanza_puntero_de_album_de_fotos_y_malotes]_
+; _ para situarnos en el siguiente album y en la siguiente Caja_de_malotes.
+
+	call Avanza_puntero_de_album_de_fotos_y_malotes
 
 ; ------------------------------------
 
-2 ei ; Interrupciones habilitadas.
-
+	ei ; Interrupciones habilitadas.
 
 ; -----------------------------------------------------------------------
 ;
@@ -666,12 +670,7 @@ Main ld a,(Clock_Entidades_en_curso)
 	call Calcula_numero_de_disparotes
 9 call Calcula_numero_de_malotes 
 
-	ld a,(Contador_de_frames)
-	jr $
-
-	call Gestiona_albumes_de_fotos
-	call Gestiona_albumes_de_fotos_disparos
-	call Gestiona_cajas_de_malotes
+	call Avanza_puntero_de_album_de_fotos_y_malotes
 
 	ld a,4
 	out ($fe),a  
@@ -911,22 +910,47 @@ Inicia_punteros_de_cajas
 ;	4/8/23
 ;
 
-Inicia_punteros_de_albumes ld hl,Indice_album_de_fotos
+Inicia_punteros_de_albumes_y_malotes
+
+	ld hl,Indice_album_de_fotos
 	ld (Puntero_indice_album_de_fotos),hl
 	call Extrae_address
-	ld (Puntero_de_album_de_fotos),hl
+	ld (Stack_snapshot),hl
 
 	ld hl,Indice_album_de_fotos_disparos
 	ld (Puntero_indice_album_de_fotos_disparos),hl
 	call Extrae_address
-	ld (Puntero_de_album_de_fotos_de_disparos),hl
+	ld (Stack_snapshot_disparos),hl
+
+	ld hl,Caja_de_malotes
+	ld (Puntero_de_caja_de_malotes),hl
+	ld hl,Caja_de_disparotes
+	ld (Puntero_de_caja_de_disparotes),hl
 
 	ret
 
-Avanza_puntero_de_album_de_fotos 
+Avanza_puntero_de_album_de_fotos_y_malotes
 
-;	Primero tengo que actualizar el Stack_snapshot correspondiente y después desplazar el puntero_
-;	_ por el índice.
+; Caja_de_malotes equ $7419 ; (7419h - 741ch) 4 bytes.
+
+; Estamos en el último álbum del índice???.
+
+	ld hl,(Puntero_indice_album_de_fotos)
+	ld bc,Indice_album_de_fotos+6
+	and a
+	sbc hl,bc
+	jr z,$				; Estamos en el último álbum del índice. 
+
+	ld hl,(Puntero_indice_album_de_fotos)
+	inc hl
+	inc hl
+	ld (Puntero_indice_album_de_fotos),hl
+	call Extrae_address
+	ld (Stack_snapshot),hl
+
+	ld hl,(Puntero_de_caja_de_malotes)
+	inc hl
+	ld (Puntero_de_caja_de_malotes),hl
 
 	ret
 	
@@ -952,7 +976,7 @@ Calcula_numero_de_malotes
 
 	ld hl,Album_de_fotos
 	ex de,hl
-	ld hl,(Stack_snapshot)
+	ld hl,(Puntero_de_album_de_fotos)
 
 	ld b,0
 	ld a,l
@@ -967,9 +991,7 @@ Calcula_numero_de_malotes
 	jr nz,2B
 	ld a,b
 
-1 ld (Numero_de_malotes),a
-
-	ld hl,Caja_de_malotes+3
+1 ld hl,(Puntero_de_caja_de_malotes)					; Guardamos nº de malotes en su correspondiente caja.
 	ld (hl),a
 
 	ret
@@ -998,8 +1020,11 @@ Calcula_numero_de_disparotes
 	jr nz,2B
 	ld a,b
 
-1 ld (Numero_de_disparotes),a
+1 	ld hl,(Puntero_de_caja_de_disparotes)
+	ld (hl),a
+
 	ret
+
 ; *************************************************************************************************************************************************************
 ;
 ; 20/10/22
@@ -1344,6 +1369,9 @@ Frame
 	ld hl,Album_de_fotos
     ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
 ;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
+
+	call Gestiona_albumes_de_fotos 
+
 ; RELOJES.
 
 	ld hl,Contador_de_frames

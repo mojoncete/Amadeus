@@ -717,13 +717,11 @@ PreviousScan ld a,h
 Extrae_foto_entidades 
 
 	ld hl,Album_de_fotos+1
-    ld a,(hl)
-    and a
-    ret z																	; Salimos si no hay DATOS en el álbum. 
-
-	ld hl,Caja_de_malotes
 	ld a,(hl)
-	ld (Numero_de_malotes),a												; Salimos si no hay MOVIMIENTO. 
+	and a
+	ret z 																	; Salimos si no hay datos en el álbum.
+
+	ld a,(Numero_de_malotes)												; Salimos si no hay MOVIMIENTO. 
 	and a
 	ret z
 
