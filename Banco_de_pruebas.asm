@@ -11,14 +11,7 @@
 
 	org $a101		
 
-	push af
-	push hl
-
 	call Frame
-
-	pop hl
-	pop af
-
 	reti									 
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
@@ -260,7 +253,7 @@ Datos_de_entidad defw 0									; Contiene los bytes de información de la entid
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;	4/8/23
+;	9/8/23
 ;
 ;	Álbumes.
 
@@ -269,24 +262,30 @@ Stack defw 0 												; La rutinas de pintado, utilizan esta_
 ; 															; _de pila, SP.
 Stack_2 defw 0												; 2º variable destinada a almacenar el puntero de pila, SP.
 ;															; La utiliza la rutina [Extrae_foto_registros].
-Stack_snapshot defw 0										; Puntero que indica la posición de memoria donde vamos a guardar_
-;															; _el snapshot de los registros de la siguiente entidad.
+Stack_snapshot defw 0
+Stack_snapshot_disparos defw 0
+
+End_Snapshot defw 0										
 ;															; Inicialmente está situado el la posición $7000, Album_de_fotos.
-Stack_snapshot_disparos defw 0								; Puntero que indica la posición de memoria donde vamos a guardar_
+End_Snapshot_disparos defw 0								; Puntero que indica la posición de memoria donde vamos a guardar_
 ;															; _el snapshot de los registros del siguiente disparo.
 ;															; Inicialmente está situado en la posición $7060, Album_de_fotos_disparos.
-Stack_snapshot_1 defw Album_de_fotos_1
-Stack_snapshot_disparos_1 defw Album_de_fotos_disparos_1
-Stack_snapshot_2 defw Album_de_fotos_2
-Stack_snapshot_disparos_2 defw Album_de_fotos_disparos_2
-Stack_snapshot_3 defw Album_de_fotos_3
-Stack_snapshot_disparos_3 defw Album_de_fotos_disparos_3
+End_Snapshot_1 defw 0
+End_Snapshot_disparos_1 defw 0
+End_Snapshot_2 defw 0
+End_Snapshot_disparos_2 defw 0
+End_Snapshot_3 defw 0
+End_Snapshot_disparos_3 defw 0
 
 Puntero_indice_album_de_fotos defw 0
 Puntero_indice_album_de_fotos_disparos defw 0
-
 Puntero_de_album_de_fotos defw 0
 Puntero_de_album_de_fotos_de_disparos defw 0
+
+Puntero_indice_End_Snapshot defw 0
+Puntero_indice_End_Snapshot_disparos defw 0
+Puntero_de_End_Snapshot defw 0
+Puntero_de_End_Snapshot_disparos defw 0
 
 Puntero_de_caja_de_malotes defw 0
 Puntero_de_caja_de_disparotes defw 0
@@ -434,7 +433,7 @@ START
 	inc a
 	ld (Numero_de_malotes),a
 
-21 ld hl,(Puntero_de_caja_de_malotes)
+21 ld hl,(Puntero_de_caja_de_malotes)	; Guarda el nº de malotes en la 1ª caja.
 	ld (hl),a
 
 ; En este punto tenemos el 1er FRAME preparado. Los datos del FRAME se encuentran en Album_de_fotos y_
@@ -445,19 +444,27 @@ START
 
 	call Avanza_puntero_de_album_de_fotos_y_malotes
 
+	jr $
+
 ; ------------------------------------
 
-	ei ; Interrupciones habilitadas.
+Main ei ; Interrupciones habilitadas.
 
 ; -----------------------------------------------------------------------
 ;
 ;	3/8/23
 
-Main ld a,(Clock_Entidades_en_curso)
+	ld a,(Clock_Entidades_en_curso)
 	ld b,a
 	ld a,(Contador_de_frames)
 	cp b
 	jr nz,13F
+;
+;!debuggg
+;    ld a,(Contador_de_frames)
+;    ld hl,(Stack_snapshot)
+;    jr $
+;!debuggg	
 
 	ld a,(Numero_parcial_de_entidades)
 	ld b,a
@@ -529,7 +536,7 @@ Main ld a,(Clock_Entidades_en_curso)
 
 11 ld a,(Entidades_en_curso)
 	and a
-	jp z,16F												; Si no hay entidades en curso, RESTORE AMADEUS.
+	jp z,16F											; Si no hay entidades en curso, RESTORE AMADEUS.
 	ld b,a												; (Entidades_en_curso) en A´ y B.
 
 ; Código que ejecutamos con cada entidad:
@@ -630,6 +637,7 @@ Main ld a,(Clock_Entidades_en_curso)
 	djnz 15B
 
 ; ------------------------------------
+
 ;! Activando estas líneas podemos habilitar 2 explosiones en el mismo FRAME.
 ; Hemos gestionado todas las unidades.
 ; Desactivamos el flag de impacto en entidad por disparo de amadeus.
@@ -907,8 +915,9 @@ Inicia_punteros_de_cajas
 
 ; ---------------------------------------------------------------
 ;
-;	4/8/23
+;	9/8/23
 ;
+;	Inicialización y gestión de álbumes de fotos y cajas.
 
 Inicia_punteros_de_albumes_y_malotes
 
@@ -921,6 +930,16 @@ Inicia_punteros_de_albumes_y_malotes
 	ld (Puntero_indice_album_de_fotos_disparos),hl
 	call Extrae_address
 	ld (Stack_snapshot_disparos),hl
+
+	ld hl,Indice_End_Snapshot
+	ld (Puntero_indice_End_Snapshot),hl
+	call Extrae_address
+	ld (Puntero_de_End_Snapshot),hl
+
+	ld hl,Indice_End_Snapshot_disparos
+	ld (Puntero_indice_End_Snapshot_disparos),hl
+	call Extrae_address
+	ld (Puntero_de_End_Snapshot_disparos),hl
 
 	ld hl,Caja_de_malotes
 	ld (Puntero_de_caja_de_malotes),hl
@@ -938,19 +957,29 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 	ld hl,(Puntero_indice_album_de_fotos)
 	ld bc,Indice_album_de_fotos+6
 	and a
-	sbc hl,bc
-	jr z,$				; Estamos en el último álbum del índice. 
+	sbc hl,bc										; Estamos en el último álbum del índice.
+	jr nz,1F								 		; El buffer está lleno. HALT.
 
-	ld hl,(Puntero_indice_album_de_fotos)
+	halt
+	ret							
+
+1 ld hl,(Puntero_indice_album_de_fotos)
 	inc hl
 	inc hl
 	ld (Puntero_indice_album_de_fotos),hl
 	call Extrae_address
-	ld (Stack_snapshot),hl
+	ld (Stack_snapshot),hl							; Seleccionamos el siguiente álbum.
+
+	ld hl,(Puntero_indice_End_Snapshot)
+	inc hl
+	inc hl
+	ld (Puntero_indice_End_Snapshot),hl
+	call Extrae_address
+	ld (Puntero_de_End_Snapshot),hl					
 
 	ld hl,(Puntero_de_caja_de_malotes)
 	inc hl
-	ld (Puntero_de_caja_de_malotes),hl
+	ld (Puntero_de_caja_de_malotes),hl				; Seleccionamos la siguente caja.
 
 	ret
 	
@@ -1355,6 +1384,11 @@ Frame
 
 ; PINTAMOS.
 
+	push af
+	push bc
+	push de
+	push hl
+
     ld a,2
     out ($fe),a											; Rojo.
 	call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
@@ -1369,13 +1403,28 @@ Frame
 	ld hl,Album_de_fotos
     ld (Stack_snapshot),hl								; Hemos impreso en pantalla el total de entidades. Iniciamos el puntero_
 ;														; _(Stack_snapshot), (lo situamos al principio de Album_de_fotos).
+	call Gestiona_albumes_de_fotos 						; Escupe Álbum de fotos. 1a0, 2a1, 3a2. 
 
-	call Gestiona_albumes_de_fotos 
+	ld hl,(Puntero_indice_album_de_fotos)
+	dec hl
+	dec hl
+	ld (Puntero_indice_album_de_fotos),hl 					; Bajamos el (Puntero_de_album_de_fotos) una posición en el índice.
+	call Extrae_address
+	ld (Stack_snapshot),hl
+
+	ld hl,(Puntero_de_caja_de_malotes)
+	dec hl
+	ld (Puntero_de_caja_de_malotes),hl
 
 ; RELOJES.
 
 	ld hl,Contador_de_frames
 	inc (hl)											; 0 - 255
+
+	pop hl
+	pop de
+	pop bc
+	pop af
 
 	ret
 

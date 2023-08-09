@@ -40,7 +40,6 @@ Guarda_foto_registros
     jr z,2F
 
     ld hl,(Stack_snapshot_disparos)
-
     jr 4F
 
 2 ld hl,(Stack_snapshot)                          ; Album_de_fotos contiene la imagen de los registros implicados en el_
@@ -62,6 +61,12 @@ Guarda_foto_registros
 
 5 ld (Stack_snapshot),hl
 6 ld sp,(Stack)
+
+; Aquí tengo que copiar (Stack_snapshot) en la dirección hacia donde apunta (Puntero_de_End_Snapshot).
+
+
+
+
 
     ret
 
@@ -172,7 +177,7 @@ Gestiona_albumes_de_fotos
 
 ;   El álbum_1 contiene datos?
 
-    jr $
+
 
     ld hl,Album_de_fotos_1+1
     ld a,(hl)
@@ -232,7 +237,7 @@ Gestiona_albumes_de_fotos
     ld bc,$83
     ldir    
     ld hl,Album_de_fotos_1
-    ld (Stack_snapshot_1),hl
+;    ld (Stack_snapshot_1),hl
 
 ; (Album_de_fotos_3) --- (Album_de_fotos_2).
 
@@ -264,7 +269,7 @@ Gestiona_albumes_de_fotos
     ld bc,$83
     ldir    
     ld hl,Album_de_fotos_2
-    ld (Stack_snapshot_2),hl
+;    ld (Stack_snapshot_2),hl
 
 6 ret
 
@@ -291,17 +296,23 @@ Trasbase_de_datos push bc
 
 ; Paquetitos.
 
-Trasbase_3a2 ld hl,(Stack_snapshot_3)
+Trasbase_3a2 
+
+;    ld hl,(Stack_snapshot_3)
     ld bc,Album_de_fotos_3
     call Trasbase_de_datos
     ret 
 
-Trasbase_2a1 ld hl,(Stack_snapshot_2)
+Trasbase_2a1 
+
+;    ld hl,(Stack_snapshot_2)
     ld bc,Album_de_fotos_2
     call Trasbase_de_datos
     ret 
 
-Trasbase_1a0 ld hl,(Stack_snapshot_1)
+Trasbase_1a0 
+
+;    ld hl,(Stack_snapshot_1)
     ld bc,Album_de_fotos_1
     call Trasbase_de_datos
     ret 
@@ -320,7 +331,7 @@ Album_3_a_Album_2 ld de,Album_de_fotos_2
 ;   Actualizamos (Stack_snapshot_2).   
 
     ex de,hl
-    ld (Stack_snapshot_2),hl
+;    ld (Stack_snapshot_2),hl
 
 ;   Limpiamos álbum_3 y actualizamos (Stack_snapshot_3).
 
@@ -330,7 +341,7 @@ Album_3_a_Album_2 ld de,Album_de_fotos_2
     call Trasbase_3a2
 
     ld hl,Album_de_fotos_3
-    ld (Stack_snapshot_3),hl
+;    ld (Stack_snapshot_3),hl
     ret
 
 Album_2_a_Album_1 ld de,Album_de_fotos_1
@@ -339,7 +350,7 @@ Album_2_a_Album_1 ld de,Album_de_fotos_1
 ;   Actualizamos (Stack_snapshot_1).   
 
     ex de,hl
-    ld (Stack_snapshot_1),hl
+;    ld (Stack_snapshot_1),hl
 
 ;   Limpiamos álbum_2 y actualizamos (Stack_snapshot_2).
 
@@ -349,7 +360,7 @@ Album_2_a_Album_1 ld de,Album_de_fotos_1
     call Trasbase_2a1
 
     ld hl,Album_de_fotos_2
-    ld (Stack_snapshot_2),hl
+;    ld (Stack_snapshot_2),hl
     ret
 
 Album_1_a_Album_de_fotos ld de,Album_de_fotos
@@ -368,7 +379,7 @@ Album_1_a_Album_de_fotos ld de,Album_de_fotos
     call Trasbase_1a0
 
     ld hl,Album_de_fotos_1
-    ld (Stack_snapshot_1),hl
+;    ld (Stack_snapshot_1),hl
     ret
 
 ; -------------------- ------------------------------------
@@ -439,7 +450,7 @@ Gestiona_albumes_de_fotos_disparos
     ld bc,$83
     ldir    
     ld hl,Album_de_fotos_disparos_1
-    ld (Stack_snapshot_disparos_1),hl
+;    ld (Stack_snapshot_disparos_1),hl
 
 ; (Album_de_fotos_3) --- (Album_de_fotos_2).
 
@@ -471,7 +482,7 @@ Gestiona_albumes_de_fotos_disparos
     ld bc,$83
     ldir    
     ld hl,Album_de_fotos_disparos_2
-    ld (Stack_snapshot_disparos_2),hl
+;    ld (Stack_snapshot_disparos_2),hl
 
 6 ret
 
@@ -498,17 +509,23 @@ Trasbase_de_datos_disparos push bc
 
 ; Paquetitos.
 
-Trasbase_3a2_disparos ld hl,(Stack_snapshot_disparos_3)
+Trasbase_3a2_disparos 
+
+;   ld hl,(Stack_snapshot_disparos_3)
     ld bc,Album_de_fotos_disparos_3
     call Trasbase_de_datos_disparos
     ret 
 
-Trasbase_2a1_disparos ld hl,(Stack_snapshot_disparos_2)
+Trasbase_2a1_disparos 
+
+;    ld hl,(Stack_snapshot_disparos_2)
     ld bc,Album_de_fotos_disparos_2
     call Trasbase_de_datos_disparos
     ret 
 
-Trasbase_1a0_disparos ld hl,(Stack_snapshot_disparos_1)
+Trasbase_1a0_disparos 
+
+;   ld hl,(Stack_snapshot_disparos_1)
     ld bc,Album_de_fotos_disparos_1
     call Trasbase_de_datos_disparos
     ret 
@@ -527,7 +544,7 @@ Album_3_a_Album_2_disparos ld de,Album_de_fotos_disparos_2
 ;   Actualizamos (Stack_snapshot_2).   
 
     ex de,hl
-    ld (Stack_snapshot_disparos_2),hl
+;    ld (Stack_snapshot_disparos_2),hl
 
 ;   Limpiamos álbum_3 y actualizamos (Stack_snapshot_3).
 
@@ -537,7 +554,7 @@ Album_3_a_Album_2_disparos ld de,Album_de_fotos_disparos_2
     call Trasbase_3a2_disparos
 
     ld hl,Album_de_fotos_disparos_3
-    ld (Stack_snapshot_disparos_3),hl
+;    ld (Stack_snapshot_disparos_3),hl
     ret
 
 Album_2_a_Album_1_disparos ld de,Album_de_fotos_disparos_1
@@ -546,7 +563,7 @@ Album_2_a_Album_1_disparos ld de,Album_de_fotos_disparos_1
 ;   Actualizamos (Stack_snapshot_1).   
 
     ex de,hl
-    ld (Stack_snapshot_disparos_1),hl
+;    ld (Stack_snapshot_disparos_1),hl
 
 ;   Limpiamos álbum_2 y actualizamos (Stack_snapshot_2).
 
@@ -556,7 +573,7 @@ Album_2_a_Album_1_disparos ld de,Album_de_fotos_disparos_1
     call Trasbase_2a1_disparos
 
     ld hl,Album_de_fotos_disparos_2
-    ld (Stack_snapshot_disparos_2),hl
+;    ld (Stack_snapshot_disparos_2),hl
     ret
 
 Album_1_a_Album_de_fotos_disparos ld de,Album_de_fotos_disparos
@@ -575,5 +592,5 @@ Album_1_a_Album_de_fotos_disparos ld de,Album_de_fotos_disparos
     call Trasbase_1a0_disparos
 
     ld hl,Album_de_fotos_disparos_1
-    ld (Stack_snapshot_disparos_1),hl
+;    ld (Stack_snapshot_disparos_1),hl
     ret

@@ -250,7 +250,9 @@ Explosion_2x2_3	DEFB $31,$81,$40,$02,$88,$04,$10,$0C
 	DEFB	$86,$60,$03,$80,$10,$80,$18,$00
 	DEFB	$08,$00,$40,$32,$60,$01,$80,$02
 
-; ------------------------------------------ 4/8/23
+; ------------------------------------------ 9/8/23
+;
+;	Índices de álbumes de fotos y disparos.
 
 Indice_album_de_fotos defw Album_de_fotos
 	defw Album_de_fotos_1
@@ -260,7 +262,14 @@ Indice_album_de_fotos_disparos defw Album_de_fotos_disparos
 	defw Album_de_fotos_disparos_1
 	defw Album_de_fotos_disparos_2
  	defw Album_de_fotos_disparos_3
-
+Indice_End_Snapshot defw End_Snapshot
+	defw End_Snapshot_1
+	defw End_Snapshot_2
+	defw End_Snapshot_3
+Indice_End_Snapshot_disparos defw End_Snapshot_disparos
+	defw End_Snapshot_disparos_1
+	defw End_Snapshot_disparos_2 
+	defw End_Snapshot_disparos_3
 
 
 			
