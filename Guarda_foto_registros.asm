@@ -1,6 +1,6 @@
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
-;	3/1/23
+;	9/8/23
 ;
 ;	Instrucciones donde interviene el Stack Pointer, (SP).
 
@@ -64,9 +64,13 @@ Guarda_foto_registros
 
 ; Aquí tengo que copiar (Stack_snapshot) en la dirección hacia donde apunta (Puntero_de_End_Snapshot).
 
+    push hl
+    pop de                                        ; DE contiene la dirección donde terminan los datos de este álbum.
 
-
-
+    ld hl,(Puntero_de_End_Snapshot)               ; Guardamos la dirección de `fin de álbum', en la dirección que_
+    ld (hl),e                                     ; _ contiene (Puntero_de_End_Snapshot). Esta dirección la utilizará la_
+    inc hl                                        ; _ rutina [Gestiona_albumes_de_fotos] para copiar los datos de un_
+    ld (hl),d                                     ; _ álbum a otro.
 
     ret
 
@@ -84,24 +88,25 @@ Gestiona_cajas_de_malotes
 
 ;   Byte1 - Byte0
 
-    ld hl,Caja_de_malotes+1
-    ld a,(hl)
-    and a
-    jr z,1F
+;;    ld hl,Caja_de_malotes+1
+;    ld a,(hl)
+;    and a
+;    jr z,1F
 
 ;   El Byte1 contiene datos. Transferimos al byte0.
 
-    dec hl
-    ld (hl),a
-    jr 2F
+;    dec hl
+;    ld (hl),a
+;    jr 2F
 
 ; Byte1="0". 
 ; Byte0 contiene datos?.
 
-1 ld hl,Caja_de_malotes
-    ld a,(hl)
-    and a
-    jr z,2F
+1 
+;    ld hl,Caja_de_malotes
+;    ld a,(hl)
+ ;   and a
+;;    jr z,2F
 
 ; Limpiamos Byte0 si contiene datos.
 
@@ -111,57 +116,57 @@ Gestiona_cajas_de_malotes
 
 ;   El byte2 contiene datos?
 
-2 ld hl,Caja_de_malotes+2
-    ld a,(hl)
-    and a
-    jr z,3F
+;;2 ld hl,Caja_de_malotes+2
+;    ld a,(hl)
+;    and a
+;    jr z,3F
 
 ;   El Byte2 contiene datos. Transferimos al byte1.  
 
-    dec hl
-    ld (hl),a
-    jr 4F
+;    dec hl
+;    ld (hl),a
+;    jr 4F
 
 ; Byte2="0". 
 ; Byte1 contiene datos?.
 
-3 ld hl,Caja_de_malotes+1
-    ld a,(hl)
-    and a
-    jr z,4F
+;;;3 ld hl,Caja_de_malotes+1
+;;;    ld a,(hl)
+;;;    and a
+;;;    jr z,4F
 
 ; Limpiamos Byte1 si contiene datos.
 
-    ld (hl),0
+;;    ld (hl),0
 
 ;   Byte3 - Byte2
 
 ;   El byte3 contiene datos?
 
-4 ld hl,Caja_de_malotes+3
-    ld a,(hl)
-    and a
-    jr z,5F
+;;4 ld hl,Caja_de_malotes+3
+;;    ld a,(hl)
+;;    and a
+;;    jr z,5F
 
 ;   El Byte3 contiene datos. Transferimos al byte2.  
 
-    dec hl
-    ld (hl),a
-    jr 6F
+;    dec hl
+;    ld (hl),a
+;    jr 6F
 
 ; Byte3="0". 
 ; Byte2 contiene datos?.
 
-5 ld hl,Caja_de_malotes+2
-    ld a,(hl)
-    and a
-    ret z
+;5 ld hl,Caja_de_malotes+2
+;    ld a,(hl)
+;    and a
+;    ret z
 
 ; Limpiamos Byte2 si contiene datos.
 
-    ld (hl),0
+ ;   ld (hl),0
 
-6 ret
+;6 ret
 
 ; ------------------------------------------------
 ;
@@ -177,7 +182,7 @@ Gestiona_albumes_de_fotos
 
 ;   El álbum_1 contiene datos?
 
-
+    jr $
 
     ld hl,Album_de_fotos_1+1
     ld a,(hl)

@@ -721,9 +721,7 @@ Extrae_foto_entidades
 	and a
 	ret z 																	; Salimos si no hay datos en el álbum. VACÍO.
 
-	ld hl,Caja_de_malotes
-	ld a,(hl)
-	ld (Numero_de_malotes),a												; No hay MALOTES. No se ha producido movimiento.
+	ld a,(Numero_de_malotes)												; No hay MALOTES. No se ha producido movimiento.
 	and a																	; No ha aparecido ninguna `nueva entidad'.
 	ret z
 
