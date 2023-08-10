@@ -78,524 +78,161 @@ Guarda_foto_registros
 ;
 ;   3/08/23
 ;
-;   La rutina estará situada justo después de la Caja_de_disparotes.
-
-    org $7421 
-
-Gestiona_cajas_de_malotes 
-
-; Desplazamos cajas.
-
-;   Byte1 - Byte0
-
-;;    ld hl,Caja_de_malotes+1
-;    ld a,(hl)
-;    and a
-;    jr z,1F
-
-;   El Byte1 contiene datos. Transferimos al byte0.
-
-;    dec hl
-;    ld (hl),a
-;    jr 2F
-
-; Byte1="0". 
-; Byte0 contiene datos?.
-
-1 
-;    ld hl,Caja_de_malotes
-;    ld a,(hl)
- ;   and a
-;;    jr z,2F
-
-; Limpiamos Byte0 si contiene datos.
-
-    ld (hl),0
- 
-;   Byte2 - Byte1
-
-;   El byte2 contiene datos?
-
-;;2 ld hl,Caja_de_malotes+2
-;    ld a,(hl)
-;    and a
-;    jr z,3F
-
-;   El Byte2 contiene datos. Transferimos al byte1.  
-
-;    dec hl
-;    ld (hl),a
-;    jr 4F
-
-; Byte2="0". 
-; Byte1 contiene datos?.
-
-;;;3 ld hl,Caja_de_malotes+1
-;;;    ld a,(hl)
-;;;    and a
-;;;    jr z,4F
-
-; Limpiamos Byte1 si contiene datos.
-
-;;    ld (hl),0
-
-;   Byte3 - Byte2
-
-;   El byte3 contiene datos?
-
-;;4 ld hl,Caja_de_malotes+3
-;;    ld a,(hl)
-;;    and a
-;;    jr z,5F
-
-;   El Byte3 contiene datos. Transferimos al byte2.  
-
-;    dec hl
-;    ld (hl),a
-;    jr 6F
-
-; Byte3="0". 
-; Byte2 contiene datos?.
-
-;5 ld hl,Caja_de_malotes+2
-;    ld a,(hl)
-;    and a
-;    ret z
-
-; Limpiamos Byte2 si contiene datos.
-
- ;   ld (hl),0
-
-;6 ret
-
-; ------------------------------------------------
+;   La rutina estará situada justo después de:
+;   Album_de_fotos_disparos_3 equ $7396	; (7396h - 7418h).
 ;
-;   31/07/23
-;
-;   La rutina estará situada justo después de la Caja_de_disparotes.
+;   Limpia Album_de_fotos después de imprimir pantalla y desplaza el buffer una posición.
+;   Si el buffer estaba lleno, dejará libre Album_de_fotos_3.   
+
+    org $7419 
 
 Gestiona_albumes_de_fotos 
 
-; Desplazamos álbumes.
+;   En 1er lugar limpiamos el FRAME pintado.
+;   Vaciamos Album_de_fotos.
 
-; (Album_de_fotos_1) --- (Album_de_fotos).
+    ld hl,(End_Snapshot)
+    ld bc,Album_de_fotos
+    ld de,Album_de_fotos+1
+    xor a
+    ld (bc),a                   ; "0" en el 1er byte de origen.                  
 
-;   El álbum_1 contiene datos?
+    call Limpia_album
 
-    jr $
+    ld hl,0
+    ld (End_Snapshot),hl        ; Limpia (End_Snapshot).
+
+; ----- ----- ----- -----
+
+;   Album_de_fotos_1. Contiene datos ???
 
     ld hl,Album_de_fotos_1+1
     ld a,(hl)
     and a
-    jr z,1F
+    jr z,1F                     ; Album_de_fotos y Album_de_fotos_1 están vacíos. Hay que volcar la_
+;                               ; _ información del album2 al album1.
 
-;   El álbum_1 contiene datos. Volcamos los datos a Album_de_fotos.
+; ----- ----- ----- -----
+;   Volcamos los datos del Album_de_fotos_1 a Album_de_fotos.
 
-    call Album_1_a_Album_de_fotos
-    jr 2F
+    ld hl,(End_Snapshot_1)      ; Final, (origen).
+    ld bc,Album_de_fotos_1      ; Origen.
+    ld de,Album_de_fotos        ; Destino.
 
-; El álbum_1 está vacío. 
-; Album_de_fotos contiene datos?
+    call Limpia_album
 
-1 ld hl,Album_de_fotos+1
-    ld a,(hl)
-    and a
-    jr z,2F
+    ld hl,(End_Snapshot_1)
+    ld (End_Snapshot),hl        ; Transferimos (End_Snapshot) de un álbum a otro.
 
-; Limpiamos Album_de_fotos.
+;   Limpiamos Album_de_fotos_1.
 
-    ld hl,Album_de_fotos
-    ld (hl),0
-    ld de,Album_de_fotos+1
-    ld bc,$83
-    ldir    
-    ld hl,Album_de_fotos
-    ld (Stack_snapshot),hl
-
-; (Album_de_fotos_2) --- (Album_de_fotos_1).
-
-;   El álbum_2 contiene datos?
-
-2 ld hl,Album_de_fotos_2+1
-    ld a,(hl)
-    and a
-    jr z,3F
-
-;   El álbum_1 contiene datos. Volcamos los datos a Album_de_fotos.
-
-    call Album_2_a_Album_1
-    jr 4F
-
-; El álbum_2 está vacío. 
-; álbum_1 contiene datos?
-
-3 ld hl,Album_de_fotos_1+1
-    ld a,(hl)
-    and a
-    jr z,4F
-
-; Limpiamos Album_de_fotos_1.
-
-    ld hl,Album_de_fotos_1
-    ld (hl),0
-    ld de,Album_de_fotos_1+1
-    ld bc,$83
-    ldir    
-    ld hl,Album_de_fotos_1
-;    ld (Stack_snapshot_1),hl
-
-; (Album_de_fotos_3) --- (Album_de_fotos_2).
-
-;   El álbum_3 contiene datos?
-
-4 ld hl,Album_de_fotos_3+1
-    ld a,(hl)
-    and a
-    jr z,5F
-
-;   El álbum_1 contiene datos. Volcamos los datos a Album_de_fotos.
-
-    call Album_3_a_Album_2
-    jr 6F
-
-; El álbum_3 está vacío. 
-; álbum_2 contiene datos?
-
-5 ld hl,Album_de_fotos_2+1
-    ld a,(hl)
-    and a
-    jr z,6F
-
-; Limpiamos Album_de_fotos_2.
-
-    ld hl,Album_de_fotos_2
-    ld (hl),0
-    ld de,Album_de_fotos_2+1
-    ld bc,$83
-    ldir    
-    ld hl,Album_de_fotos_2
-;    ld (Stack_snapshot_2),hl
-
-6 ret
-
-; ----------------------------------------------
-;
-;   31/7/23
-;
-;   Esta rutina sirve tanto para pasar datos de un album a otro, como para limpiarlo.
-;
-;   Para pasar datos de un album a otro:
-;
-;       INPUTS: HL contiene (Stack_snapshot_X), siendo X el álbum ORIGEN.
-;               BC contendrá la dirección de inicio del álbum ORIGEN. Ej. Album_de_fotos_3.
-;               DE contendrá la dirección de inicio del álbum DESTINO. Ej. Album_de_fotos_2.
-
-Trasbase_de_datos push bc
-    and a
-    sbc hl,bc
-    push hl
-    pop bc                          ; BC contiene el nº de bytes que ocupan los datos almacenados en el álbum. 
-    pop hl
-    ldir
-    ret
-
-; Paquetitos.
-
-Trasbase_3a2 
-
-;    ld hl,(Stack_snapshot_3)
-    ld bc,Album_de_fotos_3
-    call Trasbase_de_datos
-    ret 
-
-Trasbase_2a1 
-
-;    ld hl,(Stack_snapshot_2)
-    ld bc,Album_de_fotos_2
-    call Trasbase_de_datos
-    ret 
-
-Trasbase_1a0 
-
-;    ld hl,(Stack_snapshot_1)
+    ld hl,(End_Snapshot_1)
     ld bc,Album_de_fotos_1
-    call Trasbase_de_datos
-    ret 
-
-; ----------------------------------------------
-
-; (Album_de_fotos_2) está vacío. Pasamos los datos de (Album_de_fotos_3) a (Album_de_fotos_2) y_ 
-; _ limpiamos (Album_de_fotos_3).
-; Para ambas cosas ejecutaremos la rutina [Trasbase_de_datos].
-
-;   Datos de álbum_3 a álbum_2.
-
-Album_3_a_Album_2 ld de,Album_de_fotos_2
-    call Trasbase_3a2
-    
-;   Actualizamos (Stack_snapshot_2).   
-
-    ex de,hl
-;    ld (Stack_snapshot_2),hl
-
-;   Limpiamos álbum_3 y actualizamos (Stack_snapshot_3).
-
-    xor a
-    ld (Album_de_fotos_3),a
-    ld de,Album_de_fotos_3+1
-    call Trasbase_3a2
-
-    ld hl,Album_de_fotos_3
-;    ld (Stack_snapshot_3),hl
-    ret
-
-Album_2_a_Album_1 ld de,Album_de_fotos_1
-    call Trasbase_2a1
-
-;   Actualizamos (Stack_snapshot_1).   
-
-    ex de,hl
-;    ld (Stack_snapshot_1),hl
-
-;   Limpiamos álbum_2 y actualizamos (Stack_snapshot_2).
-
-    xor a
-    ld (Album_de_fotos_2),a
-    ld de,Album_de_fotos_2+1
-    call Trasbase_2a1
-
-    ld hl,Album_de_fotos_2
-;    ld (Stack_snapshot_2),hl
-    ret
-
-Album_1_a_Album_de_fotos ld de,Album_de_fotos
-    call Trasbase_1a0
-
-;   Actualizamos (Stack_snapshot).   
-
-    ex de,hl
-    ld (Stack_snapshot),hl
-
- ;   Limpiamos álbum_1 y actualizamos (Stack_snapshot_1).
-
-    xor a
-    ld (Album_de_fotos_1),a
     ld de,Album_de_fotos_1+1
-    call Trasbase_1a0
+    xor a
+    ld (bc),a                       
 
-    ld hl,Album_de_fotos_1
-;    ld (Stack_snapshot_1),hl
+    call Limpia_album
+
+    ld hl,0
+    ld (End_Snapshot_1),hl        ; Limpia (End_Snapshot_1).
+
+; ----- ----- ----- -----
+
+;   Album_de_fotos_2. Contiene datos ???
+
+1 ld hl,Album_de_fotos_2+1
+    ld a,(hl)
+    and a
+    jr z,2F                     ; Album_de_fotos_2 y Album_de_fotos_1 están vacíos. Hay que volcar la_
+;                               ; _ información del album3 al album2.
+; ----- ----- ----- -----
+;   Volcamos los datos del Album_de_fotos_2 a Album_de_fotos_1.
+
+    ld hl,(End_Snapshot_2)      ; Final, (origen).
+    ld bc,Album_de_fotos_2      ; Origen.
+    ld de,Album_de_fotos_1      ; Destino.
+
+    call Limpia_album
+
+    ld hl,(End_Snapshot_2)
+    ld (End_Snapshot_1),hl      ; Transferimos (End_Snapshot) de un álbum a otro.
+
+;   Limpiamos Album_de_fotos_2.
+
+    ld hl,(End_Snapshot_2)
+    ld bc,Album_de_fotos_2
+    ld de,Album_de_fotos_2+1
+    xor a
+    ld (bc),a                       
+
+    call Limpia_album
+
+    ld hl,0
+    ld (End_Snapshot_2),hl        ; Limpia (End_Snapshot_2).
+
+; ----- ----- ----- -----
+
+;   Album_de_fotos_3. Contiene datos ???
+
+2 ld hl,Album_de_fotos_3+1
+    ld a,(hl)
+    and a
+    ret z                       ; Album_de_fotos_3 y Album_de_fotos_2 están vacíos. RET.
+               
+; ----- ----- ----- -----
+;   Volcamos los datos del Album_de_fotos_3 a Album_de_fotos_2.
+
+    ld hl,(End_Snapshot_3)      ; Final, (origen).
+    ld bc,Album_de_fotos_3      ; Origen.
+    ld de,Album_de_fotos_2      ; Destino.
+
+    call Limpia_album
+
+    ld hl,(End_Snapshot_3)
+    ld (End_Snapshot_2),hl      ; Transferimos (End_Snapshot) de un álbum a otro.
+
+;   Limpiamos Album_de_fotos_2.
+
+    ld hl,(End_Snapshot_3)
+    ld bc,Album_de_fotos_3
+    ld de,Album_de_fotos_3+1
+    xor a
+    ld (bc),a                       
+
+    call Limpia_album
+
+    ld hl,0
+    ld (End_Snapshot_3),hl        ; Limpia (End_Snapshot_3).
     ret
 
-; -------------------- ------------------------------------
-
-Gestiona_albumes_de_fotos_disparos
-
-; Desplazamos álbumes.
-
-; (Album_de_fotos_1) --- (Album_de_fotos).
-
-;   El álbum_1 contiene datos?
-
-    ld hl,Album_de_fotos_disparos_1+1
-    ld a,(hl)
-    and a
-    jr z,1F
-
-;   El álbum_1 contiene datos. Volcamos los datos a Album_de_fotos.
-
-    call Album_1_a_Album_de_fotos_disparos
-    jr 2F
-
-; El álbum_1 está vacío. 
-; Album_de_fotos contiene datos?
-
-1 ld hl,Album_de_fotos_disparos+1
-    ld a,(hl)
-    and a
-    jr z,2F
-
-; Limpiamos Album_de_fotos.
-
-    ld hl,Album_de_fotos_disparos
-    ld (hl),0
-    ld de,Album_de_fotos_disparos+1
-    ld bc,$83
-    ldir    
-    ld hl,Album_de_fotos_disparos
-    ld (Stack_snapshot_disparos),hl
-
-; (Album_de_fotos_2) --- (Album_de_fotos_1).
-
-;   El álbum_2 contiene datos?
-
-2 ld hl,Album_de_fotos_disparos_2+1
-    ld a,(hl)
-    and a
-    jr z,3F
-
-;   El álbum_1 contiene datos. Volcamos los datos a Album_de_fotos.
-
-    call Album_2_a_Album_1_disparos
-    jr 4F
-
-; El álbum_2 está vacío. 
-; álbum_1 contiene datos?
-
-3 ld hl,Album_de_fotos_disparos_1+1
-    ld a,(hl)
-    and a
-    jr z,4F
-
-; Limpiamos Album_de_fotos_1.
-
-    ld hl,Album_de_fotos_disparos_1
-    ld (hl),0
-    ld de,Album_de_fotos_disparos_1+1
-    ld bc,$83
-    ldir    
-    ld hl,Album_de_fotos_disparos_1
-;    ld (Stack_snapshot_disparos_1),hl
-
-; (Album_de_fotos_3) --- (Album_de_fotos_2).
-
-;   El álbum_3 contiene datos?
-
-4 ld hl,Album_de_fotos_disparos_3+1
-    ld a,(hl)
-    and a
-    jr z,5F
-
-;   El álbum_1 contiene datos. Volcamos los datos a Album_de_fotos.
-
-    call Album_3_a_Album_2_disparos
-    jr 6F
-
-; El álbum_3 está vacío. 
-; álbum_2 contiene datos?
-
-5 ld hl,Album_de_fotos_disparos_2+1
-    ld a,(hl)
-    and a
-    jr z,6F
-
-; Limpiamos Album_de_fotos_2.
-
-    ld hl,Album_de_fotos_disparos_2
-    ld (hl),0
-    ld de,Album_de_fotos_disparos_2+1
-    ld bc,$83
-    ldir    
-    ld hl,Album_de_fotos_disparos_2
-;    ld (Stack_snapshot_disparos_2),hl
-
-6 ret
-
-; ----------------------------------------------
+; ----------------------------------------------------
 ;
-;   31/7/23
+;   10/8/23
 ;
-;   Esta rutina sirve tanto para pasar datos de un album a otro, como para limpiarlo.
+;   Limpia o transfiere el contenido de un album_de_fotos o disparos a otro álbum.
 ;
-;   Para pasar datos de un album a otro:
-;
-;       INPUTS: HL contiene (Stack_snapshot_X), siendo X el álbum ORIGEN.
-;               BC contendrá la dirección de inicio del álbum ORIGEN. Ej. Album_de_fotos_3.
-;               DE contendrá la dirección de inicio del álbum DESTINO. Ej. Album_de_fotos_2.
+;   INPUTS: HL ..... Contiene el nº de bytes a borrar.
+;           BC ..... Dirección de inicio del álbum.
+;           DE ..... Dirección de inicio del álbum. +1
 
-Trasbase_de_datos_disparos push bc
-    and a
+;    ld hl,(End_Snapshot)
+;    ld bc,Album_de_fotos
+;    ld de,Album_de_fotos+1
+
+;   MODIFICA: A,HL,BC y DE.
+
+Limpia_album push bc            ; Guardo ORIGEN.
     sbc hl,bc
-    push hl
-    pop bc                          ; BC contiene el nº de bytes que ocupan los datos almacenados en el álbum. 
+    ld c,l
+    ld b,h
     pop hl
     ldir
     ret
 
-; Paquetitos.
+; -----------------------------------------------
 
-Trasbase_3a2_disparos 
 
-;   ld hl,(Stack_snapshot_disparos_3)
-    ld bc,Album_de_fotos_disparos_3
-    call Trasbase_de_datos_disparos
-    ret 
 
-Trasbase_2a1_disparos 
 
-;    ld hl,(Stack_snapshot_disparos_2)
-    ld bc,Album_de_fotos_disparos_2
-    call Trasbase_de_datos_disparos
-    ret 
 
-Trasbase_1a0_disparos 
-
-;   ld hl,(Stack_snapshot_disparos_1)
-    ld bc,Album_de_fotos_disparos_1
-    call Trasbase_de_datos_disparos
-    ret 
-
-; ----------------------------------------------
-
-; (Album_de_fotos_2) está vacío. Pasamos los datos de (Album_de_fotos_3) a (Album_de_fotos_2) y_ 
-; _ limpiamos (Album_de_fotos_3).
-; Para ambas cosas ejecutaremos la rutina [Trasbase_de_datos].
-
-;   Datos de álbum_3 a álbum_2.
-
-Album_3_a_Album_2_disparos ld de,Album_de_fotos_disparos_2
-    call Trasbase_3a2_disparos
-    
-;   Actualizamos (Stack_snapshot_2).   
-
-    ex de,hl
-;    ld (Stack_snapshot_disparos_2),hl
-
-;   Limpiamos álbum_3 y actualizamos (Stack_snapshot_3).
-
-    xor a
-    ld (Album_de_fotos_disparos_3),a
-    ld de,Album_de_fotos_disparos_3+1
-    call Trasbase_3a2_disparos
-
-    ld hl,Album_de_fotos_disparos_3
-;    ld (Stack_snapshot_disparos_3),hl
-    ret
-
-Album_2_a_Album_1_disparos ld de,Album_de_fotos_disparos_1
-    call Trasbase_2a1_disparos
-
-;   Actualizamos (Stack_snapshot_1).   
-
-    ex de,hl
-;    ld (Stack_snapshot_disparos_1),hl
-
-;   Limpiamos álbum_2 y actualizamos (Stack_snapshot_2).
-
-    xor a
-    ld (Album_de_fotos_disparos_2),a
-    ld de,Album_de_fotos_disparos_2+1
-    call Trasbase_2a1_disparos
-
-    ld hl,Album_de_fotos_disparos_2
-;    ld (Stack_snapshot_disparos_2),hl
-    ret
-
-Album_1_a_Album_de_fotos_disparos ld de,Album_de_fotos_disparos
-    call Trasbase_1a0_disparos
-
-;   Actualizamos (Stack_snapshot).   
-
-    ex de,hl
-    ld (Stack_snapshot_disparos),hl
-
- ;   Limpiamos álbum_1 y actualizamos (Stack_snapshot_1).
-
-    xor a
-    ld (Album_de_fotos_disparos_1),a
-    ld de,Album_de_fotos_disparos_1+1
-    call Trasbase_1a0_disparos
-
-    ld hl,Album_de_fotos_disparos_1
-;    ld (Stack_snapshot_disparos_1),hl
-    ret

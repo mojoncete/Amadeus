@@ -961,7 +961,12 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 	ld (Puntero_de_End_Snapshot),hl					
 
 	ret
-	
+
+Retrasa_puntero_de_album_de_fotos_y_malotes	
+
+	jr $
+
+	ret
 ; *************************************************************************************************************************************************************
 ;
 ; 8/1/23
@@ -1375,6 +1380,7 @@ Frame
 
 	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
 	call Gestiona_albumes_de_fotos 						; Escupe Álbum de fotos. 1a0, 2a1, 3a2. 
+	call Retrasa_puntero_de_album_de_fotos_y_malotes	
 
 ; RELOJES.
 
