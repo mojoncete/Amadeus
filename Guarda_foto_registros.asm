@@ -28,6 +28,10 @@
 
 Guarda_foto_registros 
 
+;    ld a,(Contador_de_frames)
+;    jr $
+
+
     ld (Stack),sp                                 ; Guardo SP en (Stack).
     ld sp,Guarda_foto_registros                   ; Sitúo el Stack Pointer en la dirección actual -1
 
@@ -64,8 +68,8 @@ Guarda_foto_registros
 
 ; Aquí tengo que copiar (Stack_snapshot) en la dirección hacia donde apunta (Puntero_de_End_Snapshot).
 
-    push hl
-    pop de                                        ; DE contiene la dirección donde terminan los datos de este álbum.
+    ld e,l
+    ld d,h                                        ; DE contiene la dirección donde terminan los datos de este álbum.
 
     ld hl,(Puntero_de_End_Snapshot)               ; Guardamos la dirección de `fin de álbum', en la dirección que_
     ld (hl),e                                     ; _ contiene (Puntero_de_End_Snapshot). Esta dirección la utilizará la_
@@ -91,6 +95,13 @@ Gestiona_albumes_de_fotos
 ;   En 1er lugar limpiamos el FRAME pintado.
 ;   Vaciamos Album_de_fotos.
 
+;   Album_de_fotos. Contiene datos ???
+
+    ld hl,Album_de_fotos+1
+    ld a,(hl)
+    and a
+    jr z,3F                     ; Album_de_fotos está vacío. NO HAY QUE LIMPIARLO.
+
     ld hl,(End_Snapshot)
     ld bc,Album_de_fotos
     ld de,Album_de_fotos+1
@@ -106,7 +117,7 @@ Gestiona_albumes_de_fotos
 
 ;   Album_de_fotos_1. Contiene datos ???
 
-    ld hl,Album_de_fotos_1+1
+3 ld hl,Album_de_fotos_1+1
     ld a,(hl)
     and a
     jr z,1F                     ; Album_de_fotos y Album_de_fotos_1 están vacíos. Hay que volcar la_

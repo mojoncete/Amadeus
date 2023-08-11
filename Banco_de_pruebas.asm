@@ -12,6 +12,11 @@
 	org $a101		
 
 	call Frame
+
+;	ld a,(Contador_de_frames)
+;	cp $1e
+;	jr z,$
+
 	reti									 
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
@@ -962,11 +967,6 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 
 	ret
 
-Retrasa_puntero_de_album_de_fotos_y_malotes	
-
-	jr $
-
-	ret
 ; *************************************************************************************************************************************************************
 ;
 ; 8/1/23
@@ -1380,7 +1380,11 @@ Frame
 
 	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
 	call Gestiona_albumes_de_fotos 						; Escupe Álbum de fotos. 1a0, 2a1, 3a2. 
-	call Retrasa_puntero_de_album_de_fotos_y_malotes	
+
+;	En este punto:
+
+;	Hemos pintado Album_de_fotos en pantalla y desplazado los demás álbumes una posición.
+;	Tenemos vacío el último álbum en el que se encuentra (Puntero_indice_album_de_fotos).
 
 ; RELOJES.
 
