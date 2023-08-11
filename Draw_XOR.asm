@@ -716,9 +716,9 @@ PreviousScan ld a,h
 
 Extrae_foto_entidades 
 
-	ld a,(Contador_de_frames)
-	cp $1e
-	jr z,$
+;	ld a,(Contador_de_frames)
+;	cp $1e
+;	jr z,$
 
 	ld hl,Album_de_fotos+1
 	ld a,(hl)

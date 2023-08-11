@@ -12,7 +12,7 @@
 	org $a101		
 
 	call Frame
-
+	
 ;	ld a,(Contador_de_frames)
 ;	cp $1e
 ;	jr z,$
@@ -947,7 +947,6 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 	and a
 	sbc hl,bc										; Estamos en el último álbum del índice.
 	jr nz,1F								 		; El buffer está lleno. HALT.
-
 	halt
 	ret							
 
@@ -1355,7 +1354,7 @@ Detecta_disparo_entidad
 
 ; ----------------------------------------------------------------------
 ;
-;	3/8/23
+;	11/8/23
 
 Frame 
 
@@ -1376,10 +1375,23 @@ Frame
     ld a,1
     out ($fe),a											; Azul.
 
-; Gestiona los álbumes de fotos.	
+; 	Gestiona los álbumes de fotos.	
 
 	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
 	call Gestiona_albumes_de_fotos 						; Escupe Álbum de fotos. 1a0, 2a1, 3a2. 
+
+; 	Corrige (Stack_snapshot). Se sitúa al principio del último álbum libre para volver a guardar fotos.
+
+
+	ld a,(Contador_de_frames)
+	cp $90
+	jr z,$
+    jr nc,$
+
+
+	ld hl,(Puntero_indice_album_de_fotos)
+	call Extrae_address
+	ld (Stack_snapshot),hl
 
 ;	En este punto:
 

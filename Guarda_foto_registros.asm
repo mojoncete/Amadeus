@@ -132,8 +132,11 @@ Gestiona_albumes_de_fotos
 
     call Limpia_album
 
-    ld hl,(End_Snapshot_1)
-    ld (End_Snapshot),hl        ; Transferimos (End_Snapshot) de un álbum a otro.
+;   Calculamos (End_Snapshot)
+
+    and a
+    adc hl,bc
+    ld (End_Snapshot),hl
 
 ;   Limpiamos Album_de_fotos_1.
 
@@ -166,8 +169,11 @@ Gestiona_albumes_de_fotos
 
     call Limpia_album
 
-    ld hl,(End_Snapshot_2)
-    ld (End_Snapshot_1),hl      ; Transferimos (End_Snapshot) de un álbum a otro.
+;   Calculamos (End_Snapshot_1):
+
+    and a
+    adc hl,bc
+    ld (End_Snapshot_1),hl
 
 ;   Limpiamos Album_de_fotos_2.
 
@@ -200,10 +206,13 @@ Gestiona_albumes_de_fotos
 
     call Limpia_album
 
-    ld hl,(End_Snapshot_3)
-    ld (End_Snapshot_2),hl      ; Transferimos (End_Snapshot) de un álbum a otro.
+;   Calculamos (End_Snapshot_2):
 
-;   Limpiamos Album_de_fotos_2.
+    and a
+    adc hl,bc
+    ld (End_Snapshot_2),hl
+
+;   Limpiamos Album_de_fotos_3.
 
     ld hl,(End_Snapshot_3)
     ld bc,Album_de_fotos_3
@@ -233,13 +242,19 @@ Gestiona_albumes_de_fotos
 
 ;   MODIFICA: A,HL,BC y DE.
 
-Limpia_album push bc            ; Guardo ORIGEN.
+Limpia_album 
+    push de            ; Guardo DESTINO.
+    push bc            ; Guardo ORIGEN.
     sbc hl,bc
     ld c,l
     ld b,h
     pop hl
+    push bc
     ldir
-    ret
+    pop bc                      ; Esta cantidad la utilizaré para calcular (End_Snapshot_X), _
+    pop hl                      ; _ al salir de la rutina, (cuando estamos pasando datos de un álbum_
+    ret                         ; _ a otro). 
+;                               
 
 ; -----------------------------------------------
 
