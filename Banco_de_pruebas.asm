@@ -13,9 +13,11 @@
 
 	call Frame
 	
-;	ld a,(Contador_de_frames)
-;	cp $1e
-;	jr z,$
+	ld a,(Ctrl_1)
+	bit 5,a
+	ret nz
+
+	ei
 
 	reti									 
 
@@ -228,6 +230,7 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 
 ;														BIT 3, Recarga de nueva oleada.
 ;														BIT 4, Recarga de nueva oleada.
+;														BIT 5, ****
 
 Repone_puntero_objeto defw 0							; Almacena (Puntero_objeto). Cuando el Sprite se inicia por arriba o por abajo,_
 ; 														; _ hay que sustituirlo por un `sprite vacío' para que no se vea el 1er o último scanline.
@@ -673,6 +676,9 @@ Main
 
 	call Avanza_puntero_de_album_de_fotos_y_malotes		
 
+	ld hl,Ctrl_1
+	res 5,(hl)
+
 	ld a,4
 	out ($fe),a  
 
@@ -936,6 +942,8 @@ Inicia_punteros_de_albumes_y_malotes
 
 	ret
 
+;	12/8/23
+
 Avanza_puntero_de_album_de_fotos_y_malotes
 
 ; Caja_de_malotes equ $7419 ; (7419h - 741ch) 4 bytes.
@@ -947,6 +955,10 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 	and a
 	sbc hl,bc										; Estamos en el último álbum del índice.
 	jr nz,1F								 		; El buffer está lleno. HALT.
+
+	ld hl,Ctrl_1									; Necesito saber si hemos terminado de guardar todas_
+	set 5,(hl)										; _ las fotos de un FRAME.
+	
 	halt
 	ret							
 
@@ -1382,14 +1394,35 @@ Frame
 
 ; 	Corrige (Stack_snapshot). Se sitúa al principio del último álbum libre para volver a guardar fotos.
 
+;	ld a,(Contador_de_frames)
+;	cp $e6	; 1er FRAME, (sin mover AMADEUS), donde nos pasamos del FRAME RATE.!!!!!
+;	jr z,$
 
-	ld a,(Contador_de_frames)
-	cp $90
-	jr z,$
-    jr nc,$
+	ld a,(Ctrl_1)
+	bit 5,a
+	jr nz,1F
 
+; No hemos terminado de guardar el último FRAME.
 
 	ld hl,(Puntero_indice_album_de_fotos)
+	dec hl
+	dec hl
+	ld (Puntero_indice_album_de_fotos),hl
+
+	ld hl,(Puntero_indice_End_Snapshot)
+	dec hl
+	dec hl
+	ld (Puntero_indice_End_Snapshot),hl
+	call Extrae_address
+	ld (Puntero_de_End_Snapshot),hl				
+	call Extrae_address
+	ld (Stack_snapshot),hl
+
+	jr 2F
+
+; FRAME completo.
+
+1 ld hl,(Puntero_indice_album_de_fotos)
 	call Extrae_address
 	ld (Stack_snapshot),hl
 
@@ -1400,7 +1433,7 @@ Frame
 
 ; RELOJES.
 
-	ld hl,Contador_de_frames
+2 ld hl,Contador_de_frames
 	inc (hl)											; 0 - 255
 
 	pop hl
