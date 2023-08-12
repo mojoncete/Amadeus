@@ -13,11 +13,16 @@
 
 	call Frame
 	
-	ld a,(Ctrl_1)
-	bit 5,a
-	ret nz
+	ld a,(Contador_de_frames)
+	cp $e7	; 1er FRAME, (sin mover AMADEUS), donde nos pasamos del FRAME RATE.!!!!!
+	jr z,$
 
-	ei
+
+;	ld a,(Ctrl_1)
+;	bit 5,a
+;	ret nz
+
+;	ei
 
 	reti									 
 
