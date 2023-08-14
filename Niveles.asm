@@ -199,7 +199,6 @@ Admin_num_entidades
 
 	call Inicializa_Punteros_de_nivel					 ; Inicializa. 1er NIVEL. 
 
-
 3 ld a,(Numero_de_entidades)
 	cp 10
 	jr c,1F
@@ -212,7 +211,7 @@ Admin_num_entidades
 	ld b,a
 	jr 2F
 
-; El nº total de entidades no llena las 5 cajas DRAW. (Numero_parcial_de_entidades)=(Numero_de_entidades)
+; El nº total de entidades no llena las 10 cajas DRAW. (Numero_parcial_de_entidades)=(Numero_de_entidades)
 ; (Numero_de_entidades)="0".
 
 1 ld (Numero_parcial_de_entidades),a

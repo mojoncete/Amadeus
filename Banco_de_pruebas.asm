@@ -12,18 +12,6 @@
 	org $a101		
 
 	call Frame
-	
-	ld a,(Contador_de_frames)
-	cp $e7	; 1er FRAME, (sin mover AMADEUS), donde nos pasamos del FRAME RATE.!!!!!
-	jr z,$
-
-
-;	ld a,(Ctrl_1)
-;	bit 5,a
-;	ret nz
-
-;	ei
-
 	reti									 
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
@@ -267,19 +255,19 @@ Datos_de_entidad defw 0									; Contiene los bytes de información de la entid
 ;
 ;	Álbumes.
 
-Stack defw 0 												; La rutinas de pintado, utilizan esta_
-;															; _variable para almacenar lo posición del puntero_
-; 															; _de pila, SP.
-Stack_2 defw 0												; 2º variable destinada a almacenar el puntero de pila, SP.
-;															; La utiliza la rutina [Extrae_foto_registros].
+Stack defw 0 											; La rutinas de pintado, utilizan esta_
+;														; _variable para almacenar lo posición del puntero_
+; 														; _de pila, SP.
+Stack_2 defw 0											; 2º variable destinada a almacenar el puntero de pila, SP.
+;														; La utiliza la rutina [Extrae_foto_registros].
 Stack_snapshot defw 0
 Stack_snapshot_disparos defw 0
 
 End_Snapshot defw 0										
-;															; Inicialmente está situado el la posición $7000, Album_de_fotos.
-End_Snapshot_disparos defw 0								; Puntero que indica la posición de memoria donde vamos a guardar_
-;															; _el snapshot de los registros del siguiente disparo.
-;															; Inicialmente está situado en la posición $7060, Album_de_fotos_disparos.
+;														; Inicialmente está situado el la posición $7000, Album_de_fotos.
+End_Snapshot_disparos defw 0							; Puntero que indica la posición de memoria donde vamos a guardar_
+;														; _el snapshot de los registros del siguiente disparo.
+;														; Inicialmente está situado en la posición $7060, Album_de_fotos_disparos.
 End_Snapshot_1 defw 0
 End_Snapshot_disparos_1 defw 0
 End_Snapshot_2 defw 0
@@ -676,7 +664,7 @@ Main
 
 ; Calculamos el nº de malotes y de disparotes para pintarlos nada más comenzar el siguiente FRAME.
 
-	call Calcula_numero_de_disparotes
+;	call Calcula_numero_de_disparotes
 9 call Calcula_numero_de_malotes 
 
 	call Avanza_puntero_de_album_de_fotos_y_malotes		
@@ -963,7 +951,6 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 
 	ld hl,Ctrl_1									; Necesito saber si hemos terminado de guardar todas_
 	set 5,(hl)										; _ las fotos de un FRAME.
-	
 	halt
 	ret							
 
@@ -1400,7 +1387,7 @@ Frame
 ; 	Corrige (Stack_snapshot). Se sitúa al principio del último álbum libre para volver a guardar fotos.
 
 ;	ld a,(Contador_de_frames)
-;	cp $e6	; 1er FRAME, (sin mover AMADEUS), donde nos pasamos del FRAME RATE.!!!!!
+;	cp $e5	; 1er FRAME, (sin mover AMADEUS), donde nos pasamos del FRAME RATE.!!!!!
 ;	jr z,$
 
 	ld a,(Ctrl_1)

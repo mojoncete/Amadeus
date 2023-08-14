@@ -28,9 +28,9 @@
 
 Guarda_foto_registros 
 
-	ld a,(Contador_de_frames)
-	cp $e7	
-	jr z,$
+;	ld a,(Contador_de_frames)
+;	cp $e7	
+;	jr z,$
 
 
     ld (Stack),sp                                 ; Guardo SP en (Stack).
