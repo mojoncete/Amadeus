@@ -753,16 +753,19 @@ Extrae_foto_entidades
 
 Imprime db 0,0,0						
 
+	ld (Stack),sp
+
 	ld a,(Numero_de_malotes)
 	dec a
 	jr z,1F
  	ld (Numero_de_malotes),a	 
 
- 	ld sp,(Stack_2)
+	ld sp,(Stack_2)
 	jr 2B
 
 1 xor a
 	ld (Stack_2),a
+
 	ret
 	
 ; -----------------------------------------------------------------------------------

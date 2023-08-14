@@ -448,12 +448,6 @@ Main
 	ld a,(Contador_de_frames)
 	cp b
 	jr nz,13F
-;
-;!debuggg
-;    ld a,(Contador_de_frames)
-;    ld hl,(Stack_snapshot)
-;    jr $
-;!debuggg	
 
 	ld a,(Numero_parcial_de_entidades)
 	ld b,a
@@ -667,9 +661,10 @@ Main
 ;	call Calcula_numero_de_disparotes
 9 call Calcula_numero_de_malotes 
 
-	call Avanza_puntero_de_album_de_fotos_y_malotes		
-
-	ld hl,Ctrl_1
+	call Avanza_puntero_de_album_de_fotos_y_malotes		; Cuando estamos dentro del FRAME RATE, esperamos dentro_
+;														; _ de esta rutina a que se produzca la llamada a la rutina de_
+;														; _ interrupción.
+	ld hl,Ctrl_1									
 	res 5,(hl)
 
 	ld a,4
@@ -1374,6 +1369,14 @@ Frame
 
     ld a,2
     out ($fe),a											; Rojo.
+
+;! debuggg !!!
+	ld a,(Contador_de_frames)
+	cp $e5	; 1er FRAME, (sin mover AMADEUS), donde nos pasamos del FRAME RATE.!!!!!
+	jr nc,$
+	jr z,$
+;! debuggg !!!
+
 	call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
 	call Extrae_foto_disparos
     ld a,1
@@ -1386,13 +1389,12 @@ Frame
 
 ; 	Corrige (Stack_snapshot). Se sitúa al principio del último álbum libre para volver a guardar fotos.
 
-;	ld a,(Contador_de_frames)
-;	cp $e5	; 1er FRAME, (sin mover AMADEUS), donde nos pasamos del FRAME RATE.!!!!!
-;	jr z,$
-
 	ld a,(Ctrl_1)
 	bit 5,a
 	jr nz,1F
+
+;	ld a,(Contador_de_frames)
+;	jr $
 
 ; No hemos terminado de guardar el último FRAME.
 
