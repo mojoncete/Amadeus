@@ -646,6 +646,8 @@ Main
 
 	call Guarda_foto_entidad_a_pintar
 
+
+
 14 ld hl,Ctrl_0	
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
 	xor a
@@ -654,19 +656,15 @@ Main
 	ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
 	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
 
-	call Motor_de_disparos								; Borra/mueve/pinta cada uno de los disparos y crea un nuevo album de fotos.
+;	call Motor_de_disparos								; Borra/mueve/pinta cada uno de los disparos y crea un nuevo album de fotos.
 
 ; Calculamos el nº de malotes y de disparotes para pintarlos nada más comenzar el siguiente FRAME.
 
 ;	call Calcula_numero_de_disparotes
-9 call Calcula_numero_de_malotes 
 
-	call Avanza_puntero_de_album_de_fotos_y_malotes		; Cuando estamos dentro del FRAME RATE, esperamos dentro_
+9 call Avanza_puntero_de_album_de_fotos_y_malotes		; Cuando estamos dentro del FRAME RATE, esperamos dentro_
 ;														; _ de esta rutina a que se produzca la llamada a la rutina de_
 ;														; _ interrupción.
-	ld hl,Ctrl_1									
-	res 5,(hl)
-
 	ld a,4
 	out ($fe),a  
 
@@ -1370,12 +1368,12 @@ Frame
     ld a,2
     out ($fe),a											; Rojo.
 
-;! debuggg !!!
+;;! debuggg !!!
 	ld a,(Contador_de_frames)
 	cp $e5	; 1er FRAME, (sin mover AMADEUS), donde nos pasamos del FRAME RATE.!!!!!
 	jr nc,$
 	jr z,$
-;! debuggg !!!
+;;! debuggg !!!
 
 	call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
 	call Extrae_foto_disparos
@@ -1392,9 +1390,6 @@ Frame
 	ld a,(Ctrl_1)
 	bit 5,a
 	jr nz,1F
-
-;	ld a,(Contador_de_frames)
-;	jr $
 
 ; No hemos terminado de guardar el último FRAME.
 
@@ -1429,6 +1424,11 @@ Frame
 
 2 ld hl,Contador_de_frames
 	inc (hl)											; 0 - 255
+
+	ld hl,Ctrl_1									
+	res 5,(hl)
+
+	call Calcula_numero_de_malotes
 
 	pop hl
 	pop de
