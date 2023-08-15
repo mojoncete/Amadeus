@@ -311,6 +311,8 @@ Velocidad_disparo_entidades db 2	  					; Nº de scanlines, (NextScan) que avanz
 ; Relojes y temporizaciones.
 
 Contador_de_frames db 0	 								
+Contador_de_frames_2 db 0	 
+
 Clock_explosion db 4
 Clock_Entidades_en_curso db 30
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
@@ -1369,13 +1371,15 @@ Frame
     out ($fe),a											; Rojo.
 
 ;;! debuggg !!!
+	ld a,(Contador_de_frames_2)
+	cp 1	
+	jr nz,4F
 	ld a,(Contador_de_frames)
-	cp $e5	; 1er FRAME, (sin mover AMADEUS), donde nos pasamos del FRAME RATE.!!!!!
-	jr nc,$
+	cp $29	; Último FRAME estable, a partir de aquí hay que hacer seguimiento.
 	jr z,$
 ;;! debuggg !!!
 
-	call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
+4 call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
 	call Extrae_foto_disparos
     ld a,1
     out ($fe),a											; Azul.
@@ -1394,9 +1398,19 @@ Frame
 ; No hemos terminado de guardar el último FRAME.
 
 	ld hl,(Puntero_indice_album_de_fotos)
+;	ld bc,Indice_album_de_fotos+2
 	dec hl
 	dec hl
+
+;	ld a,l
+;	sub c
+
+;	jr z,$
+
 	ld (Puntero_indice_album_de_fotos),hl
+	
+
+
 
 	ld hl,(Puntero_indice_End_Snapshot)
 	dec hl
@@ -1423,7 +1437,13 @@ Frame
 ; RELOJES.
 
 2 ld hl,Contador_de_frames
-	inc (hl)											; 0 - 255
+	ld a,(hl)
+	cp $ff
+	jr nz,3F
+	inc (hl)
+
+	ld hl,Contador_de_frames_2
+3 inc (hl)											; 0 - 255
 
 	ld hl,Ctrl_1									
 	res 5,(hl)
