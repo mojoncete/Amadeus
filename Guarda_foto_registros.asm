@@ -28,10 +28,7 @@
 
 Guarda_foto_registros 
 
-;	ld a,(Contador_de_frames)
-;	cp $e7	
-;	jr z,$
-
+    di
 
     ld (Stack),sp                                 ; Guardo SP en (Stack).
     ld sp,Guarda_foto_registros                   ; Sitúo el Stack Pointer en la dirección actual -1
@@ -76,6 +73,8 @@ Guarda_foto_registros
     ld (hl),e                                     ; _ contiene (Puntero_de_End_Snapshot). Esta dirección la utilizará la_
     inc hl                                        ; _ rutina [Gestiona_albumes_de_fotos] para copiar los datos de un_
     ld (hl),d                                     ; _ álbum a otro.
+
+    ei
 
     ret
 
