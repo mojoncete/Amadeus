@@ -12,6 +12,7 @@
 	org $a101		
 
 	call Frame
+	ei
 	reti									 
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
@@ -439,7 +440,7 @@ START
 
 Main 
 
-	ei ; Interrupciones habilitadas.
+;	ei ; Interrupciones habilitadas.
 
 ; -----------------------------------------------------------------------
 ;
@@ -1371,14 +1372,17 @@ Frame
     ld a,2
     out ($fe),a											; Rojo.
 
+; Hemos completado el 1er album?. Si (Puntero_indice_album_de_fotos) no está situado en el 2º Album_
+; _ , no imprimimos FRAME. no gestionamos los álbumes de fotos.
+
 ;;! debuggg !!!
-;	ld a,(Contador_de_frames_2)
-;	cp 1	
-;	jr nz,4F
-;	ld a,(Contador_de_frames)
-;	cp $53 	; Último FRAME estable, a partir de aquí hay que hacer seguimiento.	$53.
-;	jr z,$
-;	jr nc,$
+	ld a,(Contador_de_frames_2)
+	cp 1	
+	jr nz,4F
+	ld a,(Contador_de_frames)
+	cp $56 		; Último FRAME estable, a partir de aquí hay que hacer seguimiento.	$51.
+	jr z,$
+	jr nc,$
 ;;! debuggg !!!;
 
 4 call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
@@ -1400,7 +1404,7 @@ Frame
 ; No hemos terminado de guardar el último FRAME.
 
 	ld hl,(Puntero_indice_album_de_fotos)
-;	ld bc,Indice_album_de_fotos+2
+;	ld bc,Indice_album_de_fotos
 	dec hl
 	dec hl
 
@@ -1418,9 +1422,20 @@ Frame
 	ld (Puntero_indice_End_Snapshot),hl
 	call Extrae_address
 	ld (Puntero_de_End_Snapshot),hl				
-	call Extrae_address
-	ld (Stack_snapshot),hl
 
+	call Extrae_address
+
+; Esta vacío este album???
+
+	inc h
+	dec h
+	jr nz,5F
+
+; Este album no contiene datos, por lo tanto nos tenemos que situar al comienzo del mismo.
+
+	jr 1F
+
+5 ld (Stack_snapshot),hl
 	jr 2F
 
 ; FRAME completo.
@@ -1436,19 +1451,7 @@ Frame
 
 ; RELOJES.
 
-2 
-
-;;! debuggg !!!
-	ld a,(Contador_de_frames_2)
-	cp 1	
-	jr nz,5F
-	ld a,(Contador_de_frames)
-	cp $53 	; Último FRAME estable, a partir de aquí hay que hacer seguimiento.	$53.
-	jr z,$
-	jr nc,$
-;;! debuggg !!!;
-
-5 ld hl,Contador_de_frames
+2 ld hl,Contador_de_frames
 	ld a,(hl)
 	cp $ff
 	jr nz,3F
