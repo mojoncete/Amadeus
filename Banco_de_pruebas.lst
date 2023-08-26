@@ -2676,114 +2676,119 @@
 1372  8EB6 3E 02            ld a,2
 1373  8EB8 D3 FE            out ($fe),a											; Rojo.
 1374  8EBA
-1375  8EBA CD 58 8D     	call Calcula_numero_de_malotes
-1376  8EBD
-1377  8EBD              ; Hemos completado el 1er album?. Si (Puntero_indice_album_de_fotos) no está situado en el 2º Album_
-1378  8EBD              ; _ , no imprimimos FRAME. no gestionamos los álbumes de fotos.
-1379  8EBD
-1380  8EBD              ;;! debuggg !!!
-1381  8EBD 3A 42 8A     	ld a,(Contador_de_frames_2)
-1382  8EC0 FE 01        	cp 1
-1383  8EC2 20 0C        	jr nz,4F
-1384  8EC4 3A 41 8A     	ld a,(Contador_de_frames)
-1385  8EC7 FE 71        	cp $71 		; Último FRAME estable, a partir de aquí hay que hacer seguimiento.	$70.
-1386  8EC9 28 FE        	jr z,$
-1387  8ECB 30 FE        	jr nc,$
-1388  8ECD
-1389  8ECD 2A 0E 8A     	ld hl,(Stack_snapshot)
-1390  8ED0
-1391  8ED0              ;;! debuggg !!!;
-1392  8ED0
-1393  8ED0 CD 2C 97     4 call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
-1394  8ED3              ;	call Extrae_foto_disparos
-1395  8ED3 3E 01            ld a,1
-1396  8ED5 D3 FE            out ($fe),a											; Azul.
-1397  8ED7
-1398  8ED7              ; 	Gestiona los álbumes de fotos.
-1399  8ED7
-1400  8ED7 CD 76 91     	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
-1401  8EDA CD 19 74     	call Gestiona_albumes_de_fotos 						; Escupe Álbum de fotos. 1a0, 2a1, 3a2.
-1402  8EDD
-1403  8EDD              ; 	Corrige (Stack_snapshot). Se sitúa al principio del último álbum libre para volver a guardar fotos.
-1404  8EDD
-1405  8EDD 3A F9 89     	ld a,(Ctrl_1)
-1406  8EE0 CB 6F        	bit 5,a
-1407  8EE2 20 24        	jr nz,1F
-1408  8EE4
-1409  8EE4              ; No hemos terminado de guardar el último FRAME.
-1410  8EE4
-1411  8EE4 2A 22 8A     	ld hl,(Puntero_indice_album_de_fotos)
-1412  8EE7              ;	ld bc,Indice_album_de_fotos
-1413  8EE7 2B           	dec hl
-1414  8EE8 2B           	dec hl
-1415  8EE9
-1416  8EE9              ;	ld a,l
-1417  8EE9              ;	sub c
-1418  8EE9
-1419  8EE9              ;	jr z,$
+1375  8EBA              ; Hemos completado el 1er album?. Si (Puntero_indice_album_de_fotos) no está situado en el 2º Album_
+1376  8EBA              ; _ , no imprimimos FRAME. no gestionamos los álbumes de fotos.
+1377  8EBA
+1378  8EBA              ;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+1379  8EBA
+1380  8EBA
+1381  8EBA
+1382  8EBA
+1383  8EBA CD 58 8D     	call Calcula_numero_de_malotes
+1384  8EBD
+1385  8EBD              ;;! debuggg !!!
+1386  8EBD 3A 42 8A     	ld a,(Contador_de_frames_2)
+1387  8EC0 FE 01        	cp 1
+1388  8EC2 20 0C        	jr nz,4F
+1389  8EC4 3A 41 8A     	ld a,(Contador_de_frames)
+1390  8EC7 FE 72        	cp $72 		; Último FRAME estable, a partir de aquí hay que hacer seguimiento.	$72.
+1391  8EC9 28 FE        	jr z,$
+1392  8ECB 30 FE        	jr nc,$
+1393  8ECD
+1394  8ECD 2A 0E 8A     	ld hl,(Stack_snapshot)
+1395  8ED0
+1396  8ED0              ;;! debuggg !!!;
+1397  8ED0
+1398  8ED0 CD 2C 97     4 call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
+1399  8ED3              ;	call Extrae_foto_disparos
+1400  8ED3 3E 01            ld a,1
+1401  8ED5 D3 FE            out ($fe),a											; Azul.
+1402  8ED7
+1403  8ED7              ; 	Gestiona los álbumes de fotos.
+1404  8ED7
+1405  8ED7 CD 76 91     	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
+1406  8EDA CD 19 74     	call Gestiona_albumes_de_fotos 						; Escupe Álbum de fotos. 1a0, 2a1, 3a2.
+1407  8EDD
+1408  8EDD              ; 	Corrige (Stack_snapshot). Se sitúa al principio del último álbum libre para volver a guardar fotos.
+1409  8EDD
+1410  8EDD 3A F9 89     	ld a,(Ctrl_1)
+1411  8EE0 CB 6F        	bit 5,a
+1412  8EE2 20 24        	jr nz,1F
+1413  8EE4
+1414  8EE4              ; No hemos terminado de guardar el último FRAME.
+1415  8EE4
+1416  8EE4 2A 22 8A     	ld hl,(Puntero_indice_album_de_fotos)
+1417  8EE7              ;	ld bc,Indice_album_de_fotos
+1418  8EE7 2B           	dec hl
+1419  8EE8 2B           	dec hl
 1420  8EE9
-1421  8EE9 22 22 8A     	ld (Puntero_indice_album_de_fotos),hl
-1422  8EEC
-1423  8EEC
-1424  8EEC 2A 26 8A     	ld hl,(Puntero_indice_End_Snapshot)
-1425  8EEF 2B           	dec hl
-1426  8EF0 2B           	dec hl
-1427  8EF1 22 26 8A     	ld (Puntero_indice_End_Snapshot),hl
-1428  8EF4 CD 88 8D     	call Extrae_address
-1429  8EF7 22 2A 8A     	ld (Puntero_de_End_Snapshot),hl
-1430  8EFA
-1431  8EFA CD 88 8D     	call Extrae_address
-1432  8EFD
-1433  8EFD              ; Esta vacío este album???
-1434  8EFD
-1435  8EFD 24           	inc h
-1436  8EFE 25           	dec h
-1437  8EFF 20 02        	jr nz,5F
-1438  8F01
-1439  8F01              ; Este album no contiene datos, por lo tanto nos tenemos que situar al comienzo del mismo.
-1440  8F01
-1441  8F01 18 05        	jr 1F
-1442  8F03
-1443  8F03 22 0E 8A     5 ld (Stack_snapshot),hl
-1444  8F06 18 09        	jr 2F
-1445  8F08
-1446  8F08              ; FRAME completo.
-1447  8F08
-1448  8F08 2A 22 8A     1 ld hl,(Puntero_indice_album_de_fotos)
-1449  8F0B CD 88 8D     	call Extrae_address
-1450  8F0E 22 0E 8A     	ld (Stack_snapshot),hl
-1451  8F11
-1452  8F11              ;	En este punto:
-1453  8F11
-1454  8F11              ;	Hemos pintado Album_de_fotos en pantalla y desplazado los demás álbumes una posición.
-1455  8F11              ;	Tenemos vacío el último álbum en el que se encuentra (Puntero_indice_album_de_fotos).
+1421  8EE9              ;	ld a,l
+1422  8EE9              ;	sub c
+1423  8EE9
+1424  8EE9              ;	jr z,$
+1425  8EE9
+1426  8EE9 22 22 8A     	ld (Puntero_indice_album_de_fotos),hl
+1427  8EEC
+1428  8EEC
+1429  8EEC 2A 26 8A     	ld hl,(Puntero_indice_End_Snapshot)
+1430  8EEF 2B           	dec hl
+1431  8EF0 2B           	dec hl
+1432  8EF1 22 26 8A     	ld (Puntero_indice_End_Snapshot),hl
+1433  8EF4 CD 88 8D     	call Extrae_address
+1434  8EF7 22 2A 8A     	ld (Puntero_de_End_Snapshot),hl
+1435  8EFA
+1436  8EFA CD 88 8D     	call Extrae_address
+1437  8EFD
+1438  8EFD              ; Esta vacío este album???
+1439  8EFD
+1440  8EFD 24           	inc h
+1441  8EFE 25           	dec h
+1442  8EFF 20 02        	jr nz,5F
+1443  8F01
+1444  8F01              ; Este album no contiene datos, por lo tanto nos tenemos que situar al comienzo del mismo.
+1445  8F01
+1446  8F01 18 05        	jr 1F
+1447  8F03
+1448  8F03 22 0E 8A     5 ld (Stack_snapshot),hl
+1449  8F06 18 09        	jr 2F
+1450  8F08
+1451  8F08              ; FRAME completo.
+1452  8F08
+1453  8F08 2A 22 8A     1 ld hl,(Puntero_indice_album_de_fotos)
+1454  8F0B CD 88 8D     	call Extrae_address
+1455  8F0E 22 0E 8A     	ld (Stack_snapshot),hl
 1456  8F11
-1457  8F11              ; RELOJES.
+1457  8F11              ;	En este punto:
 1458  8F11
-1459  8F11 21 41 8A     2 ld hl,Contador_de_frames
-1460  8F14 7E           	ld a,(hl)
-1461  8F15 FE FF        	cp $ff
-1462  8F17 20 04        	jr nz,3F
-1463  8F19 34           	inc (hl)
-1464  8F1A
-1465  8F1A 21 42 8A     	ld hl,Contador_de_frames_2
-1466  8F1D 34           3 inc (hl)											; 0 - 255
-1467  8F1E
-1468  8F1E 21 F9 89     	ld hl,Ctrl_1
-1469  8F21 CB AE        	res 5,(hl)
-1470  8F23
-1471  8F23              ;	call Calcula_numero_de_malotes
-1472  8F23
-1473  8F23 E1           	pop hl
-1474  8F24 D1           	pop de
-1475  8F25 C1           	pop bc
-1476  8F26 F1           	pop af
-1477  8F27
-1478  8F27 C9           	ret
-1479  8F28
-1480  8F28              ; ---------------------------------------------------------------
-1481  8F28
-1482  8F28              	include "Disparo.asm"
+1459  8F11              ;	Hemos pintado Album_de_fotos en pantalla y desplazado los demás álbumes una posición.
+1460  8F11              ;	Tenemos vacío el último álbum en el que se encuentra (Puntero_indice_album_de_fotos).
+1461  8F11
+1462  8F11              ; RELOJES.
+1463  8F11
+1464  8F11 21 41 8A     2 ld hl,Contador_de_frames
+1465  8F14 7E           	ld a,(hl)
+1466  8F15 FE FF        	cp $ff
+1467  8F17 20 04        	jr nz,3F
+1468  8F19 34           	inc (hl)
+1469  8F1A
+1470  8F1A 21 42 8A     	ld hl,Contador_de_frames_2
+1471  8F1D 34           3 inc (hl)											; 0 - 255
+1472  8F1E
+1473  8F1E 21 F9 89     	ld hl,Ctrl_1
+1474  8F21 CB AE        	res 5,(hl)
+1475  8F23
+1476  8F23              ;	call Calcula_numero_de_malotes
+1477  8F23
+1478  8F23 E1           	pop hl
+1479  8F24 D1           	pop de
+1480  8F25 C1           	pop bc
+1481  8F26 F1           	pop af
+1482  8F27
+1483  8F27 C9           	ret
+1484  8F28
+1485  8F28              ; ---------------------------------------------------------------
+1486  8F28
+1487  8F28              	include "Disparo.asm"
 # file opened: Disparo.asm
    1+ 8F28              ; ******************************************************************************************************************************************************************************************
    2+ 8F28              ;
@@ -4206,7 +4211,7 @@
 1419+ 941C 04           1 inc b
 1420+ 941D C9               ret
 # file closed: Disparo.asm
-1483  941E              	include "Draw_XOR.asm"
+1488  941E              	include "Draw_XOR.asm"
 # file opened: Draw_XOR.asm
    1+ 941E              ; ******************************************************************************************************************************************************************************************
    2+ 941E              ;
@@ -5029,7 +5034,7 @@
  819+ 97AD C9           	ret
  820+ 97AE
 # file closed: Draw_XOR.asm
-1484  97AE              	include "Rutinas_de_impresion_sprites.asm"
+1489  97AE              	include "Rutinas_de_impresion_sprites.asm"
 # file opened: Rutinas_de_impresion_sprites.asm
    1+ 97AE              ;   índices de Rutinas de impresión.
    2+ 97AE
@@ -5449,7 +5454,7 @@
  416+ 99DD C9               ret
  417+ 99DE
 # file closed: Rutinas_de_impresion_sprites.asm
-1485  99DE              	include "calcula_tercio.asm"
+1490  99DE              	include "calcula_tercio.asm"
 # file opened: calcula_tercio.asm
    1+ 99DE              ; ******************************************* Indica el tercio de pantalla en el que nos encontramos según el valor del registro H ********************************************************
    2+ 99DE              ;
@@ -5466,7 +5471,7 @@
   13+ 99E7 C9           	ret
   14+ 99E8
 # file closed: calcula_tercio.asm
-1486  99E8              	include "Cls.asm"
+1491  99E8              	include "Cls.asm"
 # file opened: Cls.asm
    1+ 99E8              ; *********************************** Limpia la pantalla, CLEAR SCREEN ****************************************************************
    2+ 99E8              ;
@@ -5501,7 +5506,7 @@
   31+ 99FB C9           	ret
   32+ 99FC
 # file closed: Cls.asm
-1487  99FC              	include "Direcciones.asm"
+1492  99FC              	include "Direcciones.asm"
 # file opened: Direcciones.asm
    1+ 99FC              ; ******************************************************************************************************************************************************************************************
    2+ 99FC              ;
@@ -6252,7 +6257,7 @@
  747+ 9D69
  748+ 9D69
 # file closed: Direcciones.asm
-1488  9D69              	include "Genera_coordenadas.asm"
+1493  9D69              	include "Genera_coordenadas.asm"
 # file opened: Genera_coordenadas.asm
    1+ 9D69              ; ------------------------------------------------------------------------
    2+ 9D69              ;
@@ -6342,7 +6347,7 @@
   86+ 9DAB C9           	ret
   87+ 9DAC
 # file closed: Genera_coordenadas.asm
-1489  9DAC              	include "Patrones_de_mov.asm"
+1494  9DAC              	include "Patrones_de_mov.asm"
 # file opened: Patrones_de_mov.asm
    1+ 9DAC
    2+ 9DAC
@@ -6919,7 +6924,7 @@
  557+ A0AD
  558+ A0AD
 # file closed: Patrones_de_mov.asm
-1490  A0AD              	include "Relojes_y_temporizaciones.asm"
+1495  A0AD              	include "Relojes_y_temporizaciones.asm"
 # file opened: Relojes_y_temporizaciones.asm
    1+ A0AD              ; Relojes y temporizaciones.
    2+ A0AD
@@ -6962,7 +6967,7 @@
   39+ A0BA 77           	ld (hl),a
   40+ A0BB C9           	ret
 # file closed: Relojes_y_temporizaciones.asm
-1491  A0BC              	include "Guarda_foto_registros.asm"
+1496  A0BC              	include "Guarda_foto_registros.asm"
 # file opened: Guarda_foto_registros.asm
    1+ A0BC              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
    2+ A0BC              ;
@@ -7229,10 +7234,10 @@
  263+ 74C8
  264+ 74C8
 # file closed: Guarda_foto_registros.asm
-1492  74C8
-1493  74C8              	SAVESNA "Pruebas.sna", START
-1494  74C8
-1495  74C8
-1496  74C8
 1497  74C8
+1498  74C8              	SAVESNA "Pruebas.sna", START
+1499  74C8
+1500  74C8
+1501  74C8
+1502  74C8
 # file closed: Banco_de_pruebas.asm
