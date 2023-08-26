@@ -1372,6 +1372,8 @@ Frame
     ld a,2
     out ($fe),a											; Rojo.
 
+	call Calcula_numero_de_malotes
+
 ; Hemos completado el 1er album?. Si (Puntero_indice_album_de_fotos) no está situado en el 2º Album_
 ; _ , no imprimimos FRAME. no gestionamos los álbumes de fotos.
 
@@ -1380,13 +1382,16 @@ Frame
 	cp 1	
 	jr nz,4F
 	ld a,(Contador_de_frames)
-	cp $56 		; Último FRAME estable, a partir de aquí hay que hacer seguimiento.	$51.
+	cp $71 		; Último FRAME estable, a partir de aquí hay que hacer seguimiento.	$70.
 	jr z,$
 	jr nc,$
+
+	ld hl,(Stack_snapshot)
+
 ;;! debuggg !!!;
 
 4 call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
-	call Extrae_foto_disparos
+;	call Extrae_foto_disparos
     ld a,1
     out ($fe),a											; Azul.
 
@@ -1463,7 +1468,7 @@ Frame
 	ld hl,Ctrl_1									
 	res 5,(hl)
 
-	call Calcula_numero_de_malotes
+;	call Calcula_numero_de_malotes
 
 	pop hl
 	pop de
