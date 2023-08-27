@@ -1377,19 +1377,23 @@ Frame
 
 ;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
 
-
-
+	ld hl,(Puntero_indice_album_de_fotos)
+	ld bc,Indice_album_de_fotos
+	and a
+	sbc hl,bc
+	
+	jr z,$
 
 	call Calcula_numero_de_malotes
 
 ;;! debuggg !!!
-	ld a,(Contador_de_frames_2)
-	cp 1	
-	jr nz,4F
-	ld a,(Contador_de_frames)
-	cp $72 		; Último FRAME estable, a partir de aquí hay que hacer seguimiento.	$72.
-	jr z,$
-	jr nc,$
+;	ld a,(Contador_de_frames_2)
+;	cp 1	
+;	jr nz,4F
+;	ld a,(Contador_de_frames)
+;	cp $72 		; Último FRAME estable, a partir de aquí hay que hacer seguimiento.	$72.
+;	jr z,$
+;	jr nc,$
 
 	ld hl,(Stack_snapshot)
 
@@ -1475,7 +1479,7 @@ Frame
 
 ;	call Calcula_numero_de_malotes
 
-	pop hl
+6 pop hl
 	pop de
 	pop bc
 	pop af
