@@ -226,6 +226,7 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 ;														BIT 4, Recarga de nueva oleada.
 ;														BIT 5, **** Buffer lleno. Aplico HALT.
 
+
 Repone_puntero_objeto defw 0							; Almacena (Puntero_objeto). Cuando el Sprite se inicia por arriba o por abajo,_
 ; 														; _ hay que sustituirlo por un `sprite vacío' para que no se vea el 1er o último scanline.
 ; 														; _ Cuando hemos terminado de iniciarlo y guardado su foto, hemos de recuperar su (Puntero_objeto).
@@ -649,10 +650,9 @@ Main
 
 	call Guarda_foto_entidad_a_pintar
 
-
-
 14 ld hl,Ctrl_0	
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
+
 	xor a
 	ld (Obj_dibujado),a
 
@@ -665,8 +665,7 @@ Main
 
 ;	call Calcula_numero_de_disparotes
 
-
-9 call Avanza_puntero_de_album_de_fotos_y_malotes		; Cuando estamos dentro del FRAME RATE, esperamos dentro_
+ call Avanza_puntero_de_album_de_fotos_y_malotes		; Cuando estamos dentro del FRAME RATE, esperamos dentro_
 ;														; _ de esta rutina a que se produzca la llamada a la rutina de_
 ;														; _ interrupción.
 	ld a,4
@@ -1381,7 +1380,6 @@ Frame
 	ld bc,Indice_album_de_fotos
 	and a
 	sbc hl,bc
-	
 	jr z,$
 
 	call Calcula_numero_de_malotes
@@ -1391,12 +1389,10 @@ Frame
 ;	cp 1	
 ;	jr nz,4F
 ;	ld a,(Contador_de_frames)
-;	cp $72 		; Último FRAME estable, a partir de aquí hay que hacer seguimiento.	$72.
+;	cp $5b 		; Último FRAME estable, a partir de aquí hay que hacer seguimiento.	$5d.
 ;	jr z,$
 ;	jr nc,$
-
-	ld hl,(Stack_snapshot)
-
+;	ld hl,(Stack_snapshot)
 ;;! debuggg !!!;
 
 4 call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
@@ -1474,12 +1470,12 @@ Frame
 	ld hl,Contador_de_frames_2
 3 inc (hl)											; 0 - 255
 
-	ld hl,Ctrl_1									
+6 ld hl,Ctrl_1									; Restauramos balizas de buffer.							
 	res 5,(hl)
 
 ;	call Calcula_numero_de_malotes
 
-6 pop hl
+	pop hl
 	pop de
 	pop bc
 	pop af
