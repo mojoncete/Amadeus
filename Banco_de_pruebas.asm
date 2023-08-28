@@ -441,9 +441,6 @@ START
 
 Main 
 
-;	ei ; Interrupciones habilitadas.
-
-; -----------------------------------------------------------------------
 ;
 ;	3/8/23
 
@@ -1380,19 +1377,19 @@ Frame
 	ld bc,Indice_album_de_fotos
 	and a
 	sbc hl,bc
-	jr z,$
-
+	jr z,6F
+	
 	call Calcula_numero_de_malotes
 
 ;;! debuggg !!!
-;	ld a,(Contador_de_frames_2)
-;	cp 1	
-;	jr nz,4F
-;	ld a,(Contador_de_frames)
-;	cp $5b 		; Último FRAME estable, a partir de aquí hay que hacer seguimiento.	$5d.
-;	jr z,$
-;	jr nc,$
-;	ld hl,(Stack_snapshot)
+	ld a,(Contador_de_frames_2)
+	cp 1	
+	jr nz,4F
+	ld a,(Contador_de_frames)
+	cp $5c 		; Último FRAME estable, a partir de aquí hay que hacer seguimiento.	$5d.
+	jr z,$
+	jr nc,$
+	ld hl,(Stack_snapshot)
 ;;! debuggg !!!;
 
 4 call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
@@ -1420,12 +1417,10 @@ Frame
 
 ;	ld a,l
 ;	sub c
-
 ;	jr z,$
 
 	ld (Puntero_indice_album_de_fotos),hl
 	
-
 	ld hl,(Puntero_indice_End_Snapshot)
 	dec hl
 	dec hl
@@ -1470,10 +1465,8 @@ Frame
 	ld hl,Contador_de_frames_2
 3 inc (hl)											; 0 - 255
 
-6 ld hl,Ctrl_1									; Restauramos balizas de buffer.							
+6 ld hl,Ctrl_1										; Restauramos balizas de buffer.							
 	res 5,(hl)
-
-;	call Calcula_numero_de_malotes
 
 	pop hl
 	pop de
