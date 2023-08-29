@@ -1386,7 +1386,7 @@ Frame
 	cp 1	
 	jr nz,4F
 	ld a,(Contador_de_frames)
-	cp $5c 		; Último FRAME estable, a partir de aquí hay que hacer seguimiento.	$5d.
+	cp $90 												; EL FRAME 92 PETAAAAAAAAAA!!!!!!!!!!!!!!!!!!!!!
 	jr z,$
 	jr nc,$
 	ld hl,(Stack_snapshot)
@@ -1399,7 +1399,7 @@ Frame
 
 ; 	Gestiona los álbumes de fotos.	
 
-	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
+;	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
 	call Gestiona_albumes_de_fotos 						; Escupe Álbum de fotos. 1a0, 2a1, 3a2. 
 
 ; 	Corrige (Stack_snapshot). Se sitúa al principio del último álbum libre para volver a guardar fotos.
