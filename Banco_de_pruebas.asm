@@ -225,7 +225,7 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 ;														BIT 3, Recarga de nueva oleada.
 ;														BIT 4, Recarga de nueva oleada.
 ;														BIT 5, **** Buffer lleno. Aplico HALT.
-
+;														BIT 6, **** Frame completo.
 
 Repone_puntero_objeto defw 0							; Almacena (Puntero_objeto). Cuando el Sprite se inicia por arriba o por abajo,_
 ; 														; _ hay que sustituirlo por un `sprite vacío' para que no se vea el 1er o último scanline.
@@ -337,6 +337,10 @@ Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos
 ; 														; _ que definen el NIVEL.
 ; Y todo comienza aquí .....
 ;
+
+Guarda_puntero_objeto defw 0
+
+
 ; Rutina principal *************************************************************************************************************************************************************************
 ;
 ;	14/11/22	
@@ -1386,18 +1390,19 @@ Frame
 	cp 1	
 	jr nz,4F
 	ld a,(Contador_de_frames)
-	cp $90 												; EL FRAME 92 PETAAAAAAAAAA!!!!!!!!!!!!!!!!!!!!!
+	cp $a5 												; EL FRAME $a6 peta. Siempre existe petada 
 	jr z,$
 	jr nc,$
 	ld hl,(Stack_snapshot)
 ;;! debuggg !!!;
 
 4 call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
+
 ;	call Extrae_foto_disparos
     ld a,1
     out ($fe),a											; Azul.
 
-; 	Gestiona los álbumes de fotos.	
+; 	Gestiona albumes de fotos.
 
 ;	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
 	call Gestiona_albumes_de_fotos 						; Escupe Álbum de fotos. 1a0, 2a1, 3a2. 
@@ -1465,7 +1470,7 @@ Frame
 	ld hl,Contador_de_frames_2
 3 inc (hl)											; 0 - 255
 
-6 ld hl,Ctrl_1										; Restauramos balizas de buffer.							
+6 ld hl,Ctrl_1																	
 	res 5,(hl)
 
 	pop hl
