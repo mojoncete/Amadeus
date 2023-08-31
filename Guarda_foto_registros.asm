@@ -29,8 +29,8 @@
 Guarda_foto_registros 
 
     di
-
-7 ld (Stack),sp                                 ; Guardo SP en (Stack).
+ 
+    ld (Stack),sp                                 ; Guardo SP en (Stack).
     ld sp,Guarda_foto_registros                   ; Sitúo el Stack Pointer en la dirección actual -1
 
     push hl                                       ; HL contiene la dirección de la rutina de impresión.

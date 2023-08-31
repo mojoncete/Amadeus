@@ -337,10 +337,6 @@ Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos
 ; 														; _ que definen el NIVEL.
 ; Y todo comienza aquí .....
 ;
-
-Guarda_puntero_objeto defw 0
-
-
 ; Rutina principal *************************************************************************************************************************************************************************
 ;
 ;	14/11/22	
@@ -447,6 +443,8 @@ Main
 
 ;
 ;	3/8/23
+
+	ei
 
 	ld a,(Clock_Entidades_en_curso)
 	ld b,a
@@ -825,7 +823,7 @@ Inicia_entidad	call Inicia_Puntero_objeto
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	31/01/23
+;	31/8/23
 ;
 ;	(Guardo la foto de Amadeus sin ejecutar DRAW, "no RECOLOCACIÓN"). IMÁGEN DE AMADEUS A BORRAR.
 
@@ -840,7 +838,7 @@ Guarda_foto_entidad_a_borrar
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	31/01/23
+;	31/08/23
 ;
 ;	(Guardo la foto de la entidad ejecutando DRAW, pues ha habido movimiento del Sprite y una posible_
 ;   _recolocación. Guarda la IMÁGEN DE LA ENTIDAD A PINTAR. 
@@ -1364,25 +1362,44 @@ Frame
 
 ; PINTAMOS.
 
-	push af
-	push bc
-	push de
-	push hl
+	ex af,af'	
+	push af	;af'
 
-    ld a,2
+	exx
+	push hl	;hl'
+	push de	;de'
+	push bc	;bc'
+
+	exx
+	push hl	;hl
+	push de	;de
+	push bc	;bc
+	
+	ex af,af'
+	push af	;af
+
+	push ix
+	push iy
+
+	ld a,2
     out ($fe),a											; Rojo.
+
+; Consultamos Frame_ctrl. Necesitamos saber en que parte de MAIN nos encontramos. 
+; Hemos llegado/completado [Guarda_foto_entidad_a_borrar] ???
+
+;	call Consulta_Frame_ctrl
 
 ; Hemos completado el 1er album?. Si (Puntero_indice_album_de_fotos) no está situado en el 2º Album_
 ; _ , no imprimimos FRAME. no gestionamos los álbumes de fotos.
-
-;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
 
 	ld hl,(Puntero_indice_album_de_fotos)
 	ld bc,Indice_album_de_fotos
 	and a
 	sbc hl,bc
 	jr z,6F
-	
+
+; $57,$72,$7b,$84,$89,...Frames en los que no se llega a completar el cuadro.
+
 	call Calcula_numero_de_malotes
 
 ;;! debuggg !!!
@@ -1390,7 +1407,7 @@ Frame
 	cp 1	
 	jr nz,4F
 	ld a,(Contador_de_frames)
-	cp $a5 												; EL FRAME $a6 peta. Siempre existe petada 
+	cp $7a 												; EL FRAME $a6 peta. Siempre existe petada 
 	jr z,$
 	jr nc,$
 	ld hl,(Stack_snapshot)
@@ -1473,10 +1490,41 @@ Frame
 6 ld hl,Ctrl_1																	
 	res 5,(hl)
 
-	pop hl
-	pop de
-	pop bc
+;	ex af,af'	
+;	push af	;af'
+
+;	exx
+;	push hl	;hl'
+;	push de	;de'
+;	push bc	;bc'
+
+;	exx
+;	push hl	;hl
+;	push de	;de
+;	push bc	;bc
+	
+;	ex af,af'
+;	push af	;af
+
+;	push ix
+;	push iy
+
+	pop iy
+	pop ix
+
 	pop af
+	pop bc
+	pop de
+	pop hl
+	exx
+	pop bc
+	pop de
+	pop hl
+	ex af,af'
+	pop af
+
+	ex af,af'
+	exx
 
 	ret
 
