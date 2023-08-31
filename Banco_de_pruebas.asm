@@ -12,7 +12,6 @@
 	org $aa01		
 
 	call Frame
-
 	ei
 	reti									 
 
@@ -264,7 +263,7 @@ Stack defw 0 											; La rutinas de pintado, utilizan esta_
 Stack_2 defw 0											; 2º variable destinada a almacenar el puntero de pila, SP.
 ;														; La utiliza la rutina [Extrae_foto_registros].
 Stack_3 defw 0
-;
+;Stack_4 defw $ff00
 Stack_snapshot defw 0
 Stack_snapshot_disparos defw 0
 
@@ -1366,6 +1365,7 @@ Frame
 ; PINTAMOS.
 
 	ld (Stack_3),sp
+;	ld sp,(Stack_4)
 
 	ex af,af'	
 	push af	;af'
@@ -1389,11 +1389,6 @@ Frame
 	ld a,2
     out ($fe),a											; Rojo.
 
-; Consultamos Frame_ctrl. Necesitamos saber en que parte de MAIN nos encontramos. 
-; Hemos llegado/completado [Guarda_foto_entidad_a_borrar] ???
-
-;	call Consulta_Frame_ctrl
-
 ; Hemos completado el 1er album?. Si (Puntero_indice_album_de_fotos) no está situado en el 2º Album_
 ; _ , no imprimimos FRAME. no gestionamos los álbumes de fotos.
 
@@ -1403,7 +1398,7 @@ Frame
 	sbc hl,bc
 	jr z,6F
 
-; $63,$6d,$79,$84,$89,...Frames en los que no se llega a completar el cuadro.
+; $59,
 
 	call Calcula_numero_de_malotes
 
@@ -1483,8 +1478,6 @@ Frame
 6 ld hl,Ctrl_1																	
 	res 5,(hl)
 
-	
-
 	pop iy
 	pop ix
 
@@ -1502,6 +1495,7 @@ Frame
 	ex af,af'
 	exx
 
+;	ld (Stack_4),sp
 	ld sp,(Stack_3)
 
 
