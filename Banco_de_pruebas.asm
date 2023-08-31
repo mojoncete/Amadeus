@@ -3,15 +3,16 @@
 	
 	DEVICE ZXSPECTRUM48
 
-	org $a0ff 	
+	org $a9ff 	
 	
 ;	Vector de interrupciones.
 
- 	defw $a101											; $9000. Rutina de interrupciones.
+ 	defw $aa01											; $9000. Rutina de interrupciones.
 
-	org $a101		
+	org $aa01		
 
 	call Frame
+
 	ei
 	reti									 
 
@@ -262,6 +263,8 @@ Stack defw 0 											; La rutinas de pintado, utilizan esta_
 ; 														; _de pila, SP.
 Stack_2 defw 0											; 2º variable destinada a almacenar el puntero de pila, SP.
 ;														; La utiliza la rutina [Extrae_foto_registros].
+Stack_3 defw 0
+;
 Stack_snapshot defw 0
 Stack_snapshot_disparos defw 0
 
@@ -344,7 +347,7 @@ Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos
 START 
 
 	ld sp,$ffff											; Situamos el inicio de Stack.
-	ld a,$a0 											; Habilitamos el modo 2 de interrupciones y fijamos el salto a $a0ff
+	ld a,$a9 											; Habilitamos el modo 2 de interrupciones y fijamos el salto a $a0ff
 	ld i,a 												; Byte alto de la dirección donde se encuentra nuestro vector de interrupciones en el registro I. ($90). El byte bajo será siempre $ff.
 	IM 2 											    ; Habilitamos el modo 2 de INTERRUPCIONES.
 	DI 													 										 
@@ -1362,6 +1365,8 @@ Frame
 
 ; PINTAMOS.
 
+	ld (Stack_3),sp
+
 	ex af,af'	
 	push af	;af'
 
@@ -1398,20 +1403,9 @@ Frame
 	sbc hl,bc
 	jr z,6F
 
-; $57,$72,$7b,$84,$89,...Frames en los que no se llega a completar el cuadro.
+; $63,$6d,$79,$84,$89,...Frames en los que no se llega a completar el cuadro.
 
 	call Calcula_numero_de_malotes
-
-;;! debuggg !!!
-	ld a,(Contador_de_frames_2)
-	cp 1	
-	jr nz,4F
-	ld a,(Contador_de_frames)
-	cp $7a 												; EL FRAME $a6 peta. Siempre existe petada 
-	jr z,$
-	jr nc,$
-	ld hl,(Stack_snapshot)
-;;! debuggg !!!;
 
 4 call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
 
@@ -1483,31 +1477,13 @@ Frame
 	cp $ff
 	jr nz,3F
 	inc (hl)
-
 	ld hl,Contador_de_frames_2
 3 inc (hl)											; 0 - 255
 
 6 ld hl,Ctrl_1																	
 	res 5,(hl)
 
-;	ex af,af'	
-;	push af	;af'
-
-;	exx
-;	push hl	;hl'
-;	push de	;de'
-;	push bc	;bc'
-
-;	exx
-;	push hl	;hl
-;	push de	;de
-;	push bc	;bc
 	
-;	ex af,af'
-;	push af	;af
-
-;	push ix
-;	push iy
 
 	pop iy
 	pop ix
@@ -1525,6 +1501,9 @@ Frame
 
 	ex af,af'
 	exx
+
+	ld sp,(Stack_3)
+
 
 	ret
 
