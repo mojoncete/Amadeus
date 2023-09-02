@@ -253,7 +253,7 @@ Datos_de_entidad defw 0									; Contiene los bytes de información de la entid
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;	9/8/23
+;	2/9/23
 ;
 ;	Álbumes.
 
@@ -262,8 +262,7 @@ Stack defw 0 											; La rutinas de pintado, utilizan esta_
 ; 														; _de pila, SP.
 Stack_2 defw 0											; 2º variable destinada a almacenar el puntero de pila, SP.
 ;														; La utiliza la rutina [Extrae_foto_registros].
-Stack_3 defw 0
-;Stack_4 defw $ff00
+Stack_3 defw 0											; Almacena el SP antes de ejecutar FRAME.
 Stack_snapshot defw 0
 Stack_snapshot_disparos defw 0
 
@@ -639,9 +638,11 @@ Main
 
 16 call Restore_Amadeus
 
-	ld a,(Impacto) 
-	and a
-	jr nz,$
+;! Activa/desactiva impacto con Amadeus.
+
+;	ld a,(Impacto) 
+;	and a
+;	jr nz,$
 
 	call Mov_Amadeus
 
@@ -932,7 +933,7 @@ Inicia_punteros_de_albumes_y_malotes
 
 	ret
 
-;	12/8/23
+;	2/9/23
 
 Avanza_puntero_de_album_de_fotos_y_malotes
 
@@ -951,7 +952,8 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 	halt
 	ret							
 
-1 ld hl,(Puntero_indice_album_de_fotos)
+1 di
+	ld hl,(Puntero_indice_album_de_fotos)
 	inc hl
 	inc hl
 	ld (Puntero_indice_album_de_fotos),hl
@@ -964,6 +966,7 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 	ld (Puntero_indice_End_Snapshot),hl
 	call Extrae_address
 	ld (Puntero_de_End_Snapshot),hl					
+	ei
 
 	ret
 
@@ -1365,24 +1368,21 @@ Frame
 ; PINTAMOS.
 
 	ld (Stack_3),sp
-;	ld sp,(Stack_4)
+
+; Guardamos registros y SP.
 
 	ex af,af'	
 	push af	;af'
-
 	exx
 	push hl	;hl'
 	push de	;de'
 	push bc	;bc'
-
 	exx
 	push hl	;hl
 	push de	;de
 	push bc	;bc
-	
 	ex af,af'
 	push af	;af
-
 	push ix
 	push iy
 
@@ -1478,9 +1478,10 @@ Frame
 6 ld hl,Ctrl_1																	
 	res 5,(hl)
 
+; Recuperamos registros y SP.
+
 	pop iy
 	pop ix
-
 	pop af
 	pop bc
 	pop de
@@ -1491,13 +1492,10 @@ Frame
 	pop hl
 	ex af,af'
 	pop af
-
 	ex af,af'
 	exx
 
-;	ld (Stack_4),sp
 	ld sp,(Stack_3)
-
 
 	ret
 
