@@ -444,11 +444,6 @@ Main
 ;
 ;	3/8/23
 
-	nop
-	nop
-	nop
-	nop
-
 	ei
 
 	ld a,(Clock_Entidades_en_curso)						; Inicialmente, (Clock_Entidades_en_curso)="30".

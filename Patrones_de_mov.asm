@@ -206,6 +206,8 @@ Movimiento
 
 ;    ld hl,(Posicion_actual)
 
+    ei
+
     ld a,(Ctrl_2)
     bit 2,a
     jr nz, Desplazamiento_iniciado
@@ -301,6 +303,8 @@ Cola ld a,(Cola_de_desplazamiento)
 
 Reinicia_el_movimiento 
 
+    di
+
     ld a,(Ctrl_2)
     bit 3,a
     jr z,2F
@@ -315,7 +319,7 @@ Reinicia_el_movimiento
 
     ld hl,Ctrl_2
     res 3,(hl)                                                  ; Decrementamos el BIT de repeticiones de movimiento.
-    
+
     ld hl,(Puntero_mov)
     inc hl
     inc hl
@@ -326,7 +330,6 @@ Reinicia_el_movimiento
     ld (Cola_de_desplazamiento),a        
 
     jp Cola
-
 
 2 call Inicia_Puntero_mov
 
