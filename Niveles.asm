@@ -14,8 +14,8 @@ Indice_de_niveles
 	defw 0
 	defw 0
 
-Nivel_1 db 4	                                ; Nº de entidades.
-	db 1,1,1,1									; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
+Nivel_1 db 9	                                ; Nº de entidades.
+	db 1,1,1,1,1,1,1,1,1						; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
 Nivel_2 db 12									; Nº de entidades.
 	db 2,1,1,1,1,2								; Tipo de entidad que vamos a introducir en las 5 cajas de DRAW.			
 	db 2,1,1,1,1,2
@@ -36,7 +36,7 @@ Nivel_5 db 20									; Nº de entidades.
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;   21/5/23
+;   3/9/23
 ;
 ;	Sitúa (Puntero_indice_NIVELES) en el 1er Nivel del índice de niveles.
 ;	Carga el nº de entidades del 1er nivel en (Numero_de_entidades). 
@@ -52,10 +52,10 @@ Inicializa_Punteros_de_nivel
 	ld (Puntero_indice_NIVELES),hl				 ; Situamos (Puntero_indice_NIVELES) en el 1er Nivel del índice.
 	call Extrae_address   
 	ld a,(hl)
-	ld (Numero_de_entidades),a
+	ld (Numero_de_entidades),a					 ; Fijamos el nº de entidades que tiene el nivel.
 	inc hl
-	ld (Datos_de_nivel),hl
-	ret
+	ld (Datos_de_nivel),hl						 ; (Datos_de_nivel) ahora apunta a la dirección de mem. donde se encuentra el 1er dato que_ 
+	ret 										 ; _ construye el nivel, (tipo de la 1ª entidad).
 
 ;---------------------------------------------------------------------------------------------------------------
 ;

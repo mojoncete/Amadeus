@@ -104,7 +104,6 @@ Vel_down db 0 											; Velocidad bajada. Nº de píxeles que desplazamos el 
 Impacto db 0											; Si después del movimiento de la entidad, (Impacto) se coloca a "1",_
 ;														; _ existen muchas posibilidades de que esta entidad haya colisionado con Amadeus. 
 ; 														; Hay que comprobar la posible colisión después de mover Amadeus. En este caso, (Impacto2)="3".
-
 Variables_de_borrado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
 	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
 	defw 0
@@ -345,8 +344,8 @@ Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos
 START 
 
 	ld sp,$ffff											; Situamos el inicio de Stack.
-	ld a,$a9 											; Habilitamos el modo 2 de interrupciones y fijamos el salto a $a0ff
-	ld i,a 												; Byte alto de la dirección donde se encuentra nuestro vector de interrupciones en el registro I. ($90). El byte bajo será siempre $ff.
+	ld a,$a9 											; Habilitamos el modo 2 de interrupciones y fijamos el salto a $a9ff
+	ld i,a 												; Byte alto de la dirección donde se encuentra nuestro vector de interrupciones en el registro I. ($a9). El byte bajo será siempre $ff.
 	IM 2 											    ; Habilitamos el modo 2 de INTERRUPCIONES.
 	DI 													 										 
 
@@ -445,9 +444,14 @@ Main
 ;
 ;	3/8/23
 
+	nop
+	nop
+	nop
+	nop
+
 	ei
 
-	ld a,(Clock_Entidades_en_curso)
+	ld a,(Clock_Entidades_en_curso)						; Inicialmente, (Clock_Entidades_en_curso)="30".
 	ld b,a
 	ld a,(Contador_de_frames)
 	cp b
@@ -640,9 +644,9 @@ Main
 
 ;! Activa/desactiva impacto con Amadeus.
 
-;	ld a,(Impacto) 
-;	and a
-;	jr nz,$
+	ld a,(Impacto) 
+	and a
+	jr nz,$
 
 	call Mov_Amadeus
 
@@ -713,8 +717,6 @@ Main
 ;	27/05/23
 
 Mov_obj 
-
-; En este punto Draw tiene cargado los 52 bytes, (parámetros), de la primera entidad de Indice_de_entidades.
 
 	ld a,(Ctrl_2)
 	bit 1,a
@@ -1508,8 +1510,8 @@ Frame
 	include "Cls.asm"
 	include "Direcciones.asm"
 	include "Genera_coordenadas.asm"
-	include "Patrones_de_mov.asm"
 	include "Relojes_y_temporizaciones.asm"
+	include "Patrones_de_mov.asm"
 	include "Guarda_foto_registros.asm"
 
 	SAVESNA "Pruebas.sna", START

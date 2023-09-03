@@ -88,7 +88,7 @@ Guarda_foto_registros
 ;   Limpia Album_de_fotos después de imprimir pantalla y desplaza el buffer una posición.
 ;   Si el buffer estaba lleno, dejará libre Album_de_fotos_3.   
 
-    org $7419 
+    org $7900 
 
 Gestiona_albumes_de_fotos 
 
