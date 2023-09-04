@@ -25,7 +25,7 @@
 ; Constantes. 
 ; ****************************************************************************************************************************************************************************************** 
 ;
-; 25/05/23
+; 4/9/23
 ;
 ; Constantes generales.
 ;
@@ -36,20 +36,22 @@ Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto e
 Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
 
-Album_de_fotos equ $7000	;	(7000h - 7083h).		; En (Album_de_fotos) vamos a ir almacenando los valores_
+Album_de_fotos equ $7000	;	(7000h - 7053h).		; En (Album_de_fotos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y las llamadas a las rutinas de impresión.   
-;                               				        ; De momento situamos este almacén en $7000. La capacidad del album será de 10 entidades + AMADEUS.  
-Album_de_fotos_disparos equ $720d ; (720dh - 728fh).	; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
+;                               				        ; De momento situamos este almacén en $7000. La capacidad del album será de 7 entidades.  
+Album_de_fotos_disparos equ $7150 ; (7150h - 71a3).		; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´. 
-;                               				        ; De momento situamos este almacén en $7060.  
-Album_de_fotos_1 equ $7084	; (7084h - 7106h).
-Album_de_fotos_disparos_1 equ $7290	; (7290h - 7312h).					
-Album_de_fotos_2 equ $7107	; (7107h - 7189h).
-Album_de_fotos_disparos_2 equ $7319	; (7313h - 7395h).
-Album_de_fotos_3 equ $718a	; (718ah - 720ch).
-Album_de_fotos_disparos_3 equ $7396	; (7396h - 7418h).
+;                               				         
+Album_de_fotos_1 equ $7054	; (7054h - 700a7).
+Album_de_fotos_disparos_1 equ $71a4	; (71a4h - 71f7h).					
+Album_de_fotos_2 equ $70a8	; (70a8h - 70fbh).
+Album_de_fotos_disparos_2 equ $71f8	; (71f8hh - 724bh).
+Album_de_fotos_3 equ $70fc	; (70fch - 714fh).
+Album_de_fotos_disparos_3 equ $724c	; (724ch - 729fh).
 
-; 84h es el espacio necesario en (Album_de_fotos) para 10 entidades en pantalla.
+Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72ach).
+
+; 54h es el espacio necesario en (Album_de_fotos) para 7 entidades/disparos en pantalla.
 
 ; ******************************************************************************************************************************************************************************************
 ; Variables. 
@@ -270,6 +272,7 @@ End_Snapshot defw 0
 End_Snapshot_disparos defw 0							; Puntero que indica la posición de memoria donde vamos a guardar_
 ;														; _el snapshot de los registros del siguiente disparo.
 ;														; Inicialmente está situado en la posición $7060, Album_de_fotos_disparos.
+End_Snapshot_Amadeus defw 0
 End_Snapshot_1 defw 0
 End_Snapshot_disparos_1 defw 0
 End_Snapshot_2 defw 0
@@ -427,7 +430,6 @@ START
 ; ----------
 
 6 ld a,(Numero_parcial_de_entidades)
-	inc a
 	ld (Numero_de_malotes),a
 
 ; En este punto tenemos el 1er FRAME preparado. Los datos del FRAME se encuentran en Album_de_fotos y tb_
@@ -982,7 +984,33 @@ Inicia_Puntero_Disparo_Amadeus ld hl,Indice_de_disparos_Amadeus
 
 ; -------------------------------------------------------------------------------------------------------------
 ;
-; 3/8/23 
+; 4/9/23 
+;
+
+; Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72ach).
+
+Limpia_album_Amadeus ld hl,(End_Snapshot_Amadeus)
+	ld bc,Album_de_fotos_Amadeus
+	and a
+	sbc hl,bc
+
+	ld b,l
+
+	ld hl,Album_de_fotos_Amadeus
+1 ld (hl),0
+	inc hl
+	djnz 1B
+
+; Restauramos (End_Snapshot_Amadeus).
+
+	ld hl,0
+	ld (End_Snapshot_Amadeus),hl
+
+	ret
+
+; -------------------------------------------------------------------------------------------------------------
+;
+; 4/9/23 
 ;
 
 Calcula_numero_de_malotes 
@@ -990,6 +1018,33 @@ Calcula_numero_de_malotes
 	ld hl,Album_de_fotos
 	ex de,hl
 	ld hl,(End_Snapshot)
+
+4 ld b,0
+	ld a,l
+	sub e
+	jr z,1F
+
+; Nº de malotes no es "0".
+
+2 sub 6
+	inc b
+	and a
+	jr nz,2B
+	ld a,b
+
+1 ld (Numero_de_malotes),a					
+	ret
+
+; -------------------------------------------------------------------------------------------------------------
+;
+; 4/9/23 
+;
+
+Calcula_malotes_Amadeus 
+
+	ld hl,Album_de_fotos_Amadeus
+	ex de,hl
+	ld hl,(End_Snapshot_Amadeus)
 
 	ld b,0
 	ld a,l
@@ -1397,9 +1452,14 @@ Frame
 
 ; $59,
 
-	call Calcula_numero_de_malotes
+;	jr $
 
-4 call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
+	call Calcula_numero_de_malotes
+	call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
+
+	call Calcula_malotes_Amadeus 
+	call Extrae_foto_Amadeus
+	call Limpia_album_Amadeus
 
 ;	call Extrae_foto_disparos
     ld a,1
@@ -1493,6 +1553,8 @@ Frame
 	exx
 
 	ld sp,(Stack_3)
+
+	jr $
 
 	ret
 

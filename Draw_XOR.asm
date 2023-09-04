@@ -813,3 +813,62 @@ Imprime2 db 0,0,0
 1 xor a
 	ld (Stack_2),a
 	ret
+
+; -----------------------------------------------------------------------------------
+;
+;	4/9/23
+;
+;	Rutina principal de pintado de Amadeus.
+;	Extrae fotos de Album_de_fotos_Amadeus.
+
+Extrae_foto_Amadeus
+
+;	jr $
+
+	ld hl,Album_de_fotos_Amadeus
+	ld a,(hl)
+	and a
+	ret z 																	; Salimos si no hay datos en el álbum. VACÍO.
+
+	ld a,(Numero_de_malotes)												; No hay MALOTES. No se ha producido movimiento.
+	and a																	; No ha aparecido ninguna `nueva entidad'.
+	ret z
+
+; -----------------------------------
+
+	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
+	ld sp,Album_de_fotos_Amadeus
+
+2 pop iy																	; (Puntero_objeto) en IY.
+	pop hl																	; Puntero de impresión de pantalla en HL.
+	pop de																	; Dirección de la rutina de impresión en DE. 
+
+	ld (Stack_2),sp
+	ld sp,(Stack)
+
+; Fabrica la llamada a la correspondiente rutina de impresión.
+
+	ld a,$cd
+	ld (Imprime_Amadeus),a
+	ex de,hl
+	ld (Imprime_Amadeus+1),hl
+	ex de,hl
+
+; Ejecuta la llamada:	CALL $xx,xx
+
+Imprime_Amadeus db 0,0,0						
+
+	ld (Stack),sp
+
+	ld a,(Numero_de_malotes)
+	dec a
+	jr z,1F
+ 	ld (Numero_de_malotes),a	 
+
+	ld sp,(Stack_2)
+	jr 2B
+
+1 xor a
+	ld (Stack_2),a
+
+	ret

@@ -1,6 +1,6 @@
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
-;	9/8/23
+;	4/9/23
 ;
 ;	Instrucciones donde interviene el Stack Pointer, (SP).
 
@@ -44,7 +44,18 @@ Guarda_foto_registros
     ld hl,(Stack_snapshot_disparos)
     jr 4F
 
-2 ld hl,(Stack_snapshot)                          ; Album_de_fotos contiene la imagen de los registros implicados en el_
+; No es disparo. Entidad/Amadeus ????
+
+2 ld a,(Ctrl_0)
+    bit 6,a
+    jr z,7F
+
+; Guardamos foto de Amadeus.
+
+    ld hl,Album_de_fotos_Amadeus
+    jr 4F
+
+7 ld hl,(Stack_snapshot)                          ; Album_de_fotos contiene la imagen de los registros implicados en el_
 
 4 ld b,3                                          ; _correcto funcionamiento de las distintas rutinas de impresión.
 
@@ -55,13 +66,22 @@ Guarda_foto_registros
     inc hl                                        ; Volvemos a tener al puntero SP en la posición inicial, (Snapshot)-1.
     djnz 1B    
 
+    ld a,(Ctrl_1)
     bit 0,a
     jr z,5F
-
+    
     ld (Stack_snapshot_disparos),hl
     jr 6F
 
-5 ld (Stack_snapshot),hl
+5 ld a,(Ctrl_0)
+    bit 6,a
+    jr z,8F
+
+    ld (End_Snapshot_Amadeus),hl    
+    ld sp,(Stack)
+    ret
+
+8 ld (Stack_snapshot),hl
 6 ld sp,(Stack)
 
 ; Aquí tengo que copiar (Stack_snapshot) en la dirección hacia donde apunta (Puntero_de_End_Snapshot).
@@ -83,12 +103,12 @@ Guarda_foto_registros
 ;   3/08/23
 ;
 ;   La rutina estará situada justo después de:
-;   Album_de_fotos_disparos_3 equ $7396	; (7396h - 7418h).
+;   Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72ach).
 ;
 ;   Limpia Album_de_fotos después de imprimir pantalla y desplaza el buffer una posición.
 ;   Si el buffer estaba lleno, dejará libre Album_de_fotos_3.   
 
-    org $7900 
+    org $72ad 
 
 Gestiona_albumes_de_fotos 
 
