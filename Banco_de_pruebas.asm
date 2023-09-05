@@ -442,7 +442,6 @@ START
 ; ------------------------------------
 
 Main 
-
 ;
 ;	3/8/23
 
@@ -1046,6 +1045,10 @@ Calcula_malotes_Amadeus
 	ex de,hl
 	ld hl,(End_Snapshot_Amadeus)
 
+	ld a,h
+	and a
+	jr z,1F										; (End_Snapshot_Amadeus) = "$0000" significa que el álbum está vacío.
+
 	ld b,0
 	ld a,l
 	sub e
@@ -1450,10 +1453,6 @@ Frame
 	sbc hl,bc
 	jr z,6F
 
-; $59,
-
-;	jr $
-
 	call Calcula_numero_de_malotes
 	call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
 
@@ -1553,8 +1552,6 @@ Frame
 	exx
 
 	ld sp,(Stack_3)
-
-	jr $
 
 	ret
 
