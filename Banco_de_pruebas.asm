@@ -384,9 +384,7 @@ START
 ;	INICIA ENTIDADES !!!!!
 
 1 push bc  												; Guardo el contador de entidades.
-
 	call Inicia_entidad
-
 	pop bc
 	djnz 1B  											; Decremento el contador de entidades.
 
@@ -438,12 +436,22 @@ START
 ; _ para situarnos en el siguiente album.
 
 	call Avanza_puntero_de_album_de_fotos_y_malotes
-
+	di
 ; ------------------------------------
 
 Main 
 ;
 ;	3/8/23
+
+;! debugging del bueno!!!!!!!!!!!
+	di
+	ld a,(Contador_de_frames)
+	cp 1
+	jr z,$
+;! debugging del bueno!!!!!!!!!!!
+
+;!	; Analizar esta vuelta. Hay bug. Se guardan datos en los Albumes_de_fotos_1,2 y 3.
+;!	; Deberíamos llegar a FRAME sin ningún dato guardado, (si no movemos Amadeus), hasta que el (Contador_de_frames)="$1e".
 
 	ei
 
@@ -1552,7 +1560,6 @@ Frame
 	exx
 
 	ld sp,(Stack_3)
-
 	ret
 
 ; ---------------------------------------------------------------
