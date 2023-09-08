@@ -823,8 +823,6 @@ Imprime2 db 0,0,0
 
 Extrae_foto_Amadeus
 
-;	jr $
-
 	ld hl,Album_de_fotos_Amadeus
 	ld a,(hl)
 	and a

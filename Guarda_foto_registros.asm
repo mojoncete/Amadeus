@@ -52,7 +52,7 @@ Guarda_foto_registros
 
 ; Guardamos foto de Amadeus.
 
-    ld hl,Album_de_fotos_Amadeus
+    ld hl,(End_Snapshot_Amadeus)
     jr 4F
 
 7 ld hl,(Stack_snapshot)                          ; Album_de_fotos contiene la imagen de los registros implicados en el_
@@ -79,6 +79,7 @@ Guarda_foto_registros
 
     ld (End_Snapshot_Amadeus),hl    
     ld sp,(Stack)
+    ei
     ret
 
 8 ld (Stack_snapshot),hl
@@ -95,7 +96,6 @@ Guarda_foto_registros
     ld (hl),d                                     ; _ álbum a otro.
 
     ei
-
     ret
 
 ; ------------------------------------------------
@@ -103,12 +103,12 @@ Guarda_foto_registros
 ;   3/08/23
 ;
 ;   La rutina estará situada justo después de:
-;   Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72ach).
+;   Almacen_de_borrado_Amadeus equ $72ad ; 6 bytes. ($72ad - $72b2).
 ;
 ;   Limpia Album_de_fotos después de imprimir pantalla y desplaza el buffer una posición.
 ;   Si el buffer estaba lleno, dejará libre Album_de_fotos_3.   
 
-    org $72ad 
+    org $72b3 
 
 Gestiona_albumes_de_fotos 
 
@@ -263,8 +263,8 @@ Gestiona_albumes_de_fotos
 ;   MODIFICA: A,HL,BC y DE.
 
 Limpia_album 
-    push de            ; Guardo DESTINO.
-    push bc            ; Guardo ORIGEN.
+    push de                     ; Guardo DESTINO.
+    push bc                     ; Guardo ORIGEN.
     sbc hl,bc
     ld c,l
     ld b,h

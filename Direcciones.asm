@@ -392,7 +392,9 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 ;
 ; 	Desplaza el Sprite (x)Pixels a la izquierda.
 ;
-Mov_left ld hl,Ctrl_0
+Mov_left 
+
+	ld hl,Ctrl_0
 	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
 ; 																	; _esta información para evitar que la entidad se vuelva borrar/pintar_
 ; 																	; _ en el caso de que no lo haya.

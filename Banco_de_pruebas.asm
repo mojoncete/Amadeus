@@ -50,6 +50,7 @@ Album_de_fotos_3 equ $70fc	; (70fch - 714fh).
 Album_de_fotos_disparos_3 equ $724c	; (724ch - 729fh).
 
 Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72ach).
+Almacen_de_borrado_Amadeus equ $72ad ; 6 bytes. ($72ad - $72b2).
 
 ; 54h es el espacio necesario en (Album_de_fotos) para 7 entidades/disparos en pantalla.
 
@@ -227,6 +228,7 @@ Ctrl_1 db 0 											; 2º Byte de control de propósito general.
 ;														BIT 4, Recarga de nueva oleada.
 ;														BIT 5, **** Buffer lleno. Aplico HALT.
 ;														BIT 6, **** Frame completo.
+;														BIT 7, Indica que ya está tomada la foto de Amadeus. No tomaremos otra hasta el próximo FRAME.
 
 Repone_puntero_objeto defw 0							; Almacena (Puntero_objeto). Cuando el Sprite se inicia por arriba o por abajo,_
 ; 														; _ hay que sustituirlo por un `sprite vacío' para que no se vea el 1er o último scanline.
@@ -272,7 +274,7 @@ End_Snapshot defw 0
 End_Snapshot_disparos defw 0							; Puntero que indica la posición de memoria donde vamos a guardar_
 ;														; _el snapshot de los registros del siguiente disparo.
 ;														; Inicialmente está situado en la posición $7060, Album_de_fotos_disparos.
-End_Snapshot_Amadeus defw 0
+End_Snapshot_Amadeus defw Album_de_fotos_Amadeus
 End_Snapshot_1 defw 0
 End_Snapshot_disparos_1 defw 0
 End_Snapshot_2 defw 0
@@ -401,6 +403,11 @@ START
 	call Inicia_Puntero_objeto
 	call Draw
 	call Guarda_foto_registros
+;	call Guarda_datos_de_borrado_Amadeus
+
+;	ld hl,Ctrl_1
+;	set 7,(hl)
+	
 	ld de,Amadeus_db
 	call Store_Amadeus
 
@@ -443,15 +450,8 @@ Main
 ;
 ;	3/8/23
 
-;! debugging del bueno!!!!!!!!!!!
-	di
-	ld a,(Contador_de_frames)
-	cp 1
-	jr z,$
-;! debugging del bueno!!!!!!!!!!!
-
-;!	; Analizar esta vuelta. Hay bug. Se guardan datos en los Albumes_de_fotos_1,2 y 3.
-;!	; Deberíamos llegar a FRAME sin ningún dato guardado, (si no movemos Amadeus), hasta que el (Contador_de_frames)="$1e".
+    ld a,1
+	out ($fe),a											; Azul.
 
 	ei
 
@@ -489,6 +489,18 @@ Main
 	ld de,CLOCK_repone_disparo_entidad 					; _ variable y variará en función de la dificultad.
 	call Habilita_disparos 								
 
+
+
+
+
+
+
+
+
+
+
+
+
 ; COLISIONES.
 
 	call Selector_de_impactos							; Analizamos el contenido de (Impacto2).
@@ -499,6 +511,9 @@ Main
 
 	xor a
 	ld (Impacto2),a										; Flag (Impacto2) a "0".
+
+; Ahora, primero Amadeus.
+;!!!
 
 	call Inicia_punteros_de_cajas 
 12 call Restore_entidad 								; Vuelca los datos de la entidad, hacia la que apunta (Puntero_store_caja),_
@@ -652,13 +667,23 @@ Main
 	and a
 	jr nz,$
 
+; Hemos tomado foto?
+
+	ld a,(Ctrl_1)
+	bit 7,a
+	jr nz,32F
+
 	call Mov_Amadeus
 
 	ld a,(Ctrl_0)
 	bit 4,a
-	jr z,14F                                             ; Omitimos BORRAR/PINTAR si no hay movimiento.
+	jr z,14F                                            ; Omitimos BORRAR/PINTAR si no hay movimiento.
 
 	call Guarda_foto_entidad_a_pintar
+;	call Guarda_datos_de_borrado_Amadeus
+
+	ld hl,Ctrl_1
+	set 7,(hl)											; Indica que hemos tomado la foto de Amadeus.
 
 14 ld hl,Ctrl_0	
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
@@ -666,7 +691,7 @@ Main
 	xor a
 	ld (Obj_dibujado),a
 
-	ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
+32 ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
 	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
 
 ;	call Motor_de_disparos								; Borra/mueve/pinta cada uno de los disparos y crea un nuevo album de fotos.
@@ -678,7 +703,7 @@ Main
  call Avanza_puntero_de_album_de_fotos_y_malotes		; Cuando estamos dentro del FRAME RATE, esperamos dentro_
 ;														; _ de esta rutina a que se produzca la llamada a la rutina de_
 ;														; _ interrupción.
-	ld a,4
+	ld a,1
 	out ($fe),a  
 
 ; ----------------------------------------
@@ -808,6 +833,7 @@ Mov_Amadeus
 ; Movemos Amadeus.
 
 	call Movimiento_Amadeus 							; MOVEMOS AMADEUS.
+
 	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
 	bit 4,a
 	ret z
@@ -818,8 +844,12 @@ Mov_Amadeus
 	ld (Obj_dibujado),a 								; _(Variables_de_pintado).					
     call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
     call Repone_borrar                                  ; Si ha habido movimiento de la entidad, borraremos el FRAME anterior.
-	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen a borrar de Amadeus, pues ha habido movimiento_
-	ret													; _de la nave.
+	call Guarda_foto_entidad_a_borrar					; Guarda la imagen a borrar de Amadeus, pues ha habido movimiento_
+;														; _de la nave.
+;	call Repone_datos_de_borrado_Amadeus
+;	call Limpia_almacen_de_borrado_Amadeus
+
+	ret													
 
 ; -----------------------------------------------------------------------------------
 
@@ -996,35 +1026,48 @@ Inicia_Puntero_Disparo_Amadeus ld hl,Indice_de_disparos_Amadeus
 
 ; Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72ach).
 
-Limpia_album_Amadeus ld hl,(End_Snapshot_Amadeus)
-	ld bc,Album_de_fotos_Amadeus
+Limpia_album_Amadeus ld hl,Album_de_fotos_Amadeus
+	ld a,(hl)
 	and a
-	sbc hl,bc
-
-	ld b,l
+	ret z
 
 	ld hl,Album_de_fotos_Amadeus
-1 ld (hl),0
-	inc hl
-	djnz 1B
+	ld de,Album_de_fotos_Amadeus+1
+	ld bc,12
+	xor a
+	ld (hl),a
+	ldir
 
-; Restauramos (End_Snapshot_Amadeus).
-
-	ld hl,0
+	ld hl,Album_de_fotos_Amadeus
 	ld (End_Snapshot_Amadeus),hl
 
 	ret
 
+Limpia_almacen_de_borrado_Amadeus ld hl,Almacen_de_borrado_Amadeus 
+	ld de,Almacen_de_borrado_Amadeus+1
+	ld bc,5
+	xor a
+	ld (hl),a
+	ldir
+	ret
+
 ; -------------------------------------------------------------------------------------------------------------
 ;
-; 4/9/23 
+; 8/9/23 
 ;
+
+; (Numero_de_malotes) lo utiliza la rutina [Extrae_foto_entidades] para borrar/pintar entidades en pantalla.
+; Se calcula dividiendo entre 6 el nº de bytes que contiene el Album_de_fotos.
 
 Calcula_numero_de_malotes 
 
 	ld hl,Album_de_fotos
 	ex de,hl
 	ld hl,(End_Snapshot)
+
+	ld a,h
+	and a
+	jr z,1F										; (End_Snapshot_Amadeus) = "$0000" significa que el álbum está vacío.
 
 4 ld b,0
 	ld a,l
@@ -1044,8 +1087,11 @@ Calcula_numero_de_malotes
 
 ; -------------------------------------------------------------------------------------------------------------
 ;
-; 4/9/23 
+; 8/9/23 
 ;
+
+; (Numero_de_malotes_Amadeus) lo utiliza la rutina [Extrae_foto_Amadeus] para borrar/pintar la nave en pantalla.
+; Se calcula dividiendo entre 6 el nº de bytes que contiene el Album_de_fotos.
 
 Calcula_malotes_Amadeus 
 
@@ -1388,6 +1434,7 @@ Movimiento_Amadeus
 	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
 	and $01													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $01 resulta "0"  llama a la rutina "Mov_izq".
     call z,Mov_left											;			"			"			"			"			"			"			"			"
+
 	ld a,$f7
 	in a,($fe)
 	and $01
@@ -1417,6 +1464,39 @@ Detecta_disparo_entidad
 ;	ret nz
 
 ;	call Genera_disparo
+	ret
+
+; ----------------------------------------------------------------------
+;
+;	8/9/23
+
+Guarda_datos_de_borrado_Amadeus 
+
+	ld hl,(End_Snapshot_Amadeus)
+	dec hl
+	ld a,(hl)
+	and a
+	ret z										; Salimos si es álbum está vacío.
+
+	ld de,Almacen_de_borrado_Amadeus+5
+	ld bc,6
+	lddr
+	ret
+
+; ----------------------------------------------------------------------
+;
+;	9/9/23
+
+Repone_datos_de_borrado_Amadeus
+
+	ld hl,Almacen_de_borrado_Amadeus
+	ld de,Album_de_fotos_Amadeus
+	ld bc,6
+	ldir
+
+	ex de,hl
+	ld (End_Snapshot_Amadeus),hl
+
 	ret
 
 ; ----------------------------------------------------------------------
@@ -1459,20 +1539,16 @@ Frame
 	ld bc,Indice_album_de_fotos
 	and a
 	sbc hl,bc
+
+	jr z,$
 	jr z,6F
 
 	call Calcula_numero_de_malotes
 	call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
 
-	call Calcula_malotes_Amadeus 
-	call Extrae_foto_Amadeus
-	call Limpia_album_Amadeus
-
 ;	call Extrae_foto_disparos
     ld a,1
     out ($fe),a											; Azul.
-
-; 	Gestiona albumes de fotos.
 
 ;	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
 	call Gestiona_albumes_de_fotos 						; Escupe Álbum de fotos. 1a0, 2a1, 3a2. 
@@ -1539,8 +1615,13 @@ Frame
 	ld hl,Contador_de_frames_2
 3 inc (hl)											; 0 - 255
 
-6 ld hl,Ctrl_1																	
+6 call Calcula_malotes_Amadeus 
+	call Extrae_foto_Amadeus
+	call Limpia_album_Amadeus
+
+	ld hl,Ctrl_1																	
 	res 5,(hl)
+	res 7,(hl)
 
 ; Recuperamos registros y SP.
 
