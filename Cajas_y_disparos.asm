@@ -92,7 +92,7 @@ Disparo_11 defw 0
 
 ; -------------------------------------------------------------------------------------
 
-Indice_de_cajas										 ;! 67 Bytes por entidad.
+Indice_de_cajas										 ;! 63 Bytes por entidad.
 
 	defw Caja_1
 	defw Caja_2
@@ -125,10 +125,7 @@ Amadeus_db db 2,2									; (Filas) / (Columns).
 
 	db 0											; Impacto. "1" existe impacto en la entidad.
 
-	db 0,0											; Variables_de_borrado 
-	defw 0											;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
+	ds 6											; Variables_de_borrado 
 
 	db 0,0											; Variables_de_pintado 
 	defw 0											;	" " " " " " "
@@ -169,10 +166,7 @@ Caja_1 db 0,0										; (Filas) / (Columns).
 
 	db 0											; Impacto. "1" existe impacto en la entidad.
 
-	db 0,0										    ; Variables_de_borrado 
-	defw 0											;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
+	ds 6											; Variables_de_borrado 
 
 	db 0,0											; Variables_de_pintado 
 	defw 0											;	" " " " " " "
@@ -213,10 +207,7 @@ Caja_2 db 0,0										; (Filas) / (Columns).
 
 	db 0											; Impacto. "1" existe impacto en la entidad.
 
-	db 0,0										    ; Variables_de_borrado 
-	defw 0											;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
+	ds 6											; Variables_de_borrado 
 
 	db 0,0											; Variables_de_pintado 
 	defw 0											;	" " " " " " "
@@ -257,10 +248,7 @@ Caja_3 db 0,0										; (Filas) / (Columns).
 
 	db 0											; Impacto. "1" existe impacto en la entidad.
 
-	db 0,0										    ; Variables_de_borrado 
-	defw 0											;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
+	ds 6											; Variables_de_borrado 
 
 	db 0,0											; Variables_de_pintado 
 	defw 0											;	" " " " " " "
@@ -301,10 +289,7 @@ Caja_4 db 0,0										; (Filas) / (Columns).
 
 	db 0											; Impacto. "1" existe impacto en la entidad.
 
-	db 0,0										    ; Variables_de_borrado 
-	defw 0											;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
+	ds 6											; Variables_de_borrado 
 
 	db 0,0											; Variables_de_pintado 
 	defw 0											;	" " " " " " "
@@ -345,10 +330,7 @@ Caja_5 db 0,0										; (Filas) / (Columns).
 
 	db 0											; Impacto. "1" existe impacto en la entidad.
 
-	db 0,0										    ; Variables_de_borrado 
-	defw 0											;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
+	ds 6											; Variables_de_borrado 
 
 	db 0,0											; Variables_de_pintado 
 	defw 0											;	" " " " " " "
@@ -389,10 +371,7 @@ Caja_6 db 0,0										; (Filas) / (Columns).
 
 	db 0											; Impacto. "1" existe impacto en la entidad.
 
-	db 0,0										    ; Variables_de_borrado 
-	defw 0											;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
+	ds 6											; Variables_de_borrado 
 
 	db 0,0											; Variables_de_pintado 
 	defw 0											;	" " " " " " "
@@ -433,10 +412,7 @@ Caja_7 db 0,0										; (Filas) / (Columns).
 
 	db 0											; Impacto. "1" existe impacto en la entidad.
 
-	db 0,0										    ; Variables_de_borrado 
-	defw 0											;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
+	ds 6											; Variables_de_borrado 
 
 	db 0,0											; Variables_de_pintado 
 	defw 0											;	" " " " " " "

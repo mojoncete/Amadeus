@@ -12,6 +12,8 @@
 	org $aa01		
 
 	call Frame
+	call Gestiona_Amadeus
+
 	ei
 	reti									 
 
@@ -107,11 +109,8 @@ Vel_down db 0 											; Velocidad bajada. Nº de píxeles que desplazamos el 
 Impacto db 0											; Si después del movimiento de la entidad, (Impacto) se coloca a "1",_
 ;														; _ existen muchas posibilidades de que esta entidad haya colisionado con Amadeus. 
 ; 														; Hay que comprobar la posible colisión después de mover Amadeus. En este caso, (Impacto2)="3".
-Variables_de_borrado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
-	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
-	defw 0
-	db 0,0,0,0
-
+Variables_de_borrado ds 6 							
+												
 Variables_de_pintado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
 	defw 0
 	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
@@ -205,7 +204,7 @@ Ctrl_2 db 0
 
 Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
-;! 67 Bytes por entidad.
+;! 63 Bytes por entidad.
 
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 ;					         		---------;      ;---------
@@ -403,18 +402,16 @@ START
 	call Inicia_Puntero_objeto
 	call Draw
 	call Guarda_foto_registros
-;	call Guarda_datos_de_borrado_Amadeus
 
-;	ld hl,Ctrl_1
-;	set 7,(hl)
-	
+	call Guarda_datos_de_borrado_Amadeus
+
 	ld de,Amadeus_db
 	call Store_Amadeus
 
 ; 	INICIA DISPAROS !!!!!
 
-	call Inicia_Puntero_Disparo_Entidades
-	call Inicia_Puntero_Disparo_Amadeus
+;	call Inicia_Puntero_Disparo_Entidades
+;	call Inicia_Puntero_Disparo_Amadeus
 
 ; Una vez inicializadas las entidades y Amadeus, Cargamos la 1ª entidad en DRAW.
 
@@ -489,18 +486,6 @@ Main
 	ld de,CLOCK_repone_disparo_entidad 					; _ variable y variará en función de la dificultad.
 	call Habilita_disparos 								
 
-
-
-
-
-
-
-
-
-
-
-
-
 ; COLISIONES.
 
 	call Selector_de_impactos							; Analizamos el contenido de (Impacto2).
@@ -511,9 +496,6 @@ Main
 
 	xor a
 	ld (Impacto2),a										; Flag (Impacto2) a "0".
-
-; Ahora, primero Amadeus.
-;!!!
 
 	call Inicia_punteros_de_cajas 
 12 call Restore_entidad 								; Vuelca los datos de la entidad, hacia la que apunta (Puntero_store_caja),_
@@ -646,8 +628,6 @@ Main
 	pop bc
 	djnz 15B
 
-; ------------------------------------
-
 ;! Activando estas líneas podemos habilitar 2 explosiones en el mismo FRAME.
 ; Hemos gestionado todas las unidades.
 ; Desactivamos el flag de impacto en entidad por disparo de amadeus.
@@ -655,11 +635,50 @@ Main
 ;	ld hl,Ctrl_1
 ;	res 2,(hl)
 
-; ------------------------------------
+16 call Avanza_puntero_de_album_de_fotos_y_malotes		; Cuando estamos dentro del FRAME RATE, esperamos dentro_
+;														; _ de esta rutina a que se produzca la llamada a la rutina de_
+;														; _ interrupción.
+	ld a,1
+	out ($fe),a  
 
-; Tras la gestión de las entidades, ... AMADEUS.
+; ----------------------------------------
 
-16 call Restore_Amadeus
+	ld a,(Ctrl_1) 										; Existe Loop?
+	bit 3,a												; Si este bit es "1". Hay recarga de nueva oleada.
+	jp z,Main
+
+	ld a,(Contador_de_frames)
+	ld b,a
+	ld a,(Activa_recarga_cajas)
+	cp b
+	jr z,20F
+
+	ld hl,Ctrl_1
+	set 4,(hl)
+	jp Main
+
+20 ld hl,Ctrl_1
+	res 4,(hl)
+
+	di
+
+	ld a,(Contador_de_frames)
+
+;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
+;! _ IMPREDECIBLE !!!!
+
+	add 10
+	ld (Clock_Entidades_en_curso),a
+
+	jp 4B
+
+	ret
+
+; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- ----- 
+
+Gestiona_Amadeus
+
+	call Restore_Amadeus
 
 ;! Activa/desactiva impacto con Amadeus.
 
@@ -667,23 +686,16 @@ Main
 	and a
 	jr nz,$
 
-; Hemos tomado foto?
-
-	ld a,(Ctrl_1)
-	bit 7,a
-	jr nz,32F
-
 	call Mov_Amadeus
 
 	ld a,(Ctrl_0)
 	bit 4,a
 	jr z,14F                                            ; Omitimos BORRAR/PINTAR si no hay movimiento.
 
-	call Guarda_foto_entidad_a_pintar
-;	call Guarda_datos_de_borrado_Amadeus
+;	jr $
 
-	ld hl,Ctrl_1
-	set 7,(hl)											; Indica que hemos tomado la foto de Amadeus.
+	call Guarda_foto_entidad_a_pintar
+	call Guarda_datos_de_borrado_Amadeus 
 
 14 ld hl,Ctrl_0	
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
@@ -699,45 +711,6 @@ Main
 ; Calculamos el nº de malotes y de disparotes para pintarlos nada más comenzar el siguiente FRAME.
 
 ;	call Calcula_numero_de_disparotes
-
- call Avanza_puntero_de_album_de_fotos_y_malotes		; Cuando estamos dentro del FRAME RATE, esperamos dentro_
-;														; _ de esta rutina a que se produzca la llamada a la rutina de_
-;														; _ interrupción.
-	ld a,1
-	out ($fe),a  
-
-; ----------------------------------------
-
-	ld a,(Ctrl_1) 										; Existe Loop?
-	bit 3,a												; Si este bit es "1". Hay recarga de nueva oleada.
-	jp z,Main
-
-; -----
-;	((( 
-
-	ld a,(Contador_de_frames)
-	ld b,a
-	ld a,(Activa_recarga_cajas)
-	cp b
-	jr z,20F
-
-	ld hl,Ctrl_1
-	set 4,(hl)
-	jp Main
-
-20 ld hl,Ctrl_1
-	res 4,(hl)
-	di
-
-	ld a,(Contador_de_frames)
-
-;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
-;! _ IMPREDECIBLE !!!!
-
-	add 10
-	ld (Clock_Entidades_en_curso),a
-
-	jp 4B
 
 	ret
 
@@ -826,12 +799,6 @@ Mov_obj
 
 Mov_Amadeus 
 
-	xor a
-	ld (Obj_dibujado),a
-    call Prepara_var_pintado_borrado                    ; Almaceno las `VARIABLES DE BORRADO´ de Amadeus, (cargadas en DRAW), en (Variables_de_borrado).
-;														; Obj_dibujado="0".
-; Movemos Amadeus.
-
 	call Movimiento_Amadeus 							; MOVEMOS AMADEUS.
 
 	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
@@ -843,11 +810,8 @@ Mov_Amadeus
 	ld a,1 				 								; Cambiamos (Obj_dibujado) a "1" para poder almacenar el contenido de DRAW en_  
 	ld (Obj_dibujado),a 								; _(Variables_de_pintado).					
     call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
-    call Repone_borrar                                  ; Si ha habido movimiento de la entidad, borraremos el FRAME anterior.
-	call Guarda_foto_entidad_a_borrar					; Guarda la imagen a borrar de Amadeus, pues ha habido movimiento_
-;														; _de la nave.
-;	call Repone_datos_de_borrado_Amadeus
-;	call Limpia_almacen_de_borrado_Amadeus
+	call Repone_datos_de_borrado_Amadeus
+	call Limpia_almacen_de_borrado_Amadeus
 
 	ret													
 
@@ -1239,7 +1203,7 @@ Store_Restore_cajas
 
 	ld hl,Filas
 	ld de,(Puntero_store_caja) 							; Puntero que se desplaza por las distintas entidades.
-	ld bc,67
+	ld bc,63
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
 ; 	Entidad_sospechosa. 20/4/23
@@ -1263,7 +1227,7 @@ Store_Restore_cajas
 	jr z,2F
 
 	ld de,Filas
-	ld bc,67
+	ld bc,63
 	ldir
 
 2 call Incrementa_punteros_de_cajas
@@ -1288,7 +1252,7 @@ Restore_entidad push hl
 
 	ld hl,(Puntero_store_caja)						; (Puntero_store_caja) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,67
+	ld bc,63
 	ldir
 
 	pop bc
@@ -1327,7 +1291,7 @@ Restore_Amadeus	push hl
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Filas
-	ld bc,67
+	ld bc,63
 	ldir
 	pop bc
 	pop de
@@ -1347,7 +1311,7 @@ Restore_Amadeus	push hl
 ;	DESTRUYE: HL y BC y DE.
 
 Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
-	ld bc,67
+	ld bc,63
 	ldir
 	ret
 
@@ -1360,7 +1324,7 @@ Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeu
 ;	Destruye: HL,BC,DE,A
 
 Borra_datos_entidad ld hl,Filas
-	ld bc,66
+	ld bc,62
 	xor a
 	ld (hl),a
 	ld de,Filas+1
@@ -1478,7 +1442,7 @@ Guarda_datos_de_borrado_Amadeus
 	and a
 	ret z										; Salimos si es álbum está vacío.
 
-	ld de,Almacen_de_borrado_Amadeus+5
+	ld de,Variables_de_borrado+5
 	ld bc,6
 	lddr
 	ret
@@ -1489,7 +1453,7 @@ Guarda_datos_de_borrado_Amadeus
 
 Repone_datos_de_borrado_Amadeus
 
-	ld hl,Almacen_de_borrado_Amadeus
+	ld hl,Variables_de_borrado
 	ld de,Album_de_fotos_Amadeus
 	ld bc,6
 	ldir
@@ -1562,14 +1526,8 @@ Frame
 ; No hemos terminado de guardar el último FRAME.
 
 	ld hl,(Puntero_indice_album_de_fotos)
-;	ld bc,Indice_album_de_fotos
 	dec hl
 	dec hl
-
-;	ld a,l
-;	sub c
-;	jr z,$
-
 	ld (Puntero_indice_album_de_fotos),hl
 	
 	ld hl,(Puntero_indice_End_Snapshot)
@@ -1621,7 +1579,6 @@ Frame
 
 	ld hl,Ctrl_1																	
 	res 5,(hl)
-	res 7,(hl)
 
 ; Recuperamos registros y SP.
 
