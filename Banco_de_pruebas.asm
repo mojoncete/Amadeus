@@ -11,8 +11,41 @@
 
 	org $aa01		
 
+; Guardamos registros y SP.
+
+	ex af,af'	
+	push af	;af'
+	exx
+	push hl	;hl'
+	push de	;de'
+	push bc	;bc'
+	exx
+	push hl	;hl
+	push de	;de
+	push bc	;bc
+	ex af,af'
+	push af	;af
+	push ix
+	push iy
+
 	call Frame
+	call Pinta_Amadeus
 	call Gestiona_Amadeus
+
+	pop iy
+	pop ix
+	pop af
+	pop bc
+	pop de
+	pop hl
+	exx
+	pop bc
+	pop de
+	pop hl
+	ex af,af'
+	pop af
+	ex af,af'
+	exx
 
 	ei
 	reti									 
@@ -52,7 +85,6 @@ Album_de_fotos_3 equ $70fc	; (70fch - 714fh).
 Album_de_fotos_disparos_3 equ $724c	; (724ch - 729fh).
 
 Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72ach).
-Almacen_de_borrado_Amadeus equ $72ad ; 6 bytes. ($72ad - $72b2).
 
 ; 54h es el espacio necesario en (Album_de_fotos) para 7 entidades/disparos en pantalla.
 
@@ -402,7 +434,6 @@ START
 	call Inicia_Puntero_objeto
 	call Draw
 	call Guarda_foto_registros
-
 	call Guarda_datos_de_borrado_Amadeus
 
 	ld de,Amadeus_db
@@ -638,9 +669,6 @@ Main
 16 call Avanza_puntero_de_album_de_fotos_y_malotes		; Cuando estamos dentro del FRAME RATE, esperamos dentro_
 ;														; _ de esta rutina a que se produzca la llamada a la rutina de_
 ;														; _ interrupción.
-	ld a,1
-	out ($fe),a  
-
 ; ----------------------------------------
 
 	ld a,(Ctrl_1) 										; Existe Loop?
@@ -678,6 +706,10 @@ Main
 
 Gestiona_Amadeus
 
+    ld a,4
+	out ($fe),a											; Azul.
+
+
 	call Restore_Amadeus
 
 ;! Activa/desactiva impacto con Amadeus.
@@ -695,7 +727,7 @@ Gestiona_Amadeus
 ;	jr $
 
 	call Guarda_foto_entidad_a_pintar
-	call Guarda_datos_de_borrado_Amadeus 
+	call Guarda_datos_de_borrado_Amadeus
 
 14 ld hl,Ctrl_0	
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
@@ -810,8 +842,9 @@ Mov_Amadeus
 	ld a,1 				 								; Cambiamos (Obj_dibujado) a "1" para poder almacenar el contenido de DRAW en_  
 	ld (Obj_dibujado),a 								; _(Variables_de_pintado).					
     call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
-	call Repone_datos_de_borrado_Amadeus
-	call Limpia_almacen_de_borrado_Amadeus
+
+	call Repone_datos_de_borrado
+	call Limpia_almacen_de_borrado
 
 	ret													
 
@@ -821,7 +854,10 @@ Inicia_entidad	call Inicia_Puntero_objeto
 	call Recompone_posicion_inicio
 	call Draw
 	call Guarda_foto_registros
- 	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
+
+;	call Guarda_datos_de_borrado
+
+	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -1007,8 +1043,8 @@ Limpia_album_Amadeus ld hl,Album_de_fotos_Amadeus
 
 	ret
 
-Limpia_almacen_de_borrado_Amadeus ld hl,Almacen_de_borrado_Amadeus 
-	ld de,Almacen_de_borrado_Amadeus+1
+Limpia_almacen_de_borrado ld hl,Variables_de_borrado 
+	ld de,Variables_de_borrado+1
 	ld bc,5
 	xor a
 	ld (hl),a
@@ -1434,10 +1470,27 @@ Detecta_disparo_entidad
 ;
 ;	8/9/23
 
-Guarda_datos_de_borrado_Amadeus 
+Guarda_datos_de_borrado
 
-	ld hl,(End_Snapshot_Amadeus)
+	ld hl,(Puntero_de_End_Snapshot)
+	call Extrae_address
+
 	dec hl
+	ld a,(hl)
+	and a
+	ret z										; Salimos si es álbum está vacío.
+
+	ld de,Variables_de_borrado+5
+	ld bc,6
+	lddr
+	ret
+
+; ----------------------------------------------------------------------
+;
+;	8/9/23
+
+Guarda_datos_de_borrado_Amadeus	ld hl,(End_Snapshot_Amadeus)
+ 	dec hl
 	ld a,(hl)
 	and a
 	ret z										; Salimos si es álbum está vacío.
@@ -1451,7 +1504,7 @@ Guarda_datos_de_borrado_Amadeus
 ;
 ;	9/9/23
 
-Repone_datos_de_borrado_Amadeus
+Repone_datos_de_borrado
 
 	ld hl,Variables_de_borrado
 	ld de,Album_de_fotos_Amadeus
@@ -1473,25 +1526,6 @@ Frame
 ; Necesito calcular nª de malotes, para ello utilizaré (Stack_snapshot)-(Album_de_fotos).
 
 ; PINTAMOS.
-
-	ld (Stack_3),sp
-
-; Guardamos registros y SP.
-
-	ex af,af'	
-	push af	;af'
-	exx
-	push hl	;hl'
-	push de	;de'
-	push bc	;bc'
-	exx
-	push hl	;hl
-	push de	;de
-	push bc	;bc
-	ex af,af'
-	push af	;af
-	push ix
-	push iy
 
 	ld a,2
     out ($fe),a											; Rojo.
@@ -1573,31 +1607,18 @@ Frame
 	ld hl,Contador_de_frames_2
 3 inc (hl)											; 0 - 255
 
-6 call Calcula_malotes_Amadeus 
+6 ld hl,Ctrl_1																	
+	res 5,(hl)
+	ret
+
+Pinta_Amadeus 
+
+	ld a,6
+    out ($fe),a										; Amarillo
+
+	call Calcula_malotes_Amadeus 
 	call Extrae_foto_Amadeus
 	call Limpia_album_Amadeus
-
-	ld hl,Ctrl_1																	
-	res 5,(hl)
-
-; Recuperamos registros y SP.
-
-	pop iy
-	pop ix
-	pop af
-	pop bc
-	pop de
-	pop hl
-	exx
-	pop bc
-	pop de
-	pop hl
-	ex af,af'
-	pop af
-	ex af,af'
-	exx
-
-	ld sp,(Stack_3)
 	ret
 
 ; ---------------------------------------------------------------
