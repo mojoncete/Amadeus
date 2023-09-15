@@ -103,12 +103,12 @@ Guarda_foto_registros
 ;   3/08/23
 ;
 ;   La rutina estará situada justo después de:
-;   Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72ach).
+;   Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72abh) ; 12 bytes.
 ;
 ;   Limpia Album_de_fotos después de imprimir pantalla y desplaza el buffer una posición.
 ;   Si el buffer estaba lleno, dejará libre Album_de_fotos_3.   
 
-    org $72ad 
+    org $72ac 
 
 Gestiona_albumes_de_fotos 
 

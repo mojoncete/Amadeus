@@ -13,6 +13,8 @@
 
 ; Guardamos registros y SP.
 
+	ld (Stack_3),sp
+
 	ex af,af'	
 	push af	;af'
 	exx
@@ -28,7 +30,7 @@
 	push ix
 	push iy
 
-	call Frame
+;	call Frame
 	call Pinta_Amadeus
 	call Gestiona_Amadeus
 
@@ -46,6 +48,8 @@
 	pop af
 	ex af,af'
 	exx
+
+	ld sp,(Stack_3)
 
 	ei
 	reti									 
@@ -84,7 +88,7 @@ Album_de_fotos_disparos_2 equ $71f8	; (71f8hh - 724bh).
 Album_de_fotos_3 equ $70fc	; (70fch - 714fh).
 Album_de_fotos_disparos_3 equ $724c	; (724ch - 729fh).
 
-Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72ach).
+Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72abh) ; 12 bytes.
 
 ; 54h es el espacio necesario en (Album_de_fotos) para 7 entidades/disparos en pantalla.
 
