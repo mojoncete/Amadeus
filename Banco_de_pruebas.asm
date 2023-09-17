@@ -30,9 +30,9 @@
 	push ix
 	push iy
 
-;	call Frame
-	call Pinta_Amadeus
-	call Gestiona_Amadeus
+	call Frame
+;	call Pinta_Amadeus
+;	call Gestiona_Amadeus
 
 	pop iy
 	pop ix
@@ -461,21 +461,16 @@ START
 
 	ld hl,Ctrl_1
 	res 3,(hl)
-	call Calcula_numero_de_malotes 
 	jr Main
 
-; ----------
 
-6 ld a,(Numero_parcial_de_entidades)
-	ld (Numero_de_malotes),a
-
-; En este punto tenemos el 1er FRAME preparado. Los datos del FRAME se encuentran en Album_de_fotos y tb_
-; _ tenemos calculado (Numero_de_malotes).
+; En este punto tenemos el 1er FRAME preparado. Los datos del FRAME se encuentran en Album_de_fotos.
 ; Después del guardado de cada FRAME hemos de llamar a [Avanza_puntero_de_album_de_fotos_y_malotes]_
 ; _ para situarnos en el siguiente album.
 
-	call Avanza_puntero_de_album_de_fotos_y_malotes
+6 call Avanza_puntero_de_album_de_fotos_y_malotes
 	di
+
 ; ------------------------------------
 
 Main 
@@ -728,8 +723,6 @@ Gestiona_Amadeus
 	bit 4,a
 	jr z,14F                                            ; Omitimos BORRAR/PINTAR si no hay movimiento.
 
-;	jr $
-
 	call Guarda_foto_entidad_a_pintar
 	call Guarda_datos_de_borrado_Amadeus
 
@@ -795,17 +788,9 @@ Mov_obj
 	jr 3F
 
 2 xor a
-	ld (Obj_dibujado),a
 	ld (Ctrl_0),a 										; El bit4 de (Ctrl_0) puede estar alzado debido al movimiento de Amadeus.
-;														; Necesito restaurarlo, lo utilizaremos para detectar el movimiento_
-; 														; _de la entidad.
-    call Prepara_var_pintado_borrado                    ; Almaceno las `VARIABLES DE BORRADO´. de la entidad almacenada en DRAW en (Variables_de_borrado).
-;														; Obj_dibujado="0".
-; Movemos Entidades malignas.
 
-;	ld a,(Autoriza_movimiento)							; Salimos de la rutina si no estamos autorizados_
-;	and a 												; _a movernos. (Limitador_de_entidades).
-;	ret z
+; Movemos Entidades malignas.
 
 	call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
 
@@ -825,8 +810,10 @@ Mov_obj
 	ld a,1 				 								; Cambiamos (Obj_dibujado) a "1" para poder almacenar el contenido de DRAW en_  
 	ld (Obj_dibujado),a 								; _(Variables_de_pintado).					
     call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
-    call Repone_borrar                                  ; Si ha habido movimiento de la entidad, borraremos el FRAME anterior.
-1 call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la "ENTIDAD a borrar", pues ha habido movimiento_
+
+	call Repone_datos_de_borrado
+	call Limpia_Variables_de_borrado
+
 3 ret													; _de la misma.
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -847,8 +834,8 @@ Mov_Amadeus
 	ld (Obj_dibujado),a 								; _(Variables_de_pintado).					
     call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
 
-	call Repone_datos_de_borrado
-	call Limpia_almacen_de_borrado
+	call Repone_datos_de_borrado_Amadeus
+	call Limpia_Variables_de_borrado
 
 	ret													
 
@@ -858,9 +845,8 @@ Inicia_entidad	call Inicia_Puntero_objeto
 	call Recompone_posicion_inicio
 	call Draw
 	call Guarda_foto_registros
-
-;	call Guarda_datos_de_borrado
-
+	call Guarda_datos_de_borrado
+	di
 	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	ret
 
@@ -1047,7 +1033,7 @@ Limpia_album_Amadeus ld hl,Album_de_fotos_Amadeus
 
 	ret
 
-Limpia_almacen_de_borrado ld hl,Variables_de_borrado 
+Limpia_Variables_de_borrado ld hl,Variables_de_borrado 
 	ld de,Variables_de_borrado+1
 	ld bc,5
 	xor a
@@ -1476,6 +1462,8 @@ Detecta_disparo_entidad
 
 Guarda_datos_de_borrado
 
+	di
+
 	ld hl,(Puntero_de_End_Snapshot)
 	call Extrae_address
 
@@ -1487,6 +1475,9 @@ Guarda_datos_de_borrado
 	ld de,Variables_de_borrado+5
 	ld bc,6
 	lddr
+
+	ei
+
 	ret
 
 ; ----------------------------------------------------------------------
@@ -1508,7 +1499,30 @@ Guarda_datos_de_borrado_Amadeus	ld hl,(End_Snapshot_Amadeus)
 ;
 ;	9/9/23
 
+Repone_datos_de_borrado_Amadeus
+
+	ld hl,Variables_de_borrado
+	ld de,Album_de_fotos_Amadeus
+	ld bc,6
+	ldir
+
+	ex de,hl
+	ld (End_Snapshot_Amadeus),hl
+
+	ret
+
+; ----------------------------------------------------------------------
+;
+;	9/9/23
+
 Repone_datos_de_borrado
+
+	di
+
+	ld de,Variables_de_borrado
+	ld hl,(Puntero_de_End_Snapshot)
+	call Extrae_address
+
 
 	ld hl,Variables_de_borrado
 	ld de,Album_de_fotos_Amadeus
