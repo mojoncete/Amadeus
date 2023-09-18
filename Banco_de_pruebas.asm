@@ -646,7 +646,22 @@ Main
 ; [[[
 	call Detecta_disparo_entidad
 ; ]]]
+
+
+
+; 18/09/23 ..... 9:30
+;! Debuggg
+	di
+	ld a,(Contador_de_frames)
+	jr $
+	ei
+;! Debuggg
+
+
+
+
 	call Guarda_foto_entidad_a_pintar					; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!
+	call Guarda_datos_de_borrado
 
 	ld hl,Ctrl_0
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
@@ -1513,24 +1528,38 @@ Repone_datos_de_borrado_Amadeus
 
 ; ----------------------------------------------------------------------
 ;
-;	9/9/23
+;	18/9/23
+;
+
+;	Si se ha producido movimiento de la entidad en curso, esta rutina vuelca las `Variables_de_borrado´ en el_
+;	_ Album_de_fotos correspondiente.
+
+;	DI.
 
 Repone_datos_de_borrado
 
 	di
 
-	ld de,Variables_de_borrado
 	ld hl,(Puntero_de_End_Snapshot)
 	call Extrae_address
 
+; Si (Puntero_de_End_Snapshot)="0" es que estamos al comienzo de uno de los álbumes de fotos.
+; Averiguamos en que álbum nos encontramos y actualizamos el valor de (Puntero_indice_End_Snapshot).
 
-	ld hl,Variables_de_borrado
-	ld de,Album_de_fotos_Amadeus
+	inc h
+	dec h
+	jr nz,1F
+
+	ld hl,(Puntero_indice_album_de_fotos)
+	call Extrae_address
+	ld (Puntero_de_End_Snapshot),hl
+
+1 ld de,Variables_de_borrado
+	ex de,hl
 	ld bc,6
 	ldir
 
-	ex de,hl
-	ld (End_Snapshot_Amadeus),hl
+	ei
 
 	ret
 
