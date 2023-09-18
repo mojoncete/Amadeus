@@ -37,6 +37,8 @@ Guarda_foto_registros
     push ix                                       ; IX contiene el puntero de impresión.
     push iy                                       ; IY contiene (Puntero_objeto).
 
+; Disparo o entidad?
+
     ld a,(Ctrl_1)
     bit 0,a
     jr z,2F
@@ -66,12 +68,16 @@ Guarda_foto_registros
     inc hl                                        ; Volvemos a tener al puntero SP en la posición inicial, (Snapshot)-1.
     djnz 1B    
 
+; Disparo o entidad ?
+
     ld a,(Ctrl_1)
     bit 0,a
     jr z,5F
     
     ld (Stack_snapshot_disparos),hl
     jr 6F
+
+; Entidad o Amadeus ?
 
 5 ld a,(Ctrl_0)
     bit 6,a

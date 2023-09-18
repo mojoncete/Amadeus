@@ -32,7 +32,7 @@
 
 	call Frame
 ;	call Pinta_Amadeus
-;	call Gestiona_Amadeus
+	call Gestiona_Amadeus
 
 	pop iy
 	pop ix
@@ -647,19 +647,6 @@ Main
 	call Detecta_disparo_entidad
 ; ]]]
 
-
-
-; 18/09/23 ..... 9:30
-;! Debuggg
-	di
-	ld a,(Contador_de_frames)
-	jr $
-	ei
-;! Debuggg
-
-
-
-
 	call Guarda_foto_entidad_a_pintar					; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!
 	call Guarda_datos_de_borrado
 
@@ -825,7 +812,6 @@ Mov_obj
 	ld a,1 				 								; Cambiamos (Obj_dibujado) a "1" para poder almacenar el contenido de DRAW en_  
 	ld (Obj_dibujado),a 								; _(Variables_de_pintado).					
     call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
-
 	call Repone_datos_de_borrado
 	call Limpia_Variables_de_borrado
 
@@ -889,10 +875,11 @@ Guarda_foto_entidad_a_borrar
 
 Guarda_foto_entidad_a_pintar 
 
-	call Repone_pintar
+; LLegados a este punto SIEMPRE tenemos cargadas las Variables_de_pintado en DRAW.
+
 	call Draw 											
 	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
-	ret
+	ret													; Modificamos también el (End_Snapshot) correspondiente al álbum en el que nos encontramos.
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -1479,8 +1466,7 @@ Guarda_datos_de_borrado
 
 	di
 
-	ld hl,(Puntero_de_End_Snapshot)
-	call Extrae_address
+	ld hl,(Stack_snapshot)
 
 	dec hl
 	ld a,(hl)
@@ -1540,24 +1526,13 @@ Repone_datos_de_borrado
 
 	di
 
-	ld hl,(Puntero_de_End_Snapshot)
-	call Extrae_address
-
-; Si (Puntero_de_End_Snapshot)="0" es que estamos al comienzo de uno de los álbumes de fotos.
-; Averiguamos en que álbum nos encontramos y actualizamos el valor de (Puntero_indice_End_Snapshot).
-
-	inc h
-	dec h
-	jr nz,1F
-
-	ld hl,(Puntero_indice_album_de_fotos)
-	call Extrae_address
-	ld (Puntero_de_End_Snapshot),hl
-
-1 ld de,Variables_de_borrado
-	ex de,hl
+	ld de,(Stack_snapshot)
+	ld hl,Variables_de_borrado
 	ld bc,6
 	ldir
+
+	ex de,hl
+	ld (Stack_snapshot),hl
 
 	ei
 
