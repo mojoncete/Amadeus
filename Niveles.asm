@@ -144,7 +144,7 @@ Datos_de_entidad_a_caja
 	ld bc,7
 	ldir										; Hemos volcado (Posicion_inicio), (Cuad_objeto) y [(Vel_left) / (Vel_right) / (Vel_up) / (Vel_down)].
 
-	ld bc,20
+	ld bc,18
 	call Situa_DE
 
 	ld bc,2

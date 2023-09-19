@@ -31,8 +31,9 @@
 	push iy
 
 	call Frame
-	call Pinta_Amadeus
-	call Gestiona_Amadeus
+;	call Pinta_Amadeus
+;	call Gestiona_Amadeus
+	call Actualiza_relojes
 
 	pop iy
 	pop ix
@@ -180,11 +181,8 @@ Ctrl_0 db 0 											; Byte de control. A través de este byte de control. Las
 ; 															   _ Utilizo la información que proporciona este BIT para modificar (CTRL_DESPLZ) si el siguiente movimiento_
 ; 															   _ se va a producir a la izquierda. "1" DERECHA - "0" IZQUIERDA.
 
-Obj_dibujado db 0 										; Indica a [DRAW] si hay que PINTAR o BORRAR el objeto.	
-
 ; Movimiento. ------------------------------------------------------------------------------------------------------
 
-Autoriza_movimiento db 0                                ; "1" Autoriza el movimiento de la entidad. "0", no hay movimiento.
 Puntero_indice_mov defw 0							    ; Puntero índice del patrón de movimiento de la entidad. "0" No hay movimiento.
 Puntero_mov defw 0										; Guarda la posición de memoria en la que nos encontramos dentro de la cadena de movimiento.
 Puntero_indice_mov_bucle defw 0							; 
@@ -240,7 +238,7 @@ Ctrl_2 db 0
 
 Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
-;! 63 Bytes por entidad.
+;! 61 Bytes por entidad.
 
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 ;					         		---------;      ;---------
@@ -582,7 +580,7 @@ Main
 
 	ld (hl),4 											; Reiniciamos el temporizador de la explosión,_
 ;														; _,(velocidad de la explosión).
-	call Guarda_foto_entidad_a_borrar 					; Guarda la imagen de la entidad `impactada´ para borrarla.
+;!!!!!	call Guarda_foto_entidad_a_borrar 	-----		; Guarda la imagen de la entidad `impactada´ para borrarla.
 
 ;!!!!!! Desintegración/Explosión!!!!!!!!!!!
 
@@ -652,8 +650,6 @@ Main
 
 	ld hl,Ctrl_0
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
-	xor a
-	ld (Obj_dibujado),a
 
 17 call Store_Restore_cajas
 
@@ -710,11 +706,6 @@ Gestiona_Amadeus
     ld a,4
 	out ($fe),a											; Azul.
 
-
-	ld a,(Contador_de_frames)
-	jr $
-
-
 	call Restore_Amadeus
 
 ;! Activa/desactiva impacto con Amadeus.
@@ -734,9 +725,6 @@ Gestiona_Amadeus
 
 14 ld hl,Ctrl_0	
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
-
-	xor a
-	ld (Obj_dibujado),a
 
 32 ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
 	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
@@ -790,7 +778,7 @@ Mov_obj
 	ld hl,Frames_explosion
 	dec (hl)
 
-	call Guarda_foto_entidad_a_borrar
+;!!!!!	call Guarda_foto_entidad_a_borrar -----
 	jr 3F
 
 2 xor a
@@ -813,9 +801,7 @@ Mov_obj
 ;														; ocupa Amadeus, tendremos el .db (Impacto)="1".	
 ; ---------
 
-	ld a,1 				 								; Cambiamos (Obj_dibujado) a "1" para poder almacenar el contenido de DRAW en_  
-	ld (Obj_dibujado),a 								; _(Variables_de_pintado).					
-    call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
+    call Prepara_var_pintado 			                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
 	call Repone_datos_de_borrado
 	call Limpia_Variables_de_borrado
 
@@ -835,10 +821,7 @@ Mov_Amadeus
 
 ; ---------
 
-	ld a,1 				 								; Cambiamos (Obj_dibujado) a "1" para poder almacenar el contenido de DRAW en_  
-	ld (Obj_dibujado),a 								; _(Variables_de_pintado).					
-    call Prepara_var_pintado_borrado	                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
-
+    call Prepara_var_pintado			                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
 	call Repone_datos_de_borrado_Amadeus
 	call Limpia_Variables_de_borrado
 
@@ -853,21 +836,6 @@ Inicia_entidad	call Inicia_Puntero_objeto
 	call Guarda_datos_de_borrado
 	di
 	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
-	ret
-
-; --------------------------------------------------------------------------------------------------------------
-;
-;	31/8/23
-;
-;	(Guardo la foto de Amadeus sin ejecutar DRAW, "no RECOLOCACIÓN"). IMÁGEN DE AMADEUS A BORRAR.
-
-Guarda_foto_entidad_a_borrar 
-
-	call Prepara_draw
-	call calcula_CColumnass
-	call Calcula_puntero_de_impresion					; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
-	call Define_rutina_de_impresion
-	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -887,26 +855,15 @@ Guarda_foto_entidad_a_pintar
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;
+;	19/9/23
 
-Prepara_var_pintado_borrado	ld hl,Filas
-	ld a,(Obj_dibujado)
-	and a
-	jr z,1F
+Prepara_var_pintado ld hl,Filas
 	ld de,Variables_de_pintado
-	jr 2F
-1 ld de,Variables_de_borrado
-2 ld bc,8
+	ld bc,8
 	ldir
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
-
-Repone_borrar ld hl,Variables_de_borrado
-	ld de,Filas
-	ld bc,8
-	ldir
-	ret
 
 Repone_pintar ld hl,Variables_de_pintado
 	ld de,Filas
@@ -1235,7 +1192,7 @@ Store_Restore_cajas
 
 	ld hl,Filas
 	ld de,(Puntero_store_caja) 							; Puntero que se desplaza por las distintas entidades.
-	ld bc,63
+	ld bc,61
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
 ; 	Entidad_sospechosa. 20/4/23
@@ -1259,7 +1216,7 @@ Store_Restore_cajas
 	jr z,2F
 
 	ld de,Filas
-	ld bc,63
+	ld bc,61
 	ldir
 
 2 call Incrementa_punteros_de_cajas
@@ -1284,7 +1241,7 @@ Restore_entidad push hl
 
 	ld hl,(Puntero_store_caja)						; (Puntero_store_caja) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,63
+	ld bc,61
 	ldir
 
 	pop bc
@@ -1323,7 +1280,7 @@ Restore_Amadeus	push hl
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Filas
-	ld bc,63
+	ld bc,61
 	ldir
 	pop bc
 	pop de
@@ -1343,7 +1300,7 @@ Restore_Amadeus	push hl
 ;	DESTRUYE: HL y BC y DE.
 
 Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
-	ld bc,63
+	ld bc,61
 	ldir
 	ret
 
@@ -1356,7 +1313,7 @@ Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeu
 ;	Destruye: HL,BC,DE,A
 
 Borra_datos_entidad ld hl,Filas
-	ld bc,62
+	ld bc,60
 	xor a
 	ld (hl),a
 	ld de,Filas+1
@@ -1565,16 +1522,14 @@ Frame
 	sbc hl,bc
 
 	jr z,$
-	jr z,6F
+	ret z
 
 	call Calcula_numero_de_malotes
 	call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
 
 ;	call Extrae_foto_disparos
-    ld a,1
-    out ($fe),a											; Azul.
-
 ;	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
+
 	call Gestiona_albumes_de_fotos 						; Escupe Álbum de fotos. 1a0, 2a1, 3a2. 
 
 ; 	Corrige (Stack_snapshot). Se sitúa al principio del último álbum libre para volver a guardar fotos.
@@ -1603,13 +1558,11 @@ Frame
 
 	inc h
 	dec h
-	jr nz,5F
+	jr z,1F
 
 ; Este album no contiene datos, por lo tanto nos tenemos que situar al comienzo del mismo.
 
-	jr 1F
-
-5 ld (Stack_snapshot),hl
+	ld (Stack_snapshot),hl
 	jr 2F
 
 ; FRAME completo.
@@ -1623,19 +1576,12 @@ Frame
 ;	Hemos pintado Album_de_fotos en pantalla y desplazado los demás álbumes una posición.
 ;	Tenemos vacío el último álbum en el que se encuentra (Puntero_indice_album_de_fotos).
 
-; RELOJES.
-
-2 ld hl,Contador_de_frames
-	ld a,(hl)
-	cp $ff
-	jr nz,3F
-	inc (hl)
-	ld hl,Contador_de_frames_2
-3 inc (hl)											; 0 - 255
-
-6 ld hl,Ctrl_1																	
+2 ld hl,Ctrl_1																	
 	res 5,(hl)
+
 	ret
+
+; -----------------------------------------------------------------------------------
 
 Pinta_Amadeus 
 
@@ -1645,6 +1591,19 @@ Pinta_Amadeus
    	call Calcula_malotes_Amadeus 
 	call Extrae_foto_Amadeus
 	call Limpia_album_Amadeus
+	ret
+
+; -----------------------------------------------------------------------------------
+
+Actualiza_relojes 
+
+	ld hl,Contador_de_frames
+	ld a,(hl)
+	cp $ff
+	jr nz,1F
+	inc (hl)
+	ld hl,Contador_de_frames_2
+1 inc (hl)											; 0 - 255
 	ret
 
 ; ---------------------------------------------------------------
