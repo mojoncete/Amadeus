@@ -821,9 +821,7 @@ Imprime2 db 0,0,0
 ;	Rutina principal de pintado de Amadeus.
 ;	Extrae fotos de Album_de_fotos_Amadeus.
 
-Extrae_foto_Amadeus
-
-	ld hl,Album_de_fotos_Amadeus
+Extrae_foto_Amadeus	ld hl,Album_de_fotos_Amadeus
 	ld a,(hl)
 	and a
 	ret z 																	; Salimos si no hay datos en el álbum. VACÍO.

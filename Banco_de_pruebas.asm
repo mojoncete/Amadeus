@@ -31,7 +31,7 @@
 	push iy
 
 	call Frame
-;	call Pinta_Amadeus
+	call Pinta_Amadeus
 	call Gestiona_Amadeus
 
 	pop iy
@@ -709,6 +709,10 @@ Gestiona_Amadeus
 
     ld a,4
 	out ($fe),a											; Azul.
+
+
+	ld a,(Contador_de_frames)
+	jr $
 
 
 	call Restore_Amadeus
@@ -1638,7 +1642,7 @@ Pinta_Amadeus
 	ld a,6
     out ($fe),a										; Amarillo
 
-	call Calcula_malotes_Amadeus 
+   	call Calcula_malotes_Amadeus 
 	call Extrae_foto_Amadeus
 	call Limpia_album_Amadeus
 	ret
