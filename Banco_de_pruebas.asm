@@ -30,9 +30,15 @@
 	push ix
 	push iy
 
+
+;	ld a,(Contador_de_frames)
+;	cp $5f
+;	jr z,$
+
+
 	call Frame
-;	call Pinta_Amadeus
-;	call Gestiona_Amadeus
+	call Pinta_Amadeus
+	call Gestiona_Amadeus
 	call Actualiza_relojes
 
 	pop iy
@@ -580,7 +586,13 @@ Main
 
 	ld (hl),4 											; Reiniciamos el temporizador de la explosión,_
 ;														; _,(velocidad de la explosión).
-;!!!!!	call Guarda_foto_entidad_a_borrar 	-----		; Guarda la imagen de la entidad `impactada´ para borrarla.
+
+; !!!!!!!! Explosiónnnnnnnnn 20/9/23
+	jr $
+
+	call Repone_datos_de_borrado
+	call Limpia_Variables_de_borrado					; Guarda los datos de la entidad `impactada´ para borrarla.
+
 
 ;!!!!!! Desintegración/Explosión!!!!!!!!!!!
 
