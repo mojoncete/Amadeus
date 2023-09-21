@@ -30,16 +30,18 @@
 	push ix
 	push iy
 
+; Pintamos y actualizamos los álbumes de fotos, (entidades).
+; Pintamos Amadeus.
 
-;	ld a,(Contador_de_frames)
-;	cp $5f
-;	jr z,$
-
-
-	call Frame
+	call Pinta_entidades
 	call Pinta_Amadeus
+	call Gestiona_entidades
 	call Gestiona_Amadeus
+
+; Restauramos los parámetros de la entidad que había alojada en DRAW "antes de gestionar AMADEUS".
+
 	call Actualiza_relojes
+
 
 	pop iy
 	pop ix
@@ -986,19 +988,21 @@ Inicia_Puntero_Disparo_Amadeus ld hl,Indice_de_disparos_Amadeus
 
 ; -------------------------------------------------------------------------------------------------------------
 ;
-; 4/9/23 
+; 21/9/23 
 ;
 
 ; Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72ach).
 
-Limpia_album_Amadeus ld hl,Album_de_fotos_Amadeus
+Limpia_album_Amadeus 
+
+	ld hl,Album_de_fotos_Amadeus
 	ld a,(hl)
 	and a
 	ret z
 
 	ld hl,Album_de_fotos_Amadeus
 	ld de,Album_de_fotos_Amadeus+1
-	ld bc,12
+	ld bc,11
 	xor a
 	ld (hl),a
 	ldir
@@ -1515,7 +1519,7 @@ Repone_datos_de_borrado
 ;
 ;	11/8/23
 
-Frame 
+Gestiona_entidades 
 
 ; He de imprimir sólo el nº de fotos que he hecho. Sólo BORRAMOS/PINTAMOS los objetos que se han desplazado.
 ; Necesito calcular nª de malotes, para ello utilizaré (Stack_snapshot)-(Album_de_fotos).
@@ -1526,7 +1530,7 @@ Frame
     out ($fe),a											; Rojo.
 
 ; Hemos completado el 1er album?. Si (Puntero_indice_album_de_fotos) no está situado en el 2º Album_
-; _ , no imprimimos FRAME. no gestionamos los álbumes de fotos.
+; _ , no gestionamos los álbumes de fotos.
 
 	ld hl,(Puntero_indice_album_de_fotos)
 	ld bc,Indice_album_de_fotos
@@ -1535,9 +1539,6 @@ Frame
 
 	jr z,$
 	ret z
-
-	call Calcula_numero_de_malotes
-	call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
 
 ;	call Extrae_foto_disparos
 ;	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
@@ -1603,6 +1604,24 @@ Pinta_Amadeus
    	call Calcula_malotes_Amadeus 
 	call Extrae_foto_Amadeus
 	call Limpia_album_Amadeus
+
+	ret
+
+Pinta_entidades
+
+	ld hl,(Puntero_indice_album_de_fotos)
+	ld bc,Indice_album_de_fotos
+	and a
+	sbc hl,bc
+
+	jr z,$
+	ret z
+
+; Pintamos siempre que esté completo Album_de_fotos.
+
+	call Calcula_numero_de_malotes
+	call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
+
 	ret
 
 ; -----------------------------------------------------------------------------------
