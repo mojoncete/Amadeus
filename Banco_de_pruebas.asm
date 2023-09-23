@@ -42,7 +42,6 @@
 
 	call Actualiza_relojes
 
-
 	pop iy
 	pop ix
 	pop af
@@ -936,7 +935,7 @@ Inicia_punteros_de_albumes_y_malotes
 
 	ret
 
-;	2/9/23
+;	23/9/23
 
 Avanza_puntero_de_album_de_fotos_y_malotes
 
@@ -944,19 +943,20 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 
 ; Estamos en el último álbum del índice???.
 
+	di
 	ld hl,(Puntero_indice_album_de_fotos)
 	ld bc,Indice_album_de_fotos+6
 	and a
 	sbc hl,bc										; Estamos en el último álbum del índice.
 	jr nz,1F								 		; El buffer está lleno. HALT.
+	ei
 
 	ld hl,Ctrl_1									; Necesito saber si hemos terminado de guardar todas_
 	set 5,(hl)										; _ las fotos de un FRAME.
 	halt
 	ret							
 
-1 di
-	ld hl,(Puntero_indice_album_de_fotos)
+1 ld hl,(Puntero_indice_album_de_fotos)
 	inc hl
 	inc hl
 	ld (Puntero_indice_album_de_fotos),hl
@@ -969,8 +969,8 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 	ld (Puntero_indice_End_Snapshot),hl
 	call Extrae_address
 	ld (Puntero_de_End_Snapshot),hl					
-	ei
 
+	ei
 	ret
 
 ; *************************************************************************************************************************************************************
@@ -1550,6 +1550,16 @@ Gestiona_entidades
 	ld a,(Ctrl_1)
 	bit 5,a
 	jr nz,1F
+
+
+
+; !!! debug. El buffer no está completo.
+	ld a,(Contador_de_frames)
+	jr $
+
+
+
+
 
 ; No hemos terminado de guardar el último FRAME.
 
