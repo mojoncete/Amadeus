@@ -30,6 +30,11 @@
 	push ix
 	push iy
 
+; En 1er lugar guardamos los 61 bytes de la entidad alojada en DRAW para restaurarlos antes de salir de la_
+; _ rutina de interrupción. (Para gestionar Amadeus hemos de introducir sus datos en DRAW).
+
+	call Guarda_parametros_DRAW
+
 ; Pintamos y actualizamos los álbumes de fotos, (entidades).
 ; Pintamos Amadeus.
 
@@ -41,6 +46,8 @@
 ; Restauramos los parámetros de la entidad que había alojada en DRAW "antes de gestionar AMADEUS".
 
 	call Actualiza_relojes
+
+	call Recupera_parametros_DRAW
 
 	pop iy
 	pop ix
@@ -59,7 +66,20 @@
 
 	ld sp,(Stack_3)
 
-	ei
+
+;! debuggggg ..... 27/09/23
+
+	ld a,(Contador_de_frames_2)
+	cp 1
+	jr nz,1F
+	ld a,(Contador_de_frames)
+	cp $53
+	jr nz,1F
+	jr $
+
+;! debuggggg
+
+1 ei
 	reti									 
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
@@ -97,6 +117,9 @@ Album_de_fotos_3 equ $70fc	; (70fch - 714fh).
 Album_de_fotos_disparos_3 equ $724c	; (724ch - 729fh).
 
 Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72abh) ; 12 bytes.
+Almacen_de_parametros_DRAW equ $72ac ; ($72ac - $72eb) ; 61 bytes.
+
+
 
 ; 54h es el espacio necesario en (Album_de_fotos) para 7 entidades/disparos en pantalla.
 
@@ -1551,15 +1574,9 @@ Gestiona_entidades
 	bit 5,a
 	jr nz,1F
 
-
-
 ; !!! debug. El buffer no está completo.
-	ld a,(Contador_de_frames)
-	jr $
-
-
-
-
+;	ld a,(Contador_de_frames)
+;	jr $
 
 ; No hemos terminado de guardar el último FRAME.
 
@@ -1648,6 +1665,27 @@ Actualiza_relojes
 	ret
 
 ; ---------------------------------------------------------------
+;
+;	27/9/23
+
+Guarda_parametros_DRAW
+
+	ld hl,Filas
+	ld de,Almacen_de_parametros_DRAW
+	ld bc,61
+	ldir
+	ret
+
+Recupera_parametros_DRAW
+
+	ld hl,Almacen_de_parametros_DRAW
+	ld de,Filas
+	ld bc,61
+	ldir
+	ret
+
+; ---------------------------------------------------------------
+
 
 	include "Disparo.asm"
 	include "Draw_XOR.asm"
