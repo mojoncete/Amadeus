@@ -11,9 +11,11 @@
 
 	org $aa01		
 
-; Guardamos registros y SP.
+; Guardamos SP.
 
 	ld (Stack_3),sp
+
+; Guardo registros.
 
 	ex af,af'	
 	push af	;af'
@@ -33,6 +35,8 @@
 ; En 1er lugar guardamos los 61 bytes de la entidad alojada en DRAW para restaurarlos antes de salir de la_
 ; _ rutina de interrupción. (Para gestionar Amadeus hemos de introducir sus datos en DRAW).
 
+; Guardamos DRAW.
+
 	call Guarda_parametros_DRAW
 
 ; Pintamos y actualizamos los álbumes de fotos, (entidades).
@@ -49,7 +53,18 @@
 
 	call Recupera_parametros_DRAW
 
-	pop iy
+;! debuggggg ..... 27/09/23
+
+	ld a,(Contador_de_frames_2)
+	cp 1
+	jr nz,1F
+	ld a,(Contador_de_frames)
+	cp $95	; $97 último FRAME que no peta !!!!!!!!!!
+	jr z,$
+
+;! debuggggg
+
+1 pop iy
 	pop ix
 	pop af
 	pop bc
@@ -66,20 +81,7 @@
 
 	ld sp,(Stack_3)
 
-
-;! debuggggg ..... 27/09/23
-
-	ld a,(Contador_de_frames_2)
-	cp 1
-	jr nz,1F
-	ld a,(Contador_de_frames)
-	cp $53
-	jr nz,1F
-	jr $
-
-;! debuggggg
-
-1 ei
+	ei
 	reti									 
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
@@ -1544,11 +1546,6 @@ Repone_datos_de_borrado
 
 Gestiona_entidades 
 
-; He de imprimir sólo el nº de fotos que he hecho. Sólo BORRAMOS/PINTAMOS los objetos que se han desplazado.
-; Necesito calcular nª de malotes, para ello utilizaré (Stack_snapshot)-(Album_de_fotos).
-
-; PINTAMOS.
-
 	ld a,2
     out ($fe),a											; Rojo.
 
@@ -1573,10 +1570,6 @@ Gestiona_entidades
 	ld a,(Ctrl_1)
 	bit 5,a
 	jr nz,1F
-
-; !!! debug. El buffer no está completo.
-;	ld a,(Contador_de_frames)
-;	jr $
 
 ; No hemos terminado de guardar el último FRAME.
 
