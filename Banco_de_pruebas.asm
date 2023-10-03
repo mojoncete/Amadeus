@@ -37,6 +37,8 @@
 
 ; Guardamos DRAW.
 
+	
+
 	call Guarda_parametros_DRAW
 
 ; Pintamos y actualizamos los álbumes de fotos, (entidades).
@@ -59,7 +61,7 @@
 	cp 1
 	jr nz,1F
 	ld a,(Contador_de_frames)
-	cp $95	; $97 último FRAME que no peta !!!!!!!!!!
+	cp $94	; $97 último FRAME que no peta !!!!!!!!!!
 	jr z,$
 
 ;! debuggggg
