@@ -53,17 +53,6 @@
 
 	call Recupera_parametros_DRAW
 
-;! debuggggg ..... 27/09/23
-
-;	ld a,(Contador_de_frames_2)
-;	cp 1
-;	jr nz,1F
-;	ld a,(Contador_de_frames)
-;	cp $94	; $97 último FRAME que no peta !!!!!!!!!!
-;	jr z,$
-
-;! debuggggg
-
 	pop iy
 	pop ix
 	pop af
