@@ -37,7 +37,17 @@
 
 ; Guardamos DRAW.
 
-	call Guarda_parametros_DRAW
+;! Debuggg
+	ld a,(Contador_de_frames_2)
+	cp 1
+	jr nz,1F
+	ld a,(Contador_de_frames)
+	cp $93
+	jr nz,1F
+
+	jr $
+
+1 call Guarda_parametros_DRAW
 
 ; Pintamos y actualizamos los álbumes de fotos, (entidades).
 ; Pintamos Amadeus.
@@ -267,7 +277,7 @@ Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
 ; Variables de funcionamiento, (No incluidas en base de datos de entidades), a partir de aquí!!!!!
 
-Ctrl_1 db 0 											; 2º Byte de control de propósito general.
+Ctrl_1 db 0 											; Byte de control de propósito general.
 
 ;														DESCRIPCIÓN:
 ;
@@ -289,7 +299,11 @@ Repone_puntero_objeto defw 0							; Almacena (Puntero_objeto). Cuando el Sprite
 ; 														; _ Cuando hemos terminado de iniciarlo y guardado su foto, hemos de recuperar su (Puntero_objeto).
 ;														; (Repone_puntero_objeto) es una copia de respaldo de (Puntero_objeto) y su función es restaurarlo.
 
+Ctrl_3 db 0												; Byte de control de propósito general.						
 
+;														DESCRIPCIÓN:
+;
+;														BIT 0, 
 
 ; Gestión de ENTIDADES y CAJAS.
 
@@ -1213,14 +1227,6 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 
 Store_Restore_cajas  
 
-
-;! debuggggg
-	di
-	ld a,(Contador_de_frames)
-	cp $e6
-	jr z,$
-	ei
-
 	push hl 
 	push de
  	push bc
@@ -1258,6 +1264,7 @@ Store_Restore_cajas
 	ldir
 
 2 call Incrementa_punteros_de_cajas
+
 	pop af
 	jr z,1B
 
