@@ -37,8 +37,6 @@
 
 ; Guardamos DRAW.
 
-	
-
 	call Guarda_parametros_DRAW
 
 ; Pintamos y actualizamos los álbumes de fotos, (entidades).
@@ -57,16 +55,16 @@
 
 ;! debuggggg ..... 27/09/23
 
-	ld a,(Contador_de_frames_2)
-	cp 1
-	jr nz,1F
-	ld a,(Contador_de_frames)
-	cp $94	; $97 último FRAME que no peta !!!!!!!!!!
-	jr z,$
+;	ld a,(Contador_de_frames_2)
+;	cp 1
+;	jr nz,1F
+;	ld a,(Contador_de_frames)
+;	cp $94	; $97 último FRAME que no peta !!!!!!!!!!
+;	jr z,$
 
 ;! debuggggg
 
-1 pop iy
+	pop iy
 	pop ix
 	pop af
 	pop bc
@@ -1226,6 +1224,14 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 
 Store_Restore_cajas  
 
+
+;! debuggggg
+	di
+	ld a,(Contador_de_frames)
+	cp $e6
+	jr z,$
+	ei
+
 	push hl 
 	push de
  	push bc
@@ -1292,14 +1298,15 @@ Restore_entidad push hl
 	pop hl
 	ret
 
-
 ; **************************************************************************************************
 ;
 ;	08/05/23
 ;
 ;	Incrementamos los dos punteros de entidades. (+1).
 
-Incrementa_punteros_de_cajas ld hl,(Puntero_restore_caja)
+Incrementa_punteros_de_cajas 
+
+	ld hl,(Puntero_restore_caja)
 	ld (Puntero_store_caja),hl 				
 	ld hl,(Indice_restore_caja)
 	inc hl
