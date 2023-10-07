@@ -37,17 +37,7 @@
 
 ; Guardamos DRAW.
 
-;! Debuggg
-	ld a,(Contador_de_frames_2)
-	cp 1
-	jr nz,1F
-	ld a,(Contador_de_frames)
-	cp $93
-	jr nz,1F
-
-	jr $
-
-1 call Guarda_parametros_DRAW
+	call Guarda_parametros_DRAW
 
 ; Pintamos y actualizamos los álbumes de fotos, (entidades).
 ; Pintamos Amadeus.
@@ -63,7 +53,17 @@
 
 	call Recupera_parametros_DRAW
 
-	pop iy
+;! Debuggg
+	ld a,(Contador_de_frames_2)
+	cp 1
+	jr nz,1F
+	ld a,(Contador_de_frames)
+	cp $94
+	jr z,$
+	jr nc,$
+;! Debuggg
+
+1 pop iy
 	pop ix
 	pop af
 	pop bc
