@@ -37,28 +37,28 @@
 
 ; Guardamos DRAW.
 
-	call Guarda_parametros_DRAW
+;	call Guarda_parametros_DRAW
 
 ; Pintamos y actualizamos los álbumes de fotos, (entidades).
 ; Pintamos Amadeus.
 
 	call Pinta_entidades
-	call Pinta_Amadeus
+;	call Pinta_Amadeus
 	call Gestiona_entidades
-	call Gestiona_Amadeus
+;	call Gestiona_Amadeus
 
 ; Restauramos los parámetros de la entidad que había alojada en DRAW "antes de gestionar AMADEUS".
 
 	call Actualiza_relojes
 
-	call Recupera_parametros_DRAW
+;	call Recupera_parametros_DRAW
 
 ;! Debuggg
 	ld a,(Contador_de_frames_2)
-	cp 1
+	cp 3
 	jr nz,1F
 	ld a,(Contador_de_frames)
-	cp $94
+	cp $d3	; Último frame que no falla.
 	jr z,$
 	jr nc,$
 ;! Debuggg
@@ -467,14 +467,16 @@ START
 
 ; 	INICIA AMADEUS !!!!!
 
-3 call Restore_Amadeus
-	call Inicia_Puntero_objeto
-	call Draw
-	call Guarda_foto_registros
-	call Guarda_datos_de_borrado_Amadeus
+3 
 
-	ld de,Amadeus_db
-	call Store_Amadeus
+;	call Restore_Amadeus
+;	call Inicia_Puntero_objeto
+;	call Draw
+;	call Guarda_foto_registros
+;	call Guarda_datos_de_borrado_Amadeus
+
+;	ld de,Amadeus_db
+;	call Store_Amadeus
 
 ; 	INICIA DISPAROS !!!!!
 
@@ -1562,7 +1564,7 @@ Gestiona_entidades
 	and a
 	sbc hl,bc
 
-	jr z,$
+;	jr z,$
 	ret z
 
 ;	call Extrae_foto_disparos
@@ -1639,7 +1641,7 @@ Pinta_entidades
 	and a
 	sbc hl,bc
 
-	jr z,$
+;	jr z,$
 	ret z
 
 ; Pintamos siempre que esté completo Album_de_fotos.
