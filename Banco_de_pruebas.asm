@@ -58,7 +58,7 @@
 	cp 3
 	jr nz,1F
 	ld a,(Contador_de_frames)
-	cp $d3	; Último frame que no falla.
+	cp $d0	; $d3 Último frame que no falla. 
 	jr z,$
 	jr nc,$
 ;! Debuggg
@@ -688,7 +688,7 @@ Main
 	call Detecta_disparo_entidad
 ; ]]]
 
-	call Guarda_foto_entidad_a_pintar					; BORRAMOS/PINTAMOS !!!!!!!!!!!!!!!!!!
+	call Guarda_foto_entidad_a_pintar					; PINTAMOS !!!!!!!!!!!!!!!!!!
 	call Guarda_datos_de_borrado
 
 	ld hl,Ctrl_0
