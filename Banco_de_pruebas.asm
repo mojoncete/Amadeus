@@ -54,13 +54,13 @@
 ;	call Recupera_parametros_DRAW
 
 ;! Debuggg
-	ld a,(Contador_de_frames_2)
-	cp 1
-	jr nz,1F
-	ld a,(Contador_de_frames)
-	cp $56	; $56 Último frame que no falla. 
-	jr z,$
-	jr nc,$
+;	ld a,(Contador_de_frames_2)
+;	cp 3
+;	jr nz,1F
+;	ld a,(Contador_de_frames)
+;	cp $ff	; $56 Último frame que no falla. 
+;	jr z,$
+;	jr nc,$
 
 ;! Debuggg
 
@@ -505,7 +505,7 @@ START
 ; _ para situarnos en el siguiente album.
 
 6 call Avanza_puntero_de_album_de_fotos_y_malotes
-	di
+	
 
 ; ------------------------------------
 
@@ -513,10 +513,7 @@ Main
 ;
 ;	3/8/23
 
-    ld a,1
-	out ($fe),a											; Azul.
-
-	ei
+ 	ei
 
 	ld a,(Clock_Entidades_en_curso)						; Inicialmente, (Clock_Entidades_en_curso)="30".
 	ld b,a
@@ -729,8 +726,6 @@ Main
 20 ld hl,Ctrl_1
 	res 4,(hl)
 
-	di
-
 	ld a,(Contador_de_frames)
 
 ;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
@@ -878,7 +873,6 @@ Inicia_entidad	call Inicia_Puntero_objeto
 	call Draw
 	call Guarda_foto_registros
 	call Guarda_datos_de_borrado
-	di
 	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	ret
 
@@ -974,13 +968,11 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 
 ; Estamos en el último álbum del índice???.
 
-	di
 	ld hl,(Puntero_indice_album_de_fotos)
 	ld bc,Indice_album_de_fotos+6
 	and a
 	sbc hl,bc										; Estamos en el último álbum del índice.
 	jr nz,1F								 		; El buffer está lleno. HALT.
-	ei
 
 	ld hl,Ctrl_1									; Necesito saber si hemos terminado de guardar todas_
 	set 5,(hl)										; _ las fotos de un FRAME.
@@ -1001,7 +993,6 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 	call Extrae_address
 	ld (Puntero_de_End_Snapshot),hl					
 
-	ei
 	ret
 
 ; *************************************************************************************************************************************************************
@@ -1474,8 +1465,6 @@ Detecta_disparo_entidad
 
 Guarda_datos_de_borrado
 
-	di
-
 	ld hl,(Stack_snapshot)
 
 	dec hl
@@ -1486,8 +1475,6 @@ Guarda_datos_de_borrado
 	ld de,Variables_de_borrado+5
 	ld bc,6
 	lddr
-
-	ei
 
 	ret
 
@@ -1534,8 +1521,6 @@ Repone_datos_de_borrado_Amadeus
 
 Repone_datos_de_borrado
 
-	di
-
 	ld de,(Stack_snapshot)
 	ld hl,Variables_de_borrado
 	ld bc,6
@@ -1544,8 +1529,6 @@ Repone_datos_de_borrado
 	ex de,hl
 	ld (Stack_snapshot),hl
 
-	ei
-
 	ret
 
 ; ----------------------------------------------------------------------
@@ -1553,9 +1536,6 @@ Repone_datos_de_borrado
 ;	11/8/23
 
 Gestiona_entidades 
-
-	ld a,2
-    out ($fe),a											; Rojo.
 
 ; Hemos completado el 1er album?. Si (Puntero_indice_album_de_fotos) no está situado en el 2º Album_
 ; _ , no gestionamos los álbumes de fotos.

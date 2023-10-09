@@ -206,8 +206,6 @@ Movimiento
 
 ;    ld hl,(Posicion_actual)
 
-    ei
-
     ld a,(Ctrl_2)
     bit 2,a
     jr nz, Desplazamiento_iniciado
@@ -302,8 +300,6 @@ Cola ld a,(Cola_de_desplazamiento)
     ret
 
 Reinicia_el_movimiento 
-
-    di
 
     ld a,(Ctrl_2)
     bit 3,a

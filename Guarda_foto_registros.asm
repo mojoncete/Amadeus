@@ -28,8 +28,6 @@
 
 Guarda_foto_registros 
 
-    di
- 
     ld (Stack),sp                                 ; Guardo SP en (Stack).
     ld sp,Guarda_foto_registros                   ; Sitúo el Stack Pointer en la dirección actual -1
 
@@ -85,7 +83,6 @@ Guarda_foto_registros
 
     ld (End_Snapshot_Amadeus),hl    
     ld sp,(Stack)
-    ei
     ret
 
 8 ld (Stack_snapshot),hl
@@ -101,7 +98,6 @@ Guarda_foto_registros
     inc hl                                        ; _ rutina [Gestiona_albumes_de_fotos] para copiar los datos de un_
     ld (hl),d                                     ; _ álbum a otro.
 
-    ei
     ret
 
 ; ------------------------------------------------
