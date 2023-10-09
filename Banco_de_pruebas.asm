@@ -55,12 +55,13 @@
 
 ;! Debuggg
 	ld a,(Contador_de_frames_2)
-	cp 3
+	cp 1
 	jr nz,1F
 	ld a,(Contador_de_frames)
-	cp $d0	; $d3 Último frame que no falla. 
+	cp $56	; $56 Último frame que no falla. 
 	jr z,$
 	jr nc,$
+
 ;! Debuggg
 
 1 pop iy
