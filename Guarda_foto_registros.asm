@@ -29,6 +29,15 @@
 Guarda_foto_registros 
 
     ld (Stack),sp                                 ; Guardo SP en (Stack).
+
+; En 1er lugar guardaremos las variables de borrado del siguiente cuadro.
+
+    ld sp,Variables_de_borrado+6
+
+    push hl
+    push ix
+    push iy
+
     ld sp,Guarda_foto_registros                   ; Sitúo el Stack Pointer en la dirección actual -1
 
     push hl                                       ; HL contiene la dirección de la rutina de impresión.

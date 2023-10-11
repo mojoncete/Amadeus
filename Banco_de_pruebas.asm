@@ -54,13 +54,13 @@
 ;	call Recupera_parametros_DRAW
 
 ;! Debuggg
-;	ld a,(Contador_de_frames_2)
-;	cp 3
-;	jr nz,1F
-;	ld a,(Contador_de_frames)
-;	cp $ff	; $56 Último frame que no falla. 
-;	jr z,$
-;	jr nc,$
+	ld a,(Contador_de_frames_2)
+	cp 1
+	jr nz,1F
+	ld a,(Contador_de_frames)
+	cp $50	; $56 Último frame que no falla. 
+	jr z,$
+	jr nc,$
 
 ;! Debuggg
 
@@ -687,7 +687,7 @@ Main
 ; ]]]
 
 	call Guarda_foto_entidad_a_pintar					; PINTAMOS !!!!!!!!!!!!!!!!!!
-	call Guarda_datos_de_borrado
+;	call Guarda_datos_de_borrado
 
 	ld hl,Ctrl_0
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
@@ -872,7 +872,7 @@ Inicia_entidad	call Inicia_Puntero_objeto
 	call Recompone_posicion_inicio
 	call Draw
 	call Guarda_foto_registros
-	call Guarda_datos_de_borrado
+;	call Guarda_datos_de_borrado
 	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	ret
 
@@ -1457,25 +1457,6 @@ Detecta_disparo_entidad
 ;	ret nz
 
 ;	call Genera_disparo
-	ret
-
-; ----------------------------------------------------------------------
-;
-;	8/9/23
-
-Guarda_datos_de_borrado
-
-	ld hl,(Stack_snapshot)
-
-	dec hl
-	ld a,(hl)
-	and a
-	ret z										; Salimos si es álbum está vacío.
-
-	ld de,Variables_de_borrado+5
-	ld bc,6
-	lddr
-
 	ret
 
 ; ----------------------------------------------------------------------
