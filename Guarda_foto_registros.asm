@@ -288,8 +288,31 @@ Limpia_album
 ;                               
 
 ; -----------------------------------------------
+;
+;   13/10/23
 
+Actualiza_semaforo_de_albumes
 
+; Está activo el bit "Album_de_fotos" ???
+
+    ld a,(Semaforo_de_albumes_de_entidades)
+    bit 0,a
+    jr nz,1F
+    set 0,a                     ; Album_de_fotos COMPLETO.
+    jr 2F
+1 bit 1,a
+    jr nz,3F
+    set 1,a                      ; Album_de_fotos_1 COMPLETO.
+    jr 2F
+3 bit 2,a
+    jr nz,4F
+    set 2,a                      ; Album_de_fotos_2 COMPLETO.
+    jr 2F
+4 bit 3,a
+    ret nz                       ; Album_de_fotos_3 COMPLETO.
+    set 3,a
+2 ld (Semaforo_de_albumes_de_entidades),a 
+    ret 
 
 
 

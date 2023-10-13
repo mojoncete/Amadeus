@@ -54,13 +54,13 @@
 ;	call Recupera_parametros_DRAW
 
 ;! Debuggg
-	ld a,(Contador_de_frames_2)
-	cp 1
-	jr nz,1F
-	ld a,(Contador_de_frames)
-	cp $50	; $56 Último frame que no falla. 
-	jr z,$
-	jr nc,$
+;	ld a,(Contador_de_frames_2)
+;	cp 1
+;	jr nz,1F
+;	ld a,(Contador_de_frames)
+;	cp $50	; $56 Último frame que no falla. 
+;	jr z,$
+;	jr nc,$
 
 ;! Debuggg
 
@@ -358,6 +358,8 @@ Puntero_indice_End_Snapshot defw 0
 Puntero_indice_End_Snapshot_disparos defw 0
 Puntero_de_End_Snapshot defw 0
 Puntero_de_End_Snapshot_disparos defw 0
+
+Semaforo_de_albumes_de_entidades db 0
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -706,7 +708,6 @@ Main
 
 16 call Avanza_puntero_de_album_de_fotos_y_malotes		; Cuando estamos dentro del FRAME RATE, esperamos dentro_
 ;														; _ de esta rutina a que se produzca la llamada a la rutina de_
-;														; _ interrupción.
 ; ----------------------------------------
 
 	ld a,(Ctrl_1) 										; Existe Loop?
@@ -966,7 +967,9 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 
 ; Caja_de_malotes equ $7419 ; (7419h - 741ch) 4 bytes.
 
+; Hemos completado de guardar en el álbum correspondiente la foto con todas las entidades.
 ; Estamos en el último álbum del índice???.
+; 
 
 	ld hl,(Puntero_indice_album_de_fotos)
 	ld bc,Indice_album_de_fotos+6
@@ -974,8 +977,11 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 	sbc hl,bc										; Estamos en el último álbum del índice.
 	jr nz,1F								 		; El buffer está lleno. HALT.
 
-	ld hl,Ctrl_1									; Necesito saber si hemos terminado de guardar todas_
-	set 5,(hl)										; _ las fotos de un FRAME.
+; Estamos en Album_de_fotos_3.	
+; Configuramos el semáforo de álbumes para indicar que todos están completos.
+
+	ld hl,Ctrl_1									
+	set 5,(hl)										
 	halt
 	ret							
 
@@ -992,6 +998,8 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 	ld (Puntero_indice_End_Snapshot),hl
 	call Extrae_address
 	ld (Puntero_de_End_Snapshot),hl					
+
+	call Actualiza_semaforo_de_albumes
 
 	ret
 
@@ -1526,7 +1534,7 @@ Gestiona_entidades
 	and a
 	sbc hl,bc
 
-;	jr z,$
+	jr z,$	;! STOP el buffer está vacío. Album_de_fotos no está completo.
 	ret z
 
 ;	call Extrae_foto_disparos
