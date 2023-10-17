@@ -359,7 +359,8 @@ Puntero_indice_End_Snapshot_disparos defw 0
 Puntero_de_End_Snapshot defw 0
 Puntero_de_End_Snapshot_disparos defw 0
 
-Semaforo_de_albumes_de_entidades db 0
+Semaforo db 0											; Indicador necesario para poder gestionar los álbumes de fotos de las entidades. Indica en que álbum_
+;														; _ nos encontramos y si el cuadro, (frame), está completo en el álbum, o no.
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -980,6 +981,9 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 ; Estamos en Album_de_fotos_3.	
 ; Configuramos el semáforo de álbumes para indicar que todos están completos.
 
+	ld hl,Semaforo
+	set 3,(hl)
+
 	ld hl,Ctrl_1									
 	set 5,(hl)										
 	halt
@@ -999,7 +1003,7 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 	call Extrae_address
 	ld (Puntero_de_End_Snapshot),hl					
 
-	call Actualiza_semaforo_de_albumes
+	call Actualiza_semaforo
 
 	ret
 

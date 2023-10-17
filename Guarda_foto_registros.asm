@@ -146,7 +146,7 @@ Gestiona_albumes_de_fotos
 
 ; ----- ----- ----- -----
 
-;   Album_de_fotos_1. Contiene datos ???
+;   Album_de_fotos_1. Contiene la imagen de un cuadro completo ???
 
 3 ld hl,Album_de_fotos_1+1
     ld a,(hl)
@@ -291,11 +291,11 @@ Limpia_album
 ;
 ;   13/10/23
 
-Actualiza_semaforo_de_albumes
+Actualiza_semaforo
 
 ; Está activo el bit "Album_de_fotos" ???
 
-    ld a,(Semaforo_de_albumes_de_entidades)
+    ld a,(Semaforo)
     bit 0,a
     jr nz,1F
     set 0,a                     ; Album_de_fotos COMPLETO.
@@ -305,13 +305,9 @@ Actualiza_semaforo_de_albumes
     set 1,a                      ; Album_de_fotos_1 COMPLETO.
     jr 2F
 3 bit 2,a
-    jr nz,4F
+    ret nz
     set 2,a                      ; Album_de_fotos_2 COMPLETO.
-    jr 2F
-4 bit 3,a
-    ret nz                       ; Album_de_fotos_3 COMPLETO.
-    set 3,a
-2 ld (Semaforo_de_albumes_de_entidades),a 
+2 ld (Semaforo),a 
     ret 
 
 
