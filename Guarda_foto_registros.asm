@@ -111,7 +111,7 @@ Guarda_foto_registros
 
 ; ------------------------------------------------
 ;
-;   3/08/23
+;   19/10/23
 ;
 ;   La rutina estará situada justo después de:
 ;   Almacen_de_parametros_DRAW equ $72ac ; ($72ac - $72eb) ; 61 bytes.
@@ -133,6 +133,8 @@ Gestiona_albumes_de_fotos
     and a
     jr z,3F                     ; Album_de_fotos está vacío. NO HAY QUE LIMPIARLO.
 
+;   Hemos impreso Album_de_fotos. Limpiamos el álbum y actualizamos (End_Snapshot).
+
     ld hl,(End_Snapshot)
     ld bc,Album_de_fotos
     ld de,Album_de_fotos+1
@@ -146,16 +148,32 @@ Gestiona_albumes_de_fotos
 
 ; ----- ----- ----- -----
 
-;   Album_de_fotos_1. Contiene la imagen de un cuadro completo ???
+;   Album_de_fotos está vacío y (End_Snapshot)="0".
+;   Album_de_fotos_1. Contiene un frame completo ???
 
-3 ld hl,Album_de_fotos_1+1
+3 ld a,(Semaforo)
+    bit 1,a
+    jr nz,4F
+
+;   Album_de_fotos_1 no está completo.     
+
+    ld hl,Semaforo
+    set 7,(hl)                  ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
+    res 1,(hl)
+    ret                         ; _ (Puntero_indice_End_Snapshot). Hay que completar el álbum. 
+
+;   Album_de_fotos_1 contiene un Frame completo. Contiene datos ???
+
+4 ld hl,Album_de_fotos_1+1
     ld a,(hl)
     and a
-    jr z,1F                     ; Album_de_fotos y Album_de_fotos_1 están vacíos. Hay que volcar la_
-;                               ; _ información del album2 al album1.
+    jr z,1F                     ; Album_de_fotos y Album_de_fotos_1 están vacíos. Saltamos a analizar Album_de_fotos_2.
 
 ; ----- ----- ----- -----
-;   Volcamos los datos del Album_de_fotos_1 a Album_de_fotos.
+; ----- ----- ----- -----
+
+;   Album_de_fotos_1 Contiene un frame completo que hay que volcar en Album_de_fotos.
+;   Actualiza (End_Snapshot).
 
     ld hl,(End_Snapshot_1)      ; Final, (origen).
     ld bc,Album_de_fotos_1      ; Origen.
@@ -184,14 +202,30 @@ Gestiona_albumes_de_fotos
 
 ; ----- ----- ----- -----
 
-;   Album_de_fotos_2. Contiene datos ???
+;   Album_de_fotos_2. Contiene Frame completo ???
 
-1 ld hl,Album_de_fotos_2+1
+1 ld a,(Semaforo)
+    bit 2,a
+    jr nz,5F
+
+;   Album_de_fotos_2 no está completo.     
+
+    ld hl,Semaforo
+    set 7,(hl)                  ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
+    res 2,(hl)
+
+;   Album_de_fotos_2 contiene un FRAME completo. Datos ???.
+
+5 ld hl,Album_de_fotos_2+1
     ld a,(hl)
     and a
-    jr z,2F                     ; Album_de_fotos_2 y Album_de_fotos_1 están vacíos. Hay que volcar la_
-;                               ; _ información del album3 al album2.
+    jr z,2F                     ; Album_de_fotos_2 y Album_de_fotos_1 están vacíos. Saltamos a analizar Album_de_fotos_3.
+
 ; ----- ----- ----- -----
+; ----- ----- ----- -----
+; ----- ----- ----- -----
+
+;   Album_de_fotos_2 contiene un frame completo.
 ;   Volcamos los datos del Album_de_fotos_2 a Album_de_fotos_1.
 
     ld hl,(End_Snapshot_2)      ; Final, (origen).
@@ -200,7 +234,7 @@ Gestiona_albumes_de_fotos
 
     call Limpia_album
 
-;   Calculamos (End_Snapshot_1):
+;   Actualizamos (End_Snapshot_1):
 
     and a
     adc hl,bc
@@ -221,14 +255,34 @@ Gestiona_albumes_de_fotos
 
 ; ----- ----- ----- -----
 
-;   Album_de_fotos_3. Contiene datos ???
+;   Album_de_fotos_2 está vacío y (End_Snapshot_2)="0".
+;   Album_de_fotos_3. Contiene un frame completo ???
 
-2 ld hl,Album_de_fotos_3+1
+2 ld a,(Semaforo)
+    bit 3,a
+    jr nz,6F
+
+;   Album_de_fotos_3 no está completo.     
+
+    ld hl,Semaforo
+    set 7,(hl)                  ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
+    res 3,(hl)
+
+    jr $    ;! Album_de_fotos_3 NO ESTÁ COMPLETO !!!!! ----- x-x-0-x
+
+    ret                         ; _ (Puntero_indice_End_Snapshot). Hay que completar el álbum. 
+
+;   Album_de_fotos_3 contiene un FRAME completo. Datos ???
+
+6 ld hl,Album_de_fotos_3+1
     ld a,(hl)
     and a
     ret z                       ; Album_de_fotos_3 y Album_de_fotos_2 están vacíos. RET.
                
 ; ----- ----- ----- -----
+; ----- ----- ----- -----
+; ----- ----- ----- -----
+
 ;   Volcamos los datos del Album_de_fotos_3 a Album_de_fotos_2.
 
     ld hl,(End_Snapshot_3)      ; Final, (origen).
@@ -237,7 +291,7 @@ Gestiona_albumes_de_fotos
 
     call Limpia_album
 
-;   Calculamos (End_Snapshot_2):
+;   Actualizamos (End_Snapshot_2):
 
     and a
     adc hl,bc
@@ -253,8 +307,12 @@ Gestiona_albumes_de_fotos
 
     call Limpia_album
 
+;   Hemos pasado los datos de Album_de_fotos_3 a Album_de_fotos_2. 
+;   Actualiza (End_Snapshot_3) y (Semaforo).
+ 
     ld hl,0
     ld (End_Snapshot_3),hl        ; Limpia (End_Snapshot_3).
+
     ret
 
 ; ----------------------------------------------------

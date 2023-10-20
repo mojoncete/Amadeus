@@ -711,8 +711,8 @@ PreviousScan ld a,h
 ;
 ;	31/7/23
 ;
-;	Rutina principal de pintado de entidades/Amadeus.
-;	Extrae fotos de Album_de_fotos.
+;	Rutina principal de pintado de entidades.
+;	Extrae la foto del frame, (entidades).
 
 Extrae_foto_entidades 
 
@@ -720,6 +720,8 @@ Extrae_foto_entidades
 	ld a,(hl)
 	and a
 	ret z 																	; Salimos si no hay datos en el álbum. VACÍO.
+
+;	No hay datos, (entidades para pintar en este frame).
 
 	ld a,(Numero_de_malotes)												; No hay MALOTES. No se ha producido movimiento.
 	and a																	; No ha aparecido ninguna `nueva entidad'.

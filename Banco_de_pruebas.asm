@@ -300,7 +300,7 @@ Repone_puntero_objeto defw 0							; Almacena (Puntero_objeto). Cuando el Sprite
 ; 														; _ Cuando hemos terminado de iniciarlo y guardado su foto, hemos de recuperar su (Puntero_objeto).
 ;														; (Repone_puntero_objeto) es una copia de respaldo de (Puntero_objeto) y su función es restaurarlo.
 
-Ctrl_3 db 0												; Byte de control de propósito general.						
+; Ctrl_3 db 0											; Byte de control de propósito general.						
 
 ;														DESCRIPCIÓN:
 ;
@@ -361,6 +361,7 @@ Puntero_de_End_Snapshot_disparos defw 0
 
 Semaforo db 0											; Indicador necesario para poder gestionar los álbumes de fotos de las entidades. Indica en que álbum_
 ;														; _ nos encontramos y si el cuadro, (frame), está completo en el álbum, o no.
+Reordena_albumes db 0
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -1530,14 +1531,10 @@ Repone_datos_de_borrado
 
 Gestiona_entidades 
 
-; Hemos completado el 1er album?. Si (Puntero_indice_album_de_fotos) no está situado en el 2º Album_
-; _ , no gestionamos los álbumes de fotos.
+;	Consultamos el estado de buffer. Si Album_de_fotos no está completo, salimos de la rutina, no hay nada que gestionar. 
 
-	ld hl,(Puntero_indice_album_de_fotos)
-	ld bc,Indice_album_de_fotos
-	and a
-	sbc hl,bc
-
+	ld a,(Semaforo)
+	bit 0,a
 	jr z,$	;! STOP el buffer está vacío. Album_de_fotos no está completo.
 	ret z
 
@@ -1548,36 +1545,43 @@ Gestiona_entidades
 
 ; 	Corrige (Stack_snapshot). Se sitúa al principio del último álbum libre para volver a guardar fotos.
 
+;	Album incompleto ?????
+;	Si es así, inicializamos el bit 4 de (Semaforo) y salimos de la rutina.
+
+	ld a,(Semaforo)
+	bit 7,a
+	jr nz,3F
+
 	ld a,(Ctrl_1)
 	bit 5,a
 	jr nz,1F
 
 ; No hemos terminado de guardar el último FRAME.
 
-	ld hl,(Puntero_indice_album_de_fotos)
-	dec hl
-	dec hl
-	ld (Puntero_indice_album_de_fotos),hl
+;	ld hl,(Puntero_indice_album_de_fotos)
+;	dec hl
+;	dec hl
+;	ld (Puntero_indice_album_de_fotos),hl
 	
-	ld hl,(Puntero_indice_End_Snapshot)
-	dec hl
-	dec hl
-	ld (Puntero_indice_End_Snapshot),hl
-	call Extrae_address
-	ld (Puntero_de_End_Snapshot),hl				
+;	ld hl,(Puntero_indice_End_Snapshot)
+;	dec hl
+;	dec hl
+;	ld (Puntero_indice_End_Snapshot),hl
+;	call Extrae_address
+;	ld (Puntero_de_End_Snapshot),hl				
 
-	call Extrae_address
+;	call Extrae_address
 
 ; Esta vacío este album???
 
-	inc h
-	dec h
-	jr z,1F
+;	inc h
+;	dec h
+;	jr z,1F
 
 ; Este album no contiene datos, por lo tanto nos tenemos que situar al comienzo del mismo.
 
-	ld (Stack_snapshot),hl
-	jr 2F
+;	ld (Stack_snapshot),hl
+;	jr 2F
 
 ; FRAME completo.
 
@@ -1592,6 +1596,13 @@ Gestiona_entidades
 
 2 ld hl,Ctrl_1																	
 	res 5,(hl)
+
+;	Album_de_fotos_3 vuelve a estar vacío.
+
+	ld hl,Semaforo
+	res 3,(hl)
+
+3 res 7,(hl)
 
 	ret
 
@@ -1610,18 +1621,14 @@ Pinta_Amadeus
 
 Pinta_entidades
 
-	ld hl,(Puntero_indice_album_de_fotos)
-	ld bc,Indice_album_de_fotos
-	and a
-	sbc hl,bc
-
-;	jr z,$
+	ld a,(Semaforo)
+	bit 0,a
 	ret z
 
-; Pintamos siempre que esté completo Album_de_fotos.
+; Pintamos siempre que Album_de_fotos contenga un frame completo.
 
 	call Calcula_numero_de_malotes
-	call Extrae_foto_entidades 							; Pintamos el fotograma anterior.
+	call Extrae_foto_entidades 						
 
 	ret
 
