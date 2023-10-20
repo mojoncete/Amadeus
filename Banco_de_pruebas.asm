@@ -1538,8 +1538,7 @@ Gestiona_entidades
 
 	ld a,(Semaforo)
 	bit 0,a
-	jr z,$	;! STOP el buffer está vacío. Album_de_fotos no está completo.
-	ret z
+	jr z,$												;! STOP el buffer está vacío.  
 
 ;	call Extrae_foto_disparos
 ;	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
@@ -1576,8 +1575,8 @@ Gestiona_entidades
 ;	Album_de_fotos_3 vuelve a estar vacío.
 
 	ld hl,Semaforo
-	res 3,(hl)
 	res 5,(hl)
+	call Actualiza_semaforo_2
 
 	ret
 

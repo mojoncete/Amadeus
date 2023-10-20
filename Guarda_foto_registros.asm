@@ -139,11 +139,11 @@ Gestiona_albumes_de_fotos
     bit 7,a                         ; bit_7 ="1". Indica que Album_de_fotos_2 está vacío.
     jr z,8F                         ; Hay que "ordenar los álbumes". Volcamos Album_de_fotos_3 a Album_de_fotos_2.
 
+
+; Rellena Album_de_fotos_2
+
     res 7,a
     set 5,a                         ; El bit_5 indica que el álbum ha sido reestructurado. 
-    res 3,a
-    res 2,a                         ; Cuando salgamos de la rutina la disposición de los álbumes será: x-x-0-0.
-
     ld (Semaforo),a
 
     call Album3_a_Album2
@@ -151,10 +151,17 @@ Gestiona_albumes_de_fotos
 
     jr 7F
 
-
 ; Album_de_fotos_1 está vacío.
 
-8 jr $
+8 
+    res 6,a
+    set 5,a
+    ld (Semaforo),a
+
+    ld a,(Contador_de_frames_2)
+    ex af,af'
+    ld a,(Contador_de_frames)
+    jr $
 
 ; #############################################################3
 
@@ -245,9 +252,18 @@ Gestiona_albumes_de_fotos
 
 ;   Album_de_fotos_2 no está completo.     
 
+;   Ha sido reestructurado ???
+
+    jr $
+
+    ld a,(Semaforo)
+    bit 5,a
+    ret nz
+
     ld hl,Semaforo
     set 4,(hl)                  ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
-    res 2,(hl)
+    set 6,(hl)
+    ret
 
 ;   Album_de_fotos_2 contiene un FRAME completo. Datos ???.
 
@@ -286,7 +302,7 @@ Gestiona_albumes_de_fotos
     call Limpia_album
 
     ld hl,0
-    ld (End_Snapshot_2),hl        ; Limpia (End_Snapshot_2).
+    ld (End_Snapshot_2),hl      ; Limpia (End_Snapshot_2).
 
 ; ----- ----- ----- -----
 
@@ -303,14 +319,6 @@ Gestiona_albumes_de_fotos
 
     ld a,(Semaforo)
     bit 5,a
-
-
-;! debugggggggggg
-
-    jr nz,$
-
-
-
     ret nz
 
     ld hl,Semaforo
@@ -420,20 +428,42 @@ Actualiza_semaforo
 
 Actualiza_punteros_de_albumes
 
-   ld hl,(Puntero_indice_album_de_fotos)
-   dec hl
-   dec hl
-   ld (Puntero_indice_album_de_fotos),hl
+    ld hl,(Puntero_indice_album_de_fotos)
+    dec hl
+    dec hl
+    ld (Puntero_indice_album_de_fotos),hl
     
-   ld hl,(Puntero_indice_End_Snapshot)
-   dec hl
-   dec hl
-   ld (Puntero_indice_End_Snapshot),hl
-   call Extrae_address
-   ld (Puntero_de_End_Snapshot),hl             
+    ld hl,(Puntero_indice_End_Snapshot)
+    dec hl
+    dec hl
+    ld (Puntero_indice_End_Snapshot),hl
+    call Extrae_address
+    ld (Puntero_de_End_Snapshot),hl             
 
-   call Extrae_address
-   ld (Stack_snapshot),hl
+    call Extrae_address
+    ld (Stack_snapshot),hl
    
+    call Actualiza_semaforo_2
+ 
    ret
 
+; --------------------------------------------------------------------------------------------
+;
+;   20/10/23
+
+Actualiza_semaforo_2
+
+    ld a,(Semaforo)
+    bit 3,a
+    jr z,2F
+    res 3,a
+    jr 1F
+2 bit 2,a
+    jr z,3F
+    res 2,a
+    jr 1F
+3 bit 1,a
+    ret z
+    res 1,a
+1 ld (Semaforo),a
+    ret
