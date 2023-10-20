@@ -361,7 +361,6 @@ Puntero_de_End_Snapshot_disparos defw 0
 
 Semaforo db 0											; Indicador necesario para poder gestionar los álbumes de fotos de las entidades. Indica en que álbum_
 ;														; _ nos encontramos y si el cuadro, (frame), está completo en el álbum, o no.
-Reordena_albumes db 0
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -517,7 +516,7 @@ Main
 ;
 ;	3/8/23
 
- 	ei
+; 	ei
 
 	ld a,(Clock_Entidades_en_curso)						; Inicialmente, (Clock_Entidades_en_curso)="30".
 	ld b,a
@@ -987,6 +986,10 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 
 	ld hl,Ctrl_1									
 	set 5,(hl)										
+
+; Inicia con el buffer de video completo !!!
+
+	ei
 	halt
 	ret							
 
@@ -1549,41 +1552,14 @@ Gestiona_entidades
 ;	Si es así, inicializamos el bit 4 de (Semaforo) y salimos de la rutina.
 
 	ld a,(Semaforo)
-	bit 7,a
-	jr nz,3F
-
-	ld a,(Ctrl_1)
 	bit 5,a
 	jr nz,1F
 
-; No hemos terminado de guardar el último FRAME.
+	bit 4,a
+	ret nz
 
-;	ld hl,(Puntero_indice_album_de_fotos)
-;	dec hl
-;	dec hl
-;	ld (Puntero_indice_album_de_fotos),hl
-	
-;	ld hl,(Puntero_indice_End_Snapshot)
-;	dec hl
-;	dec hl
-;	ld (Puntero_indice_End_Snapshot),hl
-;	call Extrae_address
-;	ld (Puntero_de_End_Snapshot),hl				
-
-;	call Extrae_address
-
-; Esta vacío este album???
-
-;	inc h
-;	dec h
-;	jr z,1F
-
-; Este album no contiene datos, por lo tanto nos tenemos que situar al comienzo del mismo.
-
-;	ld (Stack_snapshot),hl
-;	jr 2F
-
-; FRAME completo.
+; El buffer estaba completo y hemos pintado el frame y desplazado los álbumes.
+; Nos situamos al comienzo del último álbum.
 
 1 ld hl,(Puntero_indice_album_de_fotos)
 	call Extrae_address
@@ -1594,15 +1570,14 @@ Gestiona_entidades
 ;	Hemos pintado Album_de_fotos en pantalla y desplazado los demás álbumes una posición.
 ;	Tenemos vacío el último álbum en el que se encuentra (Puntero_indice_album_de_fotos).
 
-2 ld hl,Ctrl_1																	
+	ld hl,Ctrl_1																	
 	res 5,(hl)
 
 ;	Album_de_fotos_3 vuelve a estar vacío.
 
 	ld hl,Semaforo
 	res 3,(hl)
-
-3 res 7,(hl)
+	res 5,(hl)
 
 	ret
 
