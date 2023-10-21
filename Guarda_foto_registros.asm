@@ -254,8 +254,13 @@ Gestiona_albumes_de_fotos
 
 ;   Ha sido reestructurado ???
 
-    jr $
+ ;! Debuggggg
 
+    ld a,(Contador_de_frames_2)
+    ex af,af'
+    ld a,(Contador_de_frames)
+    jr $
+ 
     ld a,(Semaforo)
     bit 5,a
     ret nz
