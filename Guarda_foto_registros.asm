@@ -139,7 +139,6 @@ Gestiona_albumes_de_fotos
     bit 7,a                         ; bit_7 ="1". Indica que Album_de_fotos_2 está vacío.
     jr z,8F                         ; Hay que "ordenar los álbumes". Volcamos Album_de_fotos_3 a Album_de_fotos_2.
 
-
 ; Rellena Album_de_fotos_2
 
     res 7,a
@@ -153,15 +152,27 @@ Gestiona_albumes_de_fotos
 
 ; Album_de_fotos_1 está vacío.
 
-8 
-    res 6,a
+8 res 6,a
     set 5,a
     ld (Semaforo),a
 
-    ld a,(Contador_de_frames_2)
-    ex af,af'
-    ld a,(Contador_de_frames)
-    jr $
+;    call Album2_a_Album1
+
+;   1-1-0-X Distribución actual de los álbumes.
+
+;   Está el buffer lleno ???
+
+;    ld a,(Ctrl_1)
+;    bit 5,a
+;    jr $
+
+;    call Album3_a_Album2
+;    call Actualiza_punteros_de_albumes
+
+;    ld a,(Contador_de_frames_2)
+;    ex af,af'
+;    ld a,(Contador_de_frames)
+;    jr $
 
 ; #############################################################3
 
@@ -254,13 +265,12 @@ Gestiona_albumes_de_fotos
 
 ;   Ha sido reestructurado ???
 
- ;! Debuggggg
 
     ld a,(Contador_de_frames_2)
     ex af,af'
     ld a,(Contador_de_frames)
     jr $
- 
+
     ld a,(Semaforo)
     bit 5,a
     ret nz
@@ -282,34 +292,9 @@ Gestiona_albumes_de_fotos
 ; ----- ----- ----- -----
 
 ;   Album_de_fotos_2 contiene un frame completo.
-;   Volcamos los datos del Album_de_fotos_2 a Album_de_fotos_1.
+;   Volcamos los datos de Album_de_fotos_2 a Album_de_fotos_1 y limpiamos Album_de_fotos_2.
 
-    ld hl,(End_Snapshot_2)      ; Final, (origen).
-    ld bc,Album_de_fotos_2      ; Origen.
-    ld de,Album_de_fotos_1      ; Destino.
-
-    call Limpia_album
-
-;   Actualizamos (End_Snapshot_1):
-
-    and a
-    adc hl,bc
-    ld (End_Snapshot_1),hl
-
-;   Limpiamos Album_de_fotos_2.
-
-    ld hl,(End_Snapshot_2)
-    ld bc,Album_de_fotos_2
-    ld de,Album_de_fotos_2+1
-    xor a
-    ld (bc),a                       
-
-    call Limpia_album
-
-    ld hl,0
-    ld (End_Snapshot_2),hl      ; Limpia (End_Snapshot_2).
-
-; ----- ----- ----- -----
+    call Album2_a_Album1
 
 ;   Album_de_fotos_2 está vacío y (End_Snapshot_2)="0".
 ;   Album_de_fotos_3. Contiene un frame completo ???
@@ -342,11 +327,11 @@ Gestiona_albumes_de_fotos
 ; ----- ----- ----- -----
 ; ----- ----- ----- -----
 
-;   Volcamos los datos del Album_de_fotos_3 a Album_de_fotos_2.
+;   Volcamos los datos del Album_de_fotos_3 a Album_de_fotos_2 y limpiamos Album_de_fotos_3.
 
 Album3_a_Album2 ld hl,(End_Snapshot_3)      ; Final, (origen).
-    ld bc,Album_de_fotos_3      ; Origen.
-    ld de,Album_de_fotos_2      ; Destino.
+    ld bc,Album_de_fotos_3                  ; Origen.
+    ld de,Album_de_fotos_2                  ; Destino.
 
     call Limpia_album
 
@@ -363,16 +348,38 @@ Album3_a_Album2 ld hl,(End_Snapshot_3)      ; Final, (origen).
     ld de,Album_de_fotos_3+1
     xor a
     ld (bc),a                       
-
     call Limpia_album
 
 ;   Hemos pasado los datos de Album_de_fotos_3 a Album_de_fotos_2. 
 ;   Actualiza (End_Snapshot_3) y (Semaforo).
  
     ld hl,0
-    ld (End_Snapshot_3),hl        ; Limpia (End_Snapshot_3).
-
+    ld (End_Snapshot_3),hl                   ; Limpia (End_Snapshot_3).
     ret
+
+Album2_a_Album1 ld hl,(End_Snapshot_2)       ; Final, (origen).
+    ld bc,Album_de_fotos_2                   ; Origen.
+    ld de,Album_de_fotos_1                   ; Destino.
+    call Limpia_album
+
+;   Actualizamos (End_Snapshot_1):
+
+    and a
+    adc hl,bc
+    ld (End_Snapshot_1),hl
+
+;   Limpiamos Album_de_fotos_2.
+
+    ld hl,(End_Snapshot_2)
+    ld bc,Album_de_fotos_2
+    ld de,Album_de_fotos_2+1
+    xor a
+    ld (bc),a                       
+    call Limpia_album
+    ld hl,0
+    ld (End_Snapshot_2),hl      ; Limpia (End_Snapshot_2).
+    ret
+
 
 ; ----------------------------------------------------
 ;

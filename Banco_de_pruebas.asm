@@ -1641,7 +1641,6 @@ Recupera_parametros_DRAW
 
 ; ---------------------------------------------------------------
 
-
 	include "Disparo.asm"
 	include "Draw_XOR.asm"
 	include "Rutinas_de_impresion_sprites.asm" 
