@@ -126,35 +126,35 @@ Gestiona_albumes_de_fotos
 ; En 1er lugar consultamos el bit_4 de (Semaforo).
 ; Nos indica si existe algún album vacío.
 
-    ld a,(Semaforo)
-    bit 4,a
-    jr z,7F
+;    ld a,(Semaforo)
+;    bit 4,a
+;    jr z,7F
 
-    res 4,a
-    ld (Semaforo),a
+;    res 4,a
+;    ld (Semaforo),a
 
 ; Album_de_fots_2 o Album_de_fotos_1 está vacío.
 ; Album_de_fotos_2 ???
 
-    bit 7,a                         ; bit_7 ="1". Indica que Album_de_fotos_2 está vacío.
-    jr z,8F                         ; Hay que "ordenar los álbumes". Volcamos Album_de_fotos_3 a Album_de_fotos_2.
+;    bit 7,a                         ; bit_7 ="1". Indica que Album_de_fotos_2 está vacío.
+;    jr z,8F                         ; Hay que "ordenar los álbumes". Volcamos Album_de_fotos_3 a Album_de_fotos_2.
 
 ; Rellena Album_de_fotos_2
 
-    res 7,a
-    set 5,a                         ; El bit_5 indica que el álbum ha sido reestructurado. 
-    ld (Semaforo),a
+ ;   res 7,a
+ ;   set 5,a                         ; El bit_5 indica que el álbum ha sido reestructurado. 
+ ;   ld (Semaforo),a
 
-    call Album3_a_Album2
-    call Actualiza_punteros_de_albumes
+ ;   call Album3_a_Album2
+ ;   call Actualiza_punteros_de_albumes
 
-    jr 7F
+ ;   jr 7F
 
 ; Album_de_fotos_1 está vacío.
 
-8 res 6,a
-    set 5,a
-    ld (Semaforo),a
+;8 res 6,a
+;    set 5,a
+;    ld (Semaforo),a
 
 ;    call Album2_a_Album1
 
@@ -210,10 +210,13 @@ Gestiona_albumes_de_fotos
 
 ;   Album_de_fotos_1 no está completo.     
 
-    ld hl,Semaforo
-    set 4,(hl)                  ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
-    res 1,(hl)
-    ret                         ; _ (Puntero_indice_End_Snapshot). Hay que completar el álbum. 
+;    ld hl,Semaforo
+;    set 4,(hl)                  ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
+;    res 1,(hl)
+;    ret                         ; _ (Puntero_indice_End_Snapshot). Hay que completar el álbum. 
+
+    jr $
+
 
 ;   Album_de_fotos_1 contiene un Frame completo. Contiene datos ???
 
@@ -266,19 +269,19 @@ Gestiona_albumes_de_fotos
 ;   Ha sido reestructurado ???
 
 
-    ld a,(Contador_de_frames_2)
-    ex af,af'
-    ld a,(Contador_de_frames)
+;    ld a,(Contador_de_frames_2)
+;    ex af,af'
+ ;   ld a,(Contador_de_frames)
     jr $
 
-    ld a,(Semaforo)
-    bit 5,a
-    ret nz
+;    ld a,(Semaforo)
+;    bit 5,a
+;    ret nz
 
-    ld hl,Semaforo
-    set 4,(hl)                  ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
-    set 6,(hl)
-    ret
+;    ld hl,Semaforo
+;    set 4,(hl)                  ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
+;    set 6,(hl)
+;    ret
 
 ;   Album_de_fotos_2 contiene un FRAME completo. Datos ???.
 
@@ -307,14 +310,16 @@ Gestiona_albumes_de_fotos
 
 ;   Ha sido reestructurado ???
 
-    ld a,(Semaforo)
-    bit 5,a
-    ret nz
+    jr $
 
-    ld hl,Semaforo
-    set 4,(hl)                  ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
-    set 7,(hl)                  ; _ (Puntero_indice_End_Snapshot). Hay que completar el álbum. 
-    ret                         
+ ;   ld a,(Semaforo)
+;    bit 5,a
+;    ret nz
+
+;    ld hl,Semaforo
+;    set 4,(hl)                  ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
+;    set 7,(hl)                  ; _ (Puntero_indice_End_Snapshot). Hay que completar el álbum. 
+;    ret                         
 
 ;   Album_de_fotos_3 contiene un FRAME completo. Datos ???
 
@@ -355,6 +360,7 @@ Album3_a_Album2 ld hl,(End_Snapshot_3)      ; Final, (origen).
  
     ld hl,0
     ld (End_Snapshot_3),hl                   ; Limpia (End_Snapshot_3).
+
     ret
 
 Album2_a_Album1 ld hl,(End_Snapshot_2)       ; Final, (origen).
@@ -409,30 +415,6 @@ Limpia_album
     pop bc                      ; Esta cantidad la utilizaré para calcular (End_Snapshot_X), _
     pop hl                      ; _ al salir de la rutina, (cuando estamos pasando datos de un álbum_
     ret                         ; _ a otro). 
-;                               
-
-; -----------------------------------------------
-;
-;   13/10/23
-
-Actualiza_semaforo
-
-; Está activo el bit "Album_de_fotos" ???
-
-    ld a,(Semaforo)
-    bit 0,a
-    jr nz,1F
-    set 0,a                     ; Album_de_fotos COMPLETO.
-    jr 2F
-1 bit 1,a
-    jr nz,3F
-    set 1,a                      ; Album_de_fotos_1 COMPLETO.
-    jr 2F
-3 bit 2,a
-    ret nz
-    set 2,a                      ; Album_de_fotos_2 COMPLETO.
-2 ld (Semaforo),a 
-    ret 
 
 ; --------------------------------------------------------------------------------------------
 ;
@@ -454,28 +436,6 @@ Actualiza_punteros_de_albumes
 
     call Extrae_address
     ld (Stack_snapshot),hl
-   
-    call Actualiza_semaforo_2
- 
-   ret
 
-; --------------------------------------------------------------------------------------------
-;
-;   20/10/23
-
-Actualiza_semaforo_2
-
-    ld a,(Semaforo)
-    bit 3,a
-    jr z,2F
-    res 3,a
-    jr 1F
-2 bit 2,a
-    jr z,3F
-    res 2,a
-    jr 1F
-3 bit 1,a
-    ret z
-    res 1,a
-1 ld (Semaforo),a
     ret
+

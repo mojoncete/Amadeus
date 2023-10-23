@@ -291,7 +291,7 @@ Ctrl_1 db 0 											; Byte de control de propósito general.
 
 ;														BIT 3, Recarga de nueva oleada.
 ;														BIT 4, Recarga de nueva oleada.
-;														BIT 5, **** Buffer lleno. Aplico HALT.
+;														BIT 5, FREEEEEEEEE !!!!!!!!!!!!!!!!!
 ;														BIT 6, **** Frame completo.
 ;														BIT 7, Indica que ya está tomada la foto de Amadeus. No tomaremos otra hasta el próximo FRAME.
 
@@ -359,8 +359,9 @@ Puntero_indice_End_Snapshot_disparos defw 0
 Puntero_de_End_Snapshot defw 0
 Puntero_de_End_Snapshot_disparos defw 0
 
-Semaforo db 0											; Indicador necesario para poder gestionar los álbumes de fotos de las entidades. Indica en que álbum_
+Semaforo db $f0											; Indicador necesario para poder gestionar los álbumes de fotos de las entidades. Indica en que álbum_
 ;														; _ nos encontramos y si el cuadro, (frame), está completo en el álbum, o no.
+Ctrl_Semaforo db 0										; Byte de control utilizado por la rutina [Gestiona_albumes_de_fotos] para la recolocación de los álbumes vacíos.
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -507,7 +508,7 @@ START
 ; Después del guardado de cada FRAME hemos de llamar a [Avanza_puntero_de_album_de_fotos_y_malotes]_
 ; _ para situarnos en el siguiente album.
 
-6 call Avanza_puntero_de_album_de_fotos_y_malotes
+6 call Avanza_puntero_de_album_de_fotos_de_entidades
 	
 
 ; ------------------------------------
@@ -707,8 +708,9 @@ Main
 ;	ld hl,Ctrl_1
 ;	res 2,(hl)
 
-16 call Avanza_puntero_de_album_de_fotos_y_malotes		; Cuando estamos dentro del FRAME RATE, esperamos dentro_
-;														; _ de esta rutina a que se produzca la llamada a la rutina de_
+16 call Avanza_puntero_de_album_de_fotos_de_entidades	; Hemos terminado de "grabar" el frame completo de entidades.
+;														; Avanzamos al siguiente álbum para iniciar el siguiente FRAME.
+
 ; ----------------------------------------
 
 	ld a,(Ctrl_1) 										; Existe Loop?
@@ -962,9 +964,9 @@ Inicia_punteros_de_albumes_y_malotes
 
 	ret
 
-;	23/9/23
+;	23/10/23
 
-Avanza_puntero_de_album_de_fotos_y_malotes
+Avanza_puntero_de_album_de_fotos_de_entidades
 
 ; Caja_de_malotes equ $7419 ; (7419h - 741ch) 4 bytes.
 
@@ -978,14 +980,11 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 	sbc hl,bc										; Estamos en el último álbum del índice.
 	jr nz,1F								 		; El buffer está lleno. HALT.
 
-; Estamos en Album_de_fotos_3.	
-; Configuramos el semáforo de álbumes para indicar que todos están completos.
+; Hemos completado Album_de_fotos_3. Frame buffer lleno.
+; Actualizamos (Semaforo).
 
 	ld hl,Semaforo
-	set 3,(hl)
-
-	ld hl,Ctrl_1									
-	set 5,(hl)										
+	rlc (hl)										; Semaforo contendrá $08. (Rota a izq. sin carry).
 
 ; Inicia con el buffer de video completo !!!
 
@@ -1007,7 +1006,8 @@ Avanza_puntero_de_album_de_fotos_y_malotes
 	call Extrae_address
 	ld (Puntero_de_End_Snapshot),hl					
 
-	call Actualiza_semaforo
+	ld hl,Semaforo
+	rlc (hl) 										; (Rota a izq. sin carry).
 
 	ret
 
@@ -1539,6 +1539,7 @@ Gestiona_entidades
 	ld a,(Semaforo)
 	bit 0,a
 	jr z,$												;! STOP el buffer está vacío.  
+	ret z
 
 ;	call Extrae_foto_disparos
 ;	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
@@ -1550,12 +1551,12 @@ Gestiona_entidades
 ;	Album incompleto ?????
 ;	Si es así, inicializamos el bit 4 de (Semaforo) y salimos de la rutina.
 
-	ld a,(Semaforo)
-	bit 5,a
-	jr nz,1F
+;	ld a,(Semaforo)
+;	bit 5,a
+;	jr nz,1F
 
-	bit 4,a
-	ret nz
+;	bit 4,a
+;	ret nz
 
 ; El buffer estaba completo y hemos pintado el frame y desplazado los álbumes.
 ; Nos situamos al comienzo del último álbum.
@@ -1569,14 +1570,13 @@ Gestiona_entidades
 ;	Hemos pintado Album_de_fotos en pantalla y desplazado los demás álbumes una posición.
 ;	Tenemos vacío el último álbum en el que se encuentra (Puntero_indice_album_de_fotos).
 
-	ld hl,Ctrl_1																	
-	res 5,(hl)
+;	ld hl,Ctrl_1																	
+;	res 5,(hl)
 
 ;	Album_de_fotos_3 vuelve a estar vacío.
 
 	ld hl,Semaforo
-	res 5,(hl)
-	call Actualiza_semaforo_2
+	rrc (hl)
 
 	ret
 
