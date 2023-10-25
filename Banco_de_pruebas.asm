@@ -362,6 +362,13 @@ Puntero_de_End_Snapshot_disparos defw 0
 Semaforo db $f0											; Indicador necesario para poder gestionar los álbumes de fotos de las entidades. Indica en que álbum_
 ;														; _ nos encontramos y si el cuadro, (frame), está completo en el álbum, o no.
 Ctrl_Semaforo db 0										; Byte de control utilizado por la rutina [Gestiona_albumes_de_fotos] para la recolocación de los álbumes vacíos.
+;
+;														DESCRIPCIÓN:
+;
+;														BIT 0, Indica que el último álbum que tenemos abierto, NO ESTÁ COMPLETO. Este bit lo activa la rutina [Gestiona_albumes_de_fotos]_
+;																_ e indica a la función [Gestiona_entidades], que no ha de modificar punteros, (hemos de continuar escribiendo en el mismo_	
+;																_ álbum.														
+;															
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -1546,38 +1553,25 @@ Gestiona_entidades
 
 	call Gestiona_albumes_de_fotos 						; Escupe Álbum de fotos. 1a0, 2a1, 3a2. 
 
-; 	Corrige (Stack_snapshot). Se sitúa al principio del último álbum libre para volver a guardar fotos.
-
 ;	Album incompleto ?????
-;	Si es así, inicializamos el bit 4 de (Semaforo) y salimos de la rutina.
+;	Si es así, salimos de la rutina sin modificar punteros. Tenemos que terminar de pinter el FRAME.
 
-;	ld a,(Semaforo)
-;	bit 5,a
-;	jr nz,1F
+	ld a,(Ctrl_Semaforo)
+	bit 7,a
+	jr nz,1F
 
-;	bit 4,a
-;	ret nz
+	bit 0,a 
+	ret nz
 
 ; El buffer estaba completo y hemos pintado el frame y desplazado los álbumes.
 ; Nos situamos al comienzo del último álbum.
 
-1 ld hl,(Puntero_indice_album_de_fotos)
-	call Extrae_address
-	ld (Stack_snapshot),hl
+	call Modifica_Stack_snapshot
 
-;	En este punto:
+	ret
 
-;	Hemos pintado Album_de_fotos en pantalla y desplazado los demás álbumes una posición.
-;	Tenemos vacío el último álbum en el que se encuentra (Puntero_indice_album_de_fotos).
-
-;	ld hl,Ctrl_1																	
-;	res 5,(hl)
-
-;	Album_de_fotos_3 vuelve a estar vacío.
-
-	ld hl,Semaforo
-	rrc (hl)
-
+1 res 7,a												; Salimos sin modificar punteros. 
+	ld (Ctrl_Semaforo),a
 	ret
 
 ; -----------------------------------------------------------------------------------

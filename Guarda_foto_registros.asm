@@ -123,38 +123,51 @@ Guarda_foto_registros
 
 Gestiona_albumes_de_fotos 
 
-; En 1er lugar consultamos el bit_4 de (Semaforo).
-; Nos indica si existe algún album vacío.
+; En 1er lugar consultamos el bit_0 de (Ctrl_Semaforo).
+; Si está a "1" significa que Album_de_fotos_3 no está completo.
 
-;    ld a,(Semaforo)
-;    bit 4,a
-;    jr z,7F
+    ld a,(Ctrl_Semaforo)
+    bit 0,a
+    jr z,7F
 
-;    res 4,a
-;    ld (Semaforo),a
+; Album_de_fotos_3 completo ?????
 
-; Album_de_fots_2 o Album_de_fotos_1 está vacío.
-; Album_de_fotos_2 ???
+    ld a,(Semaforo)
+    bit 3,a
+    jr z,$
 
-;    bit 7,a                         ; bit_7 ="1". Indica que Album_de_fotos_2 está vacío.
-;    jr z,8F                         ; Hay que "ordenar los álbumes". Volcamos Album_de_fotos_3 a Album_de_fotos_2.
+; Album_de_fotos_3 contiene un FRAME completo.
+; Volcamos la imagen de Album_de_fotos_3 a Album_de_fotos_2
 
-; Rellena Album_de_fotos_2
+    call Album3_a_Album2    ;   X-X-X-0
+    call Modifica_Stack_snapshot
 
- ;   res 7,a
- ;   set 5,a                         ; El bit_5 indica que el álbum ha sido reestructurado. 
- ;   ld (Semaforo),a
 
- ;   call Album3_a_Album2
- ;   call Actualiza_punteros_de_albumes
+;;! Debugggggg
+;    ld a,(Contador_de_frames_2)
+;    ex af,af'
+;    ld a,(Contador_de_frames)
+ ;   jr $
 
- ;   jr 7F
+;
+; Tenemos completos:
 
-; Album_de_fotos_1 está vacío.
+;   Album_de_fotos
+;   Album_de_fotos_1
+;   Album_de_fotos_2
 
-;8 res 6,a
-;    set 5,a
-;    ld (Semaforo),a
+;   (Stack_snapshot) está situado al principio de Album_de_fotos_3, (que estará vacío).
+
+    jr 7F
+
+Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
+	call Extrae_address
+	ld (Stack_snapshot),hl
+	ld hl,Semaforo
+	rrc (hl)
+    ret
+
+
 
 ;    call Album2_a_Album1
 
@@ -268,13 +281,12 @@ Gestiona_albumes_de_fotos
 
 ;   Ha sido reestructurado ???
 
-
-;    ld a,(Contador_de_frames_2)
-;    ex af,af'
- ;   ld a,(Contador_de_frames)
+;! Debugggggg
+    ld a,(Contador_de_frames_2)
+    ex af,af'
+    ld a,(Contador_de_frames)
     jr $
-
-;    ld a,(Semaforo)
+ 
 ;    bit 5,a
 ;    ret nz
 
@@ -306,27 +318,35 @@ Gestiona_albumes_de_fotos
     bit 3,a
     jr nz,6F
 
+; Venimos de reorganizar los álbumes ???
+
+    ld a,(Ctrl_Semaforo)
+    bit 0,a
+    jr z,8F
+
+; Venimos de REORGANIZAR los álbumes. X-X-0-0    
+; Hay que situar (Stack_snapshot) al comienzo de Album_de_fotos_2, actualizar (Semaforo) y inicializar el bit_0 de (Ctrl_Semaforo).
+
+    call Actualiza_punteros_de_albumes
+    call Modifica_Stack_snapshot
+    ld hl,Ctrl_Semaforo
+    res 0,(hl)
+    set 7,(hl)
+    ret
+    
+
 ;   Album_de_fotos_3 no está completo.     
 
-;   Ha sido reestructurado ???
-
-    jr $
-
- ;   ld a,(Semaforo)
-;    bit 5,a
-;    ret nz
-
-;    ld hl,Semaforo
-;    set 4,(hl)                  ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
-;    set 7,(hl)                  ; _ (Puntero_indice_End_Snapshot). Hay que completar el álbum. 
-;    ret                         
-
+8 ld hl,Ctrl_Semaforo
+    set 0,(hl)                   ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
+    ret                          ; _ (Puntero_indice_End_Snapshot). Hay que completar el álbum. 
+                      
 ;   Album_de_fotos_3 contiene un FRAME completo. Datos ???
 
 6 ld hl,Album_de_fotos_3+1
     ld a,(hl)
     and a
-    ret z                       ; Album_de_fotos_3 y Album_de_fotos_2 están vacíos. RET.
+    ret z                        ; Album_de_fotos_3 y Album_de_fotos_2 están vacíos. RET.
                
 ; ----- ----- ----- -----
 ; ----- ----- ----- -----
@@ -420,22 +440,21 @@ Limpia_album
 ;
 ;   20/10/23
 
+;   
+
 Actualiza_punteros_de_albumes
 
     ld hl,(Puntero_indice_album_de_fotos)
     dec hl
     dec hl
     ld (Puntero_indice_album_de_fotos),hl
-    
+
     ld hl,(Puntero_indice_End_Snapshot)
     dec hl
     dec hl
     ld (Puntero_indice_End_Snapshot),hl
     call Extrae_address
     ld (Puntero_de_End_Snapshot),hl             
-
-    call Extrae_address
-    ld (Stack_snapshot),hl
 
     ret
 
