@@ -1,4 +1,4 @@
-# file opened: Banco_de_Pruebas.asm
+# file opened: Banco_de_pruebas.asm
    1  0000              ;	25/9/22
    2  0000
    3  0000
@@ -2703,7 +2703,7 @@
 1564  8DEC              ; El buffer estaba completo y hemos pintado el frame y desplazado los álbumes.
 1565  8DEC              ; Nos situamos al comienzo del último álbum.
 1566  8DEC
-1567  8DEC CD 07 73     	call Modifica_Stack_snapshot
+1567  8DEC CD 22 73     	call Modifica_Stack_snapshot
 1568  8DEF
 1569  8DEF C9           	ret
 1570  8DF0
@@ -7034,426 +7034,426 @@
   28+ 7FA0
   29+ 7FA0              Guarda_foto_registros
   30+ 7FA0
-  31+ 7FA0 ED 73 14 89      ld (Stack),sp                                 ; Guardo SP en (Stack).
-  32+ 7FA4
-  33+ 7FA4              ; En 1er lugar guardaremos las variables de borrado del siguiente cuadro.
-  34+ 7FA4
-  35+ 7FA4 31 E6 88         ld sp,Variables_de_borrado+6
-  36+ 7FA7
-  37+ 7FA7 E5               push hl
-  38+ 7FA8 DD E5            push ix
-  39+ 7FAA FD E5            push iy
-  40+ 7FAC
-  41+ 7FAC 31 A0 7F         ld sp,Guarda_foto_registros                   ; Sitúo el Stack Pointer en la dirección actual -1
-  42+ 7FAF
-  43+ 7FAF E5               push hl                                       ; HL contiene la dirección de la rutina de impresión.
-  44+ 7FB0 DD E5            push ix                                       ; IX contiene el puntero de impresión.
-  45+ 7FB2 FD E5            push iy                                       ; IY contiene (Puntero_objeto).
-  46+ 7FB4
-  47+ 7FB4              ; Disparo o entidad?
-  48+ 7FB4
-  49+ 7FB4 3A 03 89         ld a,(Ctrl_1)
-  50+ 7FB7 CB 47            bit 0,a
-  51+ 7FB9 28 05            jr z,2F
-  52+ 7FBB
-  53+ 7FBB 2A 1C 89         ld hl,(Stack_snapshot_disparos)
-  54+ 7FBE 18 0F            jr 4F
-  55+ 7FC0
-  56+ 7FC0              ; No es disparo. Entidad/Amadeus ????
-  57+ 7FC0
-  58+ 7FC0 3A F0 88     2 ld a,(Ctrl_0)
-  59+ 7FC3 CB 77            bit 6,a
-  60+ 7FC5 28 05            jr z,7F
-  61+ 7FC7
-  62+ 7FC7              ; Guardamos foto de Amadeus.
-  63+ 7FC7
-  64+ 7FC7 2A 22 89         ld hl,(End_Snapshot_Amadeus)
-  65+ 7FCA 18 03            jr 4F
-  66+ 7FCC
-  67+ 7FCC 2A 1A 89     7 ld hl,(Stack_snapshot)                          ; Album_de_fotos contiene la imagen de los registros implicados en el_
-  68+ 7FCF
-  69+ 7FCF 06 03        4 ld b,3                                          ; _correcto funcionamiento de las distintas rutinas de impresión.
-  70+ 7FD1
-  71+ 7FD1 D1           1 pop de
-  72+ 7FD2 73               ld (hl),e
-  73+ 7FD3 23               inc hl
-  74+ 7FD4 72               ld (hl),d
-  75+ 7FD5 23               inc hl                                        ; Volvemos a tener al puntero SP en la posición inicial, (Snapshot)-1.
-  76+ 7FD6 10 F9            djnz 1B
-  77+ 7FD8
-  78+ 7FD8              ; Disparo o entidad ?
-  79+ 7FD8
-  80+ 7FD8 3A 03 89         ld a,(Ctrl_1)
-  81+ 7FDB CB 47            bit 0,a
-  82+ 7FDD 28 05            jr z,5F
-  83+ 7FDF
-  84+ 7FDF 22 1C 89         ld (Stack_snapshot_disparos),hl
-  85+ 7FE2 18 12            jr 6F
-  86+ 7FE4
-  87+ 7FE4              ; Entidad o Amadeus ?
-  88+ 7FE4
-  89+ 7FE4 3A F0 88     5 ld a,(Ctrl_0)
-  90+ 7FE7 CB 77            bit 6,a
-  91+ 7FE9 28 08            jr z,8F
-  92+ 7FEB
-  93+ 7FEB 22 22 89         ld (End_Snapshot_Amadeus),hl
-  94+ 7FEE ED 7B 14 89      ld sp,(Stack)
-  95+ 7FF2 C9               ret
-  96+ 7FF3
-  97+ 7FF3 22 1A 89     8 ld (Stack_snapshot),hl
-  98+ 7FF6 ED 7B 14 89  6 ld sp,(Stack)
-  99+ 7FFA
- 100+ 7FFA              ; Aquí tengo que copiar (Stack_snapshot) en la dirección hacia donde apunta (Puntero_de_End_Snapshot).
- 101+ 7FFA
- 102+ 7FFA 5D               ld e,l
- 103+ 7FFB 54               ld d,h                                        ; DE contiene la dirección donde terminan los datos de este álbum.
- 104+ 7FFC
- 105+ 7FFC 2A 38 89         ld hl,(Puntero_de_End_Snapshot)               ; Guardamos la dirección de `fin de álbum', en la dirección que_
- 106+ 7FFF 73               ld (hl),e                                     ; _ contiene (Puntero_de_End_Snapshot). Esta dirección la utilizará la_
- 107+ 8000 23               inc hl                                        ; _ rutina [Gestiona_albumes_de_fotos] para copiar los datos de un_
- 108+ 8001 72               ld (hl),d                                     ; _ álbum a otro.
- 109+ 8002
- 110+ 8002 C9               ret
- 111+ 8003
- 112+ 8003              ; ------------------------------------------------
- 113+ 8003              ;
- 114+ 8003              ;   19/10/23
- 115+ 8003              ;
- 116+ 8003              ;   La rutina estará situada justo después de:
- 117+ 8003              ;   Almacen_de_parametros_DRAW equ $72ac ; ($72ac - $72eb) ; 61 bytes.
- 118+ 8003
- 119+ 8003              ;   Limpia Album_de_fotos después de imprimir pantalla y desplaza el buffer una posición.
- 120+ 8003              ;   Si el buffer estaba lleno, dejará libre Album_de_fotos_3.
- 121+ 8003
- 122+ 8003                  org $72ec
- 123+ 72EC
- 124+ 72EC              Gestiona_albumes_de_fotos
+  31+ 7FA0 F3               di
+  32+ 7FA1 ED 73 14 89      ld (Stack),sp                                 ; Guardo SP en (Stack).
+  33+ 7FA5
+  34+ 7FA5              ; En 1er lugar guardaremos las variables de borrado del siguiente cuadro.
+  35+ 7FA5
+  36+ 7FA5 31 E6 88         ld sp,Variables_de_borrado+6
+  37+ 7FA8
+  38+ 7FA8 E5               push hl
+  39+ 7FA9 DD E5            push ix
+  40+ 7FAB FD E5            push iy
+  41+ 7FAD
+  42+ 7FAD 31 A0 7F         ld sp,Guarda_foto_registros                   ; Sitúo el Stack Pointer en la dirección actual -1
+  43+ 7FB0
+  44+ 7FB0 E5               push hl                                       ; HL contiene la dirección de la rutina de impresión.
+  45+ 7FB1 DD E5            push ix                                       ; IX contiene el puntero de impresión.
+  46+ 7FB3 FD E5            push iy                                       ; IY contiene (Puntero_objeto).
+  47+ 7FB5
+  48+ 7FB5              ; Disparo o entidad?
+  49+ 7FB5
+  50+ 7FB5 3A 03 89         ld a,(Ctrl_1)
+  51+ 7FB8 CB 47            bit 0,a
+  52+ 7FBA 28 05            jr z,2F
+  53+ 7FBC
+  54+ 7FBC 2A 1C 89         ld hl,(Stack_snapshot_disparos)
+  55+ 7FBF 18 0F            jr 4F
+  56+ 7FC1
+  57+ 7FC1              ; No es disparo. Entidad/Amadeus ????
+  58+ 7FC1
+  59+ 7FC1 3A F0 88     2 ld a,(Ctrl_0)
+  60+ 7FC4 CB 77            bit 6,a
+  61+ 7FC6 28 05            jr z,7F
+  62+ 7FC8
+  63+ 7FC8              ; Guardamos foto de Amadeus.
+  64+ 7FC8
+  65+ 7FC8 2A 22 89         ld hl,(End_Snapshot_Amadeus)
+  66+ 7FCB 18 03            jr 4F
+  67+ 7FCD
+  68+ 7FCD 2A 1A 89     7 ld hl,(Stack_snapshot)                          ; Album_de_fotos contiene la imagen de los registros implicados en el_
+  69+ 7FD0
+  70+ 7FD0 06 03        4 ld b,3                                          ; _correcto funcionamiento de las distintas rutinas de impresión.
+  71+ 7FD2
+  72+ 7FD2 D1           1 pop de
+  73+ 7FD3 73               ld (hl),e
+  74+ 7FD4 23               inc hl
+  75+ 7FD5 72               ld (hl),d
+  76+ 7FD6 23               inc hl                                        ; Volvemos a tener al puntero SP en la posición inicial, (Snapshot)-1.
+  77+ 7FD7 10 F9            djnz 1B
+  78+ 7FD9
+  79+ 7FD9              ; Disparo o entidad ?
+  80+ 7FD9
+  81+ 7FD9 3A 03 89         ld a,(Ctrl_1)
+  82+ 7FDC CB 47            bit 0,a
+  83+ 7FDE 28 05            jr z,5F
+  84+ 7FE0
+  85+ 7FE0 22 1C 89         ld (Stack_snapshot_disparos),hl
+  86+ 7FE3 18 13            jr 6F
+  87+ 7FE5
+  88+ 7FE5              ; Entidad o Amadeus ?
+  89+ 7FE5
+  90+ 7FE5 3A F0 88     5 ld a,(Ctrl_0)
+  91+ 7FE8 CB 77            bit 6,a
+  92+ 7FEA 28 09            jr z,8F
+  93+ 7FEC
+  94+ 7FEC 22 22 89         ld (End_Snapshot_Amadeus),hl
+  95+ 7FEF ED 7B 14 89      ld sp,(Stack)
+  96+ 7FF3 FB               ei
+  97+ 7FF4 C9               ret
+  98+ 7FF5
+  99+ 7FF5 22 1A 89     8 ld (Stack_snapshot),hl
+ 100+ 7FF8 ED 7B 14 89  6 ld sp,(Stack)
+ 101+ 7FFC
+ 102+ 7FFC              ; Aquí tengo que copiar (Stack_snapshot) en la dirección hacia donde apunta (Puntero_de_End_Snapshot).
+ 103+ 7FFC
+ 104+ 7FFC 5D               ld e,l
+ 105+ 7FFD 54               ld d,h                                        ; DE contiene la dirección donde terminan los datos de este álbum.
+ 106+ 7FFE
+ 107+ 7FFE 2A 38 89         ld hl,(Puntero_de_End_Snapshot)               ; Guardamos la dirección de `fin de álbum', en la dirección que_
+ 108+ 8001 73               ld (hl),e                                     ; _ contiene (Puntero_de_End_Snapshot). Esta dirección la utilizará la_
+ 109+ 8002 23               inc hl                                        ; _ rutina [Gestiona_albumes_de_fotos] para copiar los datos de un_
+ 110+ 8003 72               ld (hl),d                                     ; _ álbum a otro.
+ 111+ 8004 FB               ei
+ 112+ 8005 C9               ret
+ 113+ 8006
+ 114+ 8006              ; ------------------------------------------------
+ 115+ 8006              ;
+ 116+ 8006              ;   19/10/23
+ 117+ 8006              ;
+ 118+ 8006              ;   La rutina estará situada justo después de:
+ 119+ 8006              ;   Almacen_de_parametros_DRAW equ $72ac ; ($72ac - $72eb) ; 61 bytes.
+ 120+ 8006
+ 121+ 8006              ;   Limpia Album_de_fotos después de imprimir pantalla y desplaza el buffer una posición.
+ 122+ 8006              ;   Si el buffer estaba lleno, dejará libre Album_de_fotos_3.
+ 123+ 8006
+ 124+ 8006                  org $72ec
  125+ 72EC
- 126+ 72EC              ; En 1er lugar consultamos el bit_0 de (Ctrl_Semaforo).
- 127+ 72EC              ; Si está a "1" significa que Album_de_fotos_3 no está completo.
- 128+ 72EC
- 129+ 72EC 3A 3D 89         ld a,(Ctrl_Semaforo)
- 130+ 72EF CB 47            bit 0,a
- 131+ 72F1 28 23            jr z,7F
- 132+ 72F3
- 133+ 72F3              ; Album_de_fotos_3 completo ?????
+ 126+ 72EC              Gestiona_albumes_de_fotos
+ 127+ 72EC
+ 128+ 72EC              ; En 1er lugar consultamos el bit_0 de (Ctrl_Semaforo).
+ 129+ 72EC              ; Si está a "1" significa que Album_de_fotos_3 o Album_de_fotos_2 estaban incompletos.
+ 130+ 72EC
+ 131+ 72EC 3A 3D 89         ld a,(Ctrl_Semaforo)
+ 132+ 72EF CB 47            bit 0,a
+ 133+ 72F1 28 3E            jr z,7F
  134+ 72F3
- 135+ 72F3 3A 3C 89         ld a,(Semaforo)
- 136+ 72F6 CB 5F            bit 3,a
- 137+ 72F8 28 FE            jr z,$
- 138+ 72FA
- 139+ 72FA              ; Album_de_fotos_3 contiene un FRAME completo.
- 140+ 72FA              ; Volcamos la imagen de Album_de_fotos_3 a Album_de_fotos_2
- 141+ 72FA
- 142+ 72FA CD A1 73         call Album3_a_Album2    ;   X-X-X-0
- 143+ 72FD CD 07 73         call Modifica_Stack_snapshot
- 144+ 7300
- 145+ 7300 21 3D 89         ld hl,Ctrl_Semaforo     ; Hemos reordenado los álbumes. Inicializamos el bit_0 de (Ctrl_Semaforo).
- 146+ 7303 CB 86            res 0,(hl)
- 147+ 7305
- 148+ 7305 18 0F            jr 7F
- 149+ 7307
- 150+ 7307 2A 30 89     Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
- 151+ 730A CD 80 8C     	call Extrae_address
- 152+ 730D 22 1A 89     	ld (Stack_snapshot),hl
- 153+ 7310 21 3C 89     	ld hl,Semaforo
- 154+ 7313 CB 0E        	rrc (hl)
- 155+ 7315 C9               ret
- 156+ 7316
- 157+ 7316              ;    call Album2_a_Album1
- 158+ 7316
- 159+ 7316              ;   1-1-0-X Distribución actual de los álbumes.
- 160+ 7316
- 161+ 7316              ;   Está el buffer lleno ???
- 162+ 7316
- 163+ 7316              ;    ld a,(Ctrl_1)
- 164+ 7316              ;    bit 5,a
- 165+ 7316              ;    jr $
- 166+ 7316
- 167+ 7316              ;    call Album3_a_Album2
- 168+ 7316              ;    call Actualiza_punteros_de_albumes
- 169+ 7316
- 170+ 7316              ;    ld a,(Contador_de_frames_2)
- 171+ 7316              ;    ex af,af'
- 172+ 7316              ;    ld a,(Contador_de_frames)
- 173+ 7316              ;    jr $
- 174+ 7316
- 175+ 7316              ; #############################################################3
- 176+ 7316
- 177+ 7316              ;   En 1er lugar limpiamos el FRAME pintado.
- 178+ 7316              ;   Vaciamos Album_de_fotos.
- 179+ 7316
- 180+ 7316              ;   Album_de_fotos. Contiene datos ???
- 181+ 7316
- 182+ 7316 21 01 70     7 ld hl,Album_de_fotos+1
- 183+ 7319 7E               ld a,(hl)
- 184+ 731A A7               and a
- 185+ 731B 28 14            jr z,3F                     ; Album_de_fotos está vacío. NO HAY QUE LIMPIARLO.
- 186+ 731D
- 187+ 731D              ;   Hemos impreso Album_de_fotos. Limpiamos el álbum y actualizamos (End_Snapshot).
- 188+ 731D
- 189+ 731D 2A 1E 89         ld hl,(End_Snapshot)
- 190+ 7320 01 00 70         ld bc,Album_de_fotos
- 191+ 7323 11 01 70         ld de,Album_de_fotos+1
- 192+ 7326 AF               xor a
- 193+ 7327 02               ld (bc),a                   ; "0" en el 1er byte de origen.
- 194+ 7328
- 195+ 7328 CD EF 73         call Limpia_album
- 196+ 732B
- 197+ 732B 21 00 00         ld hl,0
- 198+ 732E 22 1E 89         ld (End_Snapshot),hl        ; Limpia (End_Snapshot).
- 199+ 7331
- 200+ 7331              ; ----- ----- ----- -----
- 201+ 7331
- 202+ 7331              ;   Album_de_fotos está vacío y (End_Snapshot)="0".
- 203+ 7331              ;   Album_de_fotos_1. Contiene un frame completo ???
- 204+ 7331
- 205+ 7331 3A 3C 89     3 ld a,(Semaforo)
- 206+ 7334 CB 4F            bit 1,a
- 207+ 7336 20 02            jr nz,4F
- 208+ 7338
- 209+ 7338              ;   Album_de_fotos_1 no está completo.
- 210+ 7338
- 211+ 7338              ;    ld hl,Semaforo
- 212+ 7338              ;    set 4,(hl)                  ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
- 213+ 7338              ;    res 1,(hl)
- 214+ 7338              ;    ret                         ; _ (Puntero_indice_End_Snapshot). Hay que completar el álbum.
- 215+ 7338
- 216+ 7338 18 FE            jr $
- 217+ 733A
- 218+ 733A
- 219+ 733A              ;   Album_de_fotos_1 contiene un Frame completo. Contiene datos ???
- 220+ 733A
- 221+ 733A 21 55 70     4 ld hl,Album_de_fotos_1+1
- 222+ 733D 7E               ld a,(hl)
- 223+ 733E A7               and a
- 224+ 733F 28 26            jr z,1F                     ; Album_de_fotos y Album_de_fotos_1 están vacíos. Saltamos a analizar Album_de_fotos_2.
- 225+ 7341
- 226+ 7341              ; ----- ----- ----- -----
- 227+ 7341              ; ----- ----- ----- -----
- 228+ 7341
- 229+ 7341              ;   Album_de_fotos_1 Contiene un frame completo que hay que volcar en Album_de_fotos.
- 230+ 7341              ;   Actualiza (End_Snapshot).
- 231+ 7341
- 232+ 7341 2A 24 89         ld hl,(End_Snapshot_1)      ; Final, (origen).
- 233+ 7344 01 54 70         ld bc,Album_de_fotos_1      ; Origen.
- 234+ 7347 11 00 70         ld de,Album_de_fotos        ; Destino.
- 235+ 734A
- 236+ 734A CD EF 73         call Limpia_album
- 237+ 734D
- 238+ 734D              ;   Calculamos (End_Snapshot)
- 239+ 734D
- 240+ 734D A7               and a
- 241+ 734E ED 4A            adc hl,bc
- 242+ 7350 22 1E 89         ld (End_Snapshot),hl
- 243+ 7353
- 244+ 7353              ;   Limpiamos Album_de_fotos_1.
- 245+ 7353
- 246+ 7353 2A 24 89         ld hl,(End_Snapshot_1)
- 247+ 7356 01 54 70         ld bc,Album_de_fotos_1
- 248+ 7359 11 55 70         ld de,Album_de_fotos_1+1
- 249+ 735C AF               xor a
- 250+ 735D 02               ld (bc),a
- 251+ 735E
- 252+ 735E CD EF 73         call Limpia_album
- 253+ 7361
- 254+ 7361 21 00 00         ld hl,0
- 255+ 7364 22 24 89         ld (End_Snapshot_1),hl        ; Limpia (End_Snapshot_1).
- 256+ 7367
- 257+ 7367              ; ----- ----- ----- -----
- 258+ 7367
- 259+ 7367              ;   Album_de_fotos_2. Contiene Frame completo ???
- 260+ 7367
- 261+ 7367 3A 3C 89     1 ld a,(Semaforo)
- 262+ 736A CB 57            bit 2,a
- 263+ 736C 20 09            jr nz,5F
- 264+ 736E
- 265+ 736E              ;   Album_de_fotos_2 no está completo.
- 266+ 736E
- 267+ 736E              ;   Ha sido reestructurado ???
- 268+ 736E
- 269+ 736E              ;! Debugggggg
- 270+ 736E 3A 52 89         ld a,(Contador_de_frames_2)
- 271+ 7371 08               ex af,af'
- 272+ 7372 3A 51 89         ld a,(Contador_de_frames)
- 273+ 7375 18 FE            jr $
- 274+ 7377
- 275+ 7377              ;    bit 5,a
- 276+ 7377              ;    ret nz
- 277+ 7377
- 278+ 7377              ;    ld hl,Semaforo
- 279+ 7377              ;    set 4,(hl)                  ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
- 280+ 7377              ;    set 6,(hl)
- 281+ 7377              ;    ret
- 282+ 7377
- 283+ 7377              ;   Album_de_fotos_2 contiene un FRAME completo. Datos ???.
- 284+ 7377
- 285+ 7377 21 A9 70     5 ld hl,Album_de_fotos_2+1
- 286+ 737A 7E               ld a,(hl)
- 287+ 737B A7               and a
- 288+ 737C 28 03            jr z,2F                     ; Album_de_fotos_2 y Album_de_fotos_1 están vacíos. Saltamos a analizar Album_de_fotos_3.
- 289+ 737E
- 290+ 737E              ; ----- ----- ----- -----
- 291+ 737E              ; ----- ----- ----- -----
- 292+ 737E              ; ----- ----- ----- -----
- 293+ 737E
- 294+ 737E              ;   Album_de_fotos_2 contiene un frame completo.
- 295+ 737E              ;   Volcamos los datos de Album_de_fotos_2 a Album_de_fotos_1 y limpiamos Album_de_fotos_2.
- 296+ 737E
- 297+ 737E CD C8 73         call Album2_a_Album1
- 298+ 7381
- 299+ 7381              ;   Album_de_fotos_2 está vacío y (End_Snapshot_2)="0".
- 300+ 7381              ;   Album_de_fotos_3. Contiene un frame completo ???
- 301+ 7381
- 302+ 7381 3A 3C 89     2 ld a,(Semaforo)
- 303+ 7384 CB 5F            bit 3,a
- 304+ 7386 20 13            jr nz,6F
- 305+ 7388
- 306+ 7388              ;   Album_de_fotos_3 no contiene un FRAME completo, pero ...
- 307+ 7388              ;   Contiene datos ???
- 308+ 7388
- 309+ 7388 21 FD 70         ld hl,Album_de_fotos_3+1
- 310+ 738B 7E               ld a,(hl)
- 311+ 738C A7               and a
- 312+ 738D 20 06            jr nz,8F
- 313+ 738F
- 314+ 738F              ;   Album_de_fotos_3 y Album_de_fotos_2 están vacios !!!!!
- 315+ 738F              ;   Hay que situar (Stack_snapshot) al comienzo de Album_de_fotos_2 y actualizar (Semaforo).
- 316+ 738F
- 317+ 738F CD FC 73         call Actualiza_punteros_de_albumes
- 318+ 7392
- 319+ 7392 18 FE            jr $
- 320+ 7394
- 321+ 7394 C9               ret
- 322+ 7395
- 323+ 7395              ;   Album_de_fotos_3 no está completo.
- 324+ 7395
- 325+ 7395 21 3D 89     8 ld hl,Ctrl_Semaforo
- 326+ 7398 CB C6            set 0,(hl)                   ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
- 327+ 739A C9               ret                          ; _ (Puntero_indice_End_Snapshot). Hay que completar el álbum.
- 328+ 739B
- 329+ 739B              ;   Album_de_fotos_3 contiene un FRAME completo. Datos ???
- 330+ 739B
- 331+ 739B 21 FD 70     6 ld hl,Album_de_fotos_3+1
- 332+ 739E 7E               ld a,(hl)
- 333+ 739F A7               and a
- 334+ 73A0 C8               ret z                        ; Album_de_fotos_3 y Album_de_fotos_2 están vacíos. RET.
- 335+ 73A1
- 336+ 73A1              ; ----- ----- ----- -----
- 337+ 73A1              ; ----- ----- ----- -----
- 338+ 73A1              ; ----- ----- ----- -----
- 339+ 73A1
- 340+ 73A1              ;   Volcamos los datos del Album_de_fotos_3 a Album_de_fotos_2 y limpiamos Album_de_fotos_3.
- 341+ 73A1
- 342+ 73A1 2A 2C 89     Album3_a_Album2 ld hl,(End_Snapshot_3)      ; Final, (origen).
- 343+ 73A4 01 FC 70         ld bc,Album_de_fotos_3                  ; Origen.
- 344+ 73A7 11 A8 70         ld de,Album_de_fotos_2                  ; Destino.
- 345+ 73AA
- 346+ 73AA CD EF 73         call Limpia_album
- 347+ 73AD
- 348+ 73AD              ;   Actualizamos (End_Snapshot_2):
- 349+ 73AD
- 350+ 73AD A7               and a
- 351+ 73AE ED 4A            adc hl,bc
- 352+ 73B0 22 28 89         ld (End_Snapshot_2),hl
- 353+ 73B3
- 354+ 73B3              ;   Limpiamos Album_de_fotos_3.
- 355+ 73B3
- 356+ 73B3 2A 2C 89         ld hl,(End_Snapshot_3)
- 357+ 73B6 01 FC 70         ld bc,Album_de_fotos_3
- 358+ 73B9 11 FD 70         ld de,Album_de_fotos_3+1
- 359+ 73BC AF               xor a
- 360+ 73BD 02               ld (bc),a
- 361+ 73BE CD EF 73         call Limpia_album
- 362+ 73C1
- 363+ 73C1              ;   Hemos pasado los datos de Album_de_fotos_3 a Album_de_fotos_2.
- 364+ 73C1              ;   Actualiza (End_Snapshot_3) y (Semaforo).
- 365+ 73C1
- 366+ 73C1 21 00 00         ld hl,0
- 367+ 73C4 22 2C 89         ld (End_Snapshot_3),hl                   ; Limpia (End_Snapshot_3).
- 368+ 73C7
- 369+ 73C7 C9               ret
- 370+ 73C8
- 371+ 73C8 2A 28 89     Album2_a_Album1 ld hl,(End_Snapshot_2)       ; Final, (origen).
- 372+ 73CB 01 A8 70         ld bc,Album_de_fotos_2                   ; Origen.
- 373+ 73CE 11 54 70         ld de,Album_de_fotos_1                   ; Destino.
- 374+ 73D1 CD EF 73         call Limpia_album
- 375+ 73D4
- 376+ 73D4              ;   Actualizamos (End_Snapshot_1):
- 377+ 73D4
- 378+ 73D4 A7               and a
- 379+ 73D5 ED 4A            adc hl,bc
- 380+ 73D7 22 24 89         ld (End_Snapshot_1),hl
- 381+ 73DA
- 382+ 73DA              ;   Limpiamos Album_de_fotos_2.
- 383+ 73DA
- 384+ 73DA 2A 28 89         ld hl,(End_Snapshot_2)
- 385+ 73DD 01 A8 70         ld bc,Album_de_fotos_2
- 386+ 73E0 11 A9 70         ld de,Album_de_fotos_2+1
- 387+ 73E3 AF               xor a
- 388+ 73E4 02               ld (bc),a
- 389+ 73E5 CD EF 73         call Limpia_album
- 390+ 73E8 21 00 00         ld hl,0
- 391+ 73EB 22 28 89         ld (End_Snapshot_2),hl      ; Limpia (End_Snapshot_2).
- 392+ 73EE C9               ret
- 393+ 73EF
- 394+ 73EF
- 395+ 73EF              ; ----------------------------------------------------
- 396+ 73EF              ;
- 397+ 73EF              ;   10/8/23
- 398+ 73EF              ;
- 399+ 73EF              ;   Limpia o transfiere el contenido de un album_de_fotos o disparos a otro álbum.
- 400+ 73EF              ;
- 401+ 73EF              ;   INPUTS: HL ..... Contiene el nº de bytes a borrar.
- 402+ 73EF              ;           BC ..... Dirección de inicio del álbum.
- 403+ 73EF              ;           DE ..... Dirección de inicio del álbum. +1
- 404+ 73EF
- 405+ 73EF              ;    ld hl,(End_Snapshot)
- 406+ 73EF              ;    ld bc,Album_de_fotos
- 407+ 73EF              ;    ld de,Album_de_fotos+1
- 408+ 73EF
- 409+ 73EF              ;   MODIFICA: A,HL,BC y DE.
- 410+ 73EF
- 411+ 73EF              Limpia_album
- 412+ 73EF D5               push de                     ; Guardo DESTINO.
- 413+ 73F0 C5               push bc                     ; Guardo ORIGEN.
- 414+ 73F1 ED 42            sbc hl,bc
- 415+ 73F3 4D               ld c,l
- 416+ 73F4 44               ld b,h
- 417+ 73F5 E1               pop hl
- 418+ 73F6 C5               push bc
- 419+ 73F7 ED B0            ldir
- 420+ 73F9 C1               pop bc                      ; Esta cantidad la utilizaré para calcular (End_Snapshot_X), _
- 421+ 73FA E1               pop hl                      ; _ al salir de la rutina, (cuando estamos pasando datos de un álbum_
- 422+ 73FB C9               ret                         ; _ a otro).
- 423+ 73FC
- 424+ 73FC              ; --------------------------------------------------------------------------------------------
- 425+ 73FC              ;
- 426+ 73FC              ;   20/10/23
- 427+ 73FC
- 428+ 73FC              ;
- 429+ 73FC
- 430+ 73FC              Actualiza_punteros_de_albumes
- 431+ 73FC
- 432+ 73FC 2A 30 89         ld hl,(Puntero_indice_album_de_fotos)
- 433+ 73FF 2B               dec hl
- 434+ 7400 2B               dec hl
- 435+ 7401 22 30 89         ld (Puntero_indice_album_de_fotos),hl
- 436+ 7404
- 437+ 7404 2A 34 89         ld hl,(Puntero_indice_End_Snapshot)
- 438+ 7407 2B               dec hl
- 439+ 7408 2B               dec hl
- 440+ 7409 22 34 89         ld (Puntero_indice_End_Snapshot),hl
- 441+ 740C CD 80 8C         call Extrae_address
- 442+ 740F 22 38 89         ld (Puntero_de_End_Snapshot),hl
- 443+ 7412
- 444+ 7412 C9               ret
- 445+ 7413
+ 135+ 72F3              ;   Álbum_2 vacío ?????
+ 136+ 72F3
+ 137+ 72F3 CB 4F            bit 1,a
+ 138+ 72F5 20 13            jr nz,10F
+ 139+ 72F7
+ 140+ 72F7              ;   Álbum_1 vacío.
+ 141+ 72F7
+ 142+ 72F7              ; Album_de_fotos_2 completo ?????
+ 143+ 72F7
+ 144+ 72F7 3A 3C 89         ld a,(Semaforo)
+ 145+ 72FA CB 57            bit 2,a
+ 146+ 72FC 28 FE            jr z,$
+ 147+ 72FE
+ 148+ 72FE              ;! Debugggggggg (Revisar álbumes. Hay un fallo de pintado/borrado).
+ 149+ 72FE
+ 150+ 72FE 3A 52 89         ld a,(Contador_de_frames_2)
+ 151+ 7301 08               ex af,af
+ 152+ 7302 3A 51 89         ld a,(Contador_de_frames)
+ 153+ 7305 18 FE            jr $
+ 154+ 7307
+ 155+ 7307 CD EF 73         call Album2_a_Album1
+ 156+ 730A
+ 157+ 730A              ; Album_de_fotos_3 completo ?????
+ 158+ 730A
+ 159+ 730A 3A 3C 89     10 ld a,(Semaforo)
+ 160+ 730D CB 5F            bit 3,a
+ 161+ 730F 28 FE            jr z,$
+ 162+ 7311
+ 163+ 7311              ; Album_de_fotos_3 contiene un FRAME completo.
+ 164+ 7311              ; Volcamos la imagen de Album_de_fotos_3 a Album_de_fotos_2
+ 165+ 7311
+ 166+ 7311 CD C8 73         call Album3_a_Album2    ;   X-X-X-0
+ 167+ 7314 CD 22 73         call Modifica_Stack_snapshot
+ 168+ 7317
+ 169+ 7317 21 3D 89         ld hl,Ctrl_Semaforo     ; Hemos reordenado los álbumes. Inicializamos el bit_0 de (Ctrl_Semaforo).
+ 170+ 731A CB 86            res 0,(hl)
+ 171+ 731C CB 8E            res 1,(hl)
+ 172+ 731E CB 96            res 2,(hl)
+ 173+ 7320
+ 174+ 7320 18 0F            jr 7F
+ 175+ 7322
+ 176+ 7322 2A 30 89     Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
+ 177+ 7325 CD 80 8C     	call Extrae_address
+ 178+ 7328 22 1A 89     	ld (Stack_snapshot),hl
+ 179+ 732B 21 3C 89     	ld hl,Semaforo
+ 180+ 732E CB 0E        	rrc (hl)
+ 181+ 7330 C9               ret
+ 182+ 7331
+ 183+ 7331              ; #############################################################3
+ 184+ 7331
+ 185+ 7331              ;   En 1er lugar limpiamos el FRAME pintado.
+ 186+ 7331              ;   Vaciamos Album_de_fotos.
+ 187+ 7331
+ 188+ 7331              ;   Album_de_fotos. Contiene datos ???
+ 189+ 7331
+ 190+ 7331 21 01 70     7 ld hl,Album_de_fotos+1
+ 191+ 7334 7E               ld a,(hl)
+ 192+ 7335 A7               and a
+ 193+ 7336 28 14            jr z,3F                     ; Album_de_fotos está vacío. NO HAY QUE LIMPIARLO.
+ 194+ 7338
+ 195+ 7338              ;   Hemos impreso Album_de_fotos. Limpiamos el álbum y actualizamos (End_Snapshot).
+ 196+ 7338
+ 197+ 7338 2A 1E 89         ld hl,(End_Snapshot)
+ 198+ 733B 01 00 70         ld bc,Album_de_fotos
+ 199+ 733E 11 01 70         ld de,Album_de_fotos+1
+ 200+ 7341 AF               xor a
+ 201+ 7342 02               ld (bc),a                   ; "0" en el 1er byte de origen.
+ 202+ 7343
+ 203+ 7343 CD 16 74         call Limpia_album
+ 204+ 7346
+ 205+ 7346 21 00 00         ld hl,0
+ 206+ 7349 22 1E 89         ld (End_Snapshot),hl        ; Limpia (End_Snapshot).
+ 207+ 734C
+ 208+ 734C              ; ----- ----- ----- -----
+ 209+ 734C
+ 210+ 734C              ;   Album_de_fotos está vacío y (End_Snapshot)="0".
+ 211+ 734C              ;   Album_de_fotos_1. Contiene un frame completo ???
+ 212+ 734C
+ 213+ 734C 3A 3C 89     3 ld a,(Semaforo)
+ 214+ 734F CB 4F            bit 1,a
+ 215+ 7351 20 02            jr nz,4F
+ 216+ 7353
+ 217+ 7353 18 FE            jr $
+ 218+ 7355
+ 219+ 7355
+ 220+ 7355              ;   Album_de_fotos_1 contiene un Frame completo. Contiene datos ???
+ 221+ 7355
+ 222+ 7355 21 55 70     4 ld hl,Album_de_fotos_1+1
+ 223+ 7358 7E               ld a,(hl)
+ 224+ 7359 A7               and a
+ 225+ 735A 28 26            jr z,1F                     ; Album_de_fotos y Album_de_fotos_1 están vacíos. Saltamos a analizar Album_de_fotos_2.
+ 226+ 735C
+ 227+ 735C              ; ----- ----- ----- -----
+ 228+ 735C              ; ----- ----- ----- -----
+ 229+ 735C
+ 230+ 735C              ;   Album_de_fotos_1 Contiene un frame completo que hay que volcar en Album_de_fotos.
+ 231+ 735C              ;   Actualiza (End_Snapshot).
+ 232+ 735C
+ 233+ 735C 2A 24 89         ld hl,(End_Snapshot_1)      ; Final, (origen).
+ 234+ 735F 01 54 70         ld bc,Album_de_fotos_1      ; Origen.
+ 235+ 7362 11 00 70         ld de,Album_de_fotos        ; Destino.
+ 236+ 7365
+ 237+ 7365 CD 16 74         call Limpia_album
+ 238+ 7368
+ 239+ 7368              ;   Calculamos (End_Snapshot)
+ 240+ 7368
+ 241+ 7368 A7               and a
+ 242+ 7369 ED 4A            adc hl,bc
+ 243+ 736B 22 1E 89         ld (End_Snapshot),hl
+ 244+ 736E
+ 245+ 736E              ;   Limpiamos Album_de_fotos_1.
+ 246+ 736E
+ 247+ 736E 2A 24 89         ld hl,(End_Snapshot_1)
+ 248+ 7371 01 54 70         ld bc,Album_de_fotos_1
+ 249+ 7374 11 55 70         ld de,Album_de_fotos_1+1
+ 250+ 7377 AF               xor a
+ 251+ 7378 02               ld (bc),a
+ 252+ 7379
+ 253+ 7379 CD 16 74         call Limpia_album
+ 254+ 737C
+ 255+ 737C 21 00 00         ld hl,0
+ 256+ 737F 22 24 89         ld (End_Snapshot_1),hl        ; Limpia (End_Snapshot_1).
+ 257+ 7382
+ 258+ 7382              ; ----- ----- ----- -----
+ 259+ 7382
+ 260+ 7382              ;   Album_de_fotos_2. Contiene Frame completo ???
+ 261+ 7382
+ 262+ 7382 3A 3C 89     1 ld a,(Semaforo)
+ 263+ 7385 CB 57            bit 2,a
+ 264+ 7387 20 15            jr nz,5F
+ 265+ 7389
+ 266+ 7389              ;   Album_de_fotos_2 NO contiene un FRAME completo. Contiene datos ???
+ 267+ 7389
+ 268+ 7389 21 A9 70         ld hl,Album_de_fotos_2+1
+ 269+ 738C 7E               ld a,(hl)
+ 270+ 738D A7               and a
+ 271+ 738E 20 06            jr nz,9F
+ 272+ 7390
+ 273+ 7390              ;   Album_de_fotos_3 y Album_de_fotos_2 están vacios !!!!!
+ 274+ 7390              ;   Hay que situar (Stack_snapshot) al comienzo de Album_de_fotos_2 y actualizar (Semaforo).
+ 275+ 7390
+ 276+ 7390 18 FE            jr $
+ 277+ 7392
+ 278+ 7392 CD 23 74         call Actualiza_punteros_de_albumes
+ 279+ 7395 C9               ret
+ 280+ 7396
+ 281+ 7396              ;   Album_de_fotos_3 no está completo.
+ 282+ 7396
+ 283+ 7396 21 3D 89     9 ld hl,Ctrl_Semaforo
+ 284+ 7399 CB C6            set 0,(hl)                   ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
+ 285+ 739B CB D6            set 2,(hl)                   ; _ (Puntero_indice_End_Snapshot). Hay que completar el álbum.
+ 286+ 739D C9               ret
+ 287+ 739E
+ 288+ 739E 21 A9 70     5 ld hl,Album_de_fotos_2+1
+ 289+ 73A1 7E               ld a,(hl)
+ 290+ 73A2 A7               and a
+ 291+ 73A3 28 03            jr z,2F                     ; Album_de_fotos_2 y Album_de_fotos_1 están vacíos. Saltamos a analizar Album_de_fotos_3.
+ 292+ 73A5
+ 293+ 73A5              ; ----- ----- ----- -----
+ 294+ 73A5              ; ----- ----- ----- -----
+ 295+ 73A5              ; ----- ----- ----- -----
+ 296+ 73A5
+ 297+ 73A5              ;   Album_de_fotos_2 contiene un frame completo.
+ 298+ 73A5              ;   Volcamos los datos de Album_de_fotos_2 a Album_de_fotos_1 y limpiamos Album_de_fotos_2.
+ 299+ 73A5
+ 300+ 73A5 CD EF 73         call Album2_a_Album1
+ 301+ 73A8
+ 302+ 73A8              ;   Album_de_fotos_2 está vacío y (End_Snapshot_2)="0".
+ 303+ 73A8              ;   Album_de_fotos_3. Contiene un frame completo ???
+ 304+ 73A8
+ 305+ 73A8 3A 3C 89     2 ld a,(Semaforo)
+ 306+ 73AB CB 5F            bit 3,a
+ 307+ 73AD 20 13            jr nz,6F
+ 308+ 73AF
+ 309+ 73AF              ;   Album_de_fotos_3 NO contiene un FRAME completo. Contiene datos ???
+ 310+ 73AF
+ 311+ 73AF 21 FD 70         ld hl,Album_de_fotos_3+1
+ 312+ 73B2 7E               ld a,(hl)
+ 313+ 73B3 A7               and a
+ 314+ 73B4 20 04            jr nz,8F
+ 315+ 73B6
+ 316+ 73B6              ;   Album_de_fotos_3 y Album_de_fotos_2 están vacios !!!!!
+ 317+ 73B6              ;   Hay que situar (Stack_snapshot) al comienzo de Album_de_fotos_2 y actualizar (Semaforo).
+ 318+ 73B6
+ 319+ 73B6 CD 23 74         call Actualiza_punteros_de_albumes
+ 320+ 73B9 C9               ret
+ 321+ 73BA
+ 322+ 73BA              ;   Album_de_fotos_3 no está completo.
+ 323+ 73BA
+ 324+ 73BA 21 3D 89     8 ld hl,Ctrl_Semaforo
+ 325+ 73BD CB C6            set 0,(hl)                   ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
+ 326+ 73BF CB CE            set 1,(hl)
+ 327+ 73C1 C9               ret                          ; _ (Puntero_indice_End_Snapshot). Hay que completar el álbum.
+ 328+ 73C2
+ 329+ 73C2              ;   Album_de_fotos_3 contiene un FRAME completo. Datos ???
+ 330+ 73C2
+ 331+ 73C2 21 FD 70     6 ld hl,Album_de_fotos_3+1
+ 332+ 73C5 7E               ld a,(hl)
+ 333+ 73C6 A7               and a
+ 334+ 73C7 C8               ret z                        ; Album_de_fotos_3 y Album_de_fotos_2 están vacíos. RET.
+ 335+ 73C8
+ 336+ 73C8              ; ----- ----- ----- -----
+ 337+ 73C8              ; ----- ----- ----- -----
+ 338+ 73C8              ; ----- ----- ----- -----
+ 339+ 73C8
+ 340+ 73C8              ;   Volcamos los datos del Album_de_fotos_3 a Album_de_fotos_2 y limpiamos Album_de_fotos_3.
+ 341+ 73C8
+ 342+ 73C8 2A 2C 89     Album3_a_Album2 ld hl,(End_Snapshot_3)      ; Final, (origen).
+ 343+ 73CB 01 FC 70         ld bc,Album_de_fotos_3                  ; Origen.
+ 344+ 73CE 11 A8 70         ld de,Album_de_fotos_2                  ; Destino.
+ 345+ 73D1
+ 346+ 73D1 CD 16 74         call Limpia_album
+ 347+ 73D4
+ 348+ 73D4              ;   Actualizamos (End_Snapshot_2):
+ 349+ 73D4
+ 350+ 73D4 A7               and a
+ 351+ 73D5 ED 4A            adc hl,bc
+ 352+ 73D7 22 28 89         ld (End_Snapshot_2),hl
+ 353+ 73DA
+ 354+ 73DA              ;   Limpiamos Album_de_fotos_3.
+ 355+ 73DA
+ 356+ 73DA 2A 2C 89         ld hl,(End_Snapshot_3)
+ 357+ 73DD 01 FC 70         ld bc,Album_de_fotos_3
+ 358+ 73E0 11 FD 70         ld de,Album_de_fotos_3+1
+ 359+ 73E3 AF               xor a
+ 360+ 73E4 02               ld (bc),a
+ 361+ 73E5 CD 16 74         call Limpia_album
+ 362+ 73E8
+ 363+ 73E8              ;   Hemos pasado los datos de Album_de_fotos_3 a Album_de_fotos_2.
+ 364+ 73E8              ;   Actualiza (End_Snapshot_3) y (Semaforo).
+ 365+ 73E8
+ 366+ 73E8 21 00 00         ld hl,0
+ 367+ 73EB 22 2C 89         ld (End_Snapshot_3),hl                   ; Limpia (End_Snapshot_3).
+ 368+ 73EE
+ 369+ 73EE C9               ret
+ 370+ 73EF
+ 371+ 73EF 2A 28 89     Album2_a_Album1 ld hl,(End_Snapshot_2)       ; Final, (origen).
+ 372+ 73F2 01 A8 70         ld bc,Album_de_fotos_2                   ; Origen.
+ 373+ 73F5 11 54 70         ld de,Album_de_fotos_1                   ; Destino.
+ 374+ 73F8 CD 16 74         call Limpia_album
+ 375+ 73FB
+ 376+ 73FB              ;   Actualizamos (End_Snapshot_1):
+ 377+ 73FB
+ 378+ 73FB A7               and a
+ 379+ 73FC ED 4A            adc hl,bc
+ 380+ 73FE 22 24 89         ld (End_Snapshot_1),hl
+ 381+ 7401
+ 382+ 7401              ;   Limpiamos Album_de_fotos_2.
+ 383+ 7401
+ 384+ 7401 2A 28 89         ld hl,(End_Snapshot_2)
+ 385+ 7404 01 A8 70         ld bc,Album_de_fotos_2
+ 386+ 7407 11 A9 70         ld de,Album_de_fotos_2+1
+ 387+ 740A AF               xor a
+ 388+ 740B 02               ld (bc),a
+ 389+ 740C CD 16 74         call Limpia_album
+ 390+ 740F 21 00 00         ld hl,0
+ 391+ 7412 22 28 89         ld (End_Snapshot_2),hl      ; Limpia (End_Snapshot_2).
+ 392+ 7415 C9               ret
+ 393+ 7416
+ 394+ 7416
+ 395+ 7416              ; ----------------------------------------------------
+ 396+ 7416              ;
+ 397+ 7416              ;   10/8/23
+ 398+ 7416              ;
+ 399+ 7416              ;   Limpia o transfiere el contenido de un album_de_fotos o disparos a otro álbum.
+ 400+ 7416              ;
+ 401+ 7416              ;   INPUTS: HL ..... Contiene el nº de bytes a borrar.
+ 402+ 7416              ;           BC ..... Dirección de inicio del álbum.
+ 403+ 7416              ;           DE ..... Dirección de inicio del álbum. +1
+ 404+ 7416
+ 405+ 7416              ;    ld hl,(End_Snapshot)
+ 406+ 7416              ;    ld bc,Album_de_fotos
+ 407+ 7416              ;    ld de,Album_de_fotos+1
+ 408+ 7416
+ 409+ 7416              ;   MODIFICA: A,HL,BC y DE.
+ 410+ 7416
+ 411+ 7416              Limpia_album
+ 412+ 7416 D5               push de                     ; Guardo DESTINO.
+ 413+ 7417 C5               push bc                     ; Guardo ORIGEN.
+ 414+ 7418 ED 42            sbc hl,bc
+ 415+ 741A 4D               ld c,l
+ 416+ 741B 44               ld b,h
+ 417+ 741C E1               pop hl
+ 418+ 741D C5               push bc
+ 419+ 741E ED B0            ldir
+ 420+ 7420 C1               pop bc                      ; Esta cantidad la utilizaré para calcular (End_Snapshot_X), _
+ 421+ 7421 E1               pop hl                      ; _ al salir de la rutina, (cuando estamos pasando datos de un álbum_
+ 422+ 7422 C9               ret                         ; _ a otro).
+ 423+ 7423
+ 424+ 7423              ; --------------------------------------------------------------------------------------------
+ 425+ 7423              ;
+ 426+ 7423              ;   20/10/23
+ 427+ 7423
+ 428+ 7423              ;
+ 429+ 7423
+ 430+ 7423              Actualiza_punteros_de_albumes
+ 431+ 7423
+ 432+ 7423 2A 30 89         ld hl,(Puntero_indice_album_de_fotos)
+ 433+ 7426 2B               dec hl
+ 434+ 7427 2B               dec hl
+ 435+ 7428 22 30 89         ld (Puntero_indice_album_de_fotos),hl
+ 436+ 742B
+ 437+ 742B 2A 34 89         ld hl,(Puntero_indice_End_Snapshot)
+ 438+ 742E 2B               dec hl
+ 439+ 742F 2B               dec hl
+ 440+ 7430 22 34 89         ld (Puntero_indice_End_Snapshot),hl
+ 441+ 7433 CD 80 8C         call Extrae_address
+ 442+ 7436 22 38 89         ld (Puntero_de_End_Snapshot),hl
+ 443+ 7439
+ 444+ 7439 C9               ret
+ 445+ 743A
 # file closed: Guarda_foto_registros.asm
-1644  7413
-1645  7413              	SAVESNA "Pruebas.sna", START
-1646  7413
-1647  7413
-1648  7413
-1649  7413
-# file closed: Banco_de_Pruebas.asm
+1644  743A
+1645  743A              	SAVESNA "Pruebas.sna", START
+1646  743A
+1647  743A
+1648  743A
+1649  743A
+# file closed: Banco_de_pruebas.asm

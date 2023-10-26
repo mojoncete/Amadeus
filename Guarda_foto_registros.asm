@@ -28,6 +28,7 @@
 
 Guarda_foto_registros 
 
+    di
     ld (Stack),sp                                 ; Guardo SP en (Stack).
 
 ; En 1er lugar guardaremos las variables de borrado del siguiente cuadro.
@@ -92,6 +93,7 @@ Guarda_foto_registros
 
     ld (End_Snapshot_Amadeus),hl    
     ld sp,(Stack)
+    ei
     ret
 
 8 ld (Stack_snapshot),hl
@@ -106,7 +108,7 @@ Guarda_foto_registros
     ld (hl),e                                     ; _ contiene (Puntero_de_End_Snapshot). Esta dirección la utilizará la_
     inc hl                                        ; _ rutina [Gestiona_albumes_de_fotos] para copiar los datos de un_
     ld (hl),d                                     ; _ álbum a otro.
-
+    ei
     ret
 
 ; ------------------------------------------------
@@ -124,15 +126,37 @@ Guarda_foto_registros
 Gestiona_albumes_de_fotos 
 
 ; En 1er lugar consultamos el bit_0 de (Ctrl_Semaforo).
-; Si está a "1" significa que Album_de_fotos_3 no está completo.
+; Si está a "1" significa que Album_de_fotos_3 o Album_de_fotos_2 estaban incompletos.
 
     ld a,(Ctrl_Semaforo)
     bit 0,a
     jr z,7F
 
-; Album_de_fotos_3 completo ?????
+;   Álbum_2 vacío ?????
+
+    bit 1,a
+    jr nz,10F
+
+;   Álbum_1 vacío.
+
+; Album_de_fotos_2 completo ?????
 
     ld a,(Semaforo)
+    bit 2,a
+    jr z,$
+
+;! Debugggggggg (Revisar álbumes. Hay un fallo de pintado/borrado).
+
+    ld a,(Contador_de_frames_2)
+    ex af,af
+    ld a,(Contador_de_frames)
+    jr $
+
+    call Album2_a_Album1
+
+; Album_de_fotos_3 completo ?????
+
+10 ld a,(Semaforo)
     bit 3,a
     jr z,$
 
@@ -144,6 +168,8 @@ Gestiona_albumes_de_fotos
 
     ld hl,Ctrl_Semaforo     ; Hemos reordenado los álbumes. Inicializamos el bit_0 de (Ctrl_Semaforo).
     res 0,(hl)
+    res 1,(hl)
+    res 2,(hl)
 
     jr 7F
 
@@ -153,24 +179,6 @@ Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
 	ld hl,Semaforo
 	rrc (hl)
     ret
-
-;    call Album2_a_Album1
-
-;   1-1-0-X Distribución actual de los álbumes.
-
-;   Está el buffer lleno ???
-
-;    ld a,(Ctrl_1)
-;    bit 5,a
-;    jr $
-
-;    call Album3_a_Album2
-;    call Actualiza_punteros_de_albumes
-
-;    ld a,(Contador_de_frames_2)
-;    ex af,af'
-;    ld a,(Contador_de_frames)
-;    jr $
 
 ; #############################################################3
 
@@ -205,13 +213,6 @@ Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
 3 ld a,(Semaforo)
     bit 1,a
     jr nz,4F
-
-;   Album_de_fotos_1 no está completo.     
-
-;    ld hl,Semaforo
-;    set 4,(hl)                  ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
-;    res 1,(hl)
-;    ret                         ; _ (Puntero_indice_End_Snapshot). Hay que completar el álbum. 
 
     jr $
 
@@ -262,25 +263,27 @@ Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
     bit 2,a
     jr nz,5F
 
-;   Album_de_fotos_2 no está completo.     
+;   Album_de_fotos_2 NO contiene un FRAME completo. Contiene datos ???
 
-;   Ha sido reestructurado ???
+    ld hl,Album_de_fotos_2+1
+    ld a,(hl)
+    and a
+    jr nz,9F                        
 
-;! Debugggggg
-    ld a,(Contador_de_frames_2)
-    ex af,af'
-    ld a,(Contador_de_frames)
+;   Album_de_fotos_3 y Album_de_fotos_2 están vacios !!!!!
+;   Hay que situar (Stack_snapshot) al comienzo de Album_de_fotos_2 y actualizar (Semaforo).
+
     jr $
- 
-;    bit 5,a
-;    ret nz
 
-;    ld hl,Semaforo
-;    set 4,(hl)                  ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
-;    set 6,(hl)
-;    ret
+    call Actualiza_punteros_de_albumes
+    ret
+    
+;   Album_de_fotos_3 no está completo.     
 
-;   Album_de_fotos_2 contiene un FRAME completo. Datos ???.
+9 ld hl,Ctrl_Semaforo
+    set 0,(hl)                   ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
+    set 2,(hl)                   ; _ (Puntero_indice_End_Snapshot). Hay que completar el álbum. 
+    ret
 
 5 ld hl,Album_de_fotos_2+1
     ld a,(hl)
@@ -303,8 +306,7 @@ Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
     bit 3,a
     jr nz,6F
 
-;   Album_de_fotos_3 no contiene un FRAME completo, pero ...
-;   Contiene datos ???
+;   Album_de_fotos_3 NO contiene un FRAME completo. Contiene datos ???
 
     ld hl,Album_de_fotos_3+1
     ld a,(hl)
@@ -315,15 +317,13 @@ Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
 ;   Hay que situar (Stack_snapshot) al comienzo de Album_de_fotos_2 y actualizar (Semaforo).
 
     call Actualiza_punteros_de_albumes
-
-    jr $
-
     ret
     
 ;   Album_de_fotos_3 no está completo.     
 
 8 ld hl,Ctrl_Semaforo
     set 0,(hl)                   ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
+    set 1,(hl)
     ret                          ; _ (Puntero_indice_End_Snapshot). Hay que completar el álbum. 
                       
 ;   Album_de_fotos_3 contiene un FRAME completo. Datos ???
