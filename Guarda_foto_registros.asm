@@ -142,21 +142,8 @@ Gestiona_albumes_de_fotos
     call Album3_a_Album2    ;   X-X-X-0
     call Modifica_Stack_snapshot
 
-
-;;! Debugggggg
-;    ld a,(Contador_de_frames_2)
-;    ex af,af'
-;    ld a,(Contador_de_frames)
- ;   jr $
-
-;
-; Tenemos completos:
-
-;   Album_de_fotos
-;   Album_de_fotos_1
-;   Album_de_fotos_2
-
-;   (Stack_snapshot) está situado al principio de Album_de_fotos_3, (que estará vacío).
+    ld hl,Ctrl_Semaforo     ; Hemos reordenado los álbumes. Inicializamos el bit_0 de (Ctrl_Semaforo).
+    res 0,(hl)
 
     jr 7F
 
@@ -166,8 +153,6 @@ Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
 	ld hl,Semaforo
 	rrc (hl)
     ret
-
-
 
 ;    call Album2_a_Album1
 
@@ -318,23 +303,23 @@ Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
     bit 3,a
     jr nz,6F
 
-; Venimos de reorganizar los álbumes ???
+;   Album_de_fotos_3 no contiene un FRAME completo, pero ...
+;   Contiene datos ???
 
-    ld a,(Ctrl_Semaforo)
-    bit 0,a
-    jr z,8F
+    ld hl,Album_de_fotos_3+1
+    ld a,(hl)
+    and a
+    jr nz,8F                        
 
-; Venimos de REORGANIZAR los álbumes. X-X-0-0    
-; Hay que situar (Stack_snapshot) al comienzo de Album_de_fotos_2, actualizar (Semaforo) y inicializar el bit_0 de (Ctrl_Semaforo).
+;   Album_de_fotos_3 y Album_de_fotos_2 están vacios !!!!!
+;   Hay que situar (Stack_snapshot) al comienzo de Album_de_fotos_2 y actualizar (Semaforo).
 
     call Actualiza_punteros_de_albumes
-    call Modifica_Stack_snapshot
-    ld hl,Ctrl_Semaforo
-    res 0,(hl)
-    set 7,(hl)
+
+    jr $
+
     ret
     
-
 ;   Album_de_fotos_3 no está completo.     
 
 8 ld hl,Ctrl_Semaforo

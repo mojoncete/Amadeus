@@ -1556,10 +1556,8 @@ Gestiona_entidades
 ;	Album incompleto ?????
 ;	Si es así, salimos de la rutina sin modificar punteros. Tenemos que terminar de pinter el FRAME.
 
-	ld a,(Ctrl_Semaforo)
-	bit 7,a
-	jr nz,1F
 
+	ld a,(Ctrl_Semaforo)
 	bit 0,a 
 	ret nz
 
@@ -1570,9 +1568,7 @@ Gestiona_entidades
 
 	ret
 
-1 res 7,a												; Salimos sin modificar punteros. 
-	ld (Ctrl_Semaforo),a
-	ret
+
 
 ; -----------------------------------------------------------------------------------
 
