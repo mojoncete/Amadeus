@@ -13,7 +13,7 @@
 
 ; Guardamos SP.
 
-	ld (Stack_3),sp
+FRAME ld (Stack_3),sp
 
 ; Guardo registros.
 
@@ -42,7 +42,7 @@
 ; Pintamos y actualizamos los álbumes de fotos, (entidades).
 ; Pintamos Amadeus.
 
-	call Pinta_entidades
+2 call Pinta_entidades
 ;	call Pinta_Amadeus
 	call Gestiona_entidades
 ;	call Gestiona_Amadeus
@@ -82,7 +82,7 @@
 	ld sp,(Stack_3)
 
 	ei
-	reti									 
+	ret									 
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
 
@@ -1515,20 +1515,23 @@ Repone_datos_de_borrado_Amadeus
 
 ; ----------------------------------------------------------------------
 ;
-;	18/9/23
+;	27/10/23
 ;
 
 ;	Si se ha producido movimiento de la entidad en curso, esta rutina vuelca las `Variables_de_borrado´ en el_
 ;	_ Album_de_fotos correspondiente.
 
-;	DI.
+;	El proceso de "escritura en los álbumes de fotos" no puede verse interrumpido por la rutina FRAME, (di/ei)_
+;	_ durante el proceso de escritura.
 
 Repone_datos_de_borrado
 
+	di
 	ld de,(Stack_snapshot)
 	ld hl,Variables_de_borrado
 	ld bc,6
 	ldir
+	ei
 
 	ex de,hl
 	ld (Stack_snapshot),hl

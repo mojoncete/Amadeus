@@ -1,6 +1,6 @@
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
-;	4/9/23
+;	27/10/23
 ;
 ;	Instrucciones donde interviene el Stack Pointer, (SP).
 
@@ -28,7 +28,11 @@
 
 Guarda_foto_registros 
 
+;   El proceso de "escritura en los álbumes de fotos" no puede verse interrumpido por la rutina FRAME, (di/ei)_
+;   _ durante el proceso de escritura.
+
     di
+
     ld (Stack),sp                                 ; Guardo SP en (Stack).
 
 ; En 1er lugar guardaremos las variables de borrado del siguiente cuadro.
@@ -139,7 +143,7 @@ Gestiona_albumes_de_fotos
 
 ;   Álbum_1 vacío.
 
-; Album_de_fotos_2 completo ?????
+; Album_de_fotos_1 está vacío. Se ha completado Album_de_fotos_2 para volcar foto a Álbum_1 ???
 
     ld a,(Semaforo)
     bit 2,a
@@ -147,14 +151,14 @@ Gestiona_albumes_de_fotos
 
 ;! Debugggggggg (Revisar álbumes. Hay un fallo de pintado/borrado).
 
-    ld a,(Contador_de_frames_2)
-    ex af,af
-    ld a,(Contador_de_frames)
-    jr $
+;    ld a,(Contador_de_frames_2)
+;    ex af,af
+;    ld a,(Contador_de_frames)
+;    jr $
 
     call Album2_a_Album1
 
-; Album_de_fotos_3 completo ?????
+; Album_de_fotos_2 está vacío. Se ha completado el buffer ???. Está Album_de_fotos_3 completo??
 
 10 ld a,(Semaforo)
     bit 3,a
