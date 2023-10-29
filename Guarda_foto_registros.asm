@@ -127,7 +127,7 @@ Guarda_foto_registros
 
     org $72ec 
 
-Gestiona_albumes_de_fotos 
+Gestiona_albumes_de_fotos ; 12
 
 ; En 1er lugar consultamos el bit_0 de (Ctrl_Semaforo).
 ; Si está a "1" significa que Album_de_fotos_3 o Album_de_fotos_2 estaban incompletos.
@@ -136,9 +136,37 @@ Gestiona_albumes_de_fotos
     bit 0,a
     jr z,7F
 
+; Doble recolocación ???. Album_de_fotos_2 y Album_de_fotos_3 vacíos ???
+
+; Último FRAME impreso, vacío ????????????????? 
+ 
+    bit 4,a   
+    jr nz,$
+
+    bit 3,a
+    jr z,13F
+
+; Volcamos Álbum_3 a Álbum_2
+;    ""    Álbum_2 a Álbum_1
+; Situamos (Stack_snapshot) al comienzo de Album_de_fotos_2.
+; Actualizamos (Semaforo) 
+; Inicializamos (Ctrl_Semaforo)
+; Saltamos a 7F.
+
+    call Album3_a_Album2
+    call Album2_a_Album1
+    call Actualiza_punteros_de_albumes
+    call Modifica_Stack_snapshot
+	ld hl,Semaforo
+	rrc (hl)
+    xor a
+    ld (Ctrl_Semaforo),a
+    jr 7F
+    
+
 ;   Álbum_2 vacío ?????
 
-    bit 1,a
+13 bit 1,a
     jr nz,10F
 
 ;   Álbum_1 vacío.
@@ -149,25 +177,27 @@ Gestiona_albumes_de_fotos
     bit 2,a
     jr z,$
 
-;! Debugggggggg (Revisar álbumes. Hay un fallo de pintado/borrado).
-
-;    ld a,(Contador_de_frames_2)
-;    ex af,af
-;    ld a,(Contador_de_frames)
-;    jr $
-
     call Album2_a_Album1
 
 ; Album_de_fotos_2 está vacío. Se ha completado el buffer ???. Está Album_de_fotos_3 completo??
 
 10 ld a,(Semaforo)
     bit 3,a
-    jr z,$
+    jr nz,11F
+
+; Album_de_fotos_2 está vacío, (sus datos se han volcado a Album_de_fotos_1). Album_de_fotos_3 está incompleto por lo que no vamos a poder hacer el trasbase de datos del álbum_3 al álbum_2.
+; Activaremos el bit_3 de (Ctrl_Semaforo) para indicar este hecho.
+
+    ld hl,Ctrl_Semaforo
+    set 3,(hl)
+    res 0,(hl)
+    res 2,(hl)
+    jr 7F   
 
 ; Album_de_fotos_3 contiene un FRAME completo.
 ; Volcamos la imagen de Album_de_fotos_3 a Album_de_fotos_2
 
-    call Album3_a_Album2    ;   X-X-X-0
+11 call Album3_a_Album2     ;   X-X-X-0
     call Modifica_Stack_snapshot
 
     ld hl,Ctrl_Semaforo     ; Hemos reordenado los álbumes. Inicializamos el bit_0 de (Ctrl_Semaforo).
@@ -191,12 +221,15 @@ Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
 
 ;   Album_de_fotos. Contiene datos ???
 
+;! Ordena_Albumes 
+
 7 ld hl,Album_de_fotos+1
     ld a,(hl)
     and a
     jr z,3F                     ; Album_de_fotos está vacío. NO HAY QUE LIMPIARLO.
 
-;   Hemos impreso Album_de_fotos. Limpiamos el álbum y actualizamos (End_Snapshot).
+;   Hemos impreso Album_de_fotos. 
+;   Limpiamos el álbum y actualizamos (End_Snapshot). !!!!!!!!!!!!!!
 
     ld hl,(End_Snapshot)
     ld bc,Album_de_fotos
@@ -218,8 +251,12 @@ Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
     bit 1,a
     jr nz,4F
 
-    jr $
+;! Buffer vacío !!!!!!!!!!!!!!!!!!!!!!!!!
 
+    ld hl,Ctrl_Semaforo
+    set 0,(hl)
+    set 4,(hl)
+    ret
 
 ;   Album_de_fotos_1 contiene un Frame completo. Contiene datos ???
 
@@ -261,9 +298,19 @@ Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
 
 ; ----- ----- ----- -----
 
-;   Album_de_fotos_2. Contiene Frame completo ???
+;   Album_de_fotos_2. 
 
-1 ld a,(Semaforo)
+1 ld a,(Ctrl_Semaforo)
+    bit 3,a
+    jr nz,8F
+
+;   El bit_3 de (Ctrl_Semaforo) activo, indica que después de reestructurar, Album_de_fotos_2 está vacío por que Album_de_fotos_3 no está completo.
+;   Tenemos que salir de la rutina sin modificar punteros para completar Album_de_fotos_3.
+;   Activaremos el bit_0 y el bit_1 de (Ctrl_Semaforo) para volver a reestructurar y volcar sus datos a Album_de_fotos_2.
+
+;   Contiene Frame completo ???
+
+12 ld a,(Semaforo)
     bit 2,a
     jr nz,5F
 
@@ -277,9 +324,11 @@ Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
 ;   Album_de_fotos_3 y Album_de_fotos_2 están vacios !!!!!
 ;   Hay que situar (Stack_snapshot) al comienzo de Album_de_fotos_2 y actualizar (Semaforo).
 
-    jr $
-
     call Actualiza_punteros_de_albumes
+
+;! Debuggggggggggggggggggggggggggggggg 
+;    jr $
+
     ret
     
 ;   Album_de_fotos_3 no está completo.     
