@@ -249,8 +249,9 @@ Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
 
 ;! Buffer vacío !!!!!!!!!!!!!!!!!!!!!!!!!
 
+    jr $
+
     ld hl,Ctrl_Semaforo
-    set 0,(hl)
     set 4,(hl)
     ret
 

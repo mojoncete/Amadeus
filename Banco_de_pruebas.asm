@@ -41,7 +41,18 @@ FRAME ld (Stack_3),sp
 
 ; Pintamos y actualizamos los álbumes de fotos, (entidades).
 
-	call Pinta_entidades
+;! Debuggggggggggggggggggg
+
+;	ld a,(Contador_de_frames_2)
+;	cp 1
+;	jr nz,1F
+;	ex af,af
+;	ld a,(Contador_de_frames)
+;	cp $b9 ;	$c1 es el último FRAME que se ve bien.
+;	jr z,$
+;	jr nc,$
+
+1 call Pinta_entidades
 ;	call Pinta_Amadeus
 	call Gestiona_entidades
 ;	call Gestiona_Amadeus
