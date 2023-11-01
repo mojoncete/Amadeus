@@ -40,9 +40,8 @@ FRAME ld (Stack_3),sp
 ;	call Guarda_parametros_DRAW
 
 ; Pintamos y actualizamos los álbumes de fotos, (entidades).
-; Pintamos Amadeus.
 
-2 call Pinta_entidades
+	call Pinta_entidades
 ;	call Pinta_Amadeus
 	call Gestiona_entidades
 ;	call Gestiona_Amadeus
@@ -64,7 +63,7 @@ FRAME ld (Stack_3),sp
 
 ;! Debuggg
 
-1 pop iy
+	pop iy
 	pop ix
 	pop af
 	pop bc
@@ -442,9 +441,7 @@ START
 ; INICIALIZACIÓN.
 
 	call Inicializa_Punteros_de_nivel					 ; Inicializa. 1er NIVEL.
-
 4 call Prepara_cajas 									 ; (Niveles.asm).
-
 	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en la 1ª entidad del_
 ;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.
 	call Inicia_punteros_de_albumes_y_malotes			 ; Iniciamos los punteros de los álbumes de fotos y cajas de_
@@ -509,7 +506,6 @@ START
 	ld hl,Ctrl_1
 	res 3,(hl)
 	jr Main
-
 
 ; En este punto tenemos el 1er FRAME preparado. Los datos del FRAME se encuentran en Album_de_fotos.
 ; Después del guardado de cada FRAME hemos de llamar a [Avanza_puntero_de_album_de_fotos_y_malotes]_
@@ -878,12 +874,15 @@ Mov_Amadeus
 	ret													
 
 ; -----------------------------------------------------------------------------------
+;
+;	01/11/23
 
 Inicia_entidad	call Inicia_Puntero_objeto
 	call Recompone_posicion_inicio
 	call Draw
 	call Guarda_foto_registros
-;	call Guarda_datos_de_borrado
+	di													; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
+;														; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
 	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	ret
 
@@ -980,7 +979,6 @@ Avanza_puntero_de_album_de_fotos_de_entidades
 ; Hemos completado de guardar en el álbum correspondiente la foto con todas las entidades.
 ; Estamos en el último álbum del índice???.
 ; 
-
 	ld hl,(Puntero_indice_album_de_fotos)
 	ld bc,Indice_album_de_fotos+6
 	and a
@@ -1559,9 +1557,17 @@ Gestiona_entidades
 ;	Album incompleto ?????
 ;	Si es así, salimos de la rutina sin modificar punteros. Tenemos que terminar de pinter el FRAME.
 
-
 	ld a,(Ctrl_Semaforo)
-	bit 0,a 
+	bit 4,a
+	jr z,1F
+
+;! Buffer vacío. Inicializar (Ctrl_Semaforo) y salir sin modificar punteros.
+
+	xor a
+	ld (Ctrl_Semaforo),a
+	ret
+
+1 bit 0,a 
 	ret nz
 
 ; El buffer estaba completo y hemos pintado el frame y desplazado los álbumes.
