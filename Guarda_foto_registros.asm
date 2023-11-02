@@ -247,9 +247,10 @@ Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
     bit 1,a
     jr nz,4F
 
-;! Buffer vacío !!!!!!!!!!!!!!!!!!!!!!!!!
+;! Buffer vacío. El siguiente FRAME no se puede preparar. !!!!!!!!!!!!!!!!!!!!!!!!!
+;! Album_de_fotos_1 está incompleto.
 
-    jr $
+;    jr $
 
     ld hl,Ctrl_Semaforo
     set 4,(hl)
@@ -296,7 +297,7 @@ Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
     call Actualiza_punteros_de_albumes
     ret
     
-;   Album_de_fotos_3 no está completo.     
+;   Album_de_fotos_2 no está completo pero contiene datos.     
 
 9 ld hl,Ctrl_Semaforo
     set 0,(hl)                   ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
