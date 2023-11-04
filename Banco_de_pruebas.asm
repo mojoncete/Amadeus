@@ -48,7 +48,7 @@ FRAME ld (Stack_3),sp
 	jr nz,1F
 	ex af,af
 	ld a,(Contador_de_frames)
-	cp $51 ;	$c1 es el último FRAME que se ve bien.
+	cp $5d ;	$c1 es el último FRAME que se ve bien.
 	jr z,$
 	jr nc,$
 

@@ -117,7 +117,7 @@ Guarda_foto_registros
 
 ; ------------------------------------------------
 ;
-;   19/10/23
+;   4/11/23
 ;
 ;   La rutina estará situada justo después de:
 ;   Almacen_de_parametros_DRAW equ $72ac ; ($72ac - $72eb) ; 61 bytes.
@@ -136,9 +136,7 @@ Gestiona_albumes_de_fotos ; 14
     bit 0,a
     jr z,7F
 
-; Doble recolocación ???. Album_de_fotos_2 y Album_de_fotos_3 vacíos ???
-
-; Doble recolocación ???. Album_de_fotos_2 y Album_de_fotos_3 vacíos ???
+; Doble recolocación ???. Album_de_fotos_2 y Album_de_fotos_1 vacíos ???
 
     bit 3,a
     jr z,13F
