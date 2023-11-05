@@ -49,7 +49,7 @@
   48  AA1A 20 0A        	jr nz,1F
   49  AA1C 08           	ex af,af
   50  AA1D 3A 53 89     	ld a,(Contador_de_frames)
-  51  AA20 FE 5D        	cp $5d ;	$c1 es el último FRAME que se ve bien.
+  51  AA20 FE BA        	cp $ba ;	$c1 es el último FRAME que se ve bien.
   52  AA22 28 FE        	jr z,$
   53  AA24 30 FE        	jr nc,$
   54  AA26
@@ -65,39 +65,30 @@
   64  AA2F              ;	call Recupera_parametros_DRAW
   65  AA2F
   66  AA2F              ;! Debuggg
-  67  AA2F              ;	ld a,(Contador_de_frames_2)
-  68  AA2F              ;	cp 1
-  69  AA2F              ;	jr nz,1F
-  70  AA2F              ;	ld a,(Contador_de_frames)
-  71  AA2F              ;	cp $50	; $56 Último frame que no falla.
-  72  AA2F              ;	jr z,$
-  73  AA2F              ;	jr nc,$
-  74  AA2F
-  75  AA2F              ;! Debuggg
-  76  AA2F
-  77  AA2F FD E1        	pop iy
-  78  AA31 DD E1        	pop ix
-  79  AA33 F1           	pop af
-  80  AA34 C1           	pop bc
-  81  AA35 D1           	pop de
-  82  AA36 E1           	pop hl
-  83  AA37 D9           	exx
-  84  AA38 C1           	pop bc
-  85  AA39 D1           	pop de
-  86  AA3A E1           	pop hl
-  87  AA3B 08           	ex af,af'
-  88  AA3C F1           	pop af
-  89  AA3D 08           	ex af,af'
-  90  AA3E D9           	exx
-  91  AA3F
-  92  AA3F ED 7B 1A 89  	ld sp,(Stack_3)
-  93  AA43
-  94  AA43 FB           	ei
-  95  AA44 C9           	ret
-  96  AA45
-  97  AA45              ; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
-  98  AA45
-  99  AA45              	include "Sprites_e_indices.asm"
+  67  AA2F
+  68  AA2F FD E1        	pop iy
+  69  AA31 DD E1        	pop ix
+  70  AA33 F1           	pop af
+  71  AA34 C1           	pop bc
+  72  AA35 D1           	pop de
+  73  AA36 E1           	pop hl
+  74  AA37 D9           	exx
+  75  AA38 C1           	pop bc
+  76  AA39 D1           	pop de
+  77  AA3A E1           	pop hl
+  78  AA3B 08           	ex af,af'
+  79  AA3C F1           	pop af
+  80  AA3D 08           	ex af,af'
+  81  AA3E D9           	exx
+  82  AA3F
+  83  AA3F ED 7B 1A 89  	ld sp,(Stack_3)
+  84  AA43
+  85  AA43 FB           	ei
+  86  AA44 C9           	ret
+  87  AA45
+  88  AA45              ; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
+  89  AA45
+  90  AA45              	include "Sprites_e_indices.asm"
 # file opened: Sprites_e_indices.asm
    1+ AA45              ; ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
    2+ AA45              ;
@@ -524,7 +515,7 @@
  275+ 850C
  276+ 850C
 # file closed: Sprites_e_indices.asm
- 100  850C              	include "Cajas_y_disparos.asm"
+  91  850C              	include "Cajas_y_disparos.asm"
 # file opened: Cajas_y_disparos.asm
    1+ 850C
    2+ 850C              ; Cajas de DRAW y disparos. Índices de disparos y cajas.
@@ -1005,7 +996,7 @@
  469+ 87B8 15 9D        	defw Indice_mov_Baile_de_BadSat				    ; (Puntero_indice_mov)
  470+ 87BA
 # file closed: Cajas_y_disparos.asm
- 101  87BA              	include "Niveles.asm"
+  92  87BA              	include "Niveles.asm"
 # file opened: Niveles.asm
    1+ 87BA              ; 13/05/23
    2+ 87BA
@@ -1239,1559 +1230,1559 @@
  217+ 88C6 47           	ld b,a
  218+ 88C7 C9           2 ret
 # file closed: Niveles.asm
+  93  88C8
+  94  88C8              ; ******************************************************************************************************************************************************************************************
+  95  88C8              ; Constantes.
+  96  88C8              ; ******************************************************************************************************************************************************************************************
+  97  88C8              ;
+  98  88C8              ; 4/9/23
+  99  88C8              ;
+ 100  88C8              ; Constantes generales.
+ 101  88C8              ;
  102  88C8
- 103  88C8              ; ******************************************************************************************************************************************************************************************
- 104  88C8              ; Constantes.
- 105  88C8              ; ******************************************************************************************************************************************************************************************
- 106  88C8              ;
- 107  88C8              ; 4/9/23
- 108  88C8              ;
- 109  88C8              ; Constantes generales.
- 110  88C8              ;
- 111  88C8
- 112  88C8              Sprite_vacio equ $f000
- 113  88C8              Centro_arriba equ $0160 								; Emplearemos estas constantes en la rutina de `recolocación´ del objeto:_
- 114  88C8              Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto en las dos primeras constantes_
- 115  88C8              Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
- 116  88C8              Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
- 117  88C8
- 118  88C8              Album_de_fotos equ $7000	;	(7000h - 7053h).		; En (Album_de_fotos) vamos a ir almacenando los valores_
- 119  88C8              ;                                   				    ; _de los registros y las llamadas a las rutinas de impresión.
- 120  88C8              ;                               				        ; De momento situamos este almacén en $7000. La capacidad del album será de 7 entidades.
- 121  88C8              Album_de_fotos_disparos equ $7150 ; (7150h - 71a3).		; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
- 122  88C8              ;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´.
- 123  88C8              ;
- 124  88C8              Album_de_fotos_1 equ $7054	; (7054h - 700a7).
- 125  88C8              Album_de_fotos_disparos_1 equ $71a4	; (71a4h - 71f7h).
- 126  88C8              Album_de_fotos_2 equ $70a8	; (70a8h - 70fbh).
- 127  88C8              Album_de_fotos_disparos_2 equ $71f8	; (71f8hh - 724bh).
- 128  88C8              Album_de_fotos_3 equ $70fc	; (70fch - 714fh).
- 129  88C8              Album_de_fotos_disparos_3 equ $724c	; (724ch - 729fh).
- 130  88C8
- 131  88C8              Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72abh) ; 12 bytes.
- 132  88C8              Almacen_de_parametros_DRAW equ $72ac ; ($72ac - $72eb) ; 61 bytes.
- 133  88C8
- 134  88C8
- 135  88C8
- 136  88C8              ; 54h es el espacio necesario en (Album_de_fotos) para 7 entidades/disparos en pantalla.
- 137  88C8
- 138  88C8              ; ******************************************************************************************************************************************************************************************
- 139  88C8              ; Variables.
- 140  88C8              ; ******************************************************************************************************************************************************************************************
- 141  88C8              ;
- 142  88C8              ; 28/07/23
- 143  88C8              ;
- 144  88C8              ; Variables de DRAW. (Motor principal).
- 145  88C8              ;
- 146  88C8              ; (Variables_de_borrado) *** (Variables_de_pintado).	8 Bytes.
- 147  88C8
- 148  88C8 00           Filas db 0												; Filas. [DRAW]
- 149  88C9 00           Columns db 0  											; Nº de columnas. [DRAW]
- 150  88CA 00 00        Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
- 151  88CC 00 00        Puntero_objeto defw 0									; Donde están los datos para pintar el Sprite.
- 152  88CE 00           Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
- 153  88CF 00           Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
- 154  88D0
- 155  88D0              ; ---------- ---------- ---------- ---------;      ;--------- ---------- ---------- ----------
- 156  88D0
- 157  88D0 00           CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos.
- 158  88D1              ; 														; El hecho de que este byte sea distinto de "0", indica que se ha modificado el nº de columnas del objeto.
- 159  88D1              ; 														; Cuando vamos a imprimir un Sprite en pantalla, la rutina de pintado consultará este byte para situar (Puntero_objeto). [Mov_left].
- 160  88D1 00           Attr db 0												; Atributos de la entidad:
- 161  88D2
- 162  88D2              ;	El formato: FBPPPIII (Flash, Brillo, Papel, Tinta).
- 163  88D2              ;
- 164  88D2              ;	COLORES: 0 ..... NEGRO
- 165  88D2              ;    		 1 ..... AZUL
- 166  88D2              ; 			 2 ..... ROJO
- 167  88D2              ;			 3 ..... MAGENTA
- 168  88D2              ; 			 4 ..... VERDE
- 169  88D2              ; 			 5 ..... CIAN
- 170  88D2              ;			 6 ..... AMARILLO
- 171  88D2              ; 			 7 ..... BLANCO
- 172  88D2
- 173  88D2 00 00        Indice_Sprite_der defw 0
- 174  88D4 00 00        Indice_Sprite_izq defw 0
- 175  88D6 00 00        Puntero_DESPLZ_der defw 0
- 176  88D8 00 00        Puntero_DESPLZ_izq defw 0
- 177  88DA
- 178  88DA 00 00        Posicion_inicio defw 0									; Dirección de pantalla donde aparece el objeto. [DRAW].
- 179  88DC 00           Cuad_objeto db 0										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
- 180  88DD
- 181  88DD              ; Variables de objeto. (Características).
- 182  88DD
- 183  88DD 00           Vel_left db 0 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
- 184  88DE 00           Vel_right db 0 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
- 185  88DF 00           Vel_up db 0 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
- 186  88E0 00           Vel_down db 0 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
- 187  88E1
- 188  88E1 00           Impacto db 0											; Si después del movimiento de la entidad, (Impacto) se coloca a "1",_
- 189  88E2              ;														; _ existen muchas posibilidades de que esta entidad haya colisionado con Amadeus.
- 190  88E2              ; 														; Hay que comprobar la posible colisión después de mover Amadeus. En este caso, (Impacto2)="3".
- 191  88E2 00 00 00...  Variables_de_borrado ds 6
- 192  88E8
- 193  88E8 00 00        Variables_de_pintado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
- 194  88EA 00 00        	defw 0
- 195  88EC 00 00        	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
- 196  88EE 00 00 00 00  	db 0,0,0,0
- 197  88F2
- 198  88F2              ; Variables de funcionamiento de las rutinas de movimiento. (Mov_left), (Mov_right), (Mov_up), (Mov_down).
- 199  88F2
- 200  88F2 00           Ctrl_0 db 0 											; Byte de control. A través de este byte de control. Las rutinas de desplazamiento: [Mov_right], [Mov_left], [Mov_up] y [Mov_down],_
- 201  88F3              ;														; _indican a las subrutinas de recolocación del objeto de la rutina [DRAW]: [Comprueba_limite_horizontal] y [Comprueba_limite_vertical],_
- 202  88F3              ; 														; _que desaparecemos por un extremo de la pantalla y hemos de `reaparecer´ por el contrario.
- 203  88F3              ; 														; Este dato es necesario debido a que las rutinas de recolocación, están ideadas para recolocar el puntero (Posicion_actual), cuando pasamos_
- 204  88F3              ; 														; _de un cuadrante a otro de la pantalla pero no preveen la `desaparición´ por un extremo del cuadrante y la `reaparición´ por el otro.
- 205  88F3              ;
- 206  88F3              ; 														DESCRIPCIÖN:
- 207  88F3              ;
- 208  88F3              ; 														SET 0, [Reaparece_derecha]. El bit 0 de (Ctrl_0) se coloca a "1" cuando la rutina [Mov_left] detecta que el objeto ha `desaparecido´ por el_
- 209  88F3              ; 																_lado izquierdo de la pantalla y ha de `reaparecer´ por el derecho. ([Comprueba_limite_vertical]).
- 210  88F3              ; 														SET 1, [Reaparece_izquierda]. El bit 1 de (Ctrl_0) se coloca a "1" cuando la rutina [Mov_right] detecta que el objeto ha `desaparecido´ por el_
- 211  88F3              ; 																_lado derecho de la pantalla y ha de `reaparecer´ por el izquierdo. ([Comprueba_limite_vertical]).
- 212  88F3              ; 														SET 2, [Reaparece_abajo]. El bit 2 de (Ctrl_0) se coloca a "1" cuando la rutina [Mov_up] detecta que el objeto ha `desaparecido´ por la_
- 213  88F3              ; 																_parte superior de la pantalla y ha de `reaparecer´ por el inferior. ([Comprueba_limite_horizontal]).
- 214  88F3              ; 														SET 3, [Reaparece_arriba]. El bit 3 de (Ctrl_0) se coloca a "1" cuando la rutina [Mov_down] detecta que el objeto ha `desaparecido´ por la_
- 215  88F3              ; 																_parte inferior de la pantalla y ha de `reaparecer´ por la superior. ([Comprueba_limite_horizontal]).
- 216  88F3              ; 														SET 4, El Bit4 a "1", indica que hubo movimiento de la entidad. Necesitamos esta información
- 217  88F3              ;												                _para "NO BORRAR/PINTAR" en objeto si NO hubo MOVIMIENTO.
- 218  88F3              ;														SET 5, La rutina [Inicializacion] de Draw_XOR.asm, pone este bit a "1". Con esta información evitamos ejecutar las
- 219  88F3              ;																_rutinas: (Comprueba_limite_horizontal) y (Comprueba_limite_vertical) justo después de `inicializar´ un objeto.
- 220  88F3              ; 														SET 6, Está a "1" si el Sprite que tenemos cargado en el `Engine´ es AMADEUS.
- 221  88F3              ;
- 222  88F3              ; 														SET 7, El bit 7 se encuentra alto, ("1"), cuando el último movimiento horizontal se ha producido a la "DERECHA".
- 223  88F3              ; 															   _ Utilizo la información que proporciona este BIT para modificar (CTRL_DESPLZ) si el siguiente movimiento_
- 224  88F3              ; 															   _ se va a producir a la izquierda. "1" DERECHA - "0" IZQUIERDA.
- 225  88F3
- 226  88F3              ; Movimiento. ------------------------------------------------------------------------------------------------------
- 227  88F3
- 228  88F3 00 00        Puntero_indice_mov defw 0							    ; Puntero índice del patrón de movimiento de la entidad. "0" No hay movimiento.
- 229  88F5 00 00        Puntero_mov defw 0										; Guarda la posición de memoria en la que nos encontramos dentro de la cadena de movimiento.
- 230  88F7 00 00        Puntero_indice_mov_bucle defw 0							;
- 231  88F9              ;
- 232  88F9              ;
- 233  88F9 00           Incrementa_puntero db 0									; Byte que iremos sumando a (Puntero_indice_mov) para ir escalando por las_
- 234  88FA              ;														; _ distintas cadenas de movimiento del índice de movimiento de la entidad._
- 235  88FA              ;														; Va aumentando su valor en saltos de 2 uds, (0,2,4,6,8).
- 236  88FA 00           Incrementa_puntero_backup db 0
- 237  88FB 00           Repetimos_desplazamiento db 0							; El nibble bajo del 3er byte que compone un desplazamiento, indica el nº de veces que_
- 238  88FC              ;														; repetimos dicho desplazamiento. Ese valor se almacena en esta variable, ($1-$f). NUNCA SERÁ "0".
- 239  88FC 00           Repetimos_desplazamiento_backup db 0					; Restaura (Repetimos_desplazamiento) cuando este llega a "0".
- 240  88FD 00           Repetimos_movimiento db 0								; Byte que indica el nº de veces que repetimos el último MOVIMIENTO.
- 241  88FE 00           Cola_de_desplazamiento db 0								; Este byte indica:
+ 103  88C8              Sprite_vacio equ $f000
+ 104  88C8              Centro_arriba equ $0160 								; Emplearemos estas constantes en la rutina de `recolocación´ del objeto:_
+ 105  88C8              Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto en las dos primeras constantes_
+ 106  88C8              Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
+ 107  88C8              Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
+ 108  88C8
+ 109  88C8              Album_de_fotos equ $7000	;	(7000h - 7053h).		; En (Album_de_fotos) vamos a ir almacenando los valores_
+ 110  88C8              ;                                   				    ; _de los registros y las llamadas a las rutinas de impresión.
+ 111  88C8              ;                               				        ; De momento situamos este almacén en $7000. La capacidad del album será de 7 entidades.
+ 112  88C8              Album_de_fotos_disparos equ $7150 ; (7150h - 71a3).		; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
+ 113  88C8              ;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´.
+ 114  88C8              ;
+ 115  88C8              Album_de_fotos_1 equ $7054	; (7054h - 700a7).
+ 116  88C8              Album_de_fotos_disparos_1 equ $71a4	; (71a4h - 71f7h).
+ 117  88C8              Album_de_fotos_2 equ $70a8	; (70a8h - 70fbh).
+ 118  88C8              Album_de_fotos_disparos_2 equ $71f8	; (71f8hh - 724bh).
+ 119  88C8              Album_de_fotos_3 equ $70fc	; (70fch - 714fh).
+ 120  88C8              Album_de_fotos_disparos_3 equ $724c	; (724ch - 729fh).
+ 121  88C8
+ 122  88C8              Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72abh) ; 12 bytes.
+ 123  88C8              Almacen_de_parametros_DRAW equ $72ac ; ($72ac - $72eb) ; 61 bytes.
+ 124  88C8
+ 125  88C8
+ 126  88C8
+ 127  88C8              ; 54h es el espacio necesario en (Album_de_fotos) para 7 entidades/disparos en pantalla.
+ 128  88C8
+ 129  88C8              ; ******************************************************************************************************************************************************************************************
+ 130  88C8              ; Variables.
+ 131  88C8              ; ******************************************************************************************************************************************************************************************
+ 132  88C8              ;
+ 133  88C8              ; 28/07/23
+ 134  88C8              ;
+ 135  88C8              ; Variables de DRAW. (Motor principal).
+ 136  88C8              ;
+ 137  88C8              ; (Variables_de_borrado) *** (Variables_de_pintado).	8 Bytes.
+ 138  88C8
+ 139  88C8 00           Filas db 0												; Filas. [DRAW]
+ 140  88C9 00           Columns db 0  											; Nº de columnas. [DRAW]
+ 141  88CA 00 00        Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
+ 142  88CC 00 00        Puntero_objeto defw 0									; Donde están los datos para pintar el Sprite.
+ 143  88CE 00           Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
+ 144  88CF 00           Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
+ 145  88D0
+ 146  88D0              ; ---------- ---------- ---------- ---------;      ;--------- ---------- ---------- ----------
+ 147  88D0
+ 148  88D0 00           CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos.
+ 149  88D1              ; 														; El hecho de que este byte sea distinto de "0", indica que se ha modificado el nº de columnas del objeto.
+ 150  88D1              ; 														; Cuando vamos a imprimir un Sprite en pantalla, la rutina de pintado consultará este byte para situar (Puntero_objeto). [Mov_left].
+ 151  88D1 00           Attr db 0												; Atributos de la entidad:
+ 152  88D2
+ 153  88D2              ;	El formato: FBPPPIII (Flash, Brillo, Papel, Tinta).
+ 154  88D2              ;
+ 155  88D2              ;	COLORES: 0 ..... NEGRO
+ 156  88D2              ;    		 1 ..... AZUL
+ 157  88D2              ; 			 2 ..... ROJO
+ 158  88D2              ;			 3 ..... MAGENTA
+ 159  88D2              ; 			 4 ..... VERDE
+ 160  88D2              ; 			 5 ..... CIAN
+ 161  88D2              ;			 6 ..... AMARILLO
+ 162  88D2              ; 			 7 ..... BLANCO
+ 163  88D2
+ 164  88D2 00 00        Indice_Sprite_der defw 0
+ 165  88D4 00 00        Indice_Sprite_izq defw 0
+ 166  88D6 00 00        Puntero_DESPLZ_der defw 0
+ 167  88D8 00 00        Puntero_DESPLZ_izq defw 0
+ 168  88DA
+ 169  88DA 00 00        Posicion_inicio defw 0									; Dirección de pantalla donde aparece el objeto. [DRAW].
+ 170  88DC 00           Cuad_objeto db 0										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+ 171  88DD
+ 172  88DD              ; Variables de objeto. (Características).
+ 173  88DD
+ 174  88DD 00           Vel_left db 0 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
+ 175  88DE 00           Vel_right db 0 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
+ 176  88DF 00           Vel_up db 0 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
+ 177  88E0 00           Vel_down db 0 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
+ 178  88E1
+ 179  88E1 00           Impacto db 0											; Si después del movimiento de la entidad, (Impacto) se coloca a "1",_
+ 180  88E2              ;														; _ existen muchas posibilidades de que esta entidad haya colisionado con Amadeus.
+ 181  88E2              ; 														; Hay que comprobar la posible colisión después de mover Amadeus. En este caso, (Impacto2)="3".
+ 182  88E2 00 00 00...  Variables_de_borrado ds 6
+ 183  88E8
+ 184  88E8 00 00        Variables_de_pintado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
+ 185  88EA 00 00        	defw 0
+ 186  88EC 00 00        	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
+ 187  88EE 00 00 00 00  	db 0,0,0,0
+ 188  88F2
+ 189  88F2              ; Variables de funcionamiento de las rutinas de movimiento. (Mov_left), (Mov_right), (Mov_up), (Mov_down).
+ 190  88F2
+ 191  88F2 00           Ctrl_0 db 0 											; Byte de control. A través de este byte de control. Las rutinas de desplazamiento: [Mov_right], [Mov_left], [Mov_up] y [Mov_down],_
+ 192  88F3              ;														; _indican a las subrutinas de recolocación del objeto de la rutina [DRAW]: [Comprueba_limite_horizontal] y [Comprueba_limite_vertical],_
+ 193  88F3              ; 														; _que desaparecemos por un extremo de la pantalla y hemos de `reaparecer´ por el contrario.
+ 194  88F3              ; 														; Este dato es necesario debido a que las rutinas de recolocación, están ideadas para recolocar el puntero (Posicion_actual), cuando pasamos_
+ 195  88F3              ; 														; _de un cuadrante a otro de la pantalla pero no preveen la `desaparición´ por un extremo del cuadrante y la `reaparición´ por el otro.
+ 196  88F3              ;
+ 197  88F3              ; 														DESCRIPCIÖN:
+ 198  88F3              ;
+ 199  88F3              ; 														SET 0, [Reaparece_derecha]. El bit 0 de (Ctrl_0) se coloca a "1" cuando la rutina [Mov_left] detecta que el objeto ha `desaparecido´ por el_
+ 200  88F3              ; 																_lado izquierdo de la pantalla y ha de `reaparecer´ por el derecho. ([Comprueba_limite_vertical]).
+ 201  88F3              ; 														SET 1, [Reaparece_izquierda]. El bit 1 de (Ctrl_0) se coloca a "1" cuando la rutina [Mov_right] detecta que el objeto ha `desaparecido´ por el_
+ 202  88F3              ; 																_lado derecho de la pantalla y ha de `reaparecer´ por el izquierdo. ([Comprueba_limite_vertical]).
+ 203  88F3              ; 														SET 2, [Reaparece_abajo]. El bit 2 de (Ctrl_0) se coloca a "1" cuando la rutina [Mov_up] detecta que el objeto ha `desaparecido´ por la_
+ 204  88F3              ; 																_parte superior de la pantalla y ha de `reaparecer´ por el inferior. ([Comprueba_limite_horizontal]).
+ 205  88F3              ; 														SET 3, [Reaparece_arriba]. El bit 3 de (Ctrl_0) se coloca a "1" cuando la rutina [Mov_down] detecta que el objeto ha `desaparecido´ por la_
+ 206  88F3              ; 																_parte inferior de la pantalla y ha de `reaparecer´ por la superior. ([Comprueba_limite_horizontal]).
+ 207  88F3              ; 														SET 4, El Bit4 a "1", indica que hubo movimiento de la entidad. Necesitamos esta información
+ 208  88F3              ;												                _para "NO BORRAR/PINTAR" en objeto si NO hubo MOVIMIENTO.
+ 209  88F3              ;														SET 5, La rutina [Inicializacion] de Draw_XOR.asm, pone este bit a "1". Con esta información evitamos ejecutar las
+ 210  88F3              ;																_rutinas: (Comprueba_limite_horizontal) y (Comprueba_limite_vertical) justo después de `inicializar´ un objeto.
+ 211  88F3              ; 														SET 6, Está a "1" si el Sprite que tenemos cargado en el `Engine´ es AMADEUS.
+ 212  88F3              ;
+ 213  88F3              ; 														SET 7, El bit 7 se encuentra alto, ("1"), cuando el último movimiento horizontal se ha producido a la "DERECHA".
+ 214  88F3              ; 															   _ Utilizo la información que proporciona este BIT para modificar (CTRL_DESPLZ) si el siguiente movimiento_
+ 215  88F3              ; 															   _ se va a producir a la izquierda. "1" DERECHA - "0" IZQUIERDA.
+ 216  88F3
+ 217  88F3              ; Movimiento. ------------------------------------------------------------------------------------------------------
+ 218  88F3
+ 219  88F3 00 00        Puntero_indice_mov defw 0							    ; Puntero índice del patrón de movimiento de la entidad. "0" No hay movimiento.
+ 220  88F5 00 00        Puntero_mov defw 0										; Guarda la posición de memoria en la que nos encontramos dentro de la cadena de movimiento.
+ 221  88F7 00 00        Puntero_indice_mov_bucle defw 0							;
+ 222  88F9              ;
+ 223  88F9              ;
+ 224  88F9 00           Incrementa_puntero db 0									; Byte que iremos sumando a (Puntero_indice_mov) para ir escalando por las_
+ 225  88FA              ;														; _ distintas cadenas de movimiento del índice de movimiento de la entidad._
+ 226  88FA              ;														; Va aumentando su valor en saltos de 2 uds, (0,2,4,6,8).
+ 227  88FA 00           Incrementa_puntero_backup db 0
+ 228  88FB 00           Repetimos_desplazamiento db 0							; El nibble bajo del 3er byte que compone un desplazamiento, indica el nº de veces que_
+ 229  88FC              ;														; repetimos dicho desplazamiento. Ese valor se almacena en esta variable, ($1-$f). NUNCA SERÁ "0".
+ 230  88FC 00           Repetimos_desplazamiento_backup db 0					; Restaura (Repetimos_desplazamiento) cuando este llega a "0".
+ 231  88FD 00           Repetimos_movimiento db 0								; Byte que indica el nº de veces que repetimos el último MOVIMIENTO.
+ 232  88FE 00           Cola_de_desplazamiento db 0								; Este byte indica:
+ 233  88FF              ;
+ 234  88FF              ;														;	"$00" ..... Hemos finalizado la cadena de movimiento.
+ 235  88FF              ;														;				En este caso hemos de incrementar (Puntero_indice_mov)_
+ 236  88FF              ;														;				_ y pasar a la siguiente cadena de movimiento del índice.
+ 237  88FF              ;
+ 238  88FF              ;														;	"$01 - "$fe" ..... Repetición del movimiento.
+ 239  88FF              ;														;						Nº de veces que vamos a repetir el movimiento completo.
+ 240  88FF              ;														;						En este caso, volveremos a inicializar (Puntero_mov),_
+ 241  88FF              ;														;						_ con (Puntero_indice_mov) y decrementaremos (Cola_de_desplazamiento).
  242  88FF              ;
- 243  88FF              ;														;	"$00" ..... Hemos finalizado la cadena de movimiento.
- 244  88FF              ;														;				En este caso hemos de incrementar (Puntero_indice_mov)_
- 245  88FF              ;														;				_ y pasar a la siguiente cadena de movimiento del índice.
- 246  88FF              ;
- 247  88FF              ;														;	"$01 - "$fe" ..... Repetición del movimiento.
- 248  88FF              ;														;						Nº de veces que vamos a repetir el movimiento completo.
- 249  88FF              ;														;						En este caso, volveremos a inicializar (Puntero_mov),_
- 250  88FF              ;														;						_ con (Puntero_indice_mov) y decrementaremos (Cola_de_desplazamiento).
- 251  88FF              ;
- 252  88FF              ;														;	"$ff" ..... Bucle infinito de repetición.
- 253  88FF              ;														;				Nunca vamos a saltar a la siguiente cadena de movimiento del índice,_
- 254  88FF              ;														;				,_ (si es que la hay). Volvemos a inicializar (Puntero_mov) con (Puntero_indice_mov).
- 255  88FF
- 256  88FF
- 257  88FF              ; Variables de funcionamiento. [DRAW].
- 258  88FF
- 259  88FF 00           Columnas db 0
- 260  8900 00 00        Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado en función del tamaño del Sprite. Si el objeto llega a esta línea se modifica_
- 261  8902              ; 														; _(Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
- 262  8902 00           Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta columna se modifica (Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
- 263  8903
- 264  8903              ; variables de control general.
- 265  8903
- 266  8903 00           Ctrl_2 db 0
- 267  8904              ;														BIT 0, Los sprites se inician con un `sprite vacío', (sprite formado por "ceros"), cuando la rutina_
- 268  8904              ;															_ [Guarda_foto_registros] guarda su 1ª imagen.
- 269  8904              ;															_ Más adelante las rutinas [Mov_left] y [Mov_right] restauraran (Puntero_objeto). Si el 1er movimiento
- 270  8904              ; 															_ que hace la entidad después de iniciarse es hacia arriba/abajo no se restaurará (Puntero_objeto), pués_
- 271  8904              ; 															_ las rutinas [Mov_up] y [Mov_down] no necesitan modificar el sprite.
- 272  8904              ;															_ El bit5 a "1" nos indica que el sprite se inicia por arriba o por abajo y por lo tanto hay que restaurar_
- 273  8904              ;															_ (Puntero_objeto) con (Repone_puntero_objeto) una vez iniciado y realizada su 1ª `foto'.
- 274  8904              ;
- 275  8904              ;														BIT 1, Este bit a "1" indica que se ha iniciado el proceso de EXPLOSIÓN en una entidad.
- 276  8904              ;														BIT 2, Este bit es activado por [Movimiento]. Indica que hemos `iniciado un desplazamiento'._
- 277  8904              ;															_ Evita que volvamos a iniciar el desplazamiento cada vez que ejecutemos [Movimiento].
- 278  8904              ;														BIT 3, Indica que (Cola_de_desplazamiento)="254". Esto quiere decir que repetiremos (1-255 veces),_
- 279  8904              ;															_ el último MOVIMIENTO que hayamos ejecutado.
- 280  8904
- 281  8904 00           Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
- 282  8905
- 283  8905              ;! 61 Bytes por entidad.
- 284  8905
- 285  8905              ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
- 286  8905              ;					         		---------;      ;---------
- 287  8905
- 288  8905
- 289  8905              ; Variables de funcionamiento, (No incluidas en base de datos de entidades), a partir de aquí!!!!!
- 290  8905
- 291  8905 00           Ctrl_1 db 0 											; Byte de control de propósito general.
+ 243  88FF              ;														;	"$ff" ..... Bucle infinito de repetición.
+ 244  88FF              ;														;				Nunca vamos a saltar a la siguiente cadena de movimiento del índice,_
+ 245  88FF              ;														;				,_ (si es que la hay). Volvemos a inicializar (Puntero_mov) con (Puntero_indice_mov).
+ 246  88FF
+ 247  88FF
+ 248  88FF              ; Variables de funcionamiento. [DRAW].
+ 249  88FF
+ 250  88FF 00           Columnas db 0
+ 251  8900 00 00        Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado en función del tamaño del Sprite. Si el objeto llega a esta línea se modifica_
+ 252  8902              ; 														; _(Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
+ 253  8902 00           Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta columna se modifica (Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
+ 254  8903
+ 255  8903              ; variables de control general.
+ 256  8903
+ 257  8903 00           Ctrl_2 db 0
+ 258  8904              ;														BIT 0, Los sprites se inician con un `sprite vacío', (sprite formado por "ceros"), cuando la rutina_
+ 259  8904              ;															_ [Guarda_foto_registros] guarda su 1ª imagen.
+ 260  8904              ;															_ Más adelante las rutinas [Mov_left] y [Mov_right] restauraran (Puntero_objeto). Si el 1er movimiento
+ 261  8904              ; 															_ que hace la entidad después de iniciarse es hacia arriba/abajo no se restaurará (Puntero_objeto), pués_
+ 262  8904              ; 															_ las rutinas [Mov_up] y [Mov_down] no necesitan modificar el sprite.
+ 263  8904              ;															_ El bit5 a "1" nos indica que el sprite se inicia por arriba o por abajo y por lo tanto hay que restaurar_
+ 264  8904              ;															_ (Puntero_objeto) con (Repone_puntero_objeto) una vez iniciado y realizada su 1ª `foto'.
+ 265  8904              ;
+ 266  8904              ;														BIT 1, Este bit a "1" indica que se ha iniciado el proceso de EXPLOSIÓN en una entidad.
+ 267  8904              ;														BIT 2, Este bit es activado por [Movimiento]. Indica que hemos `iniciado un desplazamiento'._
+ 268  8904              ;															_ Evita que volvamos a iniciar el desplazamiento cada vez que ejecutemos [Movimiento].
+ 269  8904              ;														BIT 3, Indica que (Cola_de_desplazamiento)="254". Esto quiere decir que repetiremos (1-255 veces),_
+ 270  8904              ;															_ el último MOVIMIENTO que hayamos ejecutado.
+ 271  8904
+ 272  8904 00           Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
+ 273  8905
+ 274  8905              ;! 61 Bytes por entidad.
+ 275  8905
+ 276  8905              ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
+ 277  8905              ;					         		---------;      ;---------
+ 278  8905
+ 279  8905
+ 280  8905              ; Variables de funcionamiento, (No incluidas en base de datos de entidades), a partir de aquí!!!!!
+ 281  8905
+ 282  8905 00           Ctrl_1 db 0 											; Byte de control de propósito general.
+ 283  8906
+ 284  8906              ;														DESCRIPCIÓN:
+ 285  8906              ;
+ 286  8906              ;														BIT 0, La rutina de generación de disparos, [Genera_disparo], pone este bit a "1" para indicar a la_
+ 287  8906              ;															_ rutina [Guarda_foto_registros] que los datos a guardar pertenecen a un disparo y no a una entidad,_
+ 288  8906              ;															_ por lo tanto hemos de almacenarlos en `Album_de_fotos_disparos´ en lugar de `Album_de_fotos´.
+ 289  8906              ;														BIT 1, Este bit indica que el disparo sale de la pantalla, ($4000-$57ff).
+ 290  8906              ;														BIT 2, Este bit a "1" indica que un disparo de Amadeus ha alcanzado a una entidad. Como no sabemos cual,_
+ 291  8906              ;															_ hemos de comparar las coordenadas de (Coordenadas_disparo_certero) con las de cada entidad.
  292  8906
- 293  8906              ;														DESCRIPCIÓN:
- 294  8906              ;
- 295  8906              ;														BIT 0, La rutina de generación de disparos, [Genera_disparo], pone este bit a "1" para indicar a la_
- 296  8906              ;															_ rutina [Guarda_foto_registros] que los datos a guardar pertenecen a un disparo y no a una entidad,_
- 297  8906              ;															_ por lo tanto hemos de almacenarlos en `Album_de_fotos_disparos´ en lugar de `Album_de_fotos´.
- 298  8906              ;														BIT 1, Este bit indica que el disparo sale de la pantalla, ($4000-$57ff).
- 299  8906              ;														BIT 2, Este bit a "1" indica que un disparo de Amadeus ha alcanzado a una entidad. Como no sabemos cual,_
- 300  8906              ;															_ hemos de comparar las coordenadas de (Coordenadas_disparo_certero) con las de cada entidad.
- 301  8906
- 302  8906              ;														BIT 3, Recarga de nueva oleada.
- 303  8906              ;														BIT 4, Recarga de nueva oleada.
- 304  8906              ;														BIT 5, FREEEEEEEEE !!!!!!!!!!!!!!!!!
- 305  8906              ;														BIT 6, **** Frame completo.
- 306  8906              ;														BIT 7, Indica que ya está tomada la foto de Amadeus. No tomaremos otra hasta el próximo FRAME.
- 307  8906
- 308  8906 00 00        Repone_puntero_objeto defw 0							; Almacena (Puntero_objeto). Cuando el Sprite se inicia por arriba o por abajo,_
- 309  8908              ; 														; _ hay que sustituirlo por un `sprite vacío' para que no se vea el 1er o último scanline.
- 310  8908              ; 														; _ Cuando hemos terminado de iniciarlo y guardado su foto, hemos de recuperar su (Puntero_objeto).
- 311  8908              ;														; (Repone_puntero_objeto) es una copia de respaldo de (Puntero_objeto) y su función es restaurarlo.
- 312  8908
- 313  8908              ; Ctrl_3 db 0											; Byte de control de propósito general.
- 314  8908
- 315  8908              ;														DESCRIPCIÓN:
- 316  8908              ;
- 317  8908              ;														BIT 0,
- 318  8908
- 319  8908              ; Gestión de ENTIDADES y CAJAS.
- 320  8908
- 321  8908 00 00        Puntero_store_caja defw 0
- 322  890A 00 00        Puntero_restore_caja defw 0
- 323  890C 00 00        Indice_restore_caja defw 0
- 324  890E 00           Numero_de_entidades db 0								; Nº de entidades en pantalla, (contando con Amadeus).
- 325  890F 00           Numero_parcial_de_entidades db 0
- 326  8910 00           Entidades_en_curso db 0									; ..... ..... .....
- 327  8911 00           Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
- 328  8912              ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
- 329  8912              ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
- 330  8912              ;														; _ (Numero_de_malotes)="0".
- 331  8912 00 00        Puntero_indice_ENTIDADES defw 0 						; Se desplazará por el índice de entidades para `meterlas' en cajas.
- 332  8914 00 00        Datos_de_entidad defw 0									; Contiene los bytes de información de la entidad hacia la que apunta el
- 333  8916              ;														; _ puntero (Indice_entidades).
- 334  8916
- 335  8916
- 336  8916              ;---------------------------------------------------------------------------------------------------------------
- 337  8916              ;
- 338  8916              ;	2/9/23
- 339  8916              ;
- 340  8916              ;	Álbumes.
- 341  8916
- 342  8916 00 00        Stack defw 0 											; La rutinas de pintado, utilizan esta_
- 343  8918              ;														; _variable para almacenar lo posición del puntero_
- 344  8918              ; 														; _de pila, SP.
- 345  8918 00 00        Stack_2 defw 0											; 2º variable destinada a almacenar el puntero de pila, SP.
- 346  891A              ;														; La utiliza la rutina [Extrae_foto_registros].
- 347  891A 00 00        Stack_3 defw 0											; Almacena el SP antes de ejecutar FRAME.
- 348  891C 00 00        Stack_snapshot defw 0
- 349  891E 00 00        Stack_snapshot_disparos defw 0
- 350  8920
- 351  8920 00 00        End_Snapshot defw 0
- 352  8922              ;														; Inicialmente está situado el la posición $7000, Album_de_fotos.
- 353  8922 00 00        End_Snapshot_disparos defw 0							; Puntero que indica la posición de memoria donde vamos a guardar_
- 354  8924              ;														; _el snapshot de los registros del siguiente disparo.
- 355  8924              ;														; Inicialmente está situado en la posición $7060, Album_de_fotos_disparos.
- 356  8924 A0 72        End_Snapshot_Amadeus defw Album_de_fotos_Amadeus
- 357  8926 00 00        End_Snapshot_1 defw 0
- 358  8928 00 00        End_Snapshot_disparos_1 defw 0
- 359  892A 00 00        End_Snapshot_2 defw 0
- 360  892C 00 00        End_Snapshot_disparos_2 defw 0
- 361  892E 00 00        End_Snapshot_3 defw 0
- 362  8930 00 00        End_Snapshot_disparos_3 defw 0
- 363  8932
- 364  8932 00 00        Puntero_indice_album_de_fotos defw 0
- 365  8934 00 00        Puntero_indice_album_de_fotos_disparos defw 0
- 366  8936
- 367  8936 00 00        Puntero_indice_End_Snapshot defw 0
- 368  8938 00 00        Puntero_indice_End_Snapshot_disparos defw 0
- 369  893A 00 00        Puntero_de_End_Snapshot defw 0
- 370  893C 00 00        Puntero_de_End_Snapshot_disparos defw 0
- 371  893E
- 372  893E F0           Semaforo db $f0											; Indicador necesario para poder gestionar los álbumes de fotos de las entidades. Indica en que álbum_
- 373  893F              ;														; _ nos encontramos y si el cuadro, (frame), está completo en el álbum, o no.
- 374  893F 00           Ctrl_Semaforo db 0										; Byte de control utilizado por la rutina [Gestiona_albumes_de_fotos] para la recolocación de los álbumes vacíos.
- 375  8940              ;
- 376  8940              ;														DESCRIPCIÓN:
- 377  8940              ;
- 378  8940              ;														BIT 0, Indica que el último álbum que tenemos abierto, NO ESTÁ COMPLETO. Este bit lo activa la rutina [Gestiona_albumes_de_fotos]_
- 379  8940              ;																_ e indica a la función [Gestiona_entidades], que no ha de modificar punteros, (hemos de continuar escribiendo en el mismo_
- 380  8940              ;																_ álbum.
- 381  8940              ;
- 382  8940
- 383  8940              ;---------------------------------------------------------------------------------------------------------------
- 384  8940
- 385  8940              ; Gestión de Disparos.
- 386  8940
- 387  8940 00           Numero_de_disparotes db 0
- 388  8941 00 00        Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
- 389  8943 00 00        Puntero_DESPLZ_DISPARO_AMADEUS defw 0
- 390  8945 00           Impacto2 db 0											; Este byte indica que se ha producido impacto:
- 391  8946              ; 														; (Impacto)="1". El impacto se produce en una entidad.
- 392  8946              ;														; (Impacto)="2". El impacto se produce en Amadeus.
- 393  8946 00 00        Entidad_sospechosa_de_colision defw 0					; Almacena la dirección de memoria donde se encuentra el .db_
- 394  8948              ;														; _(Impacto) de la entidad que ocupa el mismo espacio que Amadeus.
- 395  8948              ;														; Necesitaremos poner a "0" este .db en el caso de que finalmente no se_
- 396  8948              ;														; _produzca colisión.
- 397  8948 00 00        Coordenadas_disparo_certero ds 2						; Almacenamos aquí las coordenadas del disparo que ha alcanzado a Amadeus.
- 398  894A              ;											            ; (Coordenadas_disparo_certero)=Y ..... (Coordenadas_disparo_certero +1)=X.
- 399  894A 00 00 00     Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posibles columnas_
- 400  894D              ;														; _ que puede ocupar el sprite de Amadeus. (Colisión).
- 401  894D 00 00 00     Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 posibles columnas_
- 402  8950              ;														; _ que puede ocupar el sprite de una entidad. (Colisión).
- 403  8950 00 00        Puntero_de_impresion_Amadeus defw 0						; Lo utilizaremos en la rutina de colisiones.
- 404  8952 02           Velocidad_disparo_entidades db 2	  					; Nº de scanlines, (NextScan) que avanza el disparo de las entidades.
- 405  8953
- 406  8953              ;---------------------------------------------------------------------------------------------------------------
- 407  8953
- 408  8953              ; Relojes y temporizaciones.
- 409  8953
- 410  8953 00           Contador_de_frames db 0
- 411  8954 00           Contador_de_frames_2 db 0
- 412  8955
- 413  8955 04           Clock_explosion db 4
- 414  8956 1E           Clock_Entidades_en_curso db 30
- 415  8957 00           Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
- 416  8958              ;														; Repite la oleada de entidades.
- 417  8958 01           Disparo_Amadeus db 1									; A "1", se puede generar disparo.
- 418  8959 1E           CLOCK_repone_disparo_Amadeus_BACKUP db 30				; Restaura (CLOCK_repone_disparo_Amadeus).
- 419  895A 1E           CLOCK_repone_disparo_Amadeus db 30 						; Reloj, decreciente.
- 420  895B
- 421  895B 01           Disparo_entidad db 1									; A "1", se puede generar disparo.
- 422  895C 14           CLOCK_repone_disparo_entidad_BACKUP db 20				; Restaura (CLOCK_repone_disparo_entidad).
- 423  895D 14           CLOCK_repone_disparo_entidad db 20						; Reloj, decreciente.
- 424  895E
- 425  895E              ;---------------------------------------------------------------------------------------------------------------
- 426  895E
- 427  895E              ; Gestión de NIVELES.
- 428  895E
- 429  895E 00           Nivel db 0												; Nivel actual del juego.
- 430  895F 00 00        Puntero_indice_NIVELES defw 0
- 431  8961 00 00        Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos bytes_
- 432  8963              ; 														; _ que definen el NIVEL.
- 433  8963              ; Y todo comienza aquí .....
- 434  8963              ;
- 435  8963              ; Rutina principal *************************************************************************************************************************************************************************
- 436  8963              ;
- 437  8963              ;	14/11/22
- 438  8963
- 439  8963              START
- 440  8963
- 441  8963 31 FF FF     	ld sp,$ffff											; Situamos el inicio de Stack.
- 442  8966 3E A9        	ld a,$a9 											; Habilitamos el modo 2 de interrupciones y fijamos el salto a $a9ff
- 443  8968 ED 47        	ld i,a 												; Byte alto de la dirección donde se encuentra nuestro vector de interrupciones en el registro I. ($a9). El byte bajo será siempre $ff.
- 444  896A ED 5E        	IM 2 											    ; Habilitamos el modo 2 de INTERRUPCIONES.
- 445  896C F3           	DI
- 446  896D
- 447  896D 3E 07        	ld a,%00000111
- 448  896F CD 42 99     	call Cls
- 449  8972
- 450  8972 CD 5C 8D     	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
- 451  8975
- 452  8975              ; INICIALIZACIÓN.
- 453  8975
- 454  8975 CD 12 88     	call Inicializa_Punteros_de_nivel					 ; Inicializa. 1er NIVEL.
- 455  8978 CD 24 88     4 call Prepara_cajas 									 ; (Niveles.asm).
- 456  897B CD 81 8B     	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en la 1ª entidad del_
- 457  897E              ;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.
- 458  897E CD 97 8B     	call Inicia_punteros_de_albumes_y_malotes			 ; Iniciamos los punteros de los álbumes de fotos y cajas de_
- 459  8981              ;													     ; _ malotes antes de guardar ninguna foto.
- 460  8981              ; ----------
- 461  8981
- 462  8981 CD 0C 8D     	call Restore_entidad
- 463  8984
- 464  8984 21 0F 89     	ld hl,Numero_parcial_de_entidades
- 465  8987 46           	ld b,(hl)
- 466  8988 04           	inc b
- 467  8989 05           	dec b
- 468  898A 28 0E        	jr z,3F										   		 ; Si no hay entidades, cargamos AMADEUS.
- 469  898C
- 470  898C              ;	Cada vez que iniciamos una entidad, hay que hacer una llamada a (Inicia_Puntero_objeto).
- 471  898C              ;   Inicialmente tengo cargada la 1ª entidad en DRAW.
- 472  898C              ;	Pintamos el resto de entidades:
- 473  898C
- 474  898C              ;	INICIA ENTIDADES !!!!!
- 475  898C
- 476  898C C5           1 push bc  												; Guardo el contador de entidades.
- 477  898D CD 51 8B     	call Inicia_entidad
- 478  8990 C1           	pop bc
- 479  8991 10 F9        	djnz 1B  											; Decremento el contador de entidades.
- 480  8993
- 481  8993              ; Si Amadeus ya está iniciado, saltamos a [Inicia_punteros_de_cajas] y [Restore_entidad].
- 482  8993              ; (Esto se dá cuando se inicia una nueva oleada).
- 483  8993
- 484  8993 3A 05 89     	ld a,(Ctrl_1)
- 485  8996 CB 5F        	bit 3,a
- 486  8998 20 00        	jr nz,5F											; Loop
- 487  899A
- 488  899A              ; 	INICIA AMADEUS !!!!!
- 489  899A
- 490  899A              3
+ 293  8906              ;														BIT 3, Recarga de nueva oleada.
+ 294  8906              ;														BIT 4, Recarga de nueva oleada.
+ 295  8906              ;														BIT 5, FREEEEEEEEE !!!!!!!!!!!!!!!!!
+ 296  8906              ;														BIT 6, **** Frame completo.
+ 297  8906              ;														BIT 7, Indica que ya está tomada la foto de Amadeus. No tomaremos otra hasta el próximo FRAME.
+ 298  8906
+ 299  8906 00 00        Repone_puntero_objeto defw 0							; Almacena (Puntero_objeto). Cuando el Sprite se inicia por arriba o por abajo,_
+ 300  8908              ; 														; _ hay que sustituirlo por un `sprite vacío' para que no se vea el 1er o último scanline.
+ 301  8908              ; 														; _ Cuando hemos terminado de iniciarlo y guardado su foto, hemos de recuperar su (Puntero_objeto).
+ 302  8908              ;														; (Repone_puntero_objeto) es una copia de respaldo de (Puntero_objeto) y su función es restaurarlo.
+ 303  8908
+ 304  8908              ; Ctrl_3 db 0											; Byte de control de propósito general.
+ 305  8908
+ 306  8908              ;														DESCRIPCIÓN:
+ 307  8908              ;
+ 308  8908              ;														BIT 0,
+ 309  8908
+ 310  8908              ; Gestión de ENTIDADES y CAJAS.
+ 311  8908
+ 312  8908 00 00        Puntero_store_caja defw 0
+ 313  890A 00 00        Puntero_restore_caja defw 0
+ 314  890C 00 00        Indice_restore_caja defw 0
+ 315  890E 00           Numero_de_entidades db 0								; Nº de entidades en pantalla, (contando con Amadeus).
+ 316  890F 00           Numero_parcial_de_entidades db 0
+ 317  8910 00           Entidades_en_curso db 0									; ..... ..... .....
+ 318  8911 00           Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
+ 319  8912              ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
+ 320  8912              ;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
+ 321  8912              ;														; _ (Numero_de_malotes)="0".
+ 322  8912 00 00        Puntero_indice_ENTIDADES defw 0 						; Se desplazará por el índice de entidades para `meterlas' en cajas.
+ 323  8914 00 00        Datos_de_entidad defw 0									; Contiene los bytes de información de la entidad hacia la que apunta el
+ 324  8916              ;														; _ puntero (Indice_entidades).
+ 325  8916
+ 326  8916
+ 327  8916              ;---------------------------------------------------------------------------------------------------------------
+ 328  8916              ;
+ 329  8916              ;	2/9/23
+ 330  8916              ;
+ 331  8916              ;	Álbumes.
+ 332  8916
+ 333  8916 00 00        Stack defw 0 											; La rutinas de pintado, utilizan esta_
+ 334  8918              ;														; _variable para almacenar lo posición del puntero_
+ 335  8918              ; 														; _de pila, SP.
+ 336  8918 00 00        Stack_2 defw 0											; 2º variable destinada a almacenar el puntero de pila, SP.
+ 337  891A              ;														; La utiliza la rutina [Extrae_foto_registros].
+ 338  891A 00 00        Stack_3 defw 0											; Almacena el SP antes de ejecutar FRAME.
+ 339  891C 00 00        Stack_snapshot defw 0
+ 340  891E 00 00        Stack_snapshot_disparos defw 0
+ 341  8920
+ 342  8920 00 00        End_Snapshot defw 0
+ 343  8922              ;														; Inicialmente está situado el la posición $7000, Album_de_fotos.
+ 344  8922 00 00        End_Snapshot_disparos defw 0							; Puntero que indica la posición de memoria donde vamos a guardar_
+ 345  8924              ;														; _el snapshot de los registros del siguiente disparo.
+ 346  8924              ;														; Inicialmente está situado en la posición $7060, Album_de_fotos_disparos.
+ 347  8924 A0 72        End_Snapshot_Amadeus defw Album_de_fotos_Amadeus
+ 348  8926 00 00        End_Snapshot_1 defw 0
+ 349  8928 00 00        End_Snapshot_disparos_1 defw 0
+ 350  892A 00 00        End_Snapshot_2 defw 0
+ 351  892C 00 00        End_Snapshot_disparos_2 defw 0
+ 352  892E 00 00        End_Snapshot_3 defw 0
+ 353  8930 00 00        End_Snapshot_disparos_3 defw 0
+ 354  8932
+ 355  8932 00 00        Puntero_indice_album_de_fotos defw 0
+ 356  8934 00 00        Puntero_indice_album_de_fotos_disparos defw 0
+ 357  8936
+ 358  8936 00 00        Puntero_indice_End_Snapshot defw 0
+ 359  8938 00 00        Puntero_indice_End_Snapshot_disparos defw 0
+ 360  893A 00 00        Puntero_de_End_Snapshot defw 0
+ 361  893C 00 00        Puntero_de_End_Snapshot_disparos defw 0
+ 362  893E
+ 363  893E F0           Semaforo db $f0											; Indicador necesario para poder gestionar los álbumes de fotos de las entidades. Indica en que álbum_
+ 364  893F              ;														; _ nos encontramos y si el cuadro, (frame), está completo en el álbum, o no.
+ 365  893F 00           Ctrl_Semaforo db 0										; Byte de control utilizado por la rutina [Gestiona_albumes_de_fotos] para la recolocación de los álbumes vacíos.
+ 366  8940              ;
+ 367  8940              ;														DESCRIPCIÓN:
+ 368  8940              ;
+ 369  8940              ;														BIT 0, Indica que el último álbum que tenemos abierto, NO ESTÁ COMPLETO. Este bit lo activa la rutina [Gestiona_albumes_de_fotos]_
+ 370  8940              ;																_ e indica a la función [Gestiona_entidades], que no ha de modificar punteros, (hemos de continuar escribiendo en el mismo_
+ 371  8940              ;																_ álbum.
+ 372  8940              ;
+ 373  8940
+ 374  8940              ;---------------------------------------------------------------------------------------------------------------
+ 375  8940
+ 376  8940              ; Gestión de Disparos.
+ 377  8940
+ 378  8940 00           Numero_de_disparotes db 0
+ 379  8941 00 00        Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
+ 380  8943 00 00        Puntero_DESPLZ_DISPARO_AMADEUS defw 0
+ 381  8945 00           Impacto2 db 0											; Este byte indica que se ha producido impacto:
+ 382  8946              ; 														; (Impacto)="1". El impacto se produce en una entidad.
+ 383  8946              ;														; (Impacto)="2". El impacto se produce en Amadeus.
+ 384  8946 00 00        Entidad_sospechosa_de_colision defw 0					; Almacena la dirección de memoria donde se encuentra el .db_
+ 385  8948              ;														; _(Impacto) de la entidad que ocupa el mismo espacio que Amadeus.
+ 386  8948              ;														; Necesitaremos poner a "0" este .db en el caso de que finalmente no se_
+ 387  8948              ;														; _produzca colisión.
+ 388  8948 00 00        Coordenadas_disparo_certero ds 2						; Almacenamos aquí las coordenadas del disparo que ha alcanzado a Amadeus.
+ 389  894A              ;											            ; (Coordenadas_disparo_certero)=Y ..... (Coordenadas_disparo_certero +1)=X.
+ 390  894A 00 00 00     Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posibles columnas_
+ 391  894D              ;														; _ que puede ocupar el sprite de Amadeus. (Colisión).
+ 392  894D 00 00 00     Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 posibles columnas_
+ 393  8950              ;														; _ que puede ocupar el sprite de una entidad. (Colisión).
+ 394  8950 00 00        Puntero_de_impresion_Amadeus defw 0						; Lo utilizaremos en la rutina de colisiones.
+ 395  8952 02           Velocidad_disparo_entidades db 2	  					; Nº de scanlines, (NextScan) que avanza el disparo de las entidades.
+ 396  8953
+ 397  8953              ;---------------------------------------------------------------------------------------------------------------
+ 398  8953
+ 399  8953              ; Relojes y temporizaciones.
+ 400  8953
+ 401  8953 00           Contador_de_frames db 0
+ 402  8954 00           Contador_de_frames_2 db 0
+ 403  8955
+ 404  8955 04           Clock_explosion db 4
+ 405  8956 1E           Clock_Entidades_en_curso db 30
+ 406  8957 00           Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
+ 407  8958              ;														; Repite la oleada de entidades.
+ 408  8958 01           Disparo_Amadeus db 1									; A "1", se puede generar disparo.
+ 409  8959 1E           CLOCK_repone_disparo_Amadeus_BACKUP db 30				; Restaura (CLOCK_repone_disparo_Amadeus).
+ 410  895A 1E           CLOCK_repone_disparo_Amadeus db 30 						; Reloj, decreciente.
+ 411  895B
+ 412  895B 01           Disparo_entidad db 1									; A "1", se puede generar disparo.
+ 413  895C 14           CLOCK_repone_disparo_entidad_BACKUP db 20				; Restaura (CLOCK_repone_disparo_entidad).
+ 414  895D 14           CLOCK_repone_disparo_entidad db 20						; Reloj, decreciente.
+ 415  895E
+ 416  895E              ;---------------------------------------------------------------------------------------------------------------
+ 417  895E
+ 418  895E              ; Gestión de NIVELES.
+ 419  895E
+ 420  895E 00           Nivel db 0												; Nivel actual del juego.
+ 421  895F 00 00        Puntero_indice_NIVELES defw 0
+ 422  8961 00 00        Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos bytes_
+ 423  8963              ; 														; _ que definen el NIVEL.
+ 424  8963              ; Y todo comienza aquí .....
+ 425  8963              ;
+ 426  8963              ; Rutina principal *************************************************************************************************************************************************************************
+ 427  8963              ;
+ 428  8963              ;	14/11/22
+ 429  8963
+ 430  8963              START
+ 431  8963
+ 432  8963 31 FF FF     	ld sp,$ffff											; Situamos el inicio de Stack.
+ 433  8966 3E A9        	ld a,$a9 											; Habilitamos el modo 2 de interrupciones y fijamos el salto a $a9ff
+ 434  8968 ED 47        	ld i,a 												; Byte alto de la dirección donde se encuentra nuestro vector de interrupciones en el registro I. ($a9). El byte bajo será siempre $ff.
+ 435  896A ED 5E        	IM 2 											    ; Habilitamos el modo 2 de INTERRUPCIONES.
+ 436  896C F3           	DI
+ 437  896D
+ 438  896D 3E 07        	ld a,%00000111
+ 439  896F CD 42 99     	call Cls
+ 440  8972
+ 441  8972 CD 5C 8D     	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
+ 442  8975
+ 443  8975              ; INICIALIZACIÓN.
+ 444  8975
+ 445  8975 CD 12 88     	call Inicializa_Punteros_de_nivel					 ; Inicializa. 1er NIVEL.
+ 446  8978 CD 24 88     4 call Prepara_cajas 									 ; (Niveles.asm).
+ 447  897B CD 81 8B     	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en la 1ª entidad del_
+ 448  897E              ;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.
+ 449  897E CD 97 8B     	call Inicia_punteros_de_albumes_y_malotes			 ; Iniciamos los punteros de los álbumes de fotos y cajas de_
+ 450  8981              ;													     ; _ malotes antes de guardar ninguna foto.
+ 451  8981              ; ----------
+ 452  8981
+ 453  8981 CD 0C 8D     	call Restore_entidad
+ 454  8984
+ 455  8984 21 0F 89     	ld hl,Numero_parcial_de_entidades
+ 456  8987 46           	ld b,(hl)
+ 457  8988 04           	inc b
+ 458  8989 05           	dec b
+ 459  898A 28 0E        	jr z,3F										   		 ; Si no hay entidades, cargamos AMADEUS.
+ 460  898C
+ 461  898C              ;	Cada vez que iniciamos una entidad, hay que hacer una llamada a (Inicia_Puntero_objeto).
+ 462  898C              ;   Inicialmente tengo cargada la 1ª entidad en DRAW.
+ 463  898C              ;	Pintamos el resto de entidades:
+ 464  898C
+ 465  898C              ;	INICIA ENTIDADES !!!!!
+ 466  898C
+ 467  898C C5           1 push bc  												; Guardo el contador de entidades.
+ 468  898D CD 51 8B     	call Inicia_entidad
+ 469  8990 C1           	pop bc
+ 470  8991 10 F9        	djnz 1B  											; Decremento el contador de entidades.
+ 471  8993
+ 472  8993              ; Si Amadeus ya está iniciado, saltamos a [Inicia_punteros_de_cajas] y [Restore_entidad].
+ 473  8993              ; (Esto se dá cuando se inicia una nueva oleada).
+ 474  8993
+ 475  8993 3A 05 89     	ld a,(Ctrl_1)
+ 476  8996 CB 5F        	bit 3,a
+ 477  8998 20 00        	jr nz,5F											; Loop
+ 478  899A
+ 479  899A              ; 	INICIA AMADEUS !!!!!
+ 480  899A
+ 481  899A              3
+ 482  899A
+ 483  899A              ;	call Restore_Amadeus
+ 484  899A              ;	call Inicia_Puntero_objeto
+ 485  899A              ;	call Draw
+ 486  899A              ;	call Guarda_foto_registros
+ 487  899A              ;	call Guarda_datos_de_borrado_Amadeus
+ 488  899A
+ 489  899A              ;	ld de,Amadeus_db
+ 490  899A              ;	call Store_Amadeus
  491  899A
- 492  899A              ;	call Restore_Amadeus
- 493  899A              ;	call Inicia_Puntero_objeto
- 494  899A              ;	call Draw
- 495  899A              ;	call Guarda_foto_registros
- 496  899A              ;	call Guarda_datos_de_borrado_Amadeus
- 497  899A
- 498  899A              ;	ld de,Amadeus_db
- 499  899A              ;	call Store_Amadeus
- 500  899A
- 501  899A              ; 	INICIA DISPAROS !!!!!
- 502  899A
- 503  899A              ;	call Inicia_Puntero_Disparo_Entidades
- 504  899A              ;	call Inicia_Puntero_Disparo_Amadeus
- 505  899A
- 506  899A              ; Una vez inicializadas las entidades y Amadeus, Cargamos la 1ª entidad en DRAW.
- 507  899A
- 508  899A CD 81 8B     5 call Inicia_punteros_de_cajas
- 509  899D CD 0C 8D     	call Restore_entidad
- 510  89A0
- 511  89A0 3A 05 89     	ld a,(Ctrl_1)
- 512  89A3 CB 5F        	bit 3,a
- 513  89A5 28 07        	jr z,6F
- 514  89A7
- 515  89A7              ; Se ha producido `RECARGA' de las cajas DRAW, RES 3(HL).
- 516  89A7
- 517  89A7 21 05 89     	ld hl,Ctrl_1
- 518  89AA CB 9E        	res 3,(hl)
- 519  89AC 18 03        	jr Main
- 520  89AE
- 521  89AE              ; En este punto tenemos el 1er FRAME preparado. Los datos del FRAME se encuentran en Album_de_fotos.
- 522  89AE              ; Después del guardado de cada FRAME hemos de llamar a [Avanza_puntero_de_album_de_fotos_y_malotes]_
- 523  89AE              ; _ para situarnos en el siguiente album.
- 524  89AE
- 525  89AE CD C8 8B     6 call Avanza_puntero_de_album_de_fotos_de_entidades
+ 492  899A              ; 	INICIA DISPAROS !!!!!
+ 493  899A
+ 494  899A              ;	call Inicia_Puntero_Disparo_Entidades
+ 495  899A              ;	call Inicia_Puntero_Disparo_Amadeus
+ 496  899A
+ 497  899A              ; Una vez inicializadas las entidades y Amadeus, Cargamos la 1ª entidad en DRAW.
+ 498  899A
+ 499  899A CD 81 8B     5 call Inicia_punteros_de_cajas
+ 500  899D CD 0C 8D     	call Restore_entidad
+ 501  89A0
+ 502  89A0 3A 05 89     	ld a,(Ctrl_1)
+ 503  89A3 CB 5F        	bit 3,a
+ 504  89A5 28 07        	jr z,6F
+ 505  89A7
+ 506  89A7              ; Se ha producido `RECARGA' de las cajas DRAW, RES 3(HL).
+ 507  89A7
+ 508  89A7 21 05 89     	ld hl,Ctrl_1
+ 509  89AA CB 9E        	res 3,(hl)
+ 510  89AC 18 03        	jr Main
+ 511  89AE
+ 512  89AE              ; En este punto tenemos el 1er FRAME preparado. Los datos del FRAME se encuentran en Album_de_fotos.
+ 513  89AE              ; Después del guardado de cada FRAME hemos de llamar a [Avanza_puntero_de_album_de_fotos_y_malotes]_
+ 514  89AE              ; _ para situarnos en el siguiente album.
+ 515  89AE
+ 516  89AE CD C8 8B     6 call Avanza_puntero_de_album_de_fotos_de_entidades
+ 517  89B1
+ 518  89B1
+ 519  89B1              ; ------------------------------------
+ 520  89B1
+ 521  89B1              Main
+ 522  89B1              ;
+ 523  89B1              ;	3/8/23
+ 524  89B1
+ 525  89B1              ; 	ei
  526  89B1
- 527  89B1
- 528  89B1              ; ------------------------------------
- 529  89B1
- 530  89B1              Main
- 531  89B1              ;
- 532  89B1              ;	3/8/23
- 533  89B1
- 534  89B1              ; 	ei
- 535  89B1
- 536  89B1 3A 56 89     	ld a,(Clock_Entidades_en_curso)						; Inicialmente, (Clock_Entidades_en_curso)="30".
- 537  89B4 47           	ld b,a
- 538  89B5 3A 53 89     	ld a,(Contador_de_frames)
- 539  89B8 B8           	cp b
- 540  89B9 20 18        	jr nz,13F
- 541  89BB
- 542  89BB 3A 0F 89     	ld a,(Numero_parcial_de_entidades)
- 543  89BE 47           	ld b,a
- 544  89BF 3A 10 89     	ld a,(Entidades_en_curso)
- 545  89C2 B8           	cp b
- 546  89C3 28 0E        	jr z,13F
- 547  89C5 30 0C        	jr nc,13F
- 548  89C7
- 549  89C7 3C           	inc a
- 550  89C8 32 10 89     	ld (Entidades_en_curso),a
- 551  89CB
- 552  89CB 3A 56 89     	ld a,(Clock_Entidades_en_curso)
- 553  89CE
- 554  89CE              ;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
- 555  89CE              ;! _ IMPREDECIBLE !!!!
- 556  89CE
- 557  89CE C6 64        	add 100
- 558  89D0 32 56 89     	ld (Clock_Entidades_en_curso),a
- 559  89D3
- 560  89D3              ; Habilita disparos.
- 561  89D3
- 562  89D3 21 58 89     13 ld hl,Disparo_Amadeus
- 563  89D6 11 5A 89     	ld de,CLOCK_repone_disparo_Amadeus
- 564  89D9 CD 06 9D     	call Habilita_disparos 								; 30 Frames como mínimo entre cada disparo de Amadeus.
- 565  89DC
- 566  89DC 21 5B 89     	ld hl,Disparo_entidad 								; El nº de frames mínimo entre disparos de entidad será_
- 567  89DF 11 5D 89     	ld de,CLOCK_repone_disparo_entidad 					; _ variable y variará en función de la dificultad.
- 568  89E2 CD 06 9D     	call Habilita_disparos
- 569  89E5
- 570  89E5              ; COLISIONES.
- 571  89E5
- 572  89E5 CD 17 92     	call Selector_de_impactos							; Analizamos el contenido de (Impacto2).
- 573  89E8
- 574  89E8              ; Bit 0 a "1" Impacto en entidad por disparo. ($01)
- 575  89E8              ; Bit 1 a "1" Impacto en Amadeus por disparo. ($02)
- 576  89E8              ; Bit 2 a "1" Colisión de Amadeus con entidad, (sin disparo). ($04)
- 577  89E8
- 578  89E8 AF           	xor a
- 579  89E9 32 45 89     	ld (Impacto2),a										; Flag (Impacto2) a "0".
- 580  89EC
- 581  89EC CD 81 8B     	call Inicia_punteros_de_cajas
- 582  89EF CD 0C 8D     12 call Restore_entidad 								; Vuelca los datos de la entidad, hacia la que apunta (Puntero_store_caja),_
- 583  89F2              ; 														; _ en DRAW.
- 584  89F2 3A C8 88     	ld a,(Filas)
- 585  89F5 A7           	and a
- 586  89F6 20 05        	jr nz,10F 											; Nos situamos en la 1ª entidad NO VACÍA del índice de ENTIDADES.
- 587  89F8 CD 1E 8D     	call Incrementa_punteros_de_cajas
- 588  89FB 18 F2        	jr 12B
- 589  89FD
- 590  89FD              ; ---------------------------------------------------------------------------------------
- 591  89FD
- 592  89FD 3A 0F 89     10 ld a,(Numero_parcial_de_entidades)
- 593  8A00 47               ld b,a
- 594  8A01 A7           	and a
- 595  8A02 20 14        	jr nz,11F
- 596  8A04
- 597  8A04 21 05 89     	ld hl,Ctrl_1
- 598  8A07 CB 66        	bit 4,(hl)
- 599  8A09 C2 96 8A     	jp nz,16F
- 600  8A0C
- 601  8A0C 21 05 89     	ld hl,Ctrl_1
- 602  8A0F CB DE        	set 3,(hl)											; Señal de RECARGA de las cajas DRAW activada. NUEVA OLEADA !!!!!!!!
- 603  8A11
- 604  8A11 3A 53 89     	ld a,(Contador_de_frames)
- 605  8A14 3C           	inc a
- 606  8A15 32 57 89     	ld (Activa_recarga_cajas),a
- 607  8A18
- 608  8A18              ; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- -----
- 609  8A18
- 610  8A18 3A 10 89     11 ld a,(Entidades_en_curso)
- 611  8A1B A7           	and a
- 612  8A1C CA 96 8A     	jp z,16F											; Si no hay entidades en curso, RESTORE AMADEUS.
- 613  8A1F 47           	ld b,a												; (Entidades_en_curso) en A´ y B.
- 614  8A20
- 615  8A20              ; Código que ejecutamos con cada entidad:
- 616  8A20              ;	--------------------------------------- GESTIÓN DE ENTIDADES. !!!!!!!!!!
- 617  8A20
- 618  8A20 C5           15 push bc 												; Nº de entidades en curso.
- 619  8A21
- 620  8A21              ; Impacto ???
- 621  8A21
- 622  8A21 3A E1 88     	ld a,(Impacto)
- 623  8A24 A7           	and a
- 624  8A25 28 32        	jr z,8F
- 625  8A27
- 626  8A27              ; Hay Impacto en esta entidad.
- 627  8A27
- 628  8A27 21 55 89     	ld hl,Clock_explosion								; _ a gestionar la siguiente entidad, JR 6F.
- 629  8A2A 35           	dec (hl)
- 630  8A2B 20 63        	jr nz,17F
- 631  8A2D
- 632  8A2D              ;! Velocidad de la animación de la explosión.
- 633  8A2D
- 634  8A2D 36 04        	ld (hl),4 											; Reiniciamos el temporizador de la explosión,_
- 635  8A2F              ;														; _,(velocidad de la explosión).
- 636  8A2F
- 637  8A2F              ; !!!!!!!! Explosiónnnnnnnnn 20/9/23
- 638  8A2F 18 FE        	jr $
- 639  8A31
- 640  8A31 CD CD 8D     	call Repone_datos_de_borrado
- 641  8A34 CD 25 8C     	call Limpia_Variables_de_borrado					; Guarda los datos de la entidad `impactada´ para borrarla.
- 642  8A37
- 643  8A37
- 644  8A37              ;!!!!!! Desintegración/Explosión!!!!!!!!!!!
- 645  8A37
- 646  8A37 3A 03 89     	ld a,(Ctrl_2)
- 647  8A3A CB 4F        	bit 1,a
- 648  8A3C 20 3D        	jr nz,7F											; Se han iniciado los punteros de explosión???
- 649  8A3E
- 650  8A3E              ; Inicialización del proceso de explosión. Omitimos si ya hemos imprimido el 1er FRAME de la explosión.
- 651  8A3E
- 652  8A3E 3A D0 88     	ld a,(CTRL_DESPLZ)
- 653  8A41 A7           	and a
- 654  8A42 20 08        	jr nz,18F
- 655  8A44
- 656  8A44 21 84 84     	ld hl,Indice_Explosion_2x2-2
- 657  8A47 22 D6 88     	ld (Puntero_DESPLZ_der),hl
- 658  8A4A 18 06        	jr 19F
- 659  8A4C
- 660  8A4C 21 EE 83     18 ld hl,Indice_Explosion_2x3-2
- 661  8A4F 22 D6 88     	ld (Puntero_DESPLZ_der),hl
- 662  8A52
- 663  8A52 21 03 89     19 ld hl,Ctrl_2											; Activamos el proceso de explosión.
- 664  8A55 CB CE        	set 1,(hl)
- 665  8A57 18 22        	jr 7F
- 666  8A59
- 667  8A59              ; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
- 668  8A59              ; _con las coordenadas de la entidad almacenada en DRAW.
- 669  8A59
- 670  8A59 3A 05 89     8 ld a,(Ctrl_1)
- 671  8A5C CB 57        	bit 2,a
- 672  8A5E 28 1B        	jr z,7F
- 673  8A60
- 674  8A60 2A 48 89     	ld hl,(Coordenadas_disparo_certero)
- 675  8A63 EB           	ex de,hl 											; D contiene la coordenada_y del disparo.
- 676  8A64              ;														; E contiene la coordenada_X del disparo.
- 677  8A64 2A CE 88     	ld hl,(Coordenada_X) 								; L COLUMNA (Coordenada_x de la entidad).
- 678  8A67              ;														; H FILA, (Coordenada_y de la entidad).
- 679  8A67 A7           	and a
- 680  8A68 ED 52        	sbc hl,de
- 681  8A6A
- 682  8A6A CD 4E 92     	call Determina_resultado_comparativa
- 683  8A6D
- 684  8A6D 78           	ld a,b
- 685  8A6E A7           	and a
- 686  8A6F 28 0A        	jr z,7F												; B="0" significa que esta entidad no es la impactada.
- 687  8A71
- 688  8A71              ; ----- ----- -----
- 689  8A71
- 690  8A71 3E 01        	ld a,1												; Esta entidad ha sido alcanzada por un disparo_
- 691  8A73 32 E1 88     	ld (Impacto),a 										; _de Amadeus. Lo indicamos activando su .db (Impacto).
- 692  8A76
- 693  8A76 21 05 89     	ld hl,Ctrl_1
- 694  8A79 CB 96        	res 2,(hl)
- 695  8A7B
- 696  8A7B CD ED 8A     7 call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
- 697  8A7E
- 698  8A7E 3A F2 88     	ld a,(Ctrl_0)
- 699  8A81 CB 67        	bit 4,a
- 700  8A83 28 0B        	jr z,17F                                       	    ; Omitimos BORRAR/PINTAR si no hay movimiento.
- 701  8A85
- 702  8A85              ; Voy a utilizar una rutina de lectura de teclado para disparar con cualquier entidad.
- 703  8A85              ; [[[
- 704  8A85 CD A7 8D     	call Detecta_disparo_entidad
- 705  8A88              ; ]]]
- 706  8A88
- 707  8A88 CD 62 8B     	call Guarda_foto_entidad_a_pintar					; PINTAMOS !!!!!!!!!!!!!!!!!!
- 708  8A8B              ;	call Guarda_datos_de_borrado
- 709  8A8B
- 710  8A8B 21 F2 88     	ld hl,Ctrl_0
- 711  8A8E CB A6            res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
- 712  8A90
- 713  8A90 CD D1 8C     17 call Store_Restore_cajas
- 714  8A93
- 715  8A93 C1           	pop bc
- 716  8A94 10 8A        	djnz 15B
- 717  8A96
- 718  8A96              ;! Activando estas líneas podemos habilitar 2 explosiones en el mismo FRAME.
- 719  8A96              ; Hemos gestionado todas las unidades.
- 720  8A96              ; Desactivamos el flag de impacto en entidad por disparo de amadeus.
- 721  8A96
- 722  8A96              ;	ld hl,Ctrl_1
- 723  8A96              ;	res 2,(hl)
- 724  8A96
- 725  8A96 CD C8 8B     16 call Avanza_puntero_de_album_de_fotos_de_entidades	; Hemos terminado de "grabar" el frame completo de entidades.
- 726  8A99              ;														; Avanzamos al siguiente álbum para iniciar el siguiente FRAME.
- 727  8A99
- 728  8A99              ; ----------------------------------------
- 729  8A99
- 730  8A99 3A 05 89     	ld a,(Ctrl_1) 										; Existe Loop?
- 731  8A9C CB 5F        	bit 3,a												; Si este bit es "1". Hay recarga de nueva oleada.
- 732  8A9E CA B1 89     	jp z,Main
- 733  8AA1
- 734  8AA1 3A 53 89     	ld a,(Contador_de_frames)
- 735  8AA4 47           	ld b,a
- 736  8AA5 3A 57 89     	ld a,(Activa_recarga_cajas)
- 737  8AA8 B8           	cp b
- 738  8AA9 28 08        	jr z,20F
- 739  8AAB
- 740  8AAB 21 05 89     	ld hl,Ctrl_1
- 741  8AAE CB E6        	set 4,(hl)
- 742  8AB0 C3 B1 89     	jp Main
- 743  8AB3
- 744  8AB3 21 05 89     20 ld hl,Ctrl_1
- 745  8AB6 CB A6        	res 4,(hl)
- 746  8AB8
- 747  8AB8 3A 53 89     	ld a,(Contador_de_frames)
- 748  8ABB
- 749  8ABB              ;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
- 750  8ABB              ;! _ IMPREDECIBLE !!!!
- 751  8ABB
- 752  8ABB C6 0A        	add 10
- 753  8ABD 32 56 89     	ld (Clock_Entidades_en_curso),a
- 754  8AC0
- 755  8AC0 C3 78 89     	jp 4B
- 756  8AC3
- 757  8AC3 C9           	ret
- 758  8AC4
- 759  8AC4              ; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- -----
- 760  8AC4
- 761  8AC4              Gestiona_Amadeus
- 762  8AC4
- 763  8AC4 3E 04            ld a,4
- 764  8AC6 D3 FE        	out ($fe),a											; Azul.
- 765  8AC8
- 766  8AC8 CD 33 8D     	call Restore_Amadeus
- 767  8ACB
- 768  8ACB              ;! Activa/desactiva impacto con Amadeus.
- 769  8ACB
- 770  8ACB 3A E1 88     	ld a,(Impacto)
- 771  8ACE A7           	and a
- 772  8ACF 20 FE        	jr nz,$
- 773  8AD1
- 774  8AD1 CD 3E 8B     	call Mov_Amadeus
- 775  8AD4
- 776  8AD4 3A F2 88     	ld a,(Ctrl_0)
- 777  8AD7 CB 67        	bit 4,a
- 778  8AD9 28 06        	jr z,14F                                            ; Omitimos BORRAR/PINTAR si no hay movimiento.
- 779  8ADB
- 780  8ADB CD 62 8B     	call Guarda_foto_entidad_a_pintar
- 781  8ADE CD AD 8D     	call Guarda_datos_de_borrado_Amadeus
- 782  8AE1
- 783  8AE1 21 F2 88     14 ld hl,Ctrl_0
- 784  8AE4 CB A6            res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
- 785  8AE6
- 786  8AE6 11 9E 85     32 ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
- 787  8AE9 CD 45 8D     	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
- 788  8AEC
- 789  8AEC              ;	call Motor_de_disparos								; Borra/mueve/pinta cada uno de los disparos y crea un nuevo album de fotos.
- 790  8AEC
- 791  8AEC              ; Calculamos el nº de malotes y de disparotes para pintarlos nada más comenzar el siguiente FRAME.
- 792  8AEC
- 793  8AEC              ;	call Calcula_numero_de_disparotes
- 794  8AEC
- 795  8AEC C9           	ret
- 796  8AED
- 797  8AED              ; --------------------------------------------------------------------------------------------------------------
- 798  8AED              ;
- 799  8AED              ;	27/05/23
- 800  8AED
- 801  8AED              Mov_obj
- 802  8AED
- 803  8AED 3A 03 89     	ld a,(Ctrl_2)
- 804  8AF0 CB 4F        	bit 1,a
- 805  8AF2 28 2B        	jr z,2F												; Se ha iniciado la EXPLOSIÓN???
- 806  8AF4
- 807  8AF4              ; Explosión:
- 808  8AF4
- 809  8AF4 3A 04 89     	ld a,(Frames_explosion)
- 810  8AF7 A7           	and a
- 811  8AF8 20 11        	jr nz,4F
- 812  8AFA
- 813  8AFA              ; Una alimaña menos!!!!!!!!!1
- 814  8AFA
- 815  8AFA CD 4E 8D     	call Borra_datos_entidad							; Borramos todos los datos de la entidad.
- 816  8AFD 21 0F 89     	ld hl,Numero_parcial_de_entidades					; Una alimaña menos.
- 817  8B00 35           	dec (hl)
- 818  8B01 21 10 89     	ld hl,Entidades_en_curso
- 819  8B04 35           	dec (hl)
- 820  8B05 21 0E 89     	ld hl,Numero_de_entidades
- 821  8B08 35           	dec (hl)
- 822  8B09 18 32        	jr 3F
- 823  8B0B
- 824  8B0B              ; -----
- 825  8B0B
- 826  8B0B              ;	`Movemos´ la explosión.
- 827  8B0B
- 828  8B0B 2A D6 88     4 ld hl,(Puntero_DESPLZ_der)
- 829  8B0E 23           	inc hl
- 830  8B0F 23           	inc hl
- 831  8B10 22 D6 88     	ld (Puntero_DESPLZ_der),hl
- 832  8B13 CD 83 8C     	call Extrae_address
- 833  8B16 22 CC 88     	ld (Puntero_objeto),hl
- 834  8B19
- 835  8B19 21 04 89     	ld hl,Frames_explosion
- 836  8B1C 35           	dec (hl)
- 837  8B1D
- 838  8B1D              ;!!!!!	call Guarda_foto_entidad_a_borrar -----
- 839  8B1D 18 1E        	jr 3F
- 840  8B1F
- 841  8B1F AF           2 xor a
- 842  8B20 32 F2 88     	ld (Ctrl_0),a 										; El bit4 de (Ctrl_0) puede estar alzado debido al movimiento de Amadeus.
- 843  8B23
- 844  8B23              ; Movemos Entidades malignas.
- 845  8B23
- 846  8B23 CD B1 9E     	call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
- 847  8B26
- 848  8B26 3A F2 88     	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
- 849  8B29 CB 67        	bit 4,a
- 850  8B2B C8           	ret z
- 851  8B2C
- 852  8B2C              ; Ha habido desplazamiento de la entidad maligna.
- 853  8B2C              ; Ha llegado a zona de AMADEUS ???
- 854  8B2C
- 855  8B2C 3A CF 88     	ld a,(Coordenada_y)
- 856  8B2F FE 14        	cp $14
- 857  8B31 D4 DC 8F     	call nc,Compara_coordenadas_X 						; Si esta entidad ocupa alguna de las columnas que_
- 858  8B34              ;														; ocupa Amadeus, tendremos el .db (Impacto)="1".
- 859  8B34              ; ---------
- 860  8B34
- 861  8B34 CD 69 8B         call Prepara_var_pintado 			                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.
- 862  8B37 CD CD 8D     	call Repone_datos_de_borrado
- 863  8B3A CD 25 8C     	call Limpia_Variables_de_borrado
- 864  8B3D
- 865  8B3D C9           3 ret													; _de la misma.
- 866  8B3E
- 867  8B3E              ; --------------------------------------------------------------------------------------------------------------
- 868  8B3E              ;
- 869  8B3E              ;	29/1/23
- 870  8B3E
- 871  8B3E              Mov_Amadeus
- 872  8B3E
- 873  8B3E CD 70 8D     	call Movimiento_Amadeus 							; MOVEMOS AMADEUS.
- 874  8B41
- 875  8B41 3A F2 88     	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
- 876  8B44 CB 67        	bit 4,a
- 877  8B46 C8           	ret z
- 878  8B47
- 879  8B47              ; ---------
- 880  8B47
- 881  8B47 CD 69 8B         call Prepara_var_pintado			                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.
- 882  8B4A CD BD 8D     	call Repone_datos_de_borrado_Amadeus
- 883  8B4D CD 25 8C     	call Limpia_Variables_de_borrado
- 884  8B50
- 885  8B50 C9           	ret
- 886  8B51
- 887  8B51              ; -----------------------------------------------------------------------------------
- 888  8B51              ;
- 889  8B51              ;	01/11/23
- 890  8B51
- 891  8B51 CD 89 8C     Inicia_entidad	call Inicia_Puntero_objeto
- 892  8B54 CD 56 99     	call Recompone_posicion_inicio
- 893  8B57 CD 35 93     	call Draw
- 894  8B5A CD A0 7F     	call Guarda_foto_registros
- 895  8B5D F3           	di													; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET.
- 896  8B5E              ;														; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
- 897  8B5E CD D1 8C     	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
- 898  8B61 C9           	ret
+ 527  89B1 3A 56 89     	ld a,(Clock_Entidades_en_curso)						; Inicialmente, (Clock_Entidades_en_curso)="30".
+ 528  89B4 47           	ld b,a
+ 529  89B5 3A 53 89     	ld a,(Contador_de_frames)
+ 530  89B8 B8           	cp b
+ 531  89B9 20 18        	jr nz,13F
+ 532  89BB
+ 533  89BB 3A 0F 89     	ld a,(Numero_parcial_de_entidades)
+ 534  89BE 47           	ld b,a
+ 535  89BF 3A 10 89     	ld a,(Entidades_en_curso)
+ 536  89C2 B8           	cp b
+ 537  89C3 28 0E        	jr z,13F
+ 538  89C5 30 0C        	jr nc,13F
+ 539  89C7
+ 540  89C7 3C           	inc a
+ 541  89C8 32 10 89     	ld (Entidades_en_curso),a
+ 542  89CB
+ 543  89CB 3A 56 89     	ld a,(Clock_Entidades_en_curso)
+ 544  89CE
+ 545  89CE              ;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
+ 546  89CE              ;! _ IMPREDECIBLE !!!!
+ 547  89CE
+ 548  89CE C6 64        	add 100
+ 549  89D0 32 56 89     	ld (Clock_Entidades_en_curso),a
+ 550  89D3
+ 551  89D3              ; Habilita disparos.
+ 552  89D3
+ 553  89D3 21 58 89     13 ld hl,Disparo_Amadeus
+ 554  89D6 11 5A 89     	ld de,CLOCK_repone_disparo_Amadeus
+ 555  89D9 CD 06 9D     	call Habilita_disparos 								; 30 Frames como mínimo entre cada disparo de Amadeus.
+ 556  89DC
+ 557  89DC 21 5B 89     	ld hl,Disparo_entidad 								; El nº de frames mínimo entre disparos de entidad será_
+ 558  89DF 11 5D 89     	ld de,CLOCK_repone_disparo_entidad 					; _ variable y variará en función de la dificultad.
+ 559  89E2 CD 06 9D     	call Habilita_disparos
+ 560  89E5
+ 561  89E5              ; COLISIONES.
+ 562  89E5
+ 563  89E5 CD 17 92     	call Selector_de_impactos							; Analizamos el contenido de (Impacto2).
+ 564  89E8
+ 565  89E8              ; Bit 0 a "1" Impacto en entidad por disparo. ($01)
+ 566  89E8              ; Bit 1 a "1" Impacto en Amadeus por disparo. ($02)
+ 567  89E8              ; Bit 2 a "1" Colisión de Amadeus con entidad, (sin disparo). ($04)
+ 568  89E8
+ 569  89E8 AF           	xor a
+ 570  89E9 32 45 89     	ld (Impacto2),a										; Flag (Impacto2) a "0".
+ 571  89EC
+ 572  89EC CD 81 8B     	call Inicia_punteros_de_cajas
+ 573  89EF CD 0C 8D     12 call Restore_entidad 								; Vuelca los datos de la entidad, hacia la que apunta (Puntero_store_caja),_
+ 574  89F2              ; 														; _ en DRAW.
+ 575  89F2 3A C8 88     	ld a,(Filas)
+ 576  89F5 A7           	and a
+ 577  89F6 20 05        	jr nz,10F 											; Nos situamos en la 1ª entidad NO VACÍA del índice de ENTIDADES.
+ 578  89F8 CD 1E 8D     	call Incrementa_punteros_de_cajas
+ 579  89FB 18 F2        	jr 12B
+ 580  89FD
+ 581  89FD              ; ---------------------------------------------------------------------------------------
+ 582  89FD
+ 583  89FD 3A 0F 89     10 ld a,(Numero_parcial_de_entidades)
+ 584  8A00 47               ld b,a
+ 585  8A01 A7           	and a
+ 586  8A02 20 14        	jr nz,11F
+ 587  8A04
+ 588  8A04 21 05 89     	ld hl,Ctrl_1
+ 589  8A07 CB 66        	bit 4,(hl)
+ 590  8A09 C2 96 8A     	jp nz,16F
+ 591  8A0C
+ 592  8A0C 21 05 89     	ld hl,Ctrl_1
+ 593  8A0F CB DE        	set 3,(hl)											; Señal de RECARGA de las cajas DRAW activada. NUEVA OLEADA !!!!!!!!
+ 594  8A11
+ 595  8A11 3A 53 89     	ld a,(Contador_de_frames)
+ 596  8A14 3C           	inc a
+ 597  8A15 32 57 89     	ld (Activa_recarga_cajas),a
+ 598  8A18
+ 599  8A18              ; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- -----
+ 600  8A18
+ 601  8A18 3A 10 89     11 ld a,(Entidades_en_curso)
+ 602  8A1B A7           	and a
+ 603  8A1C CA 96 8A     	jp z,16F											; Si no hay entidades en curso, RESTORE AMADEUS.
+ 604  8A1F 47           	ld b,a												; (Entidades_en_curso) en A´ y B.
+ 605  8A20
+ 606  8A20              ; Código que ejecutamos con cada entidad:
+ 607  8A20              ;	--------------------------------------- GESTIÓN DE ENTIDADES. !!!!!!!!!!
+ 608  8A20
+ 609  8A20 C5           15 push bc 												; Nº de entidades en curso.
+ 610  8A21
+ 611  8A21              ; Impacto ???
+ 612  8A21
+ 613  8A21 3A E1 88     	ld a,(Impacto)
+ 614  8A24 A7           	and a
+ 615  8A25 28 32        	jr z,8F
+ 616  8A27
+ 617  8A27              ; Hay Impacto en esta entidad.
+ 618  8A27
+ 619  8A27 21 55 89     	ld hl,Clock_explosion								; _ a gestionar la siguiente entidad, JR 6F.
+ 620  8A2A 35           	dec (hl)
+ 621  8A2B 20 63        	jr nz,17F
+ 622  8A2D
+ 623  8A2D              ;! Velocidad de la animación de la explosión.
+ 624  8A2D
+ 625  8A2D 36 04        	ld (hl),4 											; Reiniciamos el temporizador de la explosión,_
+ 626  8A2F              ;														; _,(velocidad de la explosión).
+ 627  8A2F
+ 628  8A2F              ; !!!!!!!! Explosiónnnnnnnnn 20/9/23
+ 629  8A2F 18 FE        	jr $
+ 630  8A31
+ 631  8A31 CD CD 8D     	call Repone_datos_de_borrado
+ 632  8A34 CD 25 8C     	call Limpia_Variables_de_borrado					; Guarda los datos de la entidad `impactada´ para borrarla.
+ 633  8A37
+ 634  8A37
+ 635  8A37              ;!!!!!! Desintegración/Explosión!!!!!!!!!!!
+ 636  8A37
+ 637  8A37 3A 03 89     	ld a,(Ctrl_2)
+ 638  8A3A CB 4F        	bit 1,a
+ 639  8A3C 20 3D        	jr nz,7F											; Se han iniciado los punteros de explosión???
+ 640  8A3E
+ 641  8A3E              ; Inicialización del proceso de explosión. Omitimos si ya hemos imprimido el 1er FRAME de la explosión.
+ 642  8A3E
+ 643  8A3E 3A D0 88     	ld a,(CTRL_DESPLZ)
+ 644  8A41 A7           	and a
+ 645  8A42 20 08        	jr nz,18F
+ 646  8A44
+ 647  8A44 21 84 84     	ld hl,Indice_Explosion_2x2-2
+ 648  8A47 22 D6 88     	ld (Puntero_DESPLZ_der),hl
+ 649  8A4A 18 06        	jr 19F
+ 650  8A4C
+ 651  8A4C 21 EE 83     18 ld hl,Indice_Explosion_2x3-2
+ 652  8A4F 22 D6 88     	ld (Puntero_DESPLZ_der),hl
+ 653  8A52
+ 654  8A52 21 03 89     19 ld hl,Ctrl_2											; Activamos el proceso de explosión.
+ 655  8A55 CB CE        	set 1,(hl)
+ 656  8A57 18 22        	jr 7F
+ 657  8A59
+ 658  8A59              ; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
+ 659  8A59              ; _con las coordenadas de la entidad almacenada en DRAW.
+ 660  8A59
+ 661  8A59 3A 05 89     8 ld a,(Ctrl_1)
+ 662  8A5C CB 57        	bit 2,a
+ 663  8A5E 28 1B        	jr z,7F
+ 664  8A60
+ 665  8A60 2A 48 89     	ld hl,(Coordenadas_disparo_certero)
+ 666  8A63 EB           	ex de,hl 											; D contiene la coordenada_y del disparo.
+ 667  8A64              ;														; E contiene la coordenada_X del disparo.
+ 668  8A64 2A CE 88     	ld hl,(Coordenada_X) 								; L COLUMNA (Coordenada_x de la entidad).
+ 669  8A67              ;														; H FILA, (Coordenada_y de la entidad).
+ 670  8A67 A7           	and a
+ 671  8A68 ED 52        	sbc hl,de
+ 672  8A6A
+ 673  8A6A CD 4E 92     	call Determina_resultado_comparativa
+ 674  8A6D
+ 675  8A6D 78           	ld a,b
+ 676  8A6E A7           	and a
+ 677  8A6F 28 0A        	jr z,7F												; B="0" significa que esta entidad no es la impactada.
+ 678  8A71
+ 679  8A71              ; ----- ----- -----
+ 680  8A71
+ 681  8A71 3E 01        	ld a,1												; Esta entidad ha sido alcanzada por un disparo_
+ 682  8A73 32 E1 88     	ld (Impacto),a 										; _de Amadeus. Lo indicamos activando su .db (Impacto).
+ 683  8A76
+ 684  8A76 21 05 89     	ld hl,Ctrl_1
+ 685  8A79 CB 96        	res 2,(hl)
+ 686  8A7B
+ 687  8A7B CD ED 8A     7 call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
+ 688  8A7E
+ 689  8A7E 3A F2 88     	ld a,(Ctrl_0)
+ 690  8A81 CB 67        	bit 4,a
+ 691  8A83 28 0B        	jr z,17F                                       	    ; Omitimos BORRAR/PINTAR si no hay movimiento.
+ 692  8A85
+ 693  8A85              ; Voy a utilizar una rutina de lectura de teclado para disparar con cualquier entidad.
+ 694  8A85              ; [[[
+ 695  8A85 CD A7 8D     	call Detecta_disparo_entidad
+ 696  8A88              ; ]]]
+ 697  8A88
+ 698  8A88 CD 62 8B     	call Guarda_foto_entidad_a_pintar					; PINTAMOS !!!!!!!!!!!!!!!!!!
+ 699  8A8B              ;	call Guarda_datos_de_borrado
+ 700  8A8B
+ 701  8A8B 21 F2 88     	ld hl,Ctrl_0
+ 702  8A8E CB A6            res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
+ 703  8A90
+ 704  8A90 CD D1 8C     17 call Store_Restore_cajas
+ 705  8A93
+ 706  8A93 C1           	pop bc
+ 707  8A94 10 8A        	djnz 15B
+ 708  8A96
+ 709  8A96              ;! Activando estas líneas podemos habilitar 2 explosiones en el mismo FRAME.
+ 710  8A96              ; Hemos gestionado todas las unidades.
+ 711  8A96              ; Desactivamos el flag de impacto en entidad por disparo de amadeus.
+ 712  8A96
+ 713  8A96              ;	ld hl,Ctrl_1
+ 714  8A96              ;	res 2,(hl)
+ 715  8A96
+ 716  8A96 CD C8 8B     16 call Avanza_puntero_de_album_de_fotos_de_entidades	; Hemos terminado de "grabar" el frame completo de entidades.
+ 717  8A99              ;														; Avanzamos al siguiente álbum para iniciar el siguiente FRAME.
+ 718  8A99
+ 719  8A99              ; ----------------------------------------
+ 720  8A99
+ 721  8A99 3A 05 89     	ld a,(Ctrl_1) 										; Existe Loop?
+ 722  8A9C CB 5F        	bit 3,a												; Si este bit es "1". Hay recarga de nueva oleada.
+ 723  8A9E CA B1 89     	jp z,Main
+ 724  8AA1
+ 725  8AA1 3A 53 89     	ld a,(Contador_de_frames)
+ 726  8AA4 47           	ld b,a
+ 727  8AA5 3A 57 89     	ld a,(Activa_recarga_cajas)
+ 728  8AA8 B8           	cp b
+ 729  8AA9 28 08        	jr z,20F
+ 730  8AAB
+ 731  8AAB 21 05 89     	ld hl,Ctrl_1
+ 732  8AAE CB E6        	set 4,(hl)
+ 733  8AB0 C3 B1 89     	jp Main
+ 734  8AB3
+ 735  8AB3 21 05 89     20 ld hl,Ctrl_1
+ 736  8AB6 CB A6        	res 4,(hl)
+ 737  8AB8
+ 738  8AB8 3A 53 89     	ld a,(Contador_de_frames)
+ 739  8ABB
+ 740  8ABB              ;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
+ 741  8ABB              ;! _ IMPREDECIBLE !!!!
+ 742  8ABB
+ 743  8ABB C6 0A        	add 10
+ 744  8ABD 32 56 89     	ld (Clock_Entidades_en_curso),a
+ 745  8AC0
+ 746  8AC0 C3 78 89     	jp 4B
+ 747  8AC3
+ 748  8AC3 C9           	ret
+ 749  8AC4
+ 750  8AC4              ; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- -----
+ 751  8AC4
+ 752  8AC4              Gestiona_Amadeus
+ 753  8AC4
+ 754  8AC4 3E 04            ld a,4
+ 755  8AC6 D3 FE        	out ($fe),a											; Azul.
+ 756  8AC8
+ 757  8AC8 CD 33 8D     	call Restore_Amadeus
+ 758  8ACB
+ 759  8ACB              ;! Activa/desactiva impacto con Amadeus.
+ 760  8ACB
+ 761  8ACB 3A E1 88     	ld a,(Impacto)
+ 762  8ACE A7           	and a
+ 763  8ACF 20 FE        	jr nz,$
+ 764  8AD1
+ 765  8AD1 CD 3E 8B     	call Mov_Amadeus
+ 766  8AD4
+ 767  8AD4 3A F2 88     	ld a,(Ctrl_0)
+ 768  8AD7 CB 67        	bit 4,a
+ 769  8AD9 28 06        	jr z,14F                                            ; Omitimos BORRAR/PINTAR si no hay movimiento.
+ 770  8ADB
+ 771  8ADB CD 62 8B     	call Guarda_foto_entidad_a_pintar
+ 772  8ADE CD AD 8D     	call Guarda_datos_de_borrado_Amadeus
+ 773  8AE1
+ 774  8AE1 21 F2 88     14 ld hl,Ctrl_0
+ 775  8AE4 CB A6            res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
+ 776  8AE6
+ 777  8AE6 11 9E 85     32 ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
+ 778  8AE9 CD 45 8D     	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
+ 779  8AEC
+ 780  8AEC              ;	call Motor_de_disparos								; Borra/mueve/pinta cada uno de los disparos y crea un nuevo album de fotos.
+ 781  8AEC
+ 782  8AEC              ; Calculamos el nº de malotes y de disparotes para pintarlos nada más comenzar el siguiente FRAME.
+ 783  8AEC
+ 784  8AEC              ;	call Calcula_numero_de_disparotes
+ 785  8AEC
+ 786  8AEC C9           	ret
+ 787  8AED
+ 788  8AED              ; --------------------------------------------------------------------------------------------------------------
+ 789  8AED              ;
+ 790  8AED              ;	27/05/23
+ 791  8AED
+ 792  8AED              Mov_obj
+ 793  8AED
+ 794  8AED 3A 03 89     	ld a,(Ctrl_2)
+ 795  8AF0 CB 4F        	bit 1,a
+ 796  8AF2 28 2B        	jr z,2F												; Se ha iniciado la EXPLOSIÓN???
+ 797  8AF4
+ 798  8AF4              ; Explosión:
+ 799  8AF4
+ 800  8AF4 3A 04 89     	ld a,(Frames_explosion)
+ 801  8AF7 A7           	and a
+ 802  8AF8 20 11        	jr nz,4F
+ 803  8AFA
+ 804  8AFA              ; Una alimaña menos!!!!!!!!!1
+ 805  8AFA
+ 806  8AFA CD 4E 8D     	call Borra_datos_entidad							; Borramos todos los datos de la entidad.
+ 807  8AFD 21 0F 89     	ld hl,Numero_parcial_de_entidades					; Una alimaña menos.
+ 808  8B00 35           	dec (hl)
+ 809  8B01 21 10 89     	ld hl,Entidades_en_curso
+ 810  8B04 35           	dec (hl)
+ 811  8B05 21 0E 89     	ld hl,Numero_de_entidades
+ 812  8B08 35           	dec (hl)
+ 813  8B09 18 32        	jr 3F
+ 814  8B0B
+ 815  8B0B              ; -----
+ 816  8B0B
+ 817  8B0B              ;	`Movemos´ la explosión.
+ 818  8B0B
+ 819  8B0B 2A D6 88     4 ld hl,(Puntero_DESPLZ_der)
+ 820  8B0E 23           	inc hl
+ 821  8B0F 23           	inc hl
+ 822  8B10 22 D6 88     	ld (Puntero_DESPLZ_der),hl
+ 823  8B13 CD 83 8C     	call Extrae_address
+ 824  8B16 22 CC 88     	ld (Puntero_objeto),hl
+ 825  8B19
+ 826  8B19 21 04 89     	ld hl,Frames_explosion
+ 827  8B1C 35           	dec (hl)
+ 828  8B1D
+ 829  8B1D              ;!!!!!	call Guarda_foto_entidad_a_borrar -----
+ 830  8B1D 18 1E        	jr 3F
+ 831  8B1F
+ 832  8B1F AF           2 xor a
+ 833  8B20 32 F2 88     	ld (Ctrl_0),a 										; El bit4 de (Ctrl_0) puede estar alzado debido al movimiento de Amadeus.
+ 834  8B23
+ 835  8B23              ; Movemos Entidades malignas.
+ 836  8B23
+ 837  8B23 CD B1 9E     	call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
+ 838  8B26
+ 839  8B26 3A F2 88     	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
+ 840  8B29 CB 67        	bit 4,a
+ 841  8B2B C8           	ret z
+ 842  8B2C
+ 843  8B2C              ; Ha habido desplazamiento de la entidad maligna.
+ 844  8B2C              ; Ha llegado a zona de AMADEUS ???
+ 845  8B2C
+ 846  8B2C 3A CF 88     	ld a,(Coordenada_y)
+ 847  8B2F FE 14        	cp $14
+ 848  8B31 D4 DC 8F     	call nc,Compara_coordenadas_X 						; Si esta entidad ocupa alguna de las columnas que_
+ 849  8B34              ;														; ocupa Amadeus, tendremos el .db (Impacto)="1".
+ 850  8B34              ; ---------
+ 851  8B34
+ 852  8B34 CD 69 8B         call Prepara_var_pintado 			                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.
+ 853  8B37 CD CD 8D     	call Repone_datos_de_borrado
+ 854  8B3A CD 25 8C     	call Limpia_Variables_de_borrado
+ 855  8B3D
+ 856  8B3D C9           3 ret													; _de la misma.
+ 857  8B3E
+ 858  8B3E              ; --------------------------------------------------------------------------------------------------------------
+ 859  8B3E              ;
+ 860  8B3E              ;	29/1/23
+ 861  8B3E
+ 862  8B3E              Mov_Amadeus
+ 863  8B3E
+ 864  8B3E CD 70 8D     	call Movimiento_Amadeus 							; MOVEMOS AMADEUS.
+ 865  8B41
+ 866  8B41 3A F2 88     	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
+ 867  8B44 CB 67        	bit 4,a
+ 868  8B46 C8           	ret z
+ 869  8B47
+ 870  8B47              ; ---------
+ 871  8B47
+ 872  8B47 CD 69 8B         call Prepara_var_pintado			                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.
+ 873  8B4A CD BD 8D     	call Repone_datos_de_borrado_Amadeus
+ 874  8B4D CD 25 8C     	call Limpia_Variables_de_borrado
+ 875  8B50
+ 876  8B50 C9           	ret
+ 877  8B51
+ 878  8B51              ; -----------------------------------------------------------------------------------
+ 879  8B51              ;
+ 880  8B51              ;	01/11/23
+ 881  8B51
+ 882  8B51 CD 89 8C     Inicia_entidad	call Inicia_Puntero_objeto
+ 883  8B54 CD 56 99     	call Recompone_posicion_inicio
+ 884  8B57 CD 35 93     	call Draw
+ 885  8B5A CD A0 7F     	call Guarda_foto_registros
+ 886  8B5D F3           	di													; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET.
+ 887  8B5E              ;														; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
+ 888  8B5E CD D1 8C     	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
+ 889  8B61 C9           	ret
+ 890  8B62
+ 891  8B62              ; --------------------------------------------------------------------------------------------------------------
+ 892  8B62              ;
+ 893  8B62              ;	31/08/23
+ 894  8B62              ;
+ 895  8B62              ;	(Guardo la foto de la entidad ejecutando DRAW, pues ha habido movimiento del Sprite y una posible_
+ 896  8B62              ;   _recolocación. Guarda la IMÁGEN DE LA ENTIDAD A PINTAR.
+ 897  8B62
+ 898  8B62              Guarda_foto_entidad_a_pintar
  899  8B62
- 900  8B62              ; --------------------------------------------------------------------------------------------------------------
- 901  8B62              ;
- 902  8B62              ;	31/08/23
- 903  8B62              ;
- 904  8B62              ;	(Guardo la foto de la entidad ejecutando DRAW, pues ha habido movimiento del Sprite y una posible_
- 905  8B62              ;   _recolocación. Guarda la IMÁGEN DE LA ENTIDAD A PINTAR.
- 906  8B62
- 907  8B62              Guarda_foto_entidad_a_pintar
- 908  8B62
- 909  8B62              ; LLegados a este punto SIEMPRE tenemos cargadas las Variables_de_pintado en DRAW.
- 910  8B62
- 911  8B62 CD 35 93     	call Draw
- 912  8B65 CD A0 7F     	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
- 913  8B68 C9           	ret													; Modificamos también el (End_Snapshot) correspondiente al álbum en el que nos encontramos.
- 914  8B69
- 915  8B69              ; --------------------------------------------------------------------------------------------------------------
- 916  8B69              ;
- 917  8B69              ;	19/9/23
- 918  8B69
- 919  8B69 21 C8 88     Prepara_var_pintado ld hl,Filas
- 920  8B6C 11 E8 88     	ld de,Variables_de_pintado
- 921  8B6F 01 08 00     	ld bc,8
- 922  8B72 ED B0        	ldir
- 923  8B74 C9           	ret
- 924  8B75
- 925  8B75              ; --------------------------------------------------------------------------------------------------------------
- 926  8B75
- 927  8B75 21 E8 88     Repone_pintar ld hl,Variables_de_pintado
- 928  8B78 11 C8 88     	ld de,Filas
- 929  8B7B 01 08 00     	ld bc,8
- 930  8B7E ED B0        	ldir
- 931  8B80 C9           	ret
- 932  8B81
- 933  8B81              ; *************************************************************************************************************************************************************
- 934  8B81              ;
- 935  8B81              ; 8/1/23
- 936  8B81              ;
- 937  8B81              ; (Puntero_store_caja) contendrá la dirección donde se encuentran los parámetros de la 1ª entidad del índice.
- 938  8B81              ; (Indice_restore_caja) se sitúa en la 2ª entidad del índice.
- 939  8B81              ; (Puntero_restore_caja) contendrá la dirección donde se encuentran los parámetros de la 2ª entidad del índice.
- 940  8B81
- 941  8B81              ; Destruye HL y DE !!!!!
- 942  8B81
- 943  8B81              Inicia_punteros_de_cajas
- 944  8B81
- 945  8B81 21 8C 85     	ld hl,Indice_de_cajas
- 946  8B84 CD 83 8C         call Extrae_address
- 947  8B87 22 08 89         ld (Puntero_store_caja),hl
- 948  8B8A 21 8E 85     	ld hl,Indice_de_cajas+2
- 949  8B8D 22 0C 89     	ld (Indice_restore_caja),hl
- 950  8B90 CD 83 8C     	call Extrae_address
- 951  8B93 22 0A 89     	ld (Puntero_restore_caja),hl
- 952  8B96 C9               ret
- 953  8B97
- 954  8B97              ; ---------------------------------------------------------------
- 955  8B97              ;
- 956  8B97              ;	9/8/23
- 957  8B97              ;
- 958  8B97              ;	Inicialización y gestión de álbumes de fotos y cajas.
- 959  8B97
- 960  8B97              Inicia_punteros_de_albumes_y_malotes
- 961  8B97
- 962  8B97 21 EC 84     	ld hl,Indice_album_de_fotos
- 963  8B9A 22 32 89     	ld (Puntero_indice_album_de_fotos),hl
- 964  8B9D CD 83 8C     	call Extrae_address
- 965  8BA0 22 1C 89     	ld (Stack_snapshot),hl
- 966  8BA3
- 967  8BA3 21 F4 84     	ld hl,Indice_album_de_fotos_disparos
- 968  8BA6 22 34 89     	ld (Puntero_indice_album_de_fotos_disparos),hl
- 969  8BA9 CD 83 8C     	call Extrae_address
- 970  8BAC 22 1E 89     	ld (Stack_snapshot_disparos),hl
- 971  8BAF
- 972  8BAF 21 FC 84     	ld hl,Indice_End_Snapshot
- 973  8BB2 22 36 89     	ld (Puntero_indice_End_Snapshot),hl
- 974  8BB5 CD 83 8C     	call Extrae_address
- 975  8BB8 22 3A 89     	ld (Puntero_de_End_Snapshot),hl
- 976  8BBB
- 977  8BBB 21 04 85     	ld hl,Indice_End_Snapshot_disparos
- 978  8BBE 22 38 89     	ld (Puntero_indice_End_Snapshot_disparos),hl
- 979  8BC1 CD 83 8C     	call Extrae_address
- 980  8BC4 22 3C 89     	ld (Puntero_de_End_Snapshot_disparos),hl
- 981  8BC7
- 982  8BC7 C9           	ret
- 983  8BC8
- 984  8BC8              ;	23/10/23
- 985  8BC8
- 986  8BC8              Avanza_puntero_de_album_de_fotos_de_entidades
- 987  8BC8
- 988  8BC8              ; Caja_de_malotes equ $7419 ; (7419h - 741ch) 4 bytes.
- 989  8BC8
- 990  8BC8              ; Hemos completado de guardar en el álbum correspondiente la foto con todas las entidades.
- 991  8BC8              ; Estamos en el último álbum del índice???.
- 992  8BC8              ;
- 993  8BC8 2A 32 89     	ld hl,(Puntero_indice_album_de_fotos)
- 994  8BCB 01 F2 84     	ld bc,Indice_album_de_fotos+6
- 995  8BCE A7           	and a
- 996  8BCF ED 42        	sbc hl,bc										; Estamos en el último álbum del índice.
- 997  8BD1 20 08        	jr nz,1F								 		; El buffer está lleno. HALT.
- 998  8BD3
- 999  8BD3              ; Hemos completado Album_de_fotos_3. Frame buffer lleno.
-1000  8BD3              ; Actualizamos (Semaforo).
-1001  8BD3
-1002  8BD3 21 3E 89     	ld hl,Semaforo
-1003  8BD6 CB 06        	rlc (hl)										; Semaforo contendrá $08. (Rota a izq. sin carry).
-1004  8BD8
-1005  8BD8              ; Inicia con el buffer de video completo !!!
-1006  8BD8
-1007  8BD8 FB           	ei
-1008  8BD9 76           	halt
-1009  8BDA C9           	ret
-1010  8BDB
-1011  8BDB 2A 32 89     1 ld hl,(Puntero_indice_album_de_fotos)
-1012  8BDE 23           	inc hl
-1013  8BDF 23           	inc hl
-1014  8BE0 22 32 89     	ld (Puntero_indice_album_de_fotos),hl
-1015  8BE3 CD 83 8C     	call Extrae_address
-1016  8BE6 22 1C 89     	ld (Stack_snapshot),hl							; Seleccionamos el siguiente álbum.
-1017  8BE9
-1018  8BE9 2A 36 89     	ld hl,(Puntero_indice_End_Snapshot)
-1019  8BEC 23           	inc hl
-1020  8BED 23           	inc hl
-1021  8BEE 22 36 89     	ld (Puntero_indice_End_Snapshot),hl
-1022  8BF1 CD 83 8C     	call Extrae_address
-1023  8BF4 22 3A 89     	ld (Puntero_de_End_Snapshot),hl
-1024  8BF7
-1025  8BF7 21 3E 89     	ld hl,Semaforo
-1026  8BFA CB 06        	rlc (hl) 										; (Rota a izq. sin carry).
-1027  8BFC
-1028  8BFC C9           	ret
-1029  8BFD
-1030  8BFD              ; *************************************************************************************************************************************************************
-1031  8BFD              ;
-1032  8BFD              ; 8/1/23
-1033  8BFD              ;
-1034  8BFD              ;	Inicializamos los punteros de selección de los 2 índices de disparo, Amadeus y Entidades.
-1035  8BFD
-1036  8BFD 21 24 85     Inicia_Puntero_Disparo_Entidades ld hl,Indice_de_disparos_entidades
-1037  8C00 22 41 89     	ld (Puntero_DESPLZ_DISPARO_ENTIDADES),hl
-1038  8C03 C9           	ret
-1039  8C04 21 0C 85     Inicia_Puntero_Disparo_Amadeus ld hl,Indice_de_disparos_Amadeus
-1040  8C07 22 43 89     	ld (Puntero_DESPLZ_DISPARO_AMADEUS),hl
-1041  8C0A C9           	ret
+ 900  8B62              ; LLegados a este punto SIEMPRE tenemos cargadas las Variables_de_pintado en DRAW.
+ 901  8B62
+ 902  8B62 CD 35 93     	call Draw
+ 903  8B65 CD A0 7F     	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
+ 904  8B68 C9           	ret													; Modificamos también el (End_Snapshot) correspondiente al álbum en el que nos encontramos.
+ 905  8B69
+ 906  8B69              ; --------------------------------------------------------------------------------------------------------------
+ 907  8B69              ;
+ 908  8B69              ;	19/9/23
+ 909  8B69
+ 910  8B69 21 C8 88     Prepara_var_pintado ld hl,Filas
+ 911  8B6C 11 E8 88     	ld de,Variables_de_pintado
+ 912  8B6F 01 08 00     	ld bc,8
+ 913  8B72 ED B0        	ldir
+ 914  8B74 C9           	ret
+ 915  8B75
+ 916  8B75              ; --------------------------------------------------------------------------------------------------------------
+ 917  8B75
+ 918  8B75 21 E8 88     Repone_pintar ld hl,Variables_de_pintado
+ 919  8B78 11 C8 88     	ld de,Filas
+ 920  8B7B 01 08 00     	ld bc,8
+ 921  8B7E ED B0        	ldir
+ 922  8B80 C9           	ret
+ 923  8B81
+ 924  8B81              ; *************************************************************************************************************************************************************
+ 925  8B81              ;
+ 926  8B81              ; 8/1/23
+ 927  8B81              ;
+ 928  8B81              ; (Puntero_store_caja) contendrá la dirección donde se encuentran los parámetros de la 1ª entidad del índice.
+ 929  8B81              ; (Indice_restore_caja) se sitúa en la 2ª entidad del índice.
+ 930  8B81              ; (Puntero_restore_caja) contendrá la dirección donde se encuentran los parámetros de la 2ª entidad del índice.
+ 931  8B81
+ 932  8B81              ; Destruye HL y DE !!!!!
+ 933  8B81
+ 934  8B81              Inicia_punteros_de_cajas
+ 935  8B81
+ 936  8B81 21 8C 85     	ld hl,Indice_de_cajas
+ 937  8B84 CD 83 8C         call Extrae_address
+ 938  8B87 22 08 89         ld (Puntero_store_caja),hl
+ 939  8B8A 21 8E 85     	ld hl,Indice_de_cajas+2
+ 940  8B8D 22 0C 89     	ld (Indice_restore_caja),hl
+ 941  8B90 CD 83 8C     	call Extrae_address
+ 942  8B93 22 0A 89     	ld (Puntero_restore_caja),hl
+ 943  8B96 C9               ret
+ 944  8B97
+ 945  8B97              ; ---------------------------------------------------------------
+ 946  8B97              ;
+ 947  8B97              ;	9/8/23
+ 948  8B97              ;
+ 949  8B97              ;	Inicialización y gestión de álbumes de fotos y cajas.
+ 950  8B97
+ 951  8B97              Inicia_punteros_de_albumes_y_malotes
+ 952  8B97
+ 953  8B97 21 EC 84     	ld hl,Indice_album_de_fotos
+ 954  8B9A 22 32 89     	ld (Puntero_indice_album_de_fotos),hl
+ 955  8B9D CD 83 8C     	call Extrae_address
+ 956  8BA0 22 1C 89     	ld (Stack_snapshot),hl
+ 957  8BA3
+ 958  8BA3 21 F4 84     	ld hl,Indice_album_de_fotos_disparos
+ 959  8BA6 22 34 89     	ld (Puntero_indice_album_de_fotos_disparos),hl
+ 960  8BA9 CD 83 8C     	call Extrae_address
+ 961  8BAC 22 1E 89     	ld (Stack_snapshot_disparos),hl
+ 962  8BAF
+ 963  8BAF 21 FC 84     	ld hl,Indice_End_Snapshot
+ 964  8BB2 22 36 89     	ld (Puntero_indice_End_Snapshot),hl
+ 965  8BB5 CD 83 8C     	call Extrae_address
+ 966  8BB8 22 3A 89     	ld (Puntero_de_End_Snapshot),hl
+ 967  8BBB
+ 968  8BBB 21 04 85     	ld hl,Indice_End_Snapshot_disparos
+ 969  8BBE 22 38 89     	ld (Puntero_indice_End_Snapshot_disparos),hl
+ 970  8BC1 CD 83 8C     	call Extrae_address
+ 971  8BC4 22 3C 89     	ld (Puntero_de_End_Snapshot_disparos),hl
+ 972  8BC7
+ 973  8BC7 C9           	ret
+ 974  8BC8
+ 975  8BC8              ;	23/10/23
+ 976  8BC8
+ 977  8BC8              Avanza_puntero_de_album_de_fotos_de_entidades
+ 978  8BC8
+ 979  8BC8              ; Caja_de_malotes equ $7419 ; (7419h - 741ch) 4 bytes.
+ 980  8BC8
+ 981  8BC8              ; Hemos completado de guardar en el álbum correspondiente la foto con todas las entidades.
+ 982  8BC8              ; Estamos en el último álbum del índice???.
+ 983  8BC8              ;
+ 984  8BC8 2A 32 89     	ld hl,(Puntero_indice_album_de_fotos)
+ 985  8BCB 01 F2 84     	ld bc,Indice_album_de_fotos+6
+ 986  8BCE A7           	and a
+ 987  8BCF ED 42        	sbc hl,bc										; Estamos en el último álbum del índice.
+ 988  8BD1 20 08        	jr nz,1F								 		; El buffer está lleno. HALT.
+ 989  8BD3
+ 990  8BD3              ; Hemos completado Album_de_fotos_3. Frame buffer lleno.
+ 991  8BD3              ; Actualizamos (Semaforo).
+ 992  8BD3
+ 993  8BD3 21 3E 89     	ld hl,Semaforo
+ 994  8BD6 CB 06        	rlc (hl)										; Semaforo contendrá $08. (Rota a izq. sin carry).
+ 995  8BD8
+ 996  8BD8              ; Inicia con el buffer de video completo !!!
+ 997  8BD8
+ 998  8BD8 FB           	ei
+ 999  8BD9 76           	halt
+1000  8BDA C9           	ret
+1001  8BDB
+1002  8BDB 2A 32 89     1 ld hl,(Puntero_indice_album_de_fotos)
+1003  8BDE 23           	inc hl
+1004  8BDF 23           	inc hl
+1005  8BE0 22 32 89     	ld (Puntero_indice_album_de_fotos),hl
+1006  8BE3 CD 83 8C     	call Extrae_address
+1007  8BE6 22 1C 89     	ld (Stack_snapshot),hl							; Seleccionamos el siguiente álbum.
+1008  8BE9
+1009  8BE9 2A 36 89     	ld hl,(Puntero_indice_End_Snapshot)
+1010  8BEC 23           	inc hl
+1011  8BED 23           	inc hl
+1012  8BEE 22 36 89     	ld (Puntero_indice_End_Snapshot),hl
+1013  8BF1 CD 83 8C     	call Extrae_address
+1014  8BF4 22 3A 89     	ld (Puntero_de_End_Snapshot),hl
+1015  8BF7
+1016  8BF7 21 3E 89     	ld hl,Semaforo
+1017  8BFA CB 06        	rlc (hl) 										; (Rota a izq. sin carry).
+1018  8BFC
+1019  8BFC C9           	ret
+1020  8BFD
+1021  8BFD              ; *************************************************************************************************************************************************************
+1022  8BFD              ;
+1023  8BFD              ; 8/1/23
+1024  8BFD              ;
+1025  8BFD              ;	Inicializamos los punteros de selección de los 2 índices de disparo, Amadeus y Entidades.
+1026  8BFD
+1027  8BFD 21 24 85     Inicia_Puntero_Disparo_Entidades ld hl,Indice_de_disparos_entidades
+1028  8C00 22 41 89     	ld (Puntero_DESPLZ_DISPARO_ENTIDADES),hl
+1029  8C03 C9           	ret
+1030  8C04 21 0C 85     Inicia_Puntero_Disparo_Amadeus ld hl,Indice_de_disparos_Amadeus
+1031  8C07 22 43 89     	ld (Puntero_DESPLZ_DISPARO_AMADEUS),hl
+1032  8C0A C9           	ret
+1033  8C0B
+1034  8C0B              ; -------------------------------------------------------------------------------------------------------------
+1035  8C0B              ;
+1036  8C0B              ; 21/9/23
+1037  8C0B              ;
+1038  8C0B
+1039  8C0B              ; Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72ach).
+1040  8C0B
+1041  8C0B              Limpia_album_Amadeus
 1042  8C0B
-1043  8C0B              ; -------------------------------------------------------------------------------------------------------------
-1044  8C0B              ;
-1045  8C0B              ; 21/9/23
-1046  8C0B              ;
-1047  8C0B
-1048  8C0B              ; Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72ach).
-1049  8C0B
-1050  8C0B              Limpia_album_Amadeus
-1051  8C0B
-1052  8C0B 21 A0 72     	ld hl,Album_de_fotos_Amadeus
-1053  8C0E 7E           	ld a,(hl)
-1054  8C0F A7           	and a
-1055  8C10 C8           	ret z
-1056  8C11
-1057  8C11 21 A0 72     	ld hl,Album_de_fotos_Amadeus
-1058  8C14 11 A1 72     	ld de,Album_de_fotos_Amadeus+1
-1059  8C17 01 0B 00     	ld bc,11
-1060  8C1A AF           	xor a
-1061  8C1B 77           	ld (hl),a
-1062  8C1C ED B0        	ldir
-1063  8C1E
-1064  8C1E 21 A0 72     	ld hl,Album_de_fotos_Amadeus
-1065  8C21 22 24 89     	ld (End_Snapshot_Amadeus),hl
-1066  8C24
-1067  8C24 C9           	ret
-1068  8C25
-1069  8C25 21 E2 88     Limpia_Variables_de_borrado ld hl,Variables_de_borrado
-1070  8C28 11 E3 88     	ld de,Variables_de_borrado+1
-1071  8C2B 01 05 00     	ld bc,5
-1072  8C2E AF           	xor a
-1073  8C2F 77           	ld (hl),a
-1074  8C30 ED B0        	ldir
-1075  8C32 C9           	ret
-1076  8C33
-1077  8C33              ; -------------------------------------------------------------------------------------------------------------
-1078  8C33              ;
-1079  8C33              ; 8/9/23
-1080  8C33              ;
-1081  8C33
-1082  8C33              ; (Numero_de_malotes) lo utiliza la rutina [Extrae_foto_entidades] para borrar/pintar entidades en pantalla.
-1083  8C33              ; Se calcula dividiendo entre 6 el nº de bytes que contiene el Album_de_fotos.
-1084  8C33
-1085  8C33              Calcula_numero_de_malotes
-1086  8C33
-1087  8C33 21 00 70     	ld hl,Album_de_fotos
-1088  8C36 EB           	ex de,hl
-1089  8C37 2A 20 89     	ld hl,(End_Snapshot)
-1090  8C3A
-1091  8C3A 7C           	ld a,h
-1092  8C3B A7           	and a
-1093  8C3C 28 0D        	jr z,1F										; (End_Snapshot_Amadeus) = "$0000" significa que el álbum está vacío.
-1094  8C3E
-1095  8C3E 06 00        4 ld b,0
-1096  8C40 7D           	ld a,l
-1097  8C41 93           	sub e
-1098  8C42 28 07        	jr z,1F
-1099  8C44
-1100  8C44              ; Nº de malotes no es "0".
-1101  8C44
-1102  8C44 D6 06        2 sub 6
-1103  8C46 04           	inc b
-1104  8C47 A7           	and a
-1105  8C48 20 FA        	jr nz,2B
-1106  8C4A 78           	ld a,b
-1107  8C4B
-1108  8C4B 32 11 89     1 ld (Numero_de_malotes),a
-1109  8C4E C9           	ret
-1110  8C4F
-1111  8C4F              ; -------------------------------------------------------------------------------------------------------------
-1112  8C4F              ;
-1113  8C4F              ; 8/9/23
-1114  8C4F              ;
-1115  8C4F
-1116  8C4F              ; (Numero_de_malotes_Amadeus) lo utiliza la rutina [Extrae_foto_Amadeus] para borrar/pintar la nave en pantalla.
-1117  8C4F              ; Se calcula dividiendo entre 6 el nº de bytes que contiene el Album_de_fotos.
-1118  8C4F
-1119  8C4F              Calcula_malotes_Amadeus
-1120  8C4F
-1121  8C4F 21 A0 72     	ld hl,Album_de_fotos_Amadeus
-1122  8C52 EB           	ex de,hl
-1123  8C53 2A 24 89     	ld hl,(End_Snapshot_Amadeus)
-1124  8C56
-1125  8C56 7C           	ld a,h
-1126  8C57 A7           	and a
-1127  8C58 28 0D        	jr z,1F										; (End_Snapshot_Amadeus) = "$0000" significa que el álbum está vacío.
-1128  8C5A
-1129  8C5A 06 00        	ld b,0
-1130  8C5C 7D           	ld a,l
-1131  8C5D 93           	sub e
-1132  8C5E 28 07        	jr z,1F
-1133  8C60
-1134  8C60              ; Nº de malotes no es "0".
-1135  8C60
-1136  8C60 D6 06        2 sub 6
-1137  8C62 04           	inc b
-1138  8C63 A7           	and a
-1139  8C64 20 FA        	jr nz,2B
-1140  8C66 78           	ld a,b
-1141  8C67
-1142  8C67 32 11 89     1 ld (Numero_de_malotes),a
-1143  8C6A C9           	ret
-1144  8C6B
-1145  8C6B              ; -------------------------------------------------------------------------------------------------------------
-1146  8C6B              ;
-1147  8C6B              ; 28/2/23
-1148  8C6B              ;
-1149  8C6B
-1150  8C6B              Calcula_numero_de_disparotes
-1151  8C6B
-1152  8C6B 21 50 71     	ld hl,Album_de_fotos_disparos
-1153  8C6E EB           	ex de,hl
-1154  8C6F 2A 3C 89     	ld hl,(Puntero_de_End_Snapshot_disparos)
-1155  8C72
-1156  8C72 06 00        	ld b,0
-1157  8C74 7D           	ld a,l
-1158  8C75 93           	sub e
-1159  8C76 28 07        	jr z,1F
-1160  8C78
-1161  8C78              ; Nº de malotes no es "0".
-1162  8C78
-1163  8C78 D6 06        2 sub 6
-1164  8C7A 04           	inc b
-1165  8C7B A7           	and a
-1166  8C7C 20 FA        	jr nz,2B
-1167  8C7E 78           	ld a,b
-1168  8C7F
-1169  8C7F 32 40 89     1 ld (Numero_de_disparotes),a
-1170  8C82 C9           	ret
-1171  8C83
-1172  8C83              ; *************************************************************************************************************************************************************
-1173  8C83              ;
-1174  8C83              ; 20/10/22
-1175  8C83              ;
-1176  8C83              ; Extrae la direccioń que contiene un puntero, (HL), también en HL.
-1177  8C83              ;
-1178  8C83              ; Destruye el puntero y DE !!!!!
-1179  8C83
-1180  8C83 5E           Extrae_address ld e,(hl)
-1181  8C84 23           	inc hl
-1182  8C85 56           	ld d,(hl)
-1183  8C86 2B           	dec hl
-1184  8C87 EB           	ex de,hl
-1185  8C88 C9           	ret
-1186  8C89
-1187  8C89              ; *************************************************************************************************************************************************************
-1188  8C89              ;
-1189  8C89              ;	7/2/23
-1190  8C89              ;
-1191  8C89              ;	Iniciamos (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
-1192  8C89              ;	Estos punteros señalan al Sprite a pintar tras cada movimiento.
-1193  8C89              ;
-1194  8C89              ;   Destruye HL y BC !!!!!,
-1195  8C89              ;
-1196  8C89              ;	BIT 7 (Ctrl_0). "1" ..... Derecha.
-1197  8C89              ;					"0" ..... Izquierda.
-1198  8C89
-1199  8C89              Inicia_Puntero_objeto
-1200  8C89
-1201  8C89 3A DC 88     	ld a,(Cuad_objeto)
-1202  8C8C E6 01        	and 1
-1203  8C8E F5           	push af
-1204  8C8F CC AD 8C     	call z,Inicia_puntero_objeto_izq
-1205  8C92 F1           	pop af
-1206  8C93 28 2B        	jr z,1F
-1207  8C95 CD 9A 8C     	call Inicia_puntero_objeto_der
-1208  8C98 18 26        	jr 1F
-1209  8C9A
-1210  8C9A              ; Arrancamos desde la parte izquierda de la pantalla.
-1211  8C9A              ; Iniciamos (Indice_Sprite_der).
-1212  8C9A
-1213  8C9A 2A D2 88     Inicia_puntero_objeto_der ld hl,(Indice_Sprite_der)
-1214  8C9D 22 D6 88     	ld (Puntero_DESPLZ_der),hl
-1215  8CA0 CD 83 8C     	call Extrae_address
-1216  8CA3 22 CC 88     	ld (Puntero_objeto),hl
-1217  8CA6
-1218  8CA6 2A D4 88     	ld hl,(Indice_Sprite_izq)							; Cuando "Iniciamos el Sprite a derecha",_
-1219  8CA9 22 D8 88     	ld (Puntero_DESPLZ_izq),hl
-1220  8CAC C9           	ret
-1221  8CAD
-1222  8CAD              ; Arrancamos desde la parte derecha de la pantalla.
-1223  8CAD              ; Iniciamos (Indice_Sprite_izq).
-1224  8CAD
-1225  8CAD 2A D4 88     Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
-1226  8CB0 22 D8 88     	ld (Puntero_DESPLZ_izq),hl
-1227  8CB3 CD 83 8C     	call Extrae_address
-1228  8CB6 22 CC 88     	ld (Puntero_objeto),hl
-1229  8CB9
-1230  8CB9 2A D2 88     	ld hl,(Indice_Sprite_der)							; Cuando "Iniciamos el Sprite a izquierda",_
-1231  8CBC 22 D6 88     	ld (Puntero_DESPLZ_der),hl							; _situamos (Puntero_DESPLZ_der) en el último defw_
-1232  8CBF C9           	ret
-1233  8CC0
-1234  8CC0              ; Tenemos que activar el bit6 de (Ctrl_0) si el Sprite que hemos cargado es AMADEUS.
-1235  8CC0
-1236  8CC0 21 40 83     1 ld hl,Amadeus
-1237  8CC3 ED 4B CC 88  	ld bc,(Puntero_objeto)
-1238  8CC7 B7 ED 42     	sub hl,bc
-1239  8CCA C0           	ret nz
-1240  8CCB 21 F2 88     	ld hl,Ctrl_0
-1241  8CCE CB F6        	set 6,(hl) 											; Cuando activamos Amadeus lo indicamos alzando el bit6 de (Ctrl_0). Esta información la utilizaremos para limitar los movimientos_
-1242  8CD0 C9           	ret 												; _de nuestra nave en los extremos.
-1243  8CD1
-1244  8CD1              ; *************************************************************************************************************************************************************
-1245  8CD1              ;
-1246  8CD1              ;	14/5/23
-1247  8CD1              ;
-1248  8CD1              ;	Almacena los datos de la 1ª entidad del Indice_de_entidades, (que tenemos cargado en DRAW), en su respectiva BASE DE DATOS.
-1249  8CD1              ;	Cargamos en DRAW los datos de la 2ª entidad del Indice_de_entidades, (de su BASE DE DATOS).
-1250  8CD1
-1251  8CD1              ;	Modifica (Puntero_store_caja)  y (Puntero_restore_caja) con las direcciones donde se encuentran los datos_
-1252  8CD1              ;	_de la 2ª y 3ª entidad respectivamente.
-1253  8CD1
-1254  8CD1              Store_Restore_cajas
-1255  8CD1
-1256  8CD1 E5           	push hl
-1257  8CD2 D5           	push de
-1258  8CD3 C5            	push bc
-1259  8CD4
-1260  8CD4              ;	STORE !!!!!
-1261  8CD4              ;	Guarda la entidad cargada en Draw en su correspondiente DB.
-1262  8CD4
-1263  8CD4 21 C8 88     	ld hl,Filas
-1264  8CD7 ED 5B 08 89  	ld de,(Puntero_store_caja) 							; Puntero que se desplaza por las distintas entidades.
-1265  8CDB 01 3D 00     	ld bc,61
-1266  8CDE ED B0        	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
-1267  8CE0
-1268  8CE0              ; 	Entidad_sospechosa. 20/4/23
-1269  8CE0
-1270  8CE0 3A E1 88     	ld a,(Impacto)
-1271  8CE3 A7           	and a
-1272  8CE4 28 0C        	jr z,1F
-1273  8CE6
-1274  8CE6 2A 08 89     	ld hl,(Puntero_store_caja) 							; Si la rutina [Compara_coordenadas_X] detecta que hay_
-1275  8CE9 01 19 00     	ld bc,25                          					; _ una entidad en zona de Amadeus, guardaremos la direccíon_
-1276  8CEC A7           	and a 												; _ donde se encuentra su .db (Impacto) para poder ponerlo a_
-1277  8CED ED 4A        	adc hl,bc 											; _ "0" más adelante.
-1278  8CEF 22 46 89     	ld (Entidad_sospechosa_de_colision),hl
-1279  8CF2
-1280  8CF2              ;	Incrementa el puntero STORE. Guarda los datos de `Entidad´+1 en Draw, (Puntero RESTORE).
-1281  8CF2
-1282  8CF2 2A 0A 89     1 ld hl,(Puntero_restore_caja)
-1283  8CF5 7E           	ld a,(hl)
-1284  8CF6 A7           	and a
-1285  8CF7 F5           	push af
-1286  8CF8 28 08        	jr z,2F
-1287  8CFA
-1288  8CFA 11 C8 88     	ld de,Filas
-1289  8CFD 01 3D 00     	ld bc,61
-1290  8D00 ED B0        	ldir
-1291  8D02
-1292  8D02 CD 1E 8D     2 call Incrementa_punteros_de_cajas
-1293  8D05
-1294  8D05 F1           	pop af
-1295  8D06 28 EA        	jr z,1B
-1296  8D08
-1297  8D08 C1           	pop bc
-1298  8D09 D1           	pop de
-1299  8D0A E1           	pop hl
-1300  8D0B
-1301  8D0B C9           	ret
-1302  8D0C
-1303  8D0C              ; **************************************************************************************************
-1304  8D0C              ;
-1305  8D0C              ;	12/05/23
-1306  8D0C              ;
-1307  8D0C              ;	Cargamos los datos de la entidad señalada por el puntero (Puntero_store_caja).
-1308  8D0C
-1309  8D0C E5           Restore_entidad push hl
-1310  8D0D D5           	push de
-1311  8D0E C5            	push bc
-1312  8D0F
-1313  8D0F 2A 08 89     	ld hl,(Puntero_store_caja)						; (Puntero_store_caja) apunta a la dbase de la 1ª entidad.
-1314  8D12 11 C8 88     	ld de,Filas
-1315  8D15 01 3D 00     	ld bc,61
-1316  8D18 ED B0        	ldir
-1317  8D1A
-1318  8D1A C1           	pop bc
-1319  8D1B D1           	pop de
-1320  8D1C E1           	pop hl
-1321  8D1D C9           	ret
-1322  8D1E
-1323  8D1E              ; **************************************************************************************************
-1324  8D1E              ;
-1325  8D1E              ;	08/05/23
-1326  8D1E              ;
-1327  8D1E              ;	Incrementamos los dos punteros de entidades. (+1).
-1328  8D1E
-1329  8D1E              Incrementa_punteros_de_cajas
-1330  8D1E
-1331  8D1E 2A 0A 89     	ld hl,(Puntero_restore_caja)
-1332  8D21 22 08 89     	ld (Puntero_store_caja),hl
-1333  8D24 2A 0C 89     	ld hl,(Indice_restore_caja)
-1334  8D27 23           	inc hl
-1335  8D28 23           	inc hl
-1336  8D29 22 0C 89     	ld (Indice_restore_caja),hl
-1337  8D2C CD 83 8C         call Extrae_address
-1338  8D2F 22 0A 89         ld (Puntero_restore_caja),hl
-1339  8D32 C9               ret
+1043  8C0B 21 A0 72     	ld hl,Album_de_fotos_Amadeus
+1044  8C0E 7E           	ld a,(hl)
+1045  8C0F A7           	and a
+1046  8C10 C8           	ret z
+1047  8C11
+1048  8C11 21 A0 72     	ld hl,Album_de_fotos_Amadeus
+1049  8C14 11 A1 72     	ld de,Album_de_fotos_Amadeus+1
+1050  8C17 01 0B 00     	ld bc,11
+1051  8C1A AF           	xor a
+1052  8C1B 77           	ld (hl),a
+1053  8C1C ED B0        	ldir
+1054  8C1E
+1055  8C1E 21 A0 72     	ld hl,Album_de_fotos_Amadeus
+1056  8C21 22 24 89     	ld (End_Snapshot_Amadeus),hl
+1057  8C24
+1058  8C24 C9           	ret
+1059  8C25
+1060  8C25 21 E2 88     Limpia_Variables_de_borrado ld hl,Variables_de_borrado
+1061  8C28 11 E3 88     	ld de,Variables_de_borrado+1
+1062  8C2B 01 05 00     	ld bc,5
+1063  8C2E AF           	xor a
+1064  8C2F 77           	ld (hl),a
+1065  8C30 ED B0        	ldir
+1066  8C32 C9           	ret
+1067  8C33
+1068  8C33              ; -------------------------------------------------------------------------------------------------------------
+1069  8C33              ;
+1070  8C33              ; 8/9/23
+1071  8C33              ;
+1072  8C33
+1073  8C33              ; (Numero_de_malotes) lo utiliza la rutina [Extrae_foto_entidades] para borrar/pintar entidades en pantalla.
+1074  8C33              ; Se calcula dividiendo entre 6 el nº de bytes que contiene el Album_de_fotos.
+1075  8C33
+1076  8C33              Calcula_numero_de_malotes
+1077  8C33
+1078  8C33 21 00 70     	ld hl,Album_de_fotos
+1079  8C36 EB           	ex de,hl
+1080  8C37 2A 20 89     	ld hl,(End_Snapshot)
+1081  8C3A
+1082  8C3A 7C           	ld a,h
+1083  8C3B A7           	and a
+1084  8C3C 28 0D        	jr z,1F										; (End_Snapshot_Amadeus) = "$0000" significa que el álbum está vacío.
+1085  8C3E
+1086  8C3E 06 00        4 ld b,0
+1087  8C40 7D           	ld a,l
+1088  8C41 93           	sub e
+1089  8C42 28 07        	jr z,1F
+1090  8C44
+1091  8C44              ; Nº de malotes no es "0".
+1092  8C44
+1093  8C44 D6 06        2 sub 6
+1094  8C46 04           	inc b
+1095  8C47 A7           	and a
+1096  8C48 20 FA        	jr nz,2B
+1097  8C4A 78           	ld a,b
+1098  8C4B
+1099  8C4B 32 11 89     1 ld (Numero_de_malotes),a
+1100  8C4E C9           	ret
+1101  8C4F
+1102  8C4F              ; -------------------------------------------------------------------------------------------------------------
+1103  8C4F              ;
+1104  8C4F              ; 8/9/23
+1105  8C4F              ;
+1106  8C4F
+1107  8C4F              ; (Numero_de_malotes_Amadeus) lo utiliza la rutina [Extrae_foto_Amadeus] para borrar/pintar la nave en pantalla.
+1108  8C4F              ; Se calcula dividiendo entre 6 el nº de bytes que contiene el Album_de_fotos.
+1109  8C4F
+1110  8C4F              Calcula_malotes_Amadeus
+1111  8C4F
+1112  8C4F 21 A0 72     	ld hl,Album_de_fotos_Amadeus
+1113  8C52 EB           	ex de,hl
+1114  8C53 2A 24 89     	ld hl,(End_Snapshot_Amadeus)
+1115  8C56
+1116  8C56 7C           	ld a,h
+1117  8C57 A7           	and a
+1118  8C58 28 0D        	jr z,1F										; (End_Snapshot_Amadeus) = "$0000" significa que el álbum está vacío.
+1119  8C5A
+1120  8C5A 06 00        	ld b,0
+1121  8C5C 7D           	ld a,l
+1122  8C5D 93           	sub e
+1123  8C5E 28 07        	jr z,1F
+1124  8C60
+1125  8C60              ; Nº de malotes no es "0".
+1126  8C60
+1127  8C60 D6 06        2 sub 6
+1128  8C62 04           	inc b
+1129  8C63 A7           	and a
+1130  8C64 20 FA        	jr nz,2B
+1131  8C66 78           	ld a,b
+1132  8C67
+1133  8C67 32 11 89     1 ld (Numero_de_malotes),a
+1134  8C6A C9           	ret
+1135  8C6B
+1136  8C6B              ; -------------------------------------------------------------------------------------------------------------
+1137  8C6B              ;
+1138  8C6B              ; 28/2/23
+1139  8C6B              ;
+1140  8C6B
+1141  8C6B              Calcula_numero_de_disparotes
+1142  8C6B
+1143  8C6B 21 50 71     	ld hl,Album_de_fotos_disparos
+1144  8C6E EB           	ex de,hl
+1145  8C6F 2A 3C 89     	ld hl,(Puntero_de_End_Snapshot_disparos)
+1146  8C72
+1147  8C72 06 00        	ld b,0
+1148  8C74 7D           	ld a,l
+1149  8C75 93           	sub e
+1150  8C76 28 07        	jr z,1F
+1151  8C78
+1152  8C78              ; Nº de malotes no es "0".
+1153  8C78
+1154  8C78 D6 06        2 sub 6
+1155  8C7A 04           	inc b
+1156  8C7B A7           	and a
+1157  8C7C 20 FA        	jr nz,2B
+1158  8C7E 78           	ld a,b
+1159  8C7F
+1160  8C7F 32 40 89     1 ld (Numero_de_disparotes),a
+1161  8C82 C9           	ret
+1162  8C83
+1163  8C83              ; *************************************************************************************************************************************************************
+1164  8C83              ;
+1165  8C83              ; 20/10/22
+1166  8C83              ;
+1167  8C83              ; Extrae la direccioń que contiene un puntero, (HL), también en HL.
+1168  8C83              ;
+1169  8C83              ; Destruye el puntero y DE !!!!!
+1170  8C83
+1171  8C83 5E           Extrae_address ld e,(hl)
+1172  8C84 23           	inc hl
+1173  8C85 56           	ld d,(hl)
+1174  8C86 2B           	dec hl
+1175  8C87 EB           	ex de,hl
+1176  8C88 C9           	ret
+1177  8C89
+1178  8C89              ; *************************************************************************************************************************************************************
+1179  8C89              ;
+1180  8C89              ;	7/2/23
+1181  8C89              ;
+1182  8C89              ;	Iniciamos (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
+1183  8C89              ;	Estos punteros señalan al Sprite a pintar tras cada movimiento.
+1184  8C89              ;
+1185  8C89              ;   Destruye HL y BC !!!!!,
+1186  8C89              ;
+1187  8C89              ;	BIT 7 (Ctrl_0). "1" ..... Derecha.
+1188  8C89              ;					"0" ..... Izquierda.
+1189  8C89
+1190  8C89              Inicia_Puntero_objeto
+1191  8C89
+1192  8C89 3A DC 88     	ld a,(Cuad_objeto)
+1193  8C8C E6 01        	and 1
+1194  8C8E F5           	push af
+1195  8C8F CC AD 8C     	call z,Inicia_puntero_objeto_izq
+1196  8C92 F1           	pop af
+1197  8C93 28 2B        	jr z,1F
+1198  8C95 CD 9A 8C     	call Inicia_puntero_objeto_der
+1199  8C98 18 26        	jr 1F
+1200  8C9A
+1201  8C9A              ; Arrancamos desde la parte izquierda de la pantalla.
+1202  8C9A              ; Iniciamos (Indice_Sprite_der).
+1203  8C9A
+1204  8C9A 2A D2 88     Inicia_puntero_objeto_der ld hl,(Indice_Sprite_der)
+1205  8C9D 22 D6 88     	ld (Puntero_DESPLZ_der),hl
+1206  8CA0 CD 83 8C     	call Extrae_address
+1207  8CA3 22 CC 88     	ld (Puntero_objeto),hl
+1208  8CA6
+1209  8CA6 2A D4 88     	ld hl,(Indice_Sprite_izq)							; Cuando "Iniciamos el Sprite a derecha",_
+1210  8CA9 22 D8 88     	ld (Puntero_DESPLZ_izq),hl
+1211  8CAC C9           	ret
+1212  8CAD
+1213  8CAD              ; Arrancamos desde la parte derecha de la pantalla.
+1214  8CAD              ; Iniciamos (Indice_Sprite_izq).
+1215  8CAD
+1216  8CAD 2A D4 88     Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
+1217  8CB0 22 D8 88     	ld (Puntero_DESPLZ_izq),hl
+1218  8CB3 CD 83 8C     	call Extrae_address
+1219  8CB6 22 CC 88     	ld (Puntero_objeto),hl
+1220  8CB9
+1221  8CB9 2A D2 88     	ld hl,(Indice_Sprite_der)							; Cuando "Iniciamos el Sprite a izquierda",_
+1222  8CBC 22 D6 88     	ld (Puntero_DESPLZ_der),hl							; _situamos (Puntero_DESPLZ_der) en el último defw_
+1223  8CBF C9           	ret
+1224  8CC0
+1225  8CC0              ; Tenemos que activar el bit6 de (Ctrl_0) si el Sprite que hemos cargado es AMADEUS.
+1226  8CC0
+1227  8CC0 21 40 83     1 ld hl,Amadeus
+1228  8CC3 ED 4B CC 88  	ld bc,(Puntero_objeto)
+1229  8CC7 B7 ED 42     	sub hl,bc
+1230  8CCA C0           	ret nz
+1231  8CCB 21 F2 88     	ld hl,Ctrl_0
+1232  8CCE CB F6        	set 6,(hl) 											; Cuando activamos Amadeus lo indicamos alzando el bit6 de (Ctrl_0). Esta información la utilizaremos para limitar los movimientos_
+1233  8CD0 C9           	ret 												; _de nuestra nave en los extremos.
+1234  8CD1
+1235  8CD1              ; *************************************************************************************************************************************************************
+1236  8CD1              ;
+1237  8CD1              ;	14/5/23
+1238  8CD1              ;
+1239  8CD1              ;	Almacena los datos de la 1ª entidad del Indice_de_entidades, (que tenemos cargado en DRAW), en su respectiva BASE DE DATOS.
+1240  8CD1              ;	Cargamos en DRAW los datos de la 2ª entidad del Indice_de_entidades, (de su BASE DE DATOS).
+1241  8CD1
+1242  8CD1              ;	Modifica (Puntero_store_caja)  y (Puntero_restore_caja) con las direcciones donde se encuentran los datos_
+1243  8CD1              ;	_de la 2ª y 3ª entidad respectivamente.
+1244  8CD1
+1245  8CD1              Store_Restore_cajas
+1246  8CD1
+1247  8CD1 E5           	push hl
+1248  8CD2 D5           	push de
+1249  8CD3 C5            	push bc
+1250  8CD4
+1251  8CD4              ;	STORE !!!!!
+1252  8CD4              ;	Guarda la entidad cargada en Draw en su correspondiente DB.
+1253  8CD4
+1254  8CD4 21 C8 88     	ld hl,Filas
+1255  8CD7 ED 5B 08 89  	ld de,(Puntero_store_caja) 							; Puntero que se desplaza por las distintas entidades.
+1256  8CDB 01 3D 00     	ld bc,61
+1257  8CDE ED B0        	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
+1258  8CE0
+1259  8CE0              ; 	Entidad_sospechosa. 20/4/23
+1260  8CE0
+1261  8CE0 3A E1 88     	ld a,(Impacto)
+1262  8CE3 A7           	and a
+1263  8CE4 28 0C        	jr z,1F
+1264  8CE6
+1265  8CE6 2A 08 89     	ld hl,(Puntero_store_caja) 							; Si la rutina [Compara_coordenadas_X] detecta que hay_
+1266  8CE9 01 19 00     	ld bc,25                          					; _ una entidad en zona de Amadeus, guardaremos la direccíon_
+1267  8CEC A7           	and a 												; _ donde se encuentra su .db (Impacto) para poder ponerlo a_
+1268  8CED ED 4A        	adc hl,bc 											; _ "0" más adelante.
+1269  8CEF 22 46 89     	ld (Entidad_sospechosa_de_colision),hl
+1270  8CF2
+1271  8CF2              ;	Incrementa el puntero STORE. Guarda los datos de `Entidad´+1 en Draw, (Puntero RESTORE).
+1272  8CF2
+1273  8CF2 2A 0A 89     1 ld hl,(Puntero_restore_caja)
+1274  8CF5 7E           	ld a,(hl)
+1275  8CF6 A7           	and a
+1276  8CF7 F5           	push af
+1277  8CF8 28 08        	jr z,2F
+1278  8CFA
+1279  8CFA 11 C8 88     	ld de,Filas
+1280  8CFD 01 3D 00     	ld bc,61
+1281  8D00 ED B0        	ldir
+1282  8D02
+1283  8D02 CD 1E 8D     2 call Incrementa_punteros_de_cajas
+1284  8D05
+1285  8D05 F1           	pop af
+1286  8D06 28 EA        	jr z,1B
+1287  8D08
+1288  8D08 C1           	pop bc
+1289  8D09 D1           	pop de
+1290  8D0A E1           	pop hl
+1291  8D0B
+1292  8D0B C9           	ret
+1293  8D0C
+1294  8D0C              ; **************************************************************************************************
+1295  8D0C              ;
+1296  8D0C              ;	12/05/23
+1297  8D0C              ;
+1298  8D0C              ;	Cargamos los datos de la entidad señalada por el puntero (Puntero_store_caja).
+1299  8D0C
+1300  8D0C E5           Restore_entidad push hl
+1301  8D0D D5           	push de
+1302  8D0E C5            	push bc
+1303  8D0F
+1304  8D0F 2A 08 89     	ld hl,(Puntero_store_caja)						; (Puntero_store_caja) apunta a la dbase de la 1ª entidad.
+1305  8D12 11 C8 88     	ld de,Filas
+1306  8D15 01 3D 00     	ld bc,61
+1307  8D18 ED B0        	ldir
+1308  8D1A
+1309  8D1A C1           	pop bc
+1310  8D1B D1           	pop de
+1311  8D1C E1           	pop hl
+1312  8D1D C9           	ret
+1313  8D1E
+1314  8D1E              ; **************************************************************************************************
+1315  8D1E              ;
+1316  8D1E              ;	08/05/23
+1317  8D1E              ;
+1318  8D1E              ;	Incrementamos los dos punteros de entidades. (+1).
+1319  8D1E
+1320  8D1E              Incrementa_punteros_de_cajas
+1321  8D1E
+1322  8D1E 2A 0A 89     	ld hl,(Puntero_restore_caja)
+1323  8D21 22 08 89     	ld (Puntero_store_caja),hl
+1324  8D24 2A 0C 89     	ld hl,(Indice_restore_caja)
+1325  8D27 23           	inc hl
+1326  8D28 23           	inc hl
+1327  8D29 22 0C 89     	ld (Indice_restore_caja),hl
+1328  8D2C CD 83 8C         call Extrae_address
+1329  8D2F 22 0A 89         ld (Puntero_restore_caja),hl
+1330  8D32 C9               ret
+1331  8D33
+1332  8D33              ; **************************************************************************************************
+1333  8D33              ;
+1334  8D33              ;	25/01/23
+1335  8D33              ;
+1336  8D33              ;	Restore_Amadeus
+1337  8D33              ;
+1338  8D33              ;	Cargamos en DRAW los parámetros de Amadeus.
+1339  8D33              ;
 1340  8D33
-1341  8D33              ; **************************************************************************************************
-1342  8D33              ;
-1343  8D33              ;	25/01/23
-1344  8D33              ;
-1345  8D33              ;	Restore_Amadeus
-1346  8D33              ;
-1347  8D33              ;	Cargamos en DRAW los parámetros de Amadeus.
-1348  8D33              ;
-1349  8D33
-1350  8D33 E5           Restore_Amadeus	push hl
-1351  8D34 D5           	push de
-1352  8D35 C5            	push bc
-1353  8D36 21 9E 85     	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
-1354  8D39 11 C8 88     	ld de,Filas
-1355  8D3C 01 3D 00     	ld bc,61
-1356  8D3F ED B0        	ldir
-1357  8D41 C1           	pop bc
-1358  8D42 D1           	pop de
-1359  8D43 E1           	pop hl
-1360  8D44 C9           	ret
-1361  8D45
-1362  8D45              ; *************************************************************************************************************************************************************
-1363  8D45              ;
-1364  8D45              ;	29/04/23
-1365  8D45              ;
-1366  8D45              ;	Store_Amadeus
-1367  8D45              ;
-1368  8D45              ;	Almacena los datos de la entidad alojada en DRAW, (incl. Amadeus), en su respectiva base de datos.
-1369  8D45              ;
-1370  8D45              ;	INPUT: DE contiene la dirección del 1er byte de la base de datos donde vamos a guardar los datos de la entidad.
-1371  8D45              ;
-1372  8D45              ;	DESTRUYE: HL y BC y DE.
-1373  8D45
-1374  8D45 21 C8 88     Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
-1375  8D48 01 3D 00     	ld bc,61
-1376  8D4B ED B0        	ldir
-1377  8D4D C9           	ret
-1378  8D4E
-1379  8D4E              ; -----------------------------------------------------------
-1380  8D4E              ;
-1381  8D4E              ;	27/04/23
-1382  8D4E              ;
-1383  8D4E              ; 	Limpia los datos del almacén de entidades de DRAW, (donde se encuentra la "entidad impactada").
-1384  8D4E              ;
-1385  8D4E              ;	Destruye: HL,BC,DE,A
-1386  8D4E
-1387  8D4E 21 C8 88     Borra_datos_entidad ld hl,Filas
-1388  8D51 01 3C 00     	ld bc,60
-1389  8D54 AF           	xor a
-1390  8D55 77           	ld (hl),a
-1391  8D56 11 C9 88     	ld de,Filas+1
-1392  8D59 ED B0        	ldir
-1393  8D5B C9           	ret
-1394  8D5C
-1395  8D5C              ; -----------------------------------------------------------
-1396  8D5C
-1397  8D5C              ; Teclado.
-1398  8D5C
-1399  8D5C 3E BF        Pulsa_ENTER ld a,$bf 									; Esperamos la pulsación de la tecla "ENTER".
-1400  8D5E DB FE        	in a,($fe)
-1401  8D60 E6 01        	and $01
-1402  8D62 28 02        	jr z,1f
-1403  8D64 18 F6        	jr Pulsa_ENTER
-1404  8D66 C9           1 ret
+1341  8D33 E5           Restore_Amadeus	push hl
+1342  8D34 D5           	push de
+1343  8D35 C5            	push bc
+1344  8D36 21 9E 85     	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
+1345  8D39 11 C8 88     	ld de,Filas
+1346  8D3C 01 3D 00     	ld bc,61
+1347  8D3F ED B0        	ldir
+1348  8D41 C1           	pop bc
+1349  8D42 D1           	pop de
+1350  8D43 E1           	pop hl
+1351  8D44 C9           	ret
+1352  8D45
+1353  8D45              ; *************************************************************************************************************************************************************
+1354  8D45              ;
+1355  8D45              ;	29/04/23
+1356  8D45              ;
+1357  8D45              ;	Store_Amadeus
+1358  8D45              ;
+1359  8D45              ;	Almacena los datos de la entidad alojada en DRAW, (incl. Amadeus), en su respectiva base de datos.
+1360  8D45              ;
+1361  8D45              ;	INPUT: DE contiene la dirección del 1er byte de la base de datos donde vamos a guardar los datos de la entidad.
+1362  8D45              ;
+1363  8D45              ;	DESTRUYE: HL y BC y DE.
+1364  8D45
+1365  8D45 21 C8 88     Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
+1366  8D48 01 3D 00     	ld bc,61
+1367  8D4B ED B0        	ldir
+1368  8D4D C9           	ret
+1369  8D4E
+1370  8D4E              ; -----------------------------------------------------------
+1371  8D4E              ;
+1372  8D4E              ;	27/04/23
+1373  8D4E              ;
+1374  8D4E              ; 	Limpia los datos del almacén de entidades de DRAW, (donde se encuentra la "entidad impactada").
+1375  8D4E              ;
+1376  8D4E              ;	Destruye: HL,BC,DE,A
+1377  8D4E
+1378  8D4E 21 C8 88     Borra_datos_entidad ld hl,Filas
+1379  8D51 01 3C 00     	ld bc,60
+1380  8D54 AF           	xor a
+1381  8D55 77           	ld (hl),a
+1382  8D56 11 C9 88     	ld de,Filas+1
+1383  8D59 ED B0        	ldir
+1384  8D5B C9           	ret
+1385  8D5C
+1386  8D5C              ; -----------------------------------------------------------
+1387  8D5C
+1388  8D5C              ; Teclado.
+1389  8D5C
+1390  8D5C 3E BF        Pulsa_ENTER ld a,$bf 									; Esperamos la pulsación de la tecla "ENTER".
+1391  8D5E DB FE        	in a,($fe)
+1392  8D60 E6 01        	and $01
+1393  8D62 28 02        	jr z,1f
+1394  8D64 18 F6        	jr Pulsa_ENTER
+1395  8D66 C9           1 ret
+1396  8D67
+1397  8D67              ; **************************************************************************************************
+1398  8D67              ;
+1399  8D67              ; Temporización.
+1400  8D67
+1401  8D67              ; $0320 ..... El RASTER va a empezar a pintar el 1er scanline de la primera FILA de la pantalla.
+1402  8D67              ;       ..... (14175 T/States) + 71 es lo que tarda el RASTER en llegar al 1er SCANLINE de la 1ª FILA.
+1403  8D67              ; $00ff ..... Es lo que tarda el RASTER en pintar 1 SCANLINE. (31 T/States) + 71. ..... 102 T/States aprox.
+1404  8D67              ;		..... 224 T/States es lo que tarda el raster en pintar 1 scanline.
 1405  8D67
-1406  8D67              ; **************************************************************************************************
-1407  8D67              ;
-1408  8D67              ; Temporización.
+1406  8D67              ; $0045 ..... Es lo que tardamos en pintar 1 FILA completa, (8 Scanlines). (1794 T/States) + 71 ..... 1 FILA.
+1407  8D67              ;       ..... (14920 T/States) + 71  ..... Es lo que tarda el RASTER en pintar 1 TERCIO.
+1408  8D67              ; $0365 ..... Llegamos al final de la 1ª FILA, (8 Scanlines).
 1409  8D67
-1410  8D67              ; $0320 ..... El RASTER va a empezar a pintar el 1er scanline de la primera FILA de la pantalla.
-1411  8D67              ;       ..... (14175 T/States) + 71 es lo que tarda el RASTER en llegar al 1er SCANLINE de la 1ª FILA.
-1412  8D67              ; $00ff ..... Es lo que tarda el RASTER en pintar 1 SCANLINE. (31 T/States) + 71. ..... 102 T/States aprox.
-1413  8D67              ;		..... 224 T/States es lo que tarda el raster en pintar 1 scanline.
-1414  8D67
-1415  8D67              ; $0045 ..... Es lo que tardamos en pintar 1 FILA completa, (8 Scanlines). (1794 T/States) + 71 ..... 1 FILA.
-1416  8D67              ;       ..... (14920 T/States) + 71  ..... Es lo que tarda el RASTER en pintar 1 TERCIO.
-1417  8D67              ; $0365 ..... Llegamos al final de la 1ª FILA, (8 Scanlines).
-1418  8D67
-1419  8D67              ; A partir de $4f61 no hace falta DELAY.
-1420  8D67
-1421  8D67              ;	!!!!!!!! DESTRUYE BC !!!!!!!!!!!
-1422  8D67
-1423  8D67 01 20 03     DELAY LD BC,$0320							;$0320 ..... Delay mínimo
-1424  8D6A 0B           wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: si el Sprite ocupa la 1ª y 2ª_
-1425  8D6B 78           	LD A,B
-1426  8D6C A7           	AND A
-1427  8D6D 20 FB        	JR NZ,wait
-1428  8D6F C9           	RET
-1429  8D70
-1430  8D70              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-1431  8D70              ;
-1432  8D70              ;	5/3/23
-1433  8D70              ;
-1434  8D70              ;	En 1er lugar detectamos disparo (5), seguido de los movimientos a izq. / derecha.
-1435  8D70
-1436  8D70              Movimiento_Amadeus
-1437  8D70
-1438  8D70              ; Disparo.
-1439  8D70
-1440  8D70 3A 58 89     	ld a,(Disparo_Amadeus)
-1441  8D73 A7           	and a
-1442  8D74 20 02        	jr nz,1F
-1443  8D76 18 15        	jr 2F
-1444  8D78
-1445  8D78 3E F7        1 ld a,$f7													; "5" para disparar.
-1446  8D7A DB FE        	in a,($fe)
-1447  8D7C E6 10        	and $10
-1448  8D7E
-1449  8D7E F5           	push af
-1450  8D7F CC 3F 8E     	call z,Genera_disparo
-1451  8D82 F1           	pop af
-1452  8D83 20 08        	jr nz,2F
-1453  8D85
-1454  8D85 3A 58 89     	ld a,(Disparo_Amadeus)
-1455  8D88 EE 01        	xor 1
-1456  8D8A 32 58 89     	ld (Disparo_Amadeus),a
-1457  8D8D
-1458  8D8D 3E F7        2 ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
-1459  8D8F DB FE        	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
-1460  8D91 E6 01        	and $01													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $01 resulta "0"  llama a la rutina "Mov_izq".
-1461  8D93 CC 10 9B         call z,Mov_left											;			"			"			"			"			"			"			"			"
-1462  8D96
-1463  8D96 3E F7        	ld a,$f7
-1464  8D98 DB FE        	in a,($fe)
-1465  8D9A E6 01        	and $01
-1466  8D9C C8           	ret z
-1467  8D9D
-1468  8D9D 3E F7        	ld a,$f7
-1469  8D9F DB FE        	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
-1470  8DA1 E6 02        	and $02													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $02 resulta "0"  llama a la rutina "Mov_der".
-1471  8DA3 CC F2 99     	call z,Mov_right										;			"			"			"			"			"			"			"			"
-1472  8DA6 C9           	ret
-1473  8DA7
-1474  8DA7              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-1475  8DA7              ;
-1476  8DA7              ;	Rutina provisional para que los malotes cagen balas.
-1477  8DA7
-1478  8DA7              Detecta_disparo_entidad
-1479  8DA7
-1480  8DA7 3A 5B 89     	ld a,(Disparo_entidad)
-1481  8DAA A7           	and a
-1482  8DAB C8           	ret z
-1483  8DAC
-1484  8DAC              ;! Aquí hemos de implementar la rutina/s que generan disparo...
-1485  8DAC
-1486  8DAC              ;	ld a,$7f				; Detecta SPACE.
-1487  8DAC              ;	in a,($fe)
-1488  8DAC              ;	and 1
-1489  8DAC              ;	ret nz
-1490  8DAC
-1491  8DAC              ;	call Genera_disparo
-1492  8DAC C9           	ret
-1493  8DAD
-1494  8DAD              ; ----------------------------------------------------------------------
-1495  8DAD              ;
-1496  8DAD              ;	8/9/23
-1497  8DAD
-1498  8DAD 2A 24 89     Guarda_datos_de_borrado_Amadeus	ld hl,(End_Snapshot_Amadeus)
-1499  8DB0 2B            	dec hl
-1500  8DB1 7E           	ld a,(hl)
-1501  8DB2 A7           	and a
-1502  8DB3 C8           	ret z										; Salimos si es álbum está vacío.
-1503  8DB4
-1504  8DB4 11 E7 88     	ld de,Variables_de_borrado+5
-1505  8DB7 01 06 00     	ld bc,6
-1506  8DBA ED B8        	lddr
-1507  8DBC C9           	ret
-1508  8DBD
-1509  8DBD              ; ----------------------------------------------------------------------
-1510  8DBD              ;
-1511  8DBD              ;	9/9/23
-1512  8DBD
-1513  8DBD              Repone_datos_de_borrado_Amadeus
-1514  8DBD
-1515  8DBD 21 E2 88     	ld hl,Variables_de_borrado
-1516  8DC0 11 A0 72     	ld de,Album_de_fotos_Amadeus
-1517  8DC3 01 06 00     	ld bc,6
-1518  8DC6 ED B0        	ldir
-1519  8DC8
-1520  8DC8 EB           	ex de,hl
-1521  8DC9 22 24 89     	ld (End_Snapshot_Amadeus),hl
-1522  8DCC
-1523  8DCC C9           	ret
-1524  8DCD
-1525  8DCD              ; ----------------------------------------------------------------------
-1526  8DCD              ;
-1527  8DCD              ;	27/10/23
-1528  8DCD              ;
-1529  8DCD
-1530  8DCD              ;	Si se ha producido movimiento de la entidad en curso, esta rutina vuelca las `Variables_de_borrado´ en el_
-1531  8DCD              ;	_ Album_de_fotos correspondiente.
-1532  8DCD
-1533  8DCD              ;	El proceso de "escritura en los álbumes de fotos" no puede verse interrumpido por la rutina FRAME, (di/ei)_
-1534  8DCD              ;	_ durante el proceso de escritura.
-1535  8DCD
-1536  8DCD              Repone_datos_de_borrado
-1537  8DCD
-1538  8DCD F3           	di
-1539  8DCE ED 5B 1C 89  	ld de,(Stack_snapshot)
-1540  8DD2 21 E2 88     	ld hl,Variables_de_borrado
-1541  8DD5 01 06 00     	ld bc,6
-1542  8DD8 ED B0        	ldir
-1543  8DDA FB           	ei
-1544  8DDB
-1545  8DDB EB           	ex de,hl
-1546  8DDC 22 1C 89     	ld (Stack_snapshot),hl
-1547  8DDF
-1548  8DDF C9           	ret
-1549  8DE0
-1550  8DE0              ; ----------------------------------------------------------------------
-1551  8DE0              ;
-1552  8DE0              ;	11/8/23
-1553  8DE0
-1554  8DE0              Gestiona_entidades
-1555  8DE0
-1556  8DE0              ;	Consultamos el estado de buffer. Si Album_de_fotos no está completo, salimos de la rutina, no hay nada que gestionar.
-1557  8DE0
-1558  8DE0 3A 3E 89     	ld a,(Semaforo)
-1559  8DE3 CB 47        	bit 0,a
-1560  8DE5 28 FE        	jr z,$												;! STOP el buffer está vacío.
-1561  8DE7 C8           	ret z
-1562  8DE8
-1563  8DE8              ;	call Extrae_foto_disparos
-1564  8DE8              ;	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
-1565  8DE8
-1566  8DE8 CD EC 72     	call Gestiona_albumes_de_fotos 						; Escupe Álbum de fotos. 1a0, 2a1, 3a2.
-1567  8DEB
-1568  8DEB              ;	Album incompleto ?????
-1569  8DEB              ;	Si es así, salimos de la rutina sin modificar punteros. Tenemos que terminar de pinter el FRAME.
-1570  8DEB
-1571  8DEB 3A 3F 89     	ld a,(Ctrl_Semaforo)
-1572  8DEE CB 67        	bit 4,a
-1573  8DF0 28 05        	jr z,1F
-1574  8DF2
-1575  8DF2              ;! Buffer vacío. Inicializar (Ctrl_Semaforo) y salir sin modificar punteros.
-1576  8DF2
-1577  8DF2 AF           	xor a
-1578  8DF3 32 3F 89     	ld (Ctrl_Semaforo),a
-1579  8DF6 C9           	ret
-1580  8DF7
-1581  8DF7 CB 47        1 bit 0,a
-1582  8DF9 C0           	ret nz
-1583  8DFA
-1584  8DFA              ; El buffer estaba completo y hemos pintado el frame y desplazado los álbumes.
-1585  8DFA              ; Nos situamos al comienzo del último álbum.
-1586  8DFA
-1587  8DFA CD 3F 73     	call Modifica_Stack_snapshot
-1588  8DFD
-1589  8DFD C9           	ret
-1590  8DFE
-1591  8DFE
-1592  8DFE
-1593  8DFE              ; -----------------------------------------------------------------------------------
-1594  8DFE
-1595  8DFE              Pinta_Amadeus
-1596  8DFE
-1597  8DFE 3E 06        	ld a,6
-1598  8E00 D3 FE            out ($fe),a										; Amarillo
-1599  8E02
-1600  8E02 CD 4F 8C        	call Calcula_malotes_Amadeus
-1601  8E05 CD C5 96     	call Extrae_foto_Amadeus
-1602  8E08 CD 0B 8C     	call Limpia_album_Amadeus
-1603  8E0B
-1604  8E0B C9           	ret
-1605  8E0C
-1606  8E0C              Pinta_entidades
-1607  8E0C
-1608  8E0C 3A 3E 89     	ld a,(Semaforo)
-1609  8E0F CB 47        	bit 0,a
-1610  8E11 C8           	ret z
-1611  8E12
-1612  8E12              ; Pintamos siempre que Album_de_fotos contenga un frame completo.
-1613  8E12
-1614  8E12 CD 33 8C     	call Calcula_numero_de_malotes
-1615  8E15 CD 43 96     	call Extrae_foto_entidades
-1616  8E18
-1617  8E18 C9           	ret
-1618  8E19
-1619  8E19              ; -----------------------------------------------------------------------------------
-1620  8E19
-1621  8E19              Actualiza_relojes
-1622  8E19
-1623  8E19 21 53 89     	ld hl,Contador_de_frames
-1624  8E1C 7E           	ld a,(hl)
-1625  8E1D FE FF        	cp $ff
-1626  8E1F 20 04        	jr nz,1F
-1627  8E21 34           	inc (hl)
-1628  8E22 21 54 89     	ld hl,Contador_de_frames_2
-1629  8E25 34           1 inc (hl)											; 0 - 255
-1630  8E26 C9           	ret
-1631  8E27
-1632  8E27              ; ---------------------------------------------------------------
-1633  8E27              ;
-1634  8E27              ;	27/9/23
-1635  8E27
-1636  8E27              Guarda_parametros_DRAW
-1637  8E27
-1638  8E27 21 C8 88     	ld hl,Filas
-1639  8E2A 11 AC 72     	ld de,Almacen_de_parametros_DRAW
-1640  8E2D 01 3D 00     	ld bc,61
-1641  8E30 ED B0        	ldir
-1642  8E32 C9           	ret
-1643  8E33
-1644  8E33              Recupera_parametros_DRAW
-1645  8E33
-1646  8E33 21 AC 72     	ld hl,Almacen_de_parametros_DRAW
-1647  8E36 11 C8 88     	ld de,Filas
-1648  8E39 01 3D 00     	ld bc,61
-1649  8E3C ED B0        	ldir
-1650  8E3E C9           	ret
-1651  8E3F
-1652  8E3F              ; ---------------------------------------------------------------
-1653  8E3F
-1654  8E3F              	include "Disparo.asm"
+1410  8D67              ; A partir de $4f61 no hace falta DELAY.
+1411  8D67
+1412  8D67              ;	!!!!!!!! DESTRUYE BC !!!!!!!!!!!
+1413  8D67
+1414  8D67 01 20 03     DELAY LD BC,$0320							;$0320 ..... Delay mínimo
+1415  8D6A 0B           wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: si el Sprite ocupa la 1ª y 2ª_
+1416  8D6B 78           	LD A,B
+1417  8D6C A7           	AND A
+1418  8D6D 20 FB        	JR NZ,wait
+1419  8D6F C9           	RET
+1420  8D70
+1421  8D70              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1422  8D70              ;
+1423  8D70              ;	5/3/23
+1424  8D70              ;
+1425  8D70              ;	En 1er lugar detectamos disparo (5), seguido de los movimientos a izq. / derecha.
+1426  8D70
+1427  8D70              Movimiento_Amadeus
+1428  8D70
+1429  8D70              ; Disparo.
+1430  8D70
+1431  8D70 3A 58 89     	ld a,(Disparo_Amadeus)
+1432  8D73 A7           	and a
+1433  8D74 20 02        	jr nz,1F
+1434  8D76 18 15        	jr 2F
+1435  8D78
+1436  8D78 3E F7        1 ld a,$f7													; "5" para disparar.
+1437  8D7A DB FE        	in a,($fe)
+1438  8D7C E6 10        	and $10
+1439  8D7E
+1440  8D7E F5           	push af
+1441  8D7F CC 3F 8E     	call z,Genera_disparo
+1442  8D82 F1           	pop af
+1443  8D83 20 08        	jr nz,2F
+1444  8D85
+1445  8D85 3A 58 89     	ld a,(Disparo_Amadeus)
+1446  8D88 EE 01        	xor 1
+1447  8D8A 32 58 89     	ld (Disparo_Amadeus),a
+1448  8D8D
+1449  8D8D 3E F7        2 ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
+1450  8D8F DB FE        	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
+1451  8D91 E6 01        	and $01													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $01 resulta "0"  llama a la rutina "Mov_izq".
+1452  8D93 CC 10 9B         call z,Mov_left											;			"			"			"			"			"			"			"			"
+1453  8D96
+1454  8D96 3E F7        	ld a,$f7
+1455  8D98 DB FE        	in a,($fe)
+1456  8D9A E6 01        	and $01
+1457  8D9C C8           	ret z
+1458  8D9D
+1459  8D9D 3E F7        	ld a,$f7
+1460  8D9F DB FE        	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
+1461  8DA1 E6 02        	and $02													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $02 resulta "0"  llama a la rutina "Mov_der".
+1462  8DA3 CC F2 99     	call z,Mov_right										;			"			"			"			"			"			"			"			"
+1463  8DA6 C9           	ret
+1464  8DA7
+1465  8DA7              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1466  8DA7              ;
+1467  8DA7              ;	Rutina provisional para que los malotes cagen balas.
+1468  8DA7
+1469  8DA7              Detecta_disparo_entidad
+1470  8DA7
+1471  8DA7 3A 5B 89     	ld a,(Disparo_entidad)
+1472  8DAA A7           	and a
+1473  8DAB C8           	ret z
+1474  8DAC
+1475  8DAC              ;! Aquí hemos de implementar la rutina/s que generan disparo...
+1476  8DAC
+1477  8DAC              ;	ld a,$7f				; Detecta SPACE.
+1478  8DAC              ;	in a,($fe)
+1479  8DAC              ;	and 1
+1480  8DAC              ;	ret nz
+1481  8DAC
+1482  8DAC              ;	call Genera_disparo
+1483  8DAC C9           	ret
+1484  8DAD
+1485  8DAD              ; ----------------------------------------------------------------------
+1486  8DAD              ;
+1487  8DAD              ;	8/9/23
+1488  8DAD
+1489  8DAD 2A 24 89     Guarda_datos_de_borrado_Amadeus	ld hl,(End_Snapshot_Amadeus)
+1490  8DB0 2B            	dec hl
+1491  8DB1 7E           	ld a,(hl)
+1492  8DB2 A7           	and a
+1493  8DB3 C8           	ret z										; Salimos si es álbum está vacío.
+1494  8DB4
+1495  8DB4 11 E7 88     	ld de,Variables_de_borrado+5
+1496  8DB7 01 06 00     	ld bc,6
+1497  8DBA ED B8        	lddr
+1498  8DBC C9           	ret
+1499  8DBD
+1500  8DBD              ; ----------------------------------------------------------------------
+1501  8DBD              ;
+1502  8DBD              ;	9/9/23
+1503  8DBD
+1504  8DBD              Repone_datos_de_borrado_Amadeus
+1505  8DBD
+1506  8DBD 21 E2 88     	ld hl,Variables_de_borrado
+1507  8DC0 11 A0 72     	ld de,Album_de_fotos_Amadeus
+1508  8DC3 01 06 00     	ld bc,6
+1509  8DC6 ED B0        	ldir
+1510  8DC8
+1511  8DC8 EB           	ex de,hl
+1512  8DC9 22 24 89     	ld (End_Snapshot_Amadeus),hl
+1513  8DCC
+1514  8DCC C9           	ret
+1515  8DCD
+1516  8DCD              ; ----------------------------------------------------------------------
+1517  8DCD              ;
+1518  8DCD              ;	27/10/23
+1519  8DCD              ;
+1520  8DCD
+1521  8DCD              ;	Si se ha producido movimiento de la entidad en curso, esta rutina vuelca las `Variables_de_borrado´ en el_
+1522  8DCD              ;	_ Album_de_fotos correspondiente.
+1523  8DCD
+1524  8DCD              ;	El proceso de "escritura en los álbumes de fotos" no puede verse interrumpido por la rutina FRAME, (di/ei)_
+1525  8DCD              ;	_ durante el proceso de escritura.
+1526  8DCD
+1527  8DCD              Repone_datos_de_borrado
+1528  8DCD
+1529  8DCD F3           	di
+1530  8DCE ED 5B 1C 89  	ld de,(Stack_snapshot)
+1531  8DD2 21 E2 88     	ld hl,Variables_de_borrado
+1532  8DD5 01 06 00     	ld bc,6
+1533  8DD8 ED B0        	ldir
+1534  8DDA FB           	ei
+1535  8DDB
+1536  8DDB EB           	ex de,hl
+1537  8DDC 22 1C 89     	ld (Stack_snapshot),hl
+1538  8DDF
+1539  8DDF C9           	ret
+1540  8DE0
+1541  8DE0              ; ----------------------------------------------------------------------
+1542  8DE0              ;
+1543  8DE0              ;	11/8/23
+1544  8DE0
+1545  8DE0              Gestiona_entidades
+1546  8DE0
+1547  8DE0              ;	Consultamos el estado de buffer. Si Album_de_fotos no está completo, salimos de la rutina, no hay nada que gestionar.
+1548  8DE0
+1549  8DE0 3A 3E 89     	ld a,(Semaforo)
+1550  8DE3 CB 47        	bit 0,a
+1551  8DE5 28 FE        	jr z,$												;! STOP el buffer está vacío.
+1552  8DE7 C8           	ret z
+1553  8DE8
+1554  8DE8              ;	call Extrae_foto_disparos
+1555  8DE8              ;	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
+1556  8DE8
+1557  8DE8 CD EC 72     	call Gestiona_albumes_de_fotos 						; Escupe Álbum de fotos. 1a0, 2a1, 3a2.
+1558  8DEB
+1559  8DEB              ;	Album incompleto ?????
+1560  8DEB              ;	Si es así, salimos de la rutina sin modificar punteros. Tenemos que terminar de pinter el FRAME.
+1561  8DEB
+1562  8DEB 3A 3F 89     	ld a,(Ctrl_Semaforo)
+1563  8DEE CB 67        	bit 4,a
+1564  8DF0 28 05        	jr z,1F
+1565  8DF2
+1566  8DF2              ;! Buffer vacío. Inicializar (Ctrl_Semaforo) y salir sin modificar punteros.
+1567  8DF2
+1568  8DF2 AF           	xor a
+1569  8DF3 32 3F 89     	ld (Ctrl_Semaforo),a
+1570  8DF6 C9           	ret
+1571  8DF7
+1572  8DF7 CB 47        1 bit 0,a
+1573  8DF9 C0           	ret nz
+1574  8DFA
+1575  8DFA              ; El buffer estaba completo y hemos pintado el frame y desplazado los álbumes.
+1576  8DFA              ; Nos situamos al comienzo del último álbum.
+1577  8DFA
+1578  8DFA CD 3F 73     	call Modifica_Stack_snapshot
+1579  8DFD
+1580  8DFD C9           	ret
+1581  8DFE
+1582  8DFE
+1583  8DFE
+1584  8DFE              ; -----------------------------------------------------------------------------------
+1585  8DFE
+1586  8DFE              Pinta_Amadeus
+1587  8DFE
+1588  8DFE 3E 06        	ld a,6
+1589  8E00 D3 FE            out ($fe),a										; Amarillo
+1590  8E02
+1591  8E02 CD 4F 8C        	call Calcula_malotes_Amadeus
+1592  8E05 CD C5 96     	call Extrae_foto_Amadeus
+1593  8E08 CD 0B 8C     	call Limpia_album_Amadeus
+1594  8E0B
+1595  8E0B C9           	ret
+1596  8E0C
+1597  8E0C              Pinta_entidades
+1598  8E0C
+1599  8E0C 3A 3E 89     	ld a,(Semaforo)
+1600  8E0F CB 47        	bit 0,a
+1601  8E11 C8           	ret z
+1602  8E12
+1603  8E12              ; Pintamos siempre que Album_de_fotos contenga un frame completo.
+1604  8E12
+1605  8E12 CD 33 8C     	call Calcula_numero_de_malotes
+1606  8E15 CD 43 96     	call Extrae_foto_entidades
+1607  8E18
+1608  8E18 C9           	ret
+1609  8E19
+1610  8E19              ; -----------------------------------------------------------------------------------
+1611  8E19
+1612  8E19              Actualiza_relojes
+1613  8E19
+1614  8E19 21 53 89     	ld hl,Contador_de_frames
+1615  8E1C 7E           	ld a,(hl)
+1616  8E1D FE FF        	cp $ff
+1617  8E1F 20 04        	jr nz,1F
+1618  8E21 34           	inc (hl)
+1619  8E22 21 54 89     	ld hl,Contador_de_frames_2
+1620  8E25 34           1 inc (hl)											; 0 - 255
+1621  8E26 C9           	ret
+1622  8E27
+1623  8E27              ; ---------------------------------------------------------------
+1624  8E27              ;
+1625  8E27              ;	27/9/23
+1626  8E27
+1627  8E27              Guarda_parametros_DRAW
+1628  8E27
+1629  8E27 21 C8 88     	ld hl,Filas
+1630  8E2A 11 AC 72     	ld de,Almacen_de_parametros_DRAW
+1631  8E2D 01 3D 00     	ld bc,61
+1632  8E30 ED B0        	ldir
+1633  8E32 C9           	ret
+1634  8E33
+1635  8E33              Recupera_parametros_DRAW
+1636  8E33
+1637  8E33 21 AC 72     	ld hl,Almacen_de_parametros_DRAW
+1638  8E36 11 C8 88     	ld de,Filas
+1639  8E39 01 3D 00     	ld bc,61
+1640  8E3C ED B0        	ldir
+1641  8E3E C9           	ret
+1642  8E3F
+1643  8E3F              ; ---------------------------------------------------------------
+1644  8E3F
+1645  8E3F              	include "Disparo.asm"
 # file opened: Disparo.asm
    1+ 8E3F              ; ******************************************************************************************************************************************************************************************
    2+ 8E3F              ;
@@ -4214,7 +4205,7 @@
 1419+ 9333 04           1 inc b
 1420+ 9334 C9               ret
 # file closed: Disparo.asm
-1655  9335              	include "Draw_XOR.asm"
+1646  9335              	include "Draw_XOR.asm"
 # file opened: Draw_XOR.asm
    1+ 9335              ; ******************************************************************************************************************************************************************************************
    2+ 9335              ;
@@ -5089,7 +5080,7 @@
  871+ 9707
  872+ 9707 C9           	ret
 # file closed: Draw_XOR.asm
-1656  9708              	include "Rutinas_de_impresion_sprites.asm"
+1647  9708              	include "Rutinas_de_impresion_sprites.asm"
 # file opened: Rutinas_de_impresion_sprites.asm
    1+ 9708              ;   índices de Rutinas de impresión.
    2+ 9708
@@ -5509,7 +5500,7 @@
  416+ 9937 C9               ret
  417+ 9938
 # file closed: Rutinas_de_impresion_sprites.asm
-1657  9938              	include "calcula_tercio.asm"
+1648  9938              	include "calcula_tercio.asm"
 # file opened: calcula_tercio.asm
    1+ 9938              ; ******************************************* Indica el tercio de pantalla en el que nos encontramos según el valor del registro H ********************************************************
    2+ 9938              ;
@@ -5526,7 +5517,7 @@
   13+ 9941 C9           	ret
   14+ 9942
 # file closed: calcula_tercio.asm
-1658  9942              	include "Cls.asm"
+1649  9942              	include "Cls.asm"
 # file opened: Cls.asm
    1+ 9942              ; *********************************** Limpia la pantalla, CLEAR SCREEN ****************************************************************
    2+ 9942              ;
@@ -5561,7 +5552,7 @@
   31+ 9955 C9           	ret
   32+ 9956
 # file closed: Cls.asm
-1659  9956              	include "Direcciones.asm"
+1650  9956              	include "Direcciones.asm"
 # file opened: Direcciones.asm
    1+ 9956              ; ******************************************************************************************************************************************************************************************
    2+ 9956              ;
@@ -6314,7 +6305,7 @@
  749+ 9CC3
  750+ 9CC3
 # file closed: Direcciones.asm
-1660  9CC3              	include "Genera_coordenadas.asm"
+1651  9CC3              	include "Genera_coordenadas.asm"
 # file opened: Genera_coordenadas.asm
    1+ 9CC3              ; ------------------------------------------------------------------------
    2+ 9CC3              ;
@@ -6404,7 +6395,7 @@
   86+ 9D05 C9           	ret
   87+ 9D06
 # file closed: Genera_coordenadas.asm
-1661  9D06              	include "Relojes_y_temporizaciones.asm"
+1652  9D06              	include "Relojes_y_temporizaciones.asm"
 # file opened: Relojes_y_temporizaciones.asm
    1+ 9D06              ; Relojes y temporizaciones.
    2+ 9D06
@@ -6447,7 +6438,7 @@
   39+ 9D13 77           	ld (hl),a
   40+ 9D14 C9           	ret
 # file closed: Relojes_y_temporizaciones.asm
-1662  9D15              	include "Patrones_de_mov.asm"
+1653  9D15              	include "Patrones_de_mov.asm"
 # file opened: Patrones_de_mov.asm
    1+ 9D15
    2+ 9D15
@@ -7023,7 +7014,7 @@
  556+ A016
  557+ A016
 # file closed: Patrones_de_mov.asm
-1663  A016              	include "Guarda_foto_registros.asm"
+1654  A016              	include "Guarda_foto_registros.asm"
 # file opened: Guarda_foto_registros.asm
    1+ A016              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
    2+ A016              ;
@@ -7512,10 +7503,10 @@
  485+ 7463 C9               ret
  486+ 7464
 # file closed: Guarda_foto_registros.asm
-1664  7464
-1665  7464              	SAVESNA "Pruebas.sna", START
-1666  7464
-1667  7464
-1668  7464
-1669  7464
+1655  7464
+1656  7464              	SAVESNA "Pruebas.sna", START
+1657  7464
+1658  7464
+1659  7464
+1660  7464
 # file closed: Banco_de_pruebas.asm

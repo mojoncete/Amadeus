@@ -48,7 +48,7 @@ FRAME ld (Stack_3),sp
 	jr nz,1F
 	ex af,af
 	ld a,(Contador_de_frames)
-	cp $5d ;	$c1 es el último FRAME que se ve bien.
+	cp $ba ;	$c1 es el último FRAME que se ve bien.
 	jr z,$
 	jr nc,$
 
@@ -62,15 +62,6 @@ FRAME ld (Stack_3),sp
 	call Actualiza_relojes
 
 ;	call Recupera_parametros_DRAW
-
-;! Debuggg
-;	ld a,(Contador_de_frames_2)
-;	cp 1
-;	jr nz,1F
-;	ld a,(Contador_de_frames)
-;	cp $50	; $56 Último frame que no falla. 
-;	jr z,$
-;	jr nc,$
 
 ;! Debuggg
 
