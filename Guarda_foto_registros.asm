@@ -141,6 +141,12 @@ Gestiona_albumes_de_fotos ; 14
     bit 3,a
     jr z,13F
 
+; Album_de_fotos_1 y Album_de_fotos_2 están vacío pero ... Está Album_de_fotos_3 completo ???
+
+    ld a,(Semaforo)
+    bit 3,a
+    jr z,$ ;! No podemos hacer la doble recolocación!!! Album_de_fotos_3 no está completo.
+
 ; Volcamos Álbum_3 a Álbum_2
 ;    ""    Álbum_2 a Álbum_1
 ; Situamos (Stack_snapshot) al comienzo de Album_de_fotos_2.
