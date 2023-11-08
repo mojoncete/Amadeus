@@ -117,7 +117,7 @@ Guarda_foto_registros
 
 ; ------------------------------------------------
 ;
-;   4/11/23
+;   8/11/23
 ;
 ;   La rutina estará situada justo después de:
 ;   Almacen_de_parametros_DRAW equ $72ac ; ($72ac - $72eb) ; 61 bytes.
@@ -128,6 +128,8 @@ Guarda_foto_registros
     org $72ec 
 
 Gestiona_albumes_de_fotos ; 14
+
+;! Recolocacion.
 
 ; En 1er lugar consultamos el bit_0 de (Ctrl_Semaforo).
 ; Si está a "1" significa que Album_de_fotos_3 o Album_de_fotos_2 estaban incompletos.
@@ -141,11 +143,14 @@ Gestiona_albumes_de_fotos ; 14
     bit 3,a
     jr z,13F
 
+
+; DOBLE RECOLOCACIÓN. ----------- ------------ -----------
+
 ; Album_de_fotos_1 y Album_de_fotos_2 están vacío pero ... Está Album_de_fotos_3 completo ???
 
     ld a,(Semaforo)
     bit 3,a
-    jr z,$ ;! No podemos hacer la doble recolocación!!! Album_de_fotos_3 no está completo.
+    jr z,7F                     ;   No podemos hacer la doble recolocación!!! Album_de_fotos_3 está incompleto.
 
 ; Volcamos Álbum_3 a Álbum_2
 ;    ""    Álbum_2 a Álbum_1
@@ -163,9 +168,12 @@ Gestiona_albumes_de_fotos ; 14
     xor a
     ld (Ctrl_Semaforo),a
     jr 7F
-    
 
-;   Álbum_2 vacío ?????
+; ------------ ---------------- ------------ 
+
+;   RECOLOCACIÓN SIMPLE.
+
+;   Album3_a_Album2 ?????
 
 13 bit 1,a
     jr nz,10F
@@ -176,9 +184,11 @@ Gestiona_albumes_de_fotos ; 14
 
     ld a,(Semaforo)
     bit 2,a
-    jr z,$
+    jr z,7F                      ; No puede haber recolocación. Album_de_fotos_2 está incompleto.
 
     call Album2_a_Album1
+
+; Album3_a_Album2 !!!
 
 ; Album_de_fotos_2 está vacío. Se ha completado el buffer ???. Está Album_de_fotos_3 completo??
 
@@ -221,7 +231,7 @@ Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
 
 ;   Album_de_fotos. Contiene datos ???
 
-;! Ordena_Albumes 
+;! Cascada.
 
 7 ld hl,Album_de_fotos+1
     ld a,(hl)
@@ -253,8 +263,6 @@ Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
 
 ;! Buffer vacío. El siguiente FRAME no se puede preparar. !!!!!!!!!!!!!!!!!!!!!!!!!
 ;! Album_de_fotos_1 está incompleto.
-
-;    jr $
 
     ld hl,Ctrl_Semaforo
     set 4,(hl)

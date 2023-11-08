@@ -48,7 +48,7 @@ FRAME ld (Stack_3),sp
 ;	jr nz,1F
 ;	ex af,af
 ;	ld a,(Contador_de_frames)
-;	cp $ba ;	$c1 es el último FRAME que se ve bien.
+;	cp $c4 ;	$c1 es el último FRAME que se ve bien.
 ;	jr z,$
 ;	jr nc,$
 
@@ -326,7 +326,7 @@ Datos_de_entidad defw 0									; Contiene los bytes de información de la entid
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;	2/9/23
+;	8/11/23
 ;
 ;	Álbumes.
 
@@ -362,14 +362,25 @@ Puntero_de_End_Snapshot_disparos defw 0
 
 Semaforo db $f0											; Indicador necesario para poder gestionar los álbumes de fotos de las entidades. Indica en que álbum_
 ;														; _ nos encontramos y si el cuadro, (frame), está completo en el álbum, o no.
+
 Ctrl_Semaforo db 0										; Byte de control utilizado por la rutina [Gestiona_albumes_de_fotos] para la recolocación de los álbumes vacíos.
 ;
 ;														DESCRIPCIÓN:
 ;
 ;														BIT 0, Indica que el último álbum que tenemos abierto, NO ESTÁ COMPLETO. Este bit lo activa la rutina [Gestiona_albumes_de_fotos]_
 ;																_ e indica a la función [Gestiona_entidades], que no ha de modificar punteros, (hemos de continuar escribiendo en el mismo_	
-;																_ álbum.														
-;															
+;																_ álbum. También indica que "hay recolocación" antes de ejecutar la "cascada de álbumes". El tipo de recolocación lo definen_	
+;																_ los bits 1 y 2.												
+;														BIT 1, Indica que la recolocación de álbumes será de Album3_a_Album2, (siempre que Álbum_3 contenga un FRAME completo).
+;														BIT 2, Indica que la recolocación de álbumes será de Album2_a_Album1, (siempre que álbum_2 contenga un FRAME completo).	
+;																Nota: En el caso de que al hacer la recolocación, nos encontremos con que el álbum donante sigue incompleto, saltaremos_
+;																	_ a ejecutar la "Casacada" de álbumes para limpiar Album_de_fotos y posteriormente salir para seguir completando el FRAME incompleto.
+;														BIT 3, Existe DOBLE RECOLOCACIÓN. Album_de_fotos_2 y Album_de_fotos_1 están vacíos. Siempre que Album_de_fotos_3 contenga un FRAME completo,_
+;																_ pasaremos Album3_a_Album2 y Album2_a_Album1. También modificaremos los punteros y los situaremos al comienzo de Album_de_fotos_2.
+;																_ En el caso de que al hacer la DOBLE RECOLOCACIÓN, Album_de_fotos_3 esté incompleto, saltaremos a ejecutar la "Casacada" de álbumes para_ 
+;																_ limpiar Album_de_fotos y posteriormente salir para seguir completando el FRAME incompleto.
+;														BIT 4, Buffer vacío !!!. Album_de_fotos está vacío y no podemos volcar Album_de_fotos_1. Está incompleto.
+;																_ El siguiente FRAME no se imprime, NO HAY CUADRO.
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -1556,7 +1567,7 @@ Gestiona_entidades
 
 	call Gestiona_albumes_de_fotos 						; Escupe Álbum de fotos. 1a0, 2a1, 3a2. 
 
-;	Album incompleto ?????
+;	BUFFER vacío ??????
 ;	Si es así, salimos de la rutina sin modificar punteros. Tenemos que terminar de pinter el FRAME.
 
 	ld a,(Ctrl_Semaforo)
@@ -1578,8 +1589,6 @@ Gestiona_entidades
 	call Modifica_Stack_snapshot
 
 	ret
-
-
 
 ; -----------------------------------------------------------------------------------
 
@@ -1608,17 +1617,13 @@ Pinta_entidades
 	ret
 
 ; -----------------------------------------------------------------------------------
+;
+;	8/11/23
 
 Actualiza_relojes 
 
 	ld hl,Contador_de_frames
-	ld a,(hl)
-	cp $ff
-	jr nz,1F
 	inc (hl)
-	ld hl,Contador_de_frames_2
-1 inc (hl)											; 0 - 255
-	ret
 
 ; ---------------------------------------------------------------
 ;
