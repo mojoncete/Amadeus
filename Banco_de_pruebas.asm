@@ -95,7 +95,8 @@ FRAME ld (Stack_3),sp
 ; Constantes. 
 ; ****************************************************************************************************************************************************************************************** 
 ;
-; 4/9/23
+; 10/11/23
+
 ;
 ; Constantes generales.
 ;
@@ -130,7 +131,7 @@ Almacen_de_parametros_DRAW equ $72ac ; ($72ac - $72eb) ; 61 bytes.
 ; Variables. 
 ; ****************************************************************************************************************************************************************************************** 
 ;
-; 28/07/23
+; 10/11//23
 ;
 ; Variables de DRAW. (Motor principal).				
 ;
@@ -301,19 +302,13 @@ Repone_puntero_objeto defw 0							; Almacena (Puntero_objeto). Cuando el Sprite
 ; 														; _ Cuando hemos terminado de iniciarlo y guardado su foto, hemos de recuperar su (Puntero_objeto).
 ;														; (Repone_puntero_objeto) es una copia de respaldo de (Puntero_objeto) y su función es restaurarlo.
 
-; Ctrl_3 db 0											; Byte de control de propósito general.						
-
-;														DESCRIPCIÓN:
-;
-;														BIT 0, 
-
 ; Gestión de ENTIDADES y CAJAS.
 
 Puntero_store_caja defw 0
 Puntero_restore_caja defw 0
 Indice_restore_caja defw 0
-Numero_de_entidades db 0								; Nº de entidades en pantalla, (contando con Amadeus).
-Numero_parcial_de_entidades db 0
+Numero_de_entidades db 0								; Nº total de entidades maliciosas que contiene el nivel.
+Numero_parcial_de_entidades db 7						; Nº de cajas que contiene un bloque de entidades. (7 Cajas).
 Entidades_en_curso db 0									; ..... ..... .....
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
@@ -531,15 +526,20 @@ START
 
 Main 
 ;
-;	3/8/23
+;	10/11/23
 
 ; 	ei
+
+; Aparece nueva entidad ???
 
 	ld a,(Clock_Entidades_en_curso)						; Inicialmente, (Clock_Entidades_en_curso)="30".
 	ld b,a
 	ld a,(Contador_de_frames)
 	cp b
 	jr nz,13F
+
+; Si aún no hemos completado el bloque de entidades, (7 cajas), incrementaremos (Entidades_en_curso) y calcularemos_ 
+; _ (Clock_Entidades_en_curso) para la siguiente entidad.
 
 	ld a,(Numero_parcial_de_entidades)
 	ld b,a
@@ -548,16 +548,26 @@ Main
 	jr z,13F
 	jr nc,13F
 
+; ---
 	inc a
 	ld (Entidades_en_curso),a
 
-	ld a,(Clock_Entidades_en_curso)
+;! debug 	
 
+	di
+	cp 6
+	jr z,$
+	ei
+
+; - Define el tiempo que ha de transcurrir para que aparezca la siguiente entidad. ----------------------------
+
+	ld a,(Clock_Entidades_en_curso)
 ;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
 ;! _ IMPREDECIBLE !!!!
-
 	add 100
 	ld (Clock_Entidades_en_curso),a
+
+; -------------------------------------------------------------------------------------------------------------
 
 ; Habilita disparos.
 
@@ -600,6 +610,8 @@ Main
 	bit 4,(hl)
 	jp nz,16F
 
+;! Cuando hemos destruido a todas las entidades del bloque preparamos una NUEVA OLEADA !!!!!
+
 	ld hl,Ctrl_1
 	set 3,(hl)											; Señal de RECARGA de las cajas DRAW activada. NUEVA OLEADA !!!!!!!!
 
@@ -611,8 +623,8 @@ Main
 
 11 ld a,(Entidades_en_curso)
 	and a
-	jp z,16F											; Si no hay entidades en curso, RESTORE AMADEUS.
-	ld b,a												; (Entidades_en_curso) en A´ y B.
+	jp z,16F											; Si no hay entidades en curso saltamos a [Avanza_puntero_de_album_de_fotos_de_entidades].
+	ld b,a												; No hay entidades que gestionar.
 
 ; Código que ejecutamos con cada entidad:
 ;	--------------------------------------- GESTIÓN DE ENTIDADES. !!!!!!!!!!
@@ -705,7 +717,6 @@ Main
 ; [[[
 	call Detecta_disparo_entidad
 ; ]]]
-
 	call Guarda_foto_entidad_a_pintar					; PINTAMOS !!!!!!!!!!!!!!!!!!
 ;	call Guarda_datos_de_borrado
 
@@ -732,6 +743,8 @@ Main
 	ld a,(Ctrl_1) 										; Existe Loop?
 	bit 3,a												; Si este bit es "1". Hay recarga de nueva oleada.
 	jp z,Main
+
+; RECARGA DE NUEVA OLEADA.
 
 	ld a,(Contador_de_frames)
 	ld b,a

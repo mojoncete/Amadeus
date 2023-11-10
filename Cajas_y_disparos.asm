@@ -91,6 +91,8 @@ Disparo_10 defw 0									; Control.
 Disparo_11 defw 0
 
 ; -------------------------------------------------------------------------------------
+;
+;	Índice de cajas de entidades.
 
 Indice_de_cajas										 ;! 63 Bytes por entidad.
 
@@ -436,7 +438,7 @@ Caja_7 db 0,0										; (Filas) / (Columns).
 ;
 ;	20/05/23
 ;
-;	TIPOS de "Entidades maliciosas". Quieren conquistar la Tierra.	
+;	TIPOS de "Entidades maliciosas" que quieren conquistar la Tierra.	
 ;
 	;	Notas de funcionamiento: (Cuad_objeto) siempre será "1" independientemente de su (Posicion_inicio).
 	;		De no ser así, la rutina [Recompone_posicion_inicio] generará problemas a la hora de hacer que_
