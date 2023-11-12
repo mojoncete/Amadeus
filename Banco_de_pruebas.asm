@@ -43,14 +43,14 @@ FRAME ld (Stack_3),sp
 
 ;! Debuggggggggggggggggggg
 
-;	ld a,(Contador_de_frames_2)
-;	cp 1
-;	jr nz,1F
-;	ex af,af
-;	ld a,(Contador_de_frames)
-;	cp $c4 ;	$c1 es el último FRAME que se ve bien.
-;	jr z,$
-;	jr nc,$
+	ld a,(Contador_de_frames_2)
+	cp 1
+	jr nz,1F
+	ex af,af
+	ld a,(Contador_de_frames)
+	cp $5b	;	$5a. Última FOTO OK, (7 entidades). 
+	jr z,$
+	jr nc,$
 
 1 call Pinta_entidades
 ;	call Pinta_Amadeus
@@ -526,45 +526,54 @@ START
 
 Main 
 ;
-;	10/11/23
-
-; 	ei
+;	12/11/23
 
 ; Aparece nueva entidad ???
 
-	ld a,(Clock_Entidades_en_curso)						; Inicialmente, (Clock_Entidades_en_curso)="30".
+; 														; Inicialmente, (Clock_Entidades_en_curso)="30".
+;														; (Clock_Entidades_en_curso) define cuando aparecen las entidades en pantalla.
+;														; Todas las entidades contenidas en un "bloque", (7 cajas), se inicializan en [START].
+;														; Si (Numero_de_entidades) > "7", cuando el bloque de 7 cajas esté a "0" se inicializaráa _
+;														; _un 2º bloque.
+
+	ld a,(Clock_Entidades_en_curso)	
 	ld b,a
 	ld a,(Contador_de_frames)
 	cp b
+	jr z,21F
+
+; Es probable que en el ciclo anterior NO HAYAMOS EJECUTADO [FRAME], (por tener desactivadas las interrupciones en ese momento, rutinas: _
+; _ [Guarda_foto_registros] y [Repone_datos_de_borrado]. 
+; En ese caso, corregiremos el "NO CONTEO" de (Contador_de_frames) incrementándolo en "1" y volviendo a comparar con (Clock_Entidades_en_curso).
+; Si la comparativa resulta positiva, actualizaremos (Contador_de_frames), evitando así la pérdida de sincronismo.
+
+	inc a
+	cp b
 	jr nz,13F
 
-; Si aún no hemos completado el bloque de entidades, (7 cajas), incrementaremos (Entidades_en_curso) y calcularemos_ 
+	ld (Contador_de_frames),a
+
+; Si aún quedan entidades por aparecer del bloque de entidades, (7 cajas), incrementaremos (Entidades_en_curso) y calcularemos_ 
 ; _ (Clock_Entidades_en_curso) para la siguiente entidad.
 
-	ld a,(Numero_parcial_de_entidades)
+21 ld a,(Numero_parcial_de_entidades)
 	ld b,a
 	ld a,(Entidades_en_curso)
 	cp b
 	jr z,13F
 	jr nc,13F
 
-; ---
+; --- --- --- --- ---
+
 	inc a
 	ld (Entidades_en_curso),a
-
-;! debug 	
-
-	di
-	cp 6
-	jr z,$
-	ei
 
 ; - Define el tiempo que ha de transcurrir para que aparezca la siguiente entidad. ----------------------------
 
 	ld a,(Clock_Entidades_en_curso)
 ;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
 ;! _ IMPREDECIBLE !!!!
-	add 100
+	add 50
 	ld (Clock_Entidades_en_curso),a
 
 ; -------------------------------------------------------------------------------------------------------------
@@ -1631,12 +1640,22 @@ Pinta_entidades
 
 ; -----------------------------------------------------------------------------------
 ;
-;	8/11/23
+;	12/11/23
+;
+;	Incrementa los relojes cada vez que se ejecuta [FRAME].
 
 Actualiza_relojes 
 
-	ld hl,Contador_de_frames
+	ld hl,Contador_de_frames	;	20 ms. (Contador_de_frames)=$ff ..... 5.1 segunados aprox.
 	inc (hl)
+	
+	inc (hl)
+	dec (hl)
+	ret nz
+
+	ld hl,Contador_de_frames_2	;	5.1 segundos. (Contador_de_frames_2)=$ff ..... 1300.5 segundos, 21.675 minutos.  
+	inc (hl)
+	ret
 
 ; ---------------------------------------------------------------
 ;
