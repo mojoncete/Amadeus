@@ -48,7 +48,7 @@ FRAME ld (Stack_3),sp
 	jr nz,1F
 	ex af,af
 	ld a,(Contador_de_frames)
-	cp $5b	;	$5a. Última FOTO OK, (7 entidades). 
+	cp $57	;	$5a. Última FOTO OK, (7 entidades). 
 	jr z,$
 	jr nc,$
 
