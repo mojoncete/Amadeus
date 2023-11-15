@@ -120,12 +120,12 @@ Guarda_foto_registros
 ;   8/11/23
 ;
 ;   La rutina estará situada justo después de:
-;   Almacen_de_parametros_DRAW equ $72ac ; ($72ac - $72eb) ; 61 bytes.
+;   Almacen_de_parametros_DRAW equ $72bd ; ($72bd - $72fa) ; 61 bytes.
 
 ;   Limpia Album_de_fotos después de imprimir pantalla y desplaza el buffer una posición.
 ;   Si el buffer estaba lleno, dejará libre Album_de_fotos_3.   
 
-    org $72ec 
+    org $72fb 
 
 Gestiona_albumes_de_fotos ; 14
 
@@ -417,11 +417,11 @@ Album2_a_Album1 ld hl,(End_Snapshot_2)       ; Final, (origen).
     ld (bc),a                       
     call Limpia_album
     ld hl,0
-    ld (End_Snapshot_2),hl      ; Limpia (End_Snapshot_2).
+    ld (End_Snapshot_2),hl                    ; Limpia (End_Snapshot_2).s
     ret
 
 
-Album1_a_Album ld hl,(End_Snapshot_1)      ; Final, (origen).
+Album1_a_Album ld hl,(End_Snapshot_1)         ; Final, (origen).
     ld bc,Album_de_fotos_1      ; Origen.
     ld de,Album_de_fotos        ; Destino.
 

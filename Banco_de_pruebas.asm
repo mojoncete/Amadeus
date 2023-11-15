@@ -41,18 +41,12 @@ FRAME ld (Stack_3),sp
 
 ; Pintamos y actualizamos los álbumes de fotos, (entidades).
 
-;! Debuggggggggggggggggggg
+	ld a,1
+	out ($fe),a
+	call Pinta_entidades
+	ld a,0
+	out ($fe),a
 
-	ld a,(Contador_de_frames_2)
-	cp 1
-	jr nz,1F
-	ex af,af
-	ld a,(Contador_de_frames)
-	cp $58	;	$5a. Última FOTO OK, (7 entidades). 
-	jr z,$
-	jr nc,$
-
-1 call Pinta_entidades
 ;	call Pinta_Amadeus
 	call Gestiona_entidades
 ;	call Gestiona_Amadeus
@@ -107,21 +101,21 @@ Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto e
 Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
 
-Album_de_fotos equ $7000	;	(7000h - 7053h).		; En (Album_de_fotos) vamos a ir almacenando los valores_
+Album_de_fotos equ $7000	;	(7000h - 7055h).		; En (Album_de_fotos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y las llamadas a las rutinas de impresión.   
 ;                               				        ; De momento situamos este almacén en $7000. La capacidad del album será de 7 entidades.  
-Album_de_fotos_disparos equ $7150 ; (7150h - 71a3).		; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
+Album_de_fotos_disparos equ $7158 ; (7158h - 71ad).		; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´. 
 ;                               				         
-Album_de_fotos_1 equ $7054	; (7054h - 700a7).
-Album_de_fotos_disparos_1 equ $71a4	; (71a4h - 71f7h).					
-Album_de_fotos_2 equ $70a8	; (70a8h - 70fbh).
-Album_de_fotos_disparos_2 equ $71f8	; (71f8hh - 724bh).
-Album_de_fotos_3 equ $70fc	; (70fch - 714fh).
-Album_de_fotos_disparos_3 equ $724c	; (724ch - 729fh).
+Album_de_fotos_1 equ $7056	; (7056h - 70ab).
+Album_de_fotos_disparos_1 equ $71ae	; (71aeh - 7203h).					
+Album_de_fotos_2 equ $70ac	; (70ach - 7101h).
+Album_de_fotos_disparos_2 equ $7204	; (7204h - 7259h).
+Album_de_fotos_3 equ $7102	; (7102 - 7157h).
+Album_de_fotos_disparos_3 equ $725a	; (725ah - 72afh).
 
-Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72abh) ; 12 bytes.
-Almacen_de_parametros_DRAW equ $72ac ; ($72ac - $72eb) ; 61 bytes.
+Album_de_fotos_Amadeus equ $72b0 ; (72b0h - 72bch) ; 12 bytes.
+Almacen_de_parametros_DRAW equ $72bd ; ($72bd - $72fa) ; 61 bytes.
 
 
 
@@ -1560,6 +1554,7 @@ Repone_datos_de_borrado_Amadeus
 Repone_datos_de_borrado
 
 	di
+
 	ld de,(Stack_snapshot)
 	ld hl,Variables_de_borrado
 	ld bc,6
@@ -1576,13 +1571,6 @@ Repone_datos_de_borrado
 ;	11/8/23
 
 Gestiona_entidades 
-
-;	Consultamos el estado de buffer. Si Album_de_fotos no está completo, salimos de la rutina, no hay nada que gestionar. 
-
-	ld a,(Semaforo)
-	bit 0,a
-	jr z,$												;! STOP el buffer está vacío.  
-	ret z
 
 ;	call Extrae_foto_disparos
 ;	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
