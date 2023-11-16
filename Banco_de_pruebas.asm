@@ -513,6 +513,7 @@ START
 ; Después del guardado de cada FRAME hemos de llamar a [Avanza_puntero_de_album_de_fotos_y_malotes]_
 ; _ para situarnos en el siguiente album.
 
+	
 6 call Avanza_puntero_de_album_de_fotos_de_entidades
 	
 
@@ -898,7 +899,7 @@ Mov_Amadeus
 
 ; -----------------------------------------------------------------------------------
 ;
-;	01/11/23
+;	16/11/23
 
 Inicia_entidad	call Inicia_Puntero_objeto
 	call Recompone_posicion_inicio
@@ -906,7 +907,17 @@ Inicia_entidad	call Inicia_Puntero_objeto
 	call Guarda_foto_registros
 	di													; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
 ;														; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
-	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
+
+; 16/11/23
+
+;	Existe Entidad guía ???
+
+;	ld a,(Ctrl_2)
+;	bit 4,a
+;	jr nz,1F
+
+
+1 call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
