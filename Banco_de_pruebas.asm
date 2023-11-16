@@ -35,29 +35,31 @@ FRAME ld (Stack_3),sp
 ; En 1er lugar guardamos los 61 bytes de la entidad alojada en DRAW para restaurarlos antes de salir de la_
 ; _ rutina de interrupción. (Para gestionar Amadeus hemos de introducir sus datos en DRAW).
 
-; Guardamos DRAW.
 
-;	call Guarda_parametros_DRAW
-
-; Pintamos y actualizamos los álbumes de fotos, (entidades).
+; Pintamos entidades/Amadeus y gestionamos álbumes de fotos de entidades.
 
 	ld a,1
 	out ($fe),a
 	call Pinta_entidades
+	call Pinta_Amadeus
+	call Gestiona_entidades								
 	ld a,0
 	out ($fe),a
 
-;	call Pinta_Amadeus
-	call Gestiona_entidades
-;	call Gestiona_Amadeus
+	ld a,2
+	out ($fe),a
+	call Guarda_parametros_DRAW
+	call Restore_Amadeus
+	call Gestiona_Amadeus
+	ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
+	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
 
 ; Restauramos los parámetros de la entidad que había alojada en DRAW "antes de gestionar AMADEUS".
 
+	call Recupera_parametros_DRAW
 	call Actualiza_relojes
-
-;	call Recupera_parametros_DRAW
-
-;! Debuggg
+	ld a,0
+	out ($fe),a
 
 	pop iy
 	pop ix
@@ -425,7 +427,7 @@ Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos
 ;
 ; Rutina principal *************************************************************************************************************************************************************************
 ;
-;	14/11/22	
+;	16/11/22	
 
 START 
 
@@ -478,16 +480,14 @@ START
 
 ; 	INICIA AMADEUS !!!!!
 
-3 
+3 call Restore_Amadeus
+	call Inicia_Puntero_objeto
+	call Draw
+	call Guarda_foto_registros
+	call Guarda_datos_de_borrado_Amadeus
 
-;	call Restore_Amadeus
-;	call Inicia_Puntero_objeto
-;	call Draw
-;	call Guarda_foto_registros
-;	call Guarda_datos_de_borrado_Amadeus
-
-;	ld de,Amadeus_db
-;	call Store_Amadeus
+	ld de,Amadeus_db
+	call Store_Amadeus
 
 ; 	INICIA DISPAROS !!!!!
 
@@ -775,13 +775,10 @@ Main
 	ret
 
 ; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- ----- 
+;
+;	16/11/23
 
 Gestiona_Amadeus
-
-    ld a,4
-	out ($fe),a											; Azul.
-
-	call Restore_Amadeus
 
 ;! Activa/desactiva impacto con Amadeus.
 
@@ -800,9 +797,6 @@ Gestiona_Amadeus
 
 14 ld hl,Ctrl_0	
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
-
-32 ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
-	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
 
 ;	call Motor_de_disparos								; Borra/mueve/pinta cada uno de los disparos y crea un nuevo album de fotos.
 
@@ -896,7 +890,7 @@ Mov_Amadeus
 
 ; ---------
 
-    call Prepara_var_pintado			                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
+    call Prepara_var_pintado			                ; HEMOS DESPLAZADO AMADEUS.!!!. Almaceno las `VARIABLES DE PINTADO´.         
 	call Repone_datos_de_borrado_Amadeus
 	call Limpia_Variables_de_borrado
 
@@ -1455,23 +1449,23 @@ Movimiento_Amadeus
 
 ; Disparo.
 
-	ld a,(Disparo_Amadeus)
-	and a
-	jr nz,1F
-	jr 2F
+;	ld a,(Disparo_Amadeus)
+;	and a
+;	jr nz,1F
+;	jr 2F
 
-1 ld a,$f7													; "5" para disparar.
-	in a,($fe)
-	and $10
+;1 ld a,$f7													; "5" para disparar.
+;	in a,($fe)
+;	and $10
 
-	push af
-	call z,Genera_disparo
-	pop af
-	jr nz,2F
+;	push af
+;	call z,Genera_disparo
+;	pop af
+;	jr nz,2F
 
-	ld a,(Disparo_Amadeus)
-	xor 1
-	ld (Disparo_Amadeus),a
+;	ld a,(Disparo_Amadeus)
+;	xor 1
+;	ld (Disparo_Amadeus),a
 
 2 ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
 	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.

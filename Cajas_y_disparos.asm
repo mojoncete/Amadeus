@@ -121,7 +121,7 @@ Amadeus_db db 2,2									; (Filas) / (Columns).
 	defw 0		 									; (Puntero_DESPLZ_der).
 	defw 0											; (Puntero_DESPLZ_izq).
 
-	defw $50d0										; (Posicion_inicio).
+	defw $50de										; (Posicion_inicio).
 	db 4 											; (Cuad_objeto).
 	db 2,2,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
