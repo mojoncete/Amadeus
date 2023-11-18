@@ -43,6 +43,14 @@ Guarda_foto_registros
     push ix
     push iy
 
+;! -----
+    ld sp,(Movimiento_precalculado)
+    push hl
+    push ix
+    push iy
+    ld (Movimiento_precalculado),sp
+;! -----
+
     ld sp,Guarda_foto_registros                   ; Sitúo el Stack Pointer en la dirección actual -1
 
     push hl                                       ; HL contiene la dirección de la rutina de impresión.

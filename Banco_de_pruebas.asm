@@ -119,7 +119,7 @@ Album_de_fotos_disparos_3 equ $725a	; (725ah - 72afh).
 Album_de_fotos_Amadeus equ $72b0 ; (72b0h - 72bch) ; 12 bytes.
 Almacen_de_parametros_DRAW equ $72bd ; ($72bd - $72fa) ; 61 bytes.
 
-
+Movimiento_precalculado defw $bfff
 
 ; 54h es el espacio necesario en (Album_de_fotos) para 7 entidades/disparos en pantalla.
 
@@ -266,8 +266,6 @@ Ctrl_2 db 0
 ;														BIT 3, Indica que (Cola_de_desplazamiento)="254". Esto quiere decir que repetiremos (1-255 veces),_
 ;															_ el último MOVIMIENTO que hayamos ejecutado.
 
-;														BIT 5, Indica si esta entidad está trabajando como "entidad guía". "1", Entidad guía.
-
 Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
 ;! 61 Bytes por entidad.
@@ -374,22 +372,6 @@ Ctrl_Semaforo db 0										; Byte de control utilizado por la rutina [Gestiona_
 ;											 					_ limpiar Album_de_fotos y posteriormente salir para seguir completando el FRAME incompleto.
 ;														BIT 4, Buffer vacío !!!. Album_de_fotos está vacío y no podemos volcar Album_de_fotos_1. Está incompleto.
 ;																_ El siguiente FRAME no se imprime, NO HAY CUADRO.
-
-;														BIT 5, Este bit a "1" indica que existe una "ENTIDAD GUÍA".
-
-Variables_de_pintado_entidad_sombra ds 14				; Almacenaremos aquí las (Variables_de_borrado)	de la "ENTIDAD GUÍA". Las utilizarán las suiguientes entidades sombra para pintarse._	
-;							  							  _ (Variables_de_pintado) precalculadas, sin pasar por DRAW. Tras las tres variables_de_pintado precalculadas, almacenaremos el posicionamiento_
-;														  _ de la "Entidad guía". Estos 8 bytes son necesarios para convertir una entidad "SOMBRA" en una "ENTIDAD GUÍA", cuando ésta sea destruida:						
-;
-;														Filas db 0												; Filas. [DRAW]
-;														Columns db 0  											; Nº de columnas. [DRAW]
-;														Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
-;														Puntero_objeto defw 0									; Donde están los datos para pintar el Sprite.
-;														Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
-;														Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
-;
-;														; 
-;---------------------------------------------------------------------------------------------------------------
 
 ; Gestión de Disparos.
 
@@ -651,19 +633,6 @@ Main
 
 15 push bc 												; Nº de entidades en curso.
 
-;	Existe Entidad guía ???
-
-	ld a,(Ctrl_Semaforo)
-	bit 5,a
-	jr nz,22F
-
-;		Aún no existe entidad guía o ha sido eliminada. Fijamos esta entidad como una "entidad guía".
-
-	ld hl,Ctrl_2
-	set 5,(hl)
-	set 5,a
-	ld (Ctrl_Semaforo),a
-
 ; Impacto ???
 
 22 ld a,(Impacto)										 
@@ -746,52 +715,19 @@ Main
 	bit 4,a
 	jr z,17F                                       	    ; Omitimos BORRAR/PINTAR si no hay movimiento.
 
-; Vamos a guardar la foto de una ENTIDAD SOMBRA ?????
-
-	ld a,(Ctrl_2)
-	bit 5,a
-	jr nz,24F
-
-;! Vamos a guardar en el álbum de fotos correspondiente una ENTIDAD SOMBRA !!!!!!!!!!
-
-	di
-	jr $
-	ei
-
-	call Preparamos_registros_entidad_SOMBRA
-
 ; Voy a utilizar una rutina de lectura de teclado para disparar con cualquier entidad.
 ; [[[
-24 call Detecta_disparo_entidad
+	call Detecta_disparo_entidad
 ; ]]]
 	call Guarda_foto_entidad_a_pintar					; PINTAMOS !!!!!!!!!!!!!!!!!!
 
-; ENTIDAD GUÍA ???
-;
-; Si es así hay que guardar sus (Variables_de_borrado) al almacén (Variables_de_pintado_entidad_sombra).
-
-	ld a,(Ctrl_2)
-	bit 5,a
-	jr z,23F
-
-	call Datos_entidad_guia_a_almacen
-
-; --- --- --- --- ---
-
-23 ld hl,Ctrl_0
+	ld hl,Ctrl_0
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
 
 17 call Store_Restore_cajas
 
 	pop bc
-;	djnz 15B
-
-	dec b
-	jp nz,15B
-
-;	Después de cada ciclo, LIMPIAMOS (Variables_de_pintado_entidad_sombra).
-
-	call Limpia_Variables_de_pintado_entidad_sombra
+	djnz 15B
 
 ;! Activando estas líneas podemos habilitar 2 explosiones en el mismo FRAME.
 ; Hemos gestionado todas las unidades.
@@ -834,46 +770,6 @@ Main
 
 	jp 4B
 
-	ret
-
-; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- ----- 
-;
-;	18/11/23
-
-Datos_entidad_guia_a_almacen 
-
-; Trasbase de datos precalculados.
-
-	ld hl,Variables_de_borrado
-	ld de,Variables_de_pintado_entidad_sombra
-	ld bc,6
-	ldir
-
-; Trasbase de datos Draw de "ENTIDAD GUÍA".
-
-	ld hl,Filas
-	ld bc,8
-	ldir
-	ret
-
-Limpia_Variables_de_pintado_entidad_sombra xor a
-	ld hl,Variables_de_pintado_entidad_sombra
-	ld de,Variables_de_pintado_entidad_sombra+1
-	ld bc,13
-	ld (hl),a
-	ldir
-	ret
-
-Preparamos_registros_entidad_SOMBRA ld hl,Variables_de_pintado_entidad_sombra+4
-	call Extrae_address
-	push hl
-	pop iy
-	dec hl
-	dec hl
-	push hl
-	pop ix
-	dec hl
-	dec hl
 	ret
 
 ; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- ----- 
@@ -948,38 +844,14 @@ Mov_obj
 
 	ld hl,Frames_explosion
 	dec (hl)
-
-;!!!!!	call Guarda_foto_entidad_a_borrar -----
 	jr 3F
 
 2 xor a
 	ld (Ctrl_0),a 										; El bit4 de (Ctrl_0) puede estar alzado debido al movimiento de Amadeus.
 
-;	Entidad SOMBRA ???
-
-	ld a,(Ctrl_2)
-	bit 5,a
-	jr nz,5F
-
-;	Gestionamos una ENTIDAD SOMBRA.
-;	Hay movimiento de la entidad SOMBRA?. Existen datos en (Variables_de_pintado_entidad_sombra) ???
-
-	ld hl,Variables_de_pintado_entidad_sombra+1
-	ld a,(hl)
-	and a
-	jr z,6F
-
-	ld hl,Ctrl_0
-	set 4,(hl)
-	jr 7F
-
-6 ld hl,Ctrl_0										; No hay movimiento de la entidad SOMBRA. Lo indicamos con el FLAG correspondiente y salimos.
-	res 4,(hl)
-	ret 
-
 ; Movemos Entidades malignas.
 
-5 call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
+	call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
 
 	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
 	bit 4,a
@@ -995,7 +867,7 @@ Mov_obj
 ; ---------
 
     call Prepara_var_pintado 			                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
-7 call Repone_datos_de_borrado
+	call Repone_datos_de_borrado
 	call Limpia_Variables_de_borrado
 
 3 ret													; _de la misma.

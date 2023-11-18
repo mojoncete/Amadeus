@@ -353,6 +353,7 @@ Siguiente_desplazamiento
     jp z,Reinicia_el_movimiento 
 
     ret
+
 ; Subrutinas -----------------------------------------
 ; ---------- --------- --------- ---------- ----------
 ;
