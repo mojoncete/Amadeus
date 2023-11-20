@@ -43,14 +43,6 @@ Guarda_foto_registros
     push ix
     push iy
 
-;! -----
-    ld sp,(Movimiento_precalculado)
-    push hl
-    push ix
-    push iy
-    ld (Movimiento_precalculado),sp
-;! -----
-
     ld sp,Guarda_foto_registros                   ; Sitúo el Stack Pointer en la dirección actual -1
 
     push hl                                       ; HL contiene la dirección de la rutina de impresión.
@@ -111,398 +103,35 @@ Guarda_foto_registros
 8 ld (Stack_snapshot),hl
 6 ld sp,(Stack)
 
-; Aquí tengo que copiar (Stack_snapshot) en la dirección hacia donde apunta (Puntero_de_End_Snapshot).
-
-    ld e,l
-    ld d,h                                        ; DE contiene la dirección donde terminan los datos de este álbum.
-
-    ld hl,(Puntero_de_End_Snapshot)               ; Guardamos la dirección de `fin de álbum', en la dirección que_
-    ld (hl),e                                     ; _ contiene (Puntero_de_End_Snapshot). Esta dirección la utilizará la_
-    inc hl                                        ; _ rutina [Gestiona_albumes_de_fotos] para copiar los datos de un_
-    ld (hl),d                                     ; _ álbum a otro.
     ei
     ret
 
-; ------------------------------------------------
+; -----------------------------------------------------------------------------
 ;
-;   8/11/23
-;
-;   La rutina estará situada justo después de:
-;   Almacen_de_parametros_DRAW equ $72bd ; ($72bd - $72fa) ; 61 bytes.
+;   20/11/23
 
-;   Limpia Album_de_fotos después de imprimir pantalla y desplaza el buffer una posición.
-;   Si el buffer estaba lleno, dejará libre Album_de_fotos_3.   
+Limpia_y_reinicia_Stack_Snapshot 
 
-    org $72fb 
+;   Limpia Album_de_fotos.
+    
+    ld hl,(Stack_snapshot)
+    push hl
 
-Gestiona_albumes_de_fotos ; 14
-
-;! Recolocacion.
-
-; En 1er lugar consultamos el bit_0 de (Ctrl_Semaforo).
-; Si está a "1" significa que Album_de_fotos_3 o Album_de_fotos_2 estaban incompletos.
-
-    ld a,(Ctrl_Semaforo)
-    bit 0,a
-    jr z,7F
-
-; Doble recolocación ???. Album_de_fotos_2 y Album_de_fotos_1 vacíos ???
-
-    bit 3,a
-    jr z,13F
-
-
-; DOBLE RECOLOCACIÓN. ----------- ------------ -----------
-
-; Album_de_fotos_1 y Album_de_fotos_2 están vacío pero ... Está Album_de_fotos_3 completo ???
-
-    ld a,(Semaforo)
-    bit 3,a
-    jr z,7F                     ;   No podemos hacer la doble recolocación!!! Album_de_fotos_3 está incompleto.
-
-; Volcamos Álbum_3 a Álbum_2
-;    ""    Álbum_2 a Álbum_1
-; Situamos (Stack_snapshot) al comienzo de Album_de_fotos_2.
-; Actualizamos (Semaforo) 
-; Inicializamos (Ctrl_Semaforo)
-; Saltamos a 7F.
-
-    call Album3_a_Album2
-    call Album2_a_Album1
-    call Actualiza_punteros_de_albumes
-    call Modifica_Stack_snapshot
-	ld hl,Semaforo
-	rrc (hl)
-    xor a
-    ld (Ctrl_Semaforo),a
-    jr 7F
-
-; ------------ ---------------- ------------ 
-
-;   RECOLOCACIÓN SIMPLE.
-
-;   Album3_a_Album2 ?????
-
-13 bit 1,a
-    jr nz,10F
-
-;   Álbum_1 vacío.
-
-; Album_de_fotos_1 está vacío. Se ha completado Album_de_fotos_2 para volcar foto a Álbum_1 ???
-
-    ld a,(Semaforo)
-    bit 2,a
-    jr z,7F                      ; No puede haber recolocación. Album_de_fotos_2 está incompleto.
-
-    call Album2_a_Album1
-
-; Album3_a_Album2 !!!
-
-; Album_de_fotos_2 está vacío. Se ha completado el buffer ???. Está Album_de_fotos_3 completo??
-
-10 ld a,(Semaforo)
-    bit 3,a
-    jr nz,11F
-
-; Album_de_fotos_2 está vacío, (sus datos se han volcado a Album_de_fotos_1). Album_de_fotos_3 está incompleto por lo que no vamos a poder hacer el trasbase de datos del álbum_3 al álbum_2.
-; Activaremos el bit_3 de (Ctrl_Semaforo) para indicar este hecho.
-
-    ld hl,Ctrl_Semaforo
-    set 3,(hl)
-    res 0,(hl)
-    res 2,(hl)
-    jr 7F   
-
-; Album_de_fotos_3 contiene un FRAME completo.
-; Volcamos la imagen de Album_de_fotos_3 a Album_de_fotos_2
-
-11 call Album3_a_Album2     ;   X-X-X-0
-    call Modifica_Stack_snapshot
-
-    ld hl,Ctrl_Semaforo     ; Hemos reordenado los álbumes. Inicializamos el bit_0 de (Ctrl_Semaforo).
-    res 0,(hl)
-    res 1,(hl)
-    res 2,(hl)
-    jr 7F
-
-Modifica_Stack_snapshot ld hl,(Puntero_indice_album_de_fotos)
-	call Extrae_address
-	ld (Stack_snapshot),hl
-	ld hl,Semaforo
-	rrc (hl)
-    ret
-
-; #############################################################3
-
-;   En 1er lugar limpiamos el FRAME pintado.
-;   Vaciamos Album_de_fotos.
-
-;   Album_de_fotos. Contiene datos ???
-
-;! Cascada.
-
-7 ld hl,Album_de_fotos+1
-    ld a,(hl)
-    and a
-    jr z,3F                     ; Album_de_fotos está vacío. NO HAY QUE LIMPIARLO.
-
-;   Hemos impreso Album_de_fotos. 
-;   Limpiamos el álbum y actualizamos (End_Snapshot). !!!!!!!!!!!!!!
-
-    ld hl,(End_Snapshot)
     ld bc,Album_de_fotos
-    ld de,Album_de_fotos+1
-    xor a
-    ld (bc),a                   ; "0" en el 1er byte de origen.                  
-
-    call Limpia_album
-
-    ld hl,0
-    ld (End_Snapshot),hl        ; Limpia (End_Snapshot).
-
-; ----- ----- ----- -----
-
-;   Album_de_fotos está vacío y (End_Snapshot)="0".
-;   Album_de_fotos_1. Contiene un frame completo ???
-
-3 ld a,(Semaforo)
-    bit 1,a
-    jr nz,4F
-
-;! Buffer vacío. El siguiente FRAME no se puede preparar. !!!!!!!!!!!!!!!!!!!!!!!!!
-;! Album_de_fotos_1 está incompleto.
-
-    ld hl,Ctrl_Semaforo
-    set 4,(hl)
-    ret
-
-;   Album_de_fotos_1 contiene un Frame completo. Contiene datos ???
-
-4 ld hl,Album_de_fotos_1+1
-    ld a,(hl)
     and a
-    jr z,1F                     ; Album_de_fotos y Album_de_fotos_1 están vacíos. Saltamos a analizar Album_de_fotos_2.
-
-; ----- ----- ----- -----
-; ----- ----- ----- -----
-
-    call Album1_a_Album
-
-;   Album_de_fotos_2. 
-
-1 ld a,(Ctrl_Semaforo)
-    bit 3,a
-    jr nz,8F
-
-;   El bit_3 de (Ctrl_Semaforo) activo, indica que después de reestructurar, Album_de_fotos_2 está vacío por que Album_de_fotos_3 no está completo.
-;   Tenemos que salir de la rutina sin modificar punteros para completar Album_de_fotos_3.
-;   Activaremos el bit_0 y el bit_1 de (Ctrl_Semaforo) para volver a reestructurar y volcar sus datos a Album_de_fotos_2.
-
-;   Contiene Frame completo ???
-
-12 ld a,(Semaforo)
-    bit 2,a
-    jr nz,5F
-
-;   Album_de_fotos_2 NO contiene un FRAME completo. Contiene datos ???
-
-    ld hl,Album_de_fotos_2+1
-    ld a,(hl)
-    and a
-    jr nz,9F                        
-
-;   Album_de_fotos_3 y Album_de_fotos_2 están vacios !!!!!
-;   Hay que situar (Stack_snapshot) al comienzo de Album_de_fotos_2 y actualizar (Semaforo).
-
-    call Actualiza_punteros_de_albumes
-    ret
-    
-;   Album_de_fotos_2 no está completo pero contiene datos.     
-
-9 ld hl,Ctrl_Semaforo
-    set 0,(hl)                   ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
-    set 2,(hl)                   ; _ (Puntero_indice_End_Snapshot). Hay que completar el álbum. 
-    ret
-
-5 ld hl,Album_de_fotos_2+1
-    ld a,(hl)
-    and a
-    jr z,2F                     ; Album_de_fotos_2 y Album_de_fotos_1 están vacíos. Saltamos a analizar Album_de_fotos_3.
-
-; ----- ----- ----- -----
-; ----- ----- ----- -----
-; ----- ----- ----- -----
-
-;   Album_de_fotos_2 contiene un frame completo.
-;   Volcamos los datos de Album_de_fotos_2 a Album_de_fotos_1 y limpiamos Album_de_fotos_2.
-
-    call Album2_a_Album1
-
-;   Album_de_fotos_2 está vacío y (End_Snapshot_2)="0".
-;   Album_de_fotos_3. Contiene un frame completo ???
-
-2 ld a,(Semaforo)
-    bit 3,a
-    jr nz,6F
-
-;   Album_de_fotos_3 NO contiene un FRAME completo. Contiene datos ???
-
-    ld hl,Album_de_fotos_3+1
-    ld a,(hl)
-    and a
-    jr nz,8F                        
-
-;   Album_de_fotos_3 y Album_de_fotos_2 están vacios !!!!!
-;   Hay que situar (Stack_snapshot) al comienzo de Album_de_fotos_2 y actualizar (Semaforo).
-
-    call Actualiza_punteros_de_albumes
-    ret
-    
-;   Album_de_fotos_3 no está completo.     
-
-8 ld hl,Ctrl_Semaforo
-    set 0,(hl)                   ; Indica a la rutina [Gestiona_entidades] que no tenemos que modificar (Puntero_indice_album_de_fotos) ni_
-    set 1,(hl)
-    ret                          ; _ (Puntero_indice_End_Snapshot). Hay que completar el álbum. 
-                      
-;   Album_de_fotos_3 contiene un FRAME completo. Datos ???
-
-6 ld hl,Album_de_fotos_3+1
-    ld a,(hl)
-    and a
-    ret z                        ; Album_de_fotos_3 y Album_de_fotos_2 están vacíos. RET.
-               
-; ----- ----- ----- -----
-; ----- ----- ----- -----
-; ----- ----- ----- -----
-
-Album3_a_Album2 ld hl,(End_Snapshot_3)      ; Final, (origen).
-    ld bc,Album_de_fotos_3                  ; Origen.
-    ld de,Album_de_fotos_2                  ; Destino.
-
-    call Limpia_album
-
-;   Actualizamos (End_Snapshot_2):
-
-    and a
-    adc hl,bc
-    ld (End_Snapshot_2),hl
-
-;   Limpiamos Album_de_fotos_3.
-
-    ld hl,(End_Snapshot_3)
-    ld bc,Album_de_fotos_3
-    ld de,Album_de_fotos_3+1
-    xor a
-    ld (bc),a                       
-    call Limpia_album
-
-;   Hemos pasado los datos de Album_de_fotos_3 a Album_de_fotos_2. 
-;   Actualiza (End_Snapshot_3) y (Semaforo).
- 
-    ld hl,0
-    ld (End_Snapshot_3),hl                   ; Limpia (End_Snapshot_3).
-
-    ret
-
-Album2_a_Album1 ld hl,(End_Snapshot_2)       ; Final, (origen).
-    ld bc,Album_de_fotos_2                   ; Origen.
-    ld de,Album_de_fotos_1                   ; Destino.
-    call Limpia_album
-
-;   Actualizamos (End_Snapshot_1):
-
-    and a
-    adc hl,bc
-    ld (End_Snapshot_1),hl
-
-;   Limpiamos Album_de_fotos_2.
-
-    ld hl,(End_Snapshot_2)
-    ld bc,Album_de_fotos_2
-    ld de,Album_de_fotos_2+1
-    xor a
-    ld (bc),a                       
-    call Limpia_album
-    ld hl,0
-    ld (End_Snapshot_2),hl                    ; Limpia (End_Snapshot_2).s
-    ret
-
-
-Album1_a_Album ld hl,(End_Snapshot_1)         ; Final, (origen).
-    ld bc,Album_de_fotos_1      ; Origen.
-    ld de,Album_de_fotos        ; Destino.
-
-    call Limpia_album
-
-;   Calculamos (End_Snapshot)
-
-    and a
-    adc hl,bc
-    ld (End_Snapshot),hl
-
-;   Limpiamos Album_de_fotos_1.
-
-    ld hl,(End_Snapshot_1)
-    ld bc,Album_de_fotos_1
-    ld de,Album_de_fotos_1+1
-    xor a
-    ld (bc),a                       
-
-    call Limpia_album
-
-    ld hl,0
-    ld (End_Snapshot_1),hl        ; Limpia (End_Snapshot_1).
-    ret
-
-; ----------------------------------------------------
-;
-;   10/8/23
-;
-;   Limpia o transfiere el contenido de un album_de_fotos o disparos a otro álbum.
-;
-;   INPUTS: HL ..... Contiene el nº de bytes a borrar.
-;           BC ..... Dirección de inicio del álbum.
-;           DE ..... Dirección de inicio del álbum. +1
-
-;    ld hl,(End_Snapshot)
-;    ld bc,Album_de_fotos
-;    ld de,Album_de_fotos+1
-
-;   MODIFICA: A,HL,BC y DE.
-
-Limpia_album 
-    push de                     ; Guardo DESTINO.
-    push bc                     ; Guardo ORIGEN.
     sbc hl,bc
-    ld c,l
-    ld b,h
+    ld b,l
+
     pop hl
-    push bc
-    ldir
-    pop bc                      ; Esta cantidad la utilizaré para calcular (End_Snapshot_X), _
-    pop hl                      ; _ al salir de la rutina, (cuando estamos pasando datos de un álbum_
-    ret                         ; _ a otro). 
-
-; --------------------------------------------------------------------------------------------
-;
-;   20/10/23
-
-;   
-
-Actualiza_punteros_de_albumes
-
-    ld hl,(Puntero_indice_album_de_fotos)
     dec hl
-    dec hl
-    ld (Puntero_indice_album_de_fotos),hl
 
-    ld hl,(Puntero_indice_End_Snapshot)
+1 ld (hl),0
     dec hl
-    dec hl
-    ld (Puntero_indice_End_Snapshot),hl
-    call Extrae_address
-    ld (Puntero_de_End_Snapshot),hl             
+    djnz 1B
+
+;   Reinicializa (Stack_snapshot).
+
+    inc hl
+    ld (Stack_snapshot),hl
 
     ret
-

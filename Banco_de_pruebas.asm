@@ -38,11 +38,19 @@ FRAME ld (Stack_3),sp
 
 ; Pintamos entidades/Amadeus y gestionamos álbumes de fotos de entidades.
 
+
+	ld a,(Contador_de_frames)
+	cp $16
+	jr z,$
+
+
+
+
 	ld a,1
 	out ($fe),a
 	call Pinta_entidades
 	call Pinta_Amadeus
-	call Gestiona_entidades								
+
 	ld a,0
 	out ($fe),a
 
@@ -106,20 +114,13 @@ Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_de
 Album_de_fotos equ $7000	;	(7000h - 7055h).		; En (Album_de_fotos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y las llamadas a las rutinas de impresión.   
 ;                               				        ; De momento situamos este almacén en $7000. La capacidad del album será de 7 entidades.  
-Album_de_fotos_disparos equ $7158 ; (7158h - 71ad).		; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
+Album_de_fotos_disparos equ $7056 ; (7056h - 70abh).		; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´. 
-;                               				         
-Album_de_fotos_1 equ $7056	; (7056h - 70ab).
-Album_de_fotos_disparos_1 equ $71ae	; (71aeh - 7203h).					
-Album_de_fotos_2 equ $70ac	; (70ach - 7101h).
-Album_de_fotos_disparos_2 equ $7204	; (7204h - 7259h).
-Album_de_fotos_3 equ $7102	; (7102 - 7157h).
-Album_de_fotos_disparos_3 equ $725a	; (725ah - 72afh).
 
-Album_de_fotos_Amadeus equ $72b0 ; (72b0h - 72bch) ; 12 bytes.
-Almacen_de_parametros_DRAW equ $72bd ; ($72bd - $72fa) ; 61 bytes.
+;														; 55 Bytes.
 
-Movimiento_precalculado defw $bfff
+Album_de_fotos_Amadeus equ $70ac ; (70ach - 70c0h) ; 14 bytes.
+Almacen_de_parametros_DRAW equ $70c1 ; ($70c1 - $7123) ; 61 bytes.
 
 ; 54h es el espacio necesario en (Album_de_fotos) para 7 entidades/disparos en pantalla.
 
@@ -327,51 +328,15 @@ Stack defw 0 											; La rutinas de pintado, utilizan esta_
 Stack_2 defw 0											; 2º variable destinada a almacenar el puntero de pila, SP.
 ;														; La utiliza la rutina [Extrae_foto_registros].
 Stack_3 defw 0											; Almacena el SP antes de ejecutar FRAME.
-Stack_snapshot defw 0
-Stack_snapshot_disparos defw 0
+Stack_snapshot defw Album_de_fotos
+Stack_snapshot_disparos defw Album_de_fotos_disparos
 
-End_Snapshot defw 0										
+;End_Snapshot defw Album_de_fotos										
 ;														; Inicialmente está situado el la posición $7000, Album_de_fotos.
-End_Snapshot_disparos defw 0							; Puntero que indica la posición de memoria donde vamos a guardar_
+End_Snapshot_disparos defw Album_de_fotos_disparos							; Puntero que indica la posición de memoria donde vamos a guardar_
 ;														; _el snapshot de los registros del siguiente disparo.
 ;														; Inicialmente está situado en la posición $7060, Album_de_fotos_disparos.
 End_Snapshot_Amadeus defw Album_de_fotos_Amadeus
-End_Snapshot_1 defw 0
-End_Snapshot_disparos_1 defw 0
-End_Snapshot_2 defw 0
-End_Snapshot_disparos_2 defw 0
-End_Snapshot_3 defw 0
-End_Snapshot_disparos_3 defw 0
-
-Puntero_indice_album_de_fotos defw 0
-Puntero_indice_album_de_fotos_disparos defw 0
-
-Puntero_indice_End_Snapshot defw 0
-Puntero_indice_End_Snapshot_disparos defw 0
-Puntero_de_End_Snapshot defw 0
-Puntero_de_End_Snapshot_disparos defw 0
-
-Semaforo db $f0											; Indicador necesario para poder gestionar los álbumes de fotos de las entidades. Indica en que álbum_
-;														; _ nos encontramos y si el cuadro, (frame), está completo en el álbum, o no.
-
-Ctrl_Semaforo db 0										; Byte de control utilizado por la rutina [Gestiona_albumes_de_fotos] para la recolocación de los álbumes vacíos.
-;
-;														DESCRIPCIÓN:
-;
-;														BIT 0, Indica que el último álbum que tenemos abierto, NO ESTÁ COMPLETO. Este bit lo activa la rutina [Gestiona_albumes_de_fotos]_
-;																_ e indica a la función [Gestiona_entidades], que no ha de modificar punteros, (hemos de continuar escribiendo en el mismo_	
-;																_ álbum. También indica que "hay recolocación" antes de ejecutar la "cascada de álbumes". El tipo de recolocación lo definen_	
-;																_ los bits 1 y 2.												
-;														BIT 1, Indica que la recolocación de álbumes será de Album3_a_Album2, (siempre que Álbum_3 contenga un FRAME completo).
-;														BIT 2, Indica que la recolocación de álbumes será de Album2_a_Album1, (siempre que álbum_2 contenga un FRAME completo).	
-;																Nota: En el caso de que al hacer la recolocación, nos encontremos con que el álbum donante sigue incompleto, saltaremos_
-;																	_ a ejecutar la "Casacada" de álbumes para limpiar Album_de_fotos y posteriormente salir para seguir completando el FRAME incompleto.
-;														BIT 3, Existe DOBLE RECOLOCACIÓN. Album_de_fotos_2 y Album_de_fotos_1 están vacíos. Siempre que Album_de_fotos_3 contenga un FRAME completo,_
-;																_ pasaremos Album3_a_Album2 y Album2_a_Album1. También modificaremos los punteros y los situaremos al comienzo de Album_de_fotos_2.
-;																_ En el caso de que al hacer la DOBLE RECOLOCACIÓN, Album_de_fotos_3 esté incompleto, saltaremos a ejecutar la "Casacada" de álbumes para_ 
-;											 					_ limpiar Album_de_fotos y posteriormente salir para seguir completando el FRAME incompleto.
-;														BIT 4, Buffer vacío !!!. Album_de_fotos está vacío y no podemos volcar Album_de_fotos_1. Está incompleto.
-;																_ El siguiente FRAME no se imprime, NO HAY CUADRO.
 
 ; Gestión de Disparos.
 
@@ -446,10 +411,6 @@ START
 4 call Prepara_cajas 									 ; (Niveles.asm).
 	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en la 1ª entidad del_
 ;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.
-	call Inicia_punteros_de_albumes_y_malotes			 ; Iniciamos los punteros de los álbumes de fotos y cajas de_
-;													     ; _ malotes antes de guardar ninguna foto.
-; ----------
-
 	call Restore_entidad
 
 	ld hl,Numero_parcial_de_entidades
@@ -507,13 +468,10 @@ START
 	res 3,(hl)
 	jr Main
 
-; En este punto tenemos el 1er FRAME preparado. Los datos del FRAME se encuentran en Album_de_fotos.
-; Después del guardado de cada FRAME hemos de llamar a [Avanza_puntero_de_album_de_fotos_y_malotes]_
-; _ para situarnos en el siguiente album.
+; Entidades y Amadeus iniciados. Esperamos a [FRAME].
 
-	
-6 call Avanza_puntero_de_album_de_fotos_de_entidades
-	
+6 ei
+	halt 
 
 ; ------------------------------------
 
@@ -528,7 +486,6 @@ Main
 ;														; Todas las entidades contenidas en un "bloque", (7 cajas), se inicializan en [START].
 ;														; Si (Numero_de_entidades) > "7", cuando el bloque de 7 cajas esté a "0" se inicializaráa _
 ;														; _un 2º bloque.
-
 	ld a,(Clock_Entidades_en_curso)	
 	ld b,a
 	ld a,(Contador_de_frames)
@@ -652,8 +609,6 @@ Main
 
 ; !!!!!!!! Explosiónnnnnnnnn 20/9/23
 
-	jr $
-
 	call Repone_datos_de_borrado
 	call Limpia_Variables_de_borrado					; Guarda los datos de la entidad `impactada´ para borrarla.
 
@@ -736,9 +691,8 @@ Main
 ;	ld hl,Ctrl_1
 ;	res 2,(hl)
 
-16 call Avanza_puntero_de_album_de_fotos_de_entidades	; Hemos terminado de "grabar" el frame completo de entidades.
-;														; Avanzamos al siguiente álbum para iniciar el siguiente FRAME.
-
+16 ei
+	halt
 ; ----------------------------------------
 
 	ld a,(Ctrl_1) 										; Existe Loop?
@@ -959,82 +913,6 @@ Inicia_punteros_de_cajas
 	ld (Puntero_restore_caja),hl
     ret
 
-; ---------------------------------------------------------------
-;
-;	9/8/23
-;
-;	Inicialización y gestión de álbumes de fotos y cajas.
-
-Inicia_punteros_de_albumes_y_malotes
-
-	ld hl,Indice_album_de_fotos
-	ld (Puntero_indice_album_de_fotos),hl
-	call Extrae_address
-	ld (Stack_snapshot),hl
-
-	ld hl,Indice_album_de_fotos_disparos
-	ld (Puntero_indice_album_de_fotos_disparos),hl
-	call Extrae_address
-	ld (Stack_snapshot_disparos),hl
-
-	ld hl,Indice_End_Snapshot
-	ld (Puntero_indice_End_Snapshot),hl
-	call Extrae_address
-	ld (Puntero_de_End_Snapshot),hl
-
-	ld hl,Indice_End_Snapshot_disparos
-	ld (Puntero_indice_End_Snapshot_disparos),hl
-	call Extrae_address
-	ld (Puntero_de_End_Snapshot_disparos),hl
-
-	ret
-
-;	23/10/23
-
-Avanza_puntero_de_album_de_fotos_de_entidades
-
-; Caja_de_malotes equ $7419 ; (7419h - 741ch) 4 bytes.
-
-; Hemos completado de guardar en el álbum correspondiente la foto con todas las entidades.
-; Estamos en el último álbum del índice???.
-; 
-	ld hl,(Puntero_indice_album_de_fotos)
-	ld bc,Indice_album_de_fotos+6
-	and a
-	sbc hl,bc										; Estamos en el último álbum del índice.
-	jr nz,1F								 		; El buffer está lleno. HALT.
-
-; Hemos completado Album_de_fotos_3. Frame buffer lleno.
-; Actualizamos (Semaforo).
-
-	ld hl,Semaforo
-	rlc (hl)										; Semaforo contendrá $08. (Rota a izq. sin carry).
-
-; Inicia con el buffer de video completo !!!
-
-	ei
-	halt
-	ret							
-
-1 ld hl,(Puntero_indice_album_de_fotos)
-	inc hl
-	inc hl
-	ld (Puntero_indice_album_de_fotos),hl
-	call Extrae_address
-	ld (Stack_snapshot),hl							; Seleccionamos el siguiente álbum.
-
-	ld hl,(Puntero_indice_End_Snapshot)
-	inc hl
-	inc hl
-	ld (Puntero_indice_End_Snapshot),hl
-	call Extrae_address
-	ld (Puntero_de_End_Snapshot),hl					
-
-	ld hl,Semaforo
-	rlc (hl) 										; (Rota a izq. sin carry).
-
-	ret
-
 ; *************************************************************************************************************************************************************
 ;
 ; 8/1/23
@@ -1094,7 +972,7 @@ Calcula_numero_de_malotes
 
 	ld hl,Album_de_fotos
 	ex de,hl
-	ld hl,(End_Snapshot)
+	ld hl,(Stack_snapshot)
 
 	ld a,h
 	and a
@@ -1159,7 +1037,7 @@ Calcula_numero_de_disparotes
 
 	ld hl,Album_de_fotos_disparos
 	ex de,hl
-	ld hl,(Puntero_de_End_Snapshot_disparos)
+	ld hl,(End_Snapshot_disparos)
 
 	ld b,0
 	ld a,l
@@ -1556,40 +1434,6 @@ Repone_datos_de_borrado
 
 	ret
 
-; ----------------------------------------------------------------------
-;
-;	11/8/23
-
-Gestiona_entidades 
-
-;	call Extrae_foto_disparos
-;	call Limpia_album_disparos 							; Después de borrar/pintar los disparos, limpiamos el album.
-
-	call Gestiona_albumes_de_fotos 						; Escupe Álbum de fotos. 1a0, 2a1, 3a2. 
-
-;	BUFFER vacío ??????
-;	Si es así, salimos de la rutina sin modificar punteros. Tenemos que terminar de pinter el FRAME.
-
-	ld a,(Ctrl_Semaforo)
-	bit 4,a
-	jr z,1F
-
-;! Buffer vacío. Inicializar (Ctrl_Semaforo) y salir sin modificar punteros.
-
-	xor a
-	ld (Ctrl_Semaforo),a
-	ret
-
-1 bit 0,a 
-	ret nz
-
-; El buffer estaba completo y hemos pintado el frame y desplazado los álbumes.
-; Nos situamos al comienzo del último álbum.
-
-	call Modifica_Stack_snapshot
-
-	ret
-
 ; -----------------------------------------------------------------------------------
 
 Pinta_Amadeus 
@@ -1605,14 +1449,9 @@ Pinta_Amadeus
 
 Pinta_entidades
 
-	ld a,(Semaforo)
-	bit 0,a
-	ret z
-
-; Pintamos siempre que Album_de_fotos contenga un frame completo.
-
 	call Calcula_numero_de_malotes
 	call Extrae_foto_entidades 						
+	call Limpia_y_reinicia_Stack_Snapshot 
 
 	ret
 
