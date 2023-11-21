@@ -1462,6 +1462,12 @@ Pinta_Amadeus
 
 Pinta_entidades
 
+;	Salimos de la rutina si la foto con todas las entidades a pintar no está completa.		
+
+	ld a,(Ctrl_3)
+	bit 0,a
+	ret z
+
 	call Calcula_numero_de_malotes
 	call Extrae_foto_entidades 						
 	call Limpia_y_reinicia_Stack_Snapshot 

@@ -715,11 +715,7 @@ PreviousScan ld a,h
 ;	Extrae la foto del frame, (entidades).
 
 Extrae_foto_entidades 
-
-	ld a,(Ctrl_3)
-	bit 0,a
-	ret Z 																	; Salimos si el FRAME a pintar NO ESTÁ COMPLETO.
-
+																
 	ld hl,Album_de_fotos+1
 	ld a,(hl)
 	and a
