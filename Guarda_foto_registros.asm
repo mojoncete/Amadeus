@@ -120,6 +120,8 @@ Limpia_y_reinicia_Stack_Snapshot
     ld bc,Album_de_fotos
     and a
     sbc hl,bc
+    ret z
+
     ld b,l
 
     pop hl

@@ -40,34 +40,35 @@ FRAME ld (Stack_3),sp
 
 
 	ld a,(Contador_de_frames)
-	cp $16
+	cp $32	; 	$44 ok.
 	jr z,$
-
-
-
+	jr nc,$
 
 	ld a,1
 	out ($fe),a
 	call Pinta_entidades
-	call Pinta_Amadeus
 
+;	call Pinta_Amadeus
 	ld a,0
 	out ($fe),a
 
-	ld a,2
-	out ($fe),a
-	call Guarda_parametros_DRAW
-	call Restore_Amadeus
-	call Gestiona_Amadeus
-	ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
-	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
+;	ld a,2
+;	out ($fe),a
+;	call Guarda_parametros_DRAW
+;	call Restore_Amadeus
+;	call Gestiona_Amadeus
+;	ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
+;	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
 
 ; Restauramos los parámetros de la entidad que había alojada en DRAW "antes de gestionar AMADEUS".
 
-	call Recupera_parametros_DRAW
+;	call Recupera_parametros_DRAW
 	call Actualiza_relojes
-	ld a,0
-	out ($fe),a
+;	ld a,0
+;	out ($fe),a
+
+	ld hl,Ctrl_3
+	res 0,(hl)	
 
 	pop iy
 	pop ix
@@ -338,6 +339,9 @@ End_Snapshot_disparos defw Album_de_fotos_disparos							; Puntero que indica la
 ;														; Inicialmente está situado en la posición $7060, Album_de_fotos_disparos.
 End_Snapshot_Amadeus defw Album_de_fotos_Amadeus
 
+Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una única entidad.
+;
+;															BIT 0, "1" Indica que el FRAME está completo, (hemos podido hacer la foto de todas las entidades).
 ; Gestión de Disparos.
 
 Numero_de_disparotes db 0	
@@ -439,14 +443,15 @@ START
 
 ; 	INICIA AMADEUS !!!!!
 
-3 call Restore_Amadeus
-	call Inicia_Puntero_objeto
-	call Draw
-	call Guarda_foto_registros
-	call Guarda_datos_de_borrado_Amadeus
+3 
+;	call Restore_Amadeus
+;	call Inicia_Puntero_objeto
+;	call Draw
+;	call Guarda_foto_registros
+;	call Guarda_datos_de_borrado_Amadeus
 
-	ld de,Amadeus_db
-	call Store_Amadeus
+;	ld de,Amadeus_db
+;	call Store_Amadeus
 
 ; 	INICIA DISPAROS !!!!!
 
@@ -470,7 +475,9 @@ START
 
 ; Entidades y Amadeus iniciados. Esperamos a [FRAME].
 
-6 ei
+6 ld hl,Ctrl_3
+	set 0,(hl)											; Frame completo. 
+	ei
 	halt 
 
 ; ------------------------------------
@@ -486,6 +493,7 @@ Main
 ;														; Todas las entidades contenidas en un "bloque", (7 cajas), se inicializan en [START].
 ;														; Si (Numero_de_entidades) > "7", cuando el bloque de 7 cajas esté a "0" se inicializaráa _
 ;														; _un 2º bloque.
+
 	ld a,(Clock_Entidades_en_curso)	
 	ld b,a
 	ld a,(Contador_de_frames)
@@ -691,8 +699,11 @@ Main
 ;	ld hl,Ctrl_1
 ;	res 2,(hl)
 
-16 ei
-	halt
+16 ld hl,Ctrl_3
+	set 0,(hl)											; Frame completo. 
+	ei
+	halt 
+
 ; ----------------------------------------
 
 	ld a,(Ctrl_1) 										; Existe Loop?
@@ -974,9 +985,9 @@ Calcula_numero_de_malotes
 	ex de,hl
 	ld hl,(Stack_snapshot)
 
-	ld a,h
-	and a
-	jr z,1F										; (End_Snapshot_Amadeus) = "$0000" significa que el álbum está vacío.
+;	ld a,h
+;	and a
+;	jr z,1F										; (End_Snapshot_Amadeus) = "$0000" significa que el álbum está vacío.
 
 4 ld b,0
 	ld a,l
