@@ -39,17 +39,17 @@ FRAME ld (Stack_3),sp
 ; Pintamos entidades/Amadeus y gestionamos álbumes de fotos de entidades.
 
 
-	ld a,(Contador_de_frames)
-	cp $32	; 	$44 ok.
-	jr z,$
-	jr nc,$
+;	ld a,(Contador_de_frames)
+;	cp $70	; 	$51 ok.
+;	jr z,$
+;	jr nc,$
 
 	ld a,1
 	out ($fe),a
 	call Pinta_entidades
 
 ;	call Pinta_Amadeus
-	ld a,0
+	ld a,2
 	out ($fe),a
 
 ;	ld a,2
@@ -701,6 +701,8 @@ Main
 
 16 ld hl,Ctrl_3
 	set 0,(hl)											; Frame completo. 
+	xor a
+	out ($fe),a
 	ei
 	halt 
 

@@ -70,10 +70,6 @@ Mov_down
 
 ; ------------------------------
 ;	call Reaparece_arriba
-	di
-	jr $
-	ei
-	
 	call Reinicio
 ; ------------------------------
 

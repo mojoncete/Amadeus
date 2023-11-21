@@ -728,7 +728,7 @@ Extrae_foto_entidades
 ;	No hay datos, (entidades para pintar en este frame).
 
 	ld a,(Numero_de_malotes)												; No hay MALOTES. No se ha producido movimiento.
-	and a																	; No ha aparecido ninguna `nueva entidad'.
+	and a																	
 	ret z
 
 ; -----------------------------------

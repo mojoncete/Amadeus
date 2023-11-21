@@ -108,32 +108,27 @@ Guarda_foto_registros
 
 ; -----------------------------------------------------------------------------
 ;
-;   20/11/23
+;   21/11/23
 
 Limpia_y_reinicia_Stack_Snapshot 
 
 ;   Limpia Album_de_fotos.
     
     ld hl,(Stack_snapshot)
-    push hl
-
-    ld bc,Album_de_fotos
+    ld a,l
     and a
-    sbc hl,bc
-    ret z
+    ret z   ;   Salimos si el álbum está vacío.
 
-    ld b,l
-
-    pop hl
-    dec hl
+    ld b,a
+    inc b
 
 1 ld (hl),0
-    dec hl
+    dec l
     djnz 1B
 
 ;   Reinicializa (Stack_snapshot).
 
-    inc hl
-    ld (Stack_snapshot),hl
+    xor a
+    ld (Stack_snapshot),a
 
     ret
