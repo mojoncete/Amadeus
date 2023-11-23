@@ -71,6 +71,10 @@ Genera_disparo
     and 1        
     ret z                               ; Salimos si (CTRL_DESPLZ) es distinto de $00, $f9, $fb y $fd.
 
+    di
+    jr $
+    ei
+
     ld a,c
     ld d,$f9
 2 inc hl
