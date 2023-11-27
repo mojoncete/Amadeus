@@ -71,10 +71,6 @@ Genera_disparo
     and 1        
     ret z                               ; Salimos si (CTRL_DESPLZ) es distinto de $00, $f9, $fb y $fd.
 
-    di
-    jr $
-    ei
-
     ld a,c
     ld d,$f9
 2 inc hl
@@ -530,6 +526,10 @@ Compara_coordenadas_X
 ; DRAW tiene almacenados, en este momento, los datos de la última ENTIDAD que hemos desplazado.
 
 ; Preparamos registros:
+
+    di
+    jr $
+    ei
 
     ld hl,Filas+6
     ld d,(hl)                                           ; Coordenada_X de Amadeus en D.

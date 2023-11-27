@@ -676,7 +676,7 @@ Main
 
 ; Voy a utilizar una rutina de lectura de teclado para disparar con cualquier entidad.
 ; [[[
-	call Detecta_disparo_entidad
+;	call Detecta_disparo_entidad
 ; ]]]
 	call Guarda_foto_entidad_a_pintar					; PINTAMOS !!!!!!!!!!!!!!!!!!
 
