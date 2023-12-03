@@ -527,10 +527,6 @@ Compara_coordenadas_X
 
 ; Preparamos registros:
 
-    di
-    jr $
-    ei
-
     ld hl,Filas+6
     ld d,(hl)                                           ; Coordenada_X de Amadeus en D.
     inc hl

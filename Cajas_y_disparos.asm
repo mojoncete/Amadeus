@@ -134,6 +134,8 @@ Amadeus_db db 2,2									; (Filas) / (Columns).
 	defw 0											;	" " " " " " "
 	db 0,0,0,0										;	" " " " " " "
 
+	defw 0 											; Puntero_de_impresion.
+
 	db $40,0										; (Ctrl_0) / (Obj_dibujado).
 
 	db 0											; (Autoriza_movimiento).
@@ -174,6 +176,8 @@ Caja_1 db 0,0										; (Filas) / (Columns).
 	defw 0											;	" " " " " " "
 	defw 0											;	" " " " " " "
 	db 0,0,0,0										;	" " " " " " "
+
+	defw 0 											; Puntero_de_impresion.
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
 
@@ -216,6 +220,8 @@ Caja_2 db 0,0										; (Filas) / (Columns).
 	defw 0											;	" " " " " " "
 	db 0,0,0,0										;	" " " " " " "
 
+	defw 0 											; Puntero_de_impresion.
+
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
 
 	db 0											; (Autoriza_movimiento).
@@ -256,6 +262,8 @@ Caja_3 db 0,0										; (Filas) / (Columns).
 	defw 0											;	" " " " " " "
 	defw 0											;	" " " " " " "
 	db 0,0,0,0										;	" " " " " " "
+
+	defw 0 											; Puntero_de_impresion.
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
 
@@ -298,6 +306,8 @@ Caja_4 db 0,0										; (Filas) / (Columns).
 	defw 0											;	" " " " " " "
 	db 0,0,0,0										;	" " " " " " "
 
+	defw 0 											; Puntero_de_impresion.
+
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
 
 	db 0											; (Autoriza_movimiento).
@@ -338,6 +348,8 @@ Caja_5 db 0,0										; (Filas) / (Columns).
 	defw 0											;	" " " " " " "
 	defw 0											;	" " " " " " "
 	db 0,0,0,0										;	" " " " " " "
+
+	defw 0 											; Puntero_de_impresion.
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
 
@@ -380,6 +392,8 @@ Caja_6 db 0,0										; (Filas) / (Columns).
 	defw 0											;	" " " " " " "
 	db 0,0,0,0										;	" " " " " " "
 
+	defw 0 											; Puntero_de_impresion.
+
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
 
 	db 0											; (Autoriza_movimiento).
@@ -421,6 +435,8 @@ Caja_7 db 0,0										; (Filas) / (Columns).
 	defw 0											;	" " " " " " "
 	db 0,0,0,0										;	" " " " " " "
 
+	defw 0 											; Puntero_de_impresion.
+	
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
 
 	db 0											; (Autoriza_movimiento).

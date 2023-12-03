@@ -182,6 +182,9 @@ Variables_de_pintado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES
 	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
 	db 0,0,0,0
 
+Puntero_de_impresion defw 0								; Contiene el puntero de impresión, (calculado por DRAW). Esta dirección la utilizará la rutina_
+;														; _ [Guarda_coordenadas_X] y [Compara_coordenadas_X] para detectar la colisión ENTIDAD-AMADEUS.
+
 ; Variables de funcionamiento de las rutinas de movimiento. (Mov_left), (Mov_right), (Mov_up), (Mov_down).
 
 Ctrl_0 db 0 											; Byte de control. A través de este byte de control. Las rutinas de desplazamiento: [Mov_right], [Mov_left], [Mov_up] y [Mov_down],_
@@ -267,7 +270,7 @@ Ctrl_2 db 0
 
 Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
-;! 61 Bytes por entidad.
+;! 63; Bytes por entidad.
 
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 ;					         		---------;      ;---------
@@ -1153,7 +1156,7 @@ Store_Restore_cajas
 
 	ld hl,Filas
 	ld de,(Puntero_store_caja) 							; Puntero que se desplaza por las distintas entidades.
-	ld bc,61
+	ld bc,63
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
 ; 	Entidad_sospechosa. 20/4/23
@@ -1177,7 +1180,7 @@ Store_Restore_cajas
 	jr z,2F
 
 	ld de,Filas
-	ld bc,61
+	ld bc,63
 	ldir
 
 2 call Incrementa_punteros_de_cajas
@@ -1203,7 +1206,7 @@ Restore_entidad push hl
 
 	ld hl,(Puntero_store_caja)						; (Puntero_store_caja) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,61
+	ld bc,63
 	ldir
 
 	pop bc
@@ -1243,7 +1246,7 @@ Restore_Amadeus	push hl
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Filas
-	ld bc,61
+	ld bc,63
 	ldir
 	pop bc
 	pop de
@@ -1263,7 +1266,7 @@ Restore_Amadeus	push hl
 ;	DESTRUYE: HL y BC y DE.
 
 Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
-	ld bc,61
+	ld bc,63
 	ldir
 	ret
 
@@ -1276,7 +1279,7 @@ Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeu
 ;	Destruye: HL,BC,DE,A
 
 Borra_datos_entidad ld hl,Filas
-	ld bc,60
+	ld bc,62
 	xor a
 	ld (hl),a
 	ld de,Filas+1
@@ -1492,7 +1495,7 @@ Guarda_parametros_DRAW
 
 	ld hl,Filas
 	ld de,Almacen_de_parametros_DRAW
-	ld bc,61
+	ld bc,63
 	ldir
 	ret
 
@@ -1500,7 +1503,7 @@ Recupera_parametros_DRAW
 
 	ld hl,Almacen_de_parametros_DRAW
 	ld de,Filas
-	ld bc,61
+	ld bc,63
 	ldir
 	ret
 
