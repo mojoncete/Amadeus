@@ -1,6 +1,6 @@
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
-;	27/10/23
+;	4/12/23
 ;
 ;	Instrucciones donde interviene el Stack Pointer, (SP).
 
@@ -42,6 +42,10 @@ Guarda_foto_registros
     push hl
     push ix
     push iy
+
+    ld sp,Puntero_de_impresion+2                  ; Almacenamos el (Puntero_de_impresion) actual de la entidad.
+    push ix                                       ; Utilizaremos este dato para generar las coordenadas_X que ocupa la entidad y compararlas_
+;                                                 ; _ con las coordenadas_X de Amadeus.
 
     ld sp,Guarda_foto_registros                   ; Sitúo el Stack Pointer en la dirección actual -1
 

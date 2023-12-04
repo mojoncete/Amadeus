@@ -112,7 +112,9 @@ Indice_de_cajas										 ;! 63 Bytes por entidad.
 Amadeus_db db 2,2									; (Filas) / (Columns).
 	defw 0		 									; (Posicion_actual).
 	defw 0	 										; (Puntero_objeto).
-	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
+	db 0,0											; (Coordenada_X) / (Coordenada_Y).
+
+ctrl_desplz_amadeus	db 0							; (CTRL_DESPLZ).
 
 	db %00000101									; (Attr).
 	defw Indice_Amadeus_der							; (Indice_Sprite_der).		
@@ -134,7 +136,7 @@ Amadeus_db db 2,2									; (Filas) / (Columns).
 	defw 0											;	" " " " " " "
 	db 0,0,0,0										;	" " " " " " "
 
-	defw 0 											; Puntero_de_impresion.
+p.imp.amadeus defw 0 								; Puntero_de_impresion.
 
 	db $40,0										; (Ctrl_0) / (Obj_dibujado).
 
