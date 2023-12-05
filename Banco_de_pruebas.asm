@@ -360,7 +360,6 @@ Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posi
 ;														; _ que puede ocupar el sprite de Amadeus. (Colisión).
 Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 posibles columnas_
 ;														; _ que puede ocupar el sprite de una entidad. (Colisión).
-Puntero_de_impresion_Amadeus defw 0						; Lo utilizaremos en la rutina de colisiones.
 Velocidad_disparo_entidades db 2	  					; Nº de scanlines, (NextScan) que avanza el disparo de las entidades.
 
 ;---------------------------------------------------------------------------------------------------------------
@@ -828,11 +827,23 @@ Mov_obj
 
 	ld a,(Coordenada_y)
 	cp $14
-	call nc,Compara_coordenadas_X 						; Si esta entidad ocupa alguna de las columnas que_
-;														; ocupa Amadeus, tendremos el .db (Impacto)="1".	
+	jr c,1F						
+
+; --------- 
+
+;	Si la entidad en curso entra en zona de Amadeus, generamos y guardamos las 2 o 3 columnas que ocupa la entidad_ 
+;	_ y las 2 o 3 columnas que ocupa Amadeus y las comparamos por si hubiera coincidencia. 
+
+	di
+	call Genera_coordenadas_X
+	call Compara_coordenadas_X 
+	ei
+
+;	En el caso de existir coincidencia colocamos a "1" el .db (Impacto) de la entidad en curso y el bit2 del flag (Impacto2).
+
 ; ---------
 
-    call Prepara_var_pintado 			                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
+1 call Prepara_var_pintado	 			                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
 	call Repone_datos_de_borrado
 	call Limpia_Variables_de_borrado
 

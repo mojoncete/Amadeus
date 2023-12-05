@@ -520,7 +520,7 @@ Modifica_H_Velocidad_disparo
 ;
 ;   MODIFICA: HL,DE,B y A.
 
-Compara_coordenadas_X
+Genera_coordenadas_X
 
 ;   Guardamos las coordenadas_X de la entidad y Amadeus en sus correspondientes almacenes.
 ;   DRAW tiene almacenados, en este momento, los datos de la última ENTIDAD que hemos desplazado.
@@ -528,7 +528,6 @@ Compara_coordenadas_X
 ;   Limpiamos almacenes.
 
     call Limpia_Coordenadas_X
-
 
 ;   Almacenamos coordenadas X.
 
@@ -547,7 +546,7 @@ Compara_coordenadas_X
 
 ;   Almacenamos las coordenadas X de Amadeus.
 
-    ld hl,p.imp.amadeus
+    ld hl,(p.imp.amadeus)
     ld de,Coordenadas_X_Amadeus
     ld b,2
 
@@ -559,8 +558,6 @@ Compara_coordenadas_X
 2 call Guarda_coordenadas_X
 
 ;   Comparamos las coordenadas X de la entidad en curso con las de Amadeus.
-
-    call Comparamos_coordenadas_X
 
     ret
 
@@ -584,9 +581,7 @@ Limpia_Coordenadas_X xor a
 
 ; ----- ----- ----- ----- -----
 
-Comparamos_coordenadas_X 
-
-    di
+Compara_coordenadas_X 
 
     ld b,3
     ld de,Coordenadas_X_Entidad+2
@@ -613,9 +608,13 @@ Comparamos_coordenadas_X
     inc de
     djnz 1B
     
-    ei
-
     ret
+
+; ----- ----- ----- ----- -----
+;
+;   4/12/23
+;
+;   Sub. de [Compara_coordenadas_X]. Deja de comparar cuando encuentra coincidencia.
 
 Comparando ld b,3
     ld a,(de)
@@ -626,10 +625,7 @@ Comparando ld b,3
     djnz 2B
     ret
 
-1 
-    jr $
-
-    ld a,1                                                ; El .db (Impacto)="1" indica que es altamente probable que esta_
+1 ld a,1                                                ; El .db (Impacto)="1" indica que es altamente probable que esta_
     ld (Impacto),a                                      ; _ entidad colisione con Amadeus, (ha superado, o está en la fila $14) y 
     ld hl,Impacto2                                      ; _ alguna de las columnas_X que ocupa coinciden con las de Amadeus.
     set 2,(hl)
@@ -892,8 +888,7 @@ Motor_de_disparos
 
 ; Preparamos los registros para llamar a [Guarda_coordenadas_X]. Necesitamos averiguar que columnas ocupa Amadeus.
 
-
-    ld hl,(Puntero_de_impresion_Amadeus)
+    ld hl,(p.imp.amadeus)
 
 ; Coordenada X de Amadeus en D.
 
@@ -1133,8 +1128,11 @@ Selector_de_impactos ld a,(Impacto2)
     cp 4
     jr nz,1F
 
-
 ; La colisión se produce por contacto entre Amadeus y una entidad.
+
+    di
+    jr $
+    ei
 
     call Detecta_colision_nave_entidad 
 

@@ -537,7 +537,7 @@ Calcula_puntero_de_impresion ld a,(Cuad_objeto)
 ; Almacenaremos el puntero de impresión de Amadeus para usarlo en la rutina de colisión `disparo de_
 ; _ entidad / Amadeus´.
 
-	ld (Puntero_de_impresion_Amadeus),ix
+	ld (p.imp.amadeus),ix
 
 	ret
 
