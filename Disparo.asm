@@ -633,21 +633,16 @@ Comparando ld b,3
 
 ; -----------------------------------------------------------------------
 ;
-;   17/04/23
+;   7/12/23
 ;   
 
 Detecta_colision_nave_entidad 
 
 ; LLegados a este punto, los datos que contiene DRAW son los de Amadeus.
 
-    ld hl,(Posicion_actual)
-    call Calcula_puntero_de_impresion
+    ld iy,(Puntero_objeto)
+    ld hl,(Puntero_de_impresion)
 
-; Ahora, IX contiene el "puntero_de_impresión" de Amadeus, (arriba-izq).
-;        IY contiene el "puntero_objeto" de Amadeus, (arriba-izq).
- 
-    push ix
-    pop hl
     push hl
 
 ; ----- ----- -----
@@ -655,7 +650,7 @@ Detecta_colision_nave_entidad
     ld b,10
 2 call Bucle_3                                     ; Comprobamos el 1er scanline.
     ld a,e
-    cp 5
+    cp 5                                           ;! Ajusta sensibilidad del impacto "Amadeus-Entidad".
     jr c,3F
 
 ; LLegados a este punto:
@@ -667,11 +662,15 @@ Detecta_colision_nave_entidad
 ;
 ;   Nota: El .db (Impacto) de la entidad implicada lo puso a "1" la rutina [Compara_coordenadas_X]. 
 
-    ld hl,Amadeus_db+25
+
+    jr $
+
+    ld hl,Impacto
     ld (hl),1                                      
     ld hl,Impacto2                                 ; Cuando se produce Colisión, RES el bit2 de (Impacto2) y_
     res 2,(hl)                                     ; _ SET el bit3. El bit3 de (Impacto2) indica que hay contacto_
-    set 3,(hl)                                     ; _  entre una entidad y Amadeus.
+;    set 3,(hl)                                     ; _  entre una entidad y Amadeus.
+
     jr 1F
 
 ; -----
@@ -1118,41 +1117,25 @@ Elimina_disparo_de_base_de_datos ld bc,7
 
 ; -----------------------------------------------------------------
 ;
-;   12/04/23
+;   7/12/23
 ;
 
 Selector_de_impactos ld a,(Impacto2)    
     and a
     ret z
 
-    cp 4
-    jr nz,1F
+; Analizamos si hay impacto por disparos.  
 
-; La colisión se produce por contacto entre Amadeus y una entidad.
-
-    di
-    jr $
-    ei
-
-    call Detecta_colision_nave_entidad 
-
-    ld hl,Impacto2
-    bit 3,(hl)
-    ret nz                                               ; Existe colisión, RET.
-
-; No hay colisión SIN disparos. Analizamos si hay impacto por disparos.  
 ; Primero analizamos si algún disparo impacta en Amadeus.
 
-1 ld hl,Impacto2
-    bit 1,(hl)
-    jr z,2F
+    bit 1,a
+    jr z,1F
 
     ld hl,Amadeus_db+25                                  ; Existe colisión con Amadeus.  
     ld (hl),1                                            ; (Impacto) de Amadeus a "1".
-    jr 3F
+    jr 2F
 
-2 ld hl,Impacto2
-    bit 0,(hl)
+1 bit 0,a
     ret z
 
 ; Aquí llamaremos a la rutina que detecta a que entidad hemos alcanzado.    
@@ -1160,7 +1143,7 @@ Selector_de_impactos ld a,(Impacto2)
     ld hl,Ctrl_1
     set 2,(hl)
 
-3 ret 
+2 ret 
 
 ; -----------------------------------------------------------------
 ;

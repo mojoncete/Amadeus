@@ -53,7 +53,22 @@ FRAME ld (Stack_3),sp
 
 	call Guarda_parametros_DRAW
 	call Restore_Amadeus
-	call Gestiona_Amadeus
+
+; Si acabamos de imprimir un FRAME completo, (entidades+Amadeus), gestionamos las colisiones entidad-Amadeus.
+
+;	ld a,(Ctrl_3)
+;	bit 0,a
+;	jr z,1F
+
+; Posible colisión Entidad-Amadeus ???
+
+	ld a,(Impacto2)	
+	bit 2,a
+	jr z,1F
+
+	call Detecta_colision_nave_entidad 
+
+1 call Gestiona_Amadeus
 	ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
 	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
 
