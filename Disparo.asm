@@ -662,14 +662,11 @@ Detecta_colision_nave_entidad
 ;
 ;   Nota: El .db (Impacto) de la entidad implicada lo puso a "1" la rutina [Compara_coordenadas_X]. 
 
-
-    jr $
-
     ld hl,Impacto
     ld (hl),1                                      
     ld hl,Impacto2                                 ; Cuando se produce Colisión, RES el bit2 de (Impacto2) y_
     res 2,(hl)                                     ; _ SET el bit3. El bit3 de (Impacto2) indica que hay contacto_
-;    set 3,(hl)                                     ; _  entre una entidad y Amadeus.
+    set 3,(hl)                                     ; _  entre una entidad y Amadeus.
 
     jr 1F
 

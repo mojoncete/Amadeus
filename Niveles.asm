@@ -14,8 +14,8 @@ Indice_de_niveles
 	defw 0
 	defw 0
 
-Nivel_1 db 3	                                ; Nº de entidades.
-	db 1,1,1									; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.			
+Nivel_1 db 2	                                ; Nº de entidades.
+	db 1,1										; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.		
 Nivel_2 db 12									; Nº de entidades.
 	db 2,1,1,1,1,2								; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.			
 	db 2,1,1,1,1,2
@@ -199,13 +199,13 @@ Admin_num_entidades
 	call Inicializa_Punteros_de_nivel					 ; Inicializa. 1er NIVEL. 
 
 3 ld a,(Numero_de_entidades)
-	cp 10
+	cp 7
 	jr c,1F
 
 ; El nº de entidades es superior al que cabe en las cajas DRAW.
 ; Actualizamos variables.
 
-	ld a,10
+	ld a,7
 	ld (Numero_parcial_de_entidades),a
 	ld b,a
 	jr 2F

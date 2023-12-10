@@ -38,12 +38,6 @@ FRAME ld (Stack_3),sp
 
 ; Pintamos entidades/Amadeus y gestionamos álbumes de fotos de entidades.
 
-
-;	ld a,(Contador_de_frames)
-;	cp $70	; 	$51 ok.
-;	jr z,$
-;	jr nc,$
-
 	ld a,1
 	out ($fe),a
 	call Pinta_entidades
@@ -53,12 +47,6 @@ FRAME ld (Stack_3),sp
 
 	call Guarda_parametros_DRAW
 	call Restore_Amadeus
-
-; Si acabamos de imprimir un FRAME completo, (entidades+Amadeus), gestionamos las colisiones entidad-Amadeus.
-
-;	ld a,(Ctrl_3)
-;	bit 0,a
-;	jr z,1F
 
 ; Posible colisión Entidad-Amadeus ???
 
@@ -511,18 +499,19 @@ Main
 	ld b,a
 	ld a,(Contador_de_frames)
 	cp b
-	jr z,21F
+	jr nz,13F
 
 ; Es probable que en el ciclo anterior NO HAYAMOS EJECUTADO [FRAME], (por tener desactivadas las interrupciones en ese momento, rutinas: _
 ; _ [Guarda_foto_registros] y [Repone_datos_de_borrado]. 
 ; En ese caso, corregiremos el "NO CONTEO" de (Contador_de_frames) incrementándolo en "1" y volviendo a comparar con (Clock_Entidades_en_curso).
 ; Si la comparativa resulta positiva, actualizaremos (Contador_de_frames), evitando así la pérdida de sincronismo.
 
-	inc a
-	cp b
-	jr nz,13F
+;	inc a
+;	cp b
+;	jr nz,13F
 
-	ld (Contador_de_frames),a
+
+;23 ld (Contador_de_frames),a
 
 ; Si aún quedan entidades por aparecer del bloque de entidades, (7 cajas), incrementaremos (Entidades_en_curso) y calcularemos_ 
 ; _ (Clock_Entidades_en_curso) para la siguiente entidad.
@@ -760,20 +749,20 @@ Gestiona_Amadeus
 
 ;! Activa/desactiva impacto con Amadeus.
 
-	ld a,(Impacto) 
-	and a
-	jr nz,$
+;	ld a,(Impacto) 
+;	and a
+;	jr nz,2F
 
 	call Mov_Amadeus
 
-	ld a,(Ctrl_0)
+2 ld a,(Ctrl_0)
 	bit 4,a
-	jr z,14F                                            ; Omitimos BORRAR/PINTAR si no hay movimiento.
+	jr z,1F                                            ; Omitimos BORRAR/PINTAR si no hay movimiento.
 
 	call Guarda_foto_entidad_a_pintar
 	call Guarda_datos_de_borrado_Amadeus
 
-14 ld hl,Ctrl_0	
+1 ld hl,Ctrl_0	
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
 
 	call Motor_de_disparos								; Borra/mueve/pinta cada uno de los disparos y crea un nuevo album de fotos.
@@ -824,6 +813,10 @@ Mov_obj
 
 	ld hl,Frames_explosion
 	dec (hl)
+
+	ld hl,Ctrl_0
+	set 4,(hl)
+
 	jr 3F
 
 2 xor a
@@ -1496,11 +1489,15 @@ Pinta_entidades
 
 ; -----------------------------------------------------------------------------------
 ;
-;	12/11/23
+;	10/12/23
 ;
-;	Incrementa los relojes cada vez que se ejecuta [FRAME].
+;	Incrementa los relojes cada vez que se ejecuta un FRAME completo, (se ha completado la foto de todas las entidades).
 
 Actualiza_relojes 
+
+	ld a,(Ctrl_3)
+	bit 0,a
+	ret z 						;	Salimos si no hemos pintado unidades.
 
 	ld hl,Contador_de_frames	;	20 ms. (Contador_de_frames)=$ff ..... 5.1 segunados aprox.
 	inc (hl)
