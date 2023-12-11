@@ -270,6 +270,8 @@ Ctrl_2 db 0
 ;															_ Evita que volvamos a iniciar el desplazamiento cada vez que ejecutemos [Movimiento].
 ;														BIT 3, Indica que (Cola_de_desplazamiento)="254". Esto quiere decir que repetiremos (1-255 veces),_
 ;															_ el último MOVIMIENTO que hayamos ejecutado.
+;														BIT 4, ???
+;														BIT 5, Este bit a "1" indica que esta entidad es una "Entidad_guía".
 
 Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
@@ -345,6 +347,8 @@ End_Snapshot_Amadeus defw Album_de_fotos_Amadeus
 Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una única entidad.
 ;
 ;															BIT 0, "1" Indica que el FRAME está completo, (hemos podido hacer la foto de todas las entidades).
+;															BIT 1, "1" Indica que "EXISTE" Entidad_guía.
+
 ; Gestión de Disparos.
 
 Numero_de_disparotes db 0	
@@ -485,7 +489,7 @@ START
 
 Main 
 ;
-;	12/11/23
+;	11/12/23
 
 ; Aparece nueva entidad ???
 
@@ -595,10 +599,23 @@ Main
 	jp z,16F											; Si no hay entidades en curso saltamos a [Avanza_puntero_de_album_de_fotos_de_entidades].
 	ld b,a												; No hay entidades que gestionar.
 
-; Código que ejecutamos con cada entidad:
+; ( Código que ejecutamos con cada entidad: ).
+
 ;	--------------------------------------- GESTIÓN DE ENTIDADES. !!!!!!!!!!
 
 15 push bc 												; Nº de entidades en curso.
+
+; Existe "Entidad_guía" ???.
+; Si la Entidad_guía ha sido fulminada hemos de reemplazarla.
+
+	ld a,(Ctrl_3)
+	bit 1,a
+	jr nz,22F
+
+; Activa "Entidad_guía".
+
+	ld hl,Ctrl_2
+	set 5,(hl)
 
 ; Impacto ???
 
@@ -791,8 +808,17 @@ Mov_obj
 
 ; Una alimaña menos!!!!!!!!!1
 
-	call Borra_datos_entidad							; Borramos todos los datos de la entidad.
-	ld hl,Numero_parcial_de_entidades					; Una alimaña menos.
+; Se trataba de una Entidad_guía ???
+
+	ld a,(Ctrl_2)
+	bit 5,a 										; El bit5 de (Ctrl_2) indica si se trata de una Entidad_guía.
+	jr z,5F
+
+	ld hl,Ctrl_3
+	res 1,(hl) 										; FLAG (Existencia de Entidad_guía) a "0".
+
+5 call Borra_datos_entidad							; Borramos todos los datos de la entidad.
+	ld hl,Numero_parcial_de_entidades				; Una alimaña menos.
 	dec (hl)
 	ld hl,Entidades_en_curso
 	dec (hl)
@@ -879,7 +905,9 @@ Mov_Amadeus
 
 ; -----------------------------------------------------------------------------------
 ;
-;	16/11/23
+;	11/12/23
+;
+;	Inicia Entidades y fija "Entidad_guía".
 
 Inicia_entidad	call Inicia_Puntero_objeto
 	call Recompone_posicion_inicio
@@ -887,7 +915,22 @@ Inicia_entidad	call Inicia_Puntero_objeto
 	call Guarda_foto_registros
 	di													; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
 ;														; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
-1 call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
+;														; La rutina [Guarda_foto_registros] activa las interrupciones antes del RET.
+; Existe "Entidad_guía" ???
+
+	ld a,(Ctrl_3)
+	bit 1,a
+	jr nz,1F 
+
+; Inicia Entidad_guía:
+
+	ld hl,Ctrl_2
+	set 5,(hl)											; Fija la 1ª entidad como "Entidad_guía".
+
+	ld hl,Ctrl_3
+	set 1,(hl)											; El bit 1 de (Ctrl_3) a "1" indica que existe una "Entidad_guía".									
+
+1 call Store_Restore_cajas	 					    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
