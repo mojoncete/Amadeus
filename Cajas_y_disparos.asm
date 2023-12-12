@@ -93,8 +93,11 @@ Disparo_11 defw 0
 ; -------------------------------------------------------------------------------------
 ;
 ;	Índice de cajas de entidades.
+;
+;	12/12/23
+;
 
-Indice_de_cajas										 ;! 63 Bytes por entidad.
+Indice_de_cajas										 ; ! 65 Bytes por entidad.
 
 	defw Caja_1
 	defw Caja_2
@@ -137,6 +140,8 @@ ctrl_desplz_amadeus	db 0							; (CTRL_DESPLZ).
 	db 0,0,0,0										;	" " " " " " "
 
 p.imp.amadeus defw 0 								; Puntero_de_impresion.
+
+	defw Almacen_de_movimientos_masticados			; Puntero_de_almacen_de_mov_masticados
 
 	db $40,0										; (Ctrl_0) / (Obj_dibujado).
 
@@ -181,6 +186,8 @@ Caja_1 db 0,0										; (Filas) / (Columns).
 
 	defw 0 											; Puntero_de_impresion.
 
+	defw Almacen_de_movimientos_masticados			; Puntero_de_almacen_de_mov_masticados
+
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
 
 	db 0											; (Autoriza_movimiento).
@@ -223,6 +230,8 @@ Caja_2 db 0,0										; (Filas) / (Columns).
 	db 0,0,0,0										;	" " " " " " "
 
 	defw 0 											; Puntero_de_impresion.
+
+	defw Almacen_de_movimientos_masticados			; Puntero_de_almacen_de_mov_masticados
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
 
@@ -267,6 +276,8 @@ Caja_3 db 0,0										; (Filas) / (Columns).
 
 	defw 0 											; Puntero_de_impresion.
 
+	defw Almacen_de_movimientos_masticados			; Puntero_de_almacen_de_mov_masticados
+
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
 
 	db 0											; (Autoriza_movimiento).
@@ -309,6 +320,8 @@ Caja_4 db 0,0										; (Filas) / (Columns).
 	db 0,0,0,0										;	" " " " " " "
 
 	defw 0 											; Puntero_de_impresion.
+
+	defw Almacen_de_movimientos_masticados			; Puntero_de_almacen_de_mov_masticados
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
 
@@ -353,6 +366,8 @@ Caja_5 db 0,0										; (Filas) / (Columns).
 
 	defw 0 											; Puntero_de_impresion.
 
+	defw Almacen_de_movimientos_masticados			; Puntero_de_almacen_de_mov_masticados
+
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
 
 	db 0											; (Autoriza_movimiento).
@@ -396,6 +411,8 @@ Caja_6 db 0,0										; (Filas) / (Columns).
 
 	defw 0 											; Puntero_de_impresion.
 
+	defw Almacen_de_movimientos_masticados			; Puntero_de_almacen_de_mov_masticados
+
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
 
 	db 0											; (Autoriza_movimiento).
@@ -438,6 +455,8 @@ Caja_7 db 0,0										; (Filas) / (Columns).
 	db 0,0,0,0										;	" " " " " " "
 
 	defw 0 											; Puntero_de_impresion.
+
+	defw Almacen_de_movimientos_masticados			; Puntero_de_almacen_de_mov_masticados
 	
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
 

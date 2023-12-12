@@ -112,6 +112,8 @@ Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto e
 Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
 
+Almacen_de_movimientos_masticados equ $5cd0				; Guardaremos los movimientos masticados que ha hido generando la entidad guía.
+
 Album_de_fotos equ $7000	;	(7000h - 7055h).		; En (Album_de_fotos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y las llamadas a las rutinas de impresión.   
 ;                               				        ; De momento situamos este almacén en $7000. La capacidad del album será de 7 entidades.  
@@ -129,7 +131,7 @@ Almacen_de_parametros_DRAW equ $70c1 ; ($70c1 - $7123) ; 61 bytes.
 ; Variables. 
 ; ****************************************************************************************************************************************************************************************** 
 ;
-; 10/11//23
+; 12/12//23
 ;
 ; Variables de DRAW. (Motor principal).				
 ;
@@ -187,6 +189,11 @@ Variables_de_pintado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES
 
 Puntero_de_impresion defw 0								; Contiene el puntero de impresión, (calculado por DRAW). Esta dirección la utilizará la rutina_
 ;														; _ [Guarda_coordenadas_X] y [Compara_coordenadas_X] para detectar la colisión ENTIDAD-AMADEUS.
+
+Puntero_de_almacen_de_mov_masticados defw Almacen_de_movimientos_masticados
+
+;	Almacén donde la entidad guía va guardando comportamiento ya calculado, (rutinas DRAW).
+;	Almacén donde una entidad "sombra" recoge el siguiente desplazamiento ya masticado, (para imprimir).
 
 ; Variables de funcionamiento de las rutinas de movimiento. (Mov_left), (Mov_right), (Mov_up), (Mov_down).
 
@@ -275,7 +282,7 @@ Ctrl_2 db 0
 
 Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
-;! 63; Bytes por entidad.
+;! 65 Bytes por entidad.
 
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 ;					         		---------;      ;---------
@@ -905,32 +912,46 @@ Mov_Amadeus
 
 ; -----------------------------------------------------------------------------------
 ;
-;	11/12/23
+;	12/12/23
 ;
 ;	Inicia Entidades y fija "Entidad_guía".
 
 Inicia_entidad	call Inicia_Puntero_objeto
 	call Recompone_posicion_inicio
 	call Draw
+
+	push hl
+	call Inicia_entidad_guia							; Determina si esta entidad es, o no es, una "Entidad_guía".
+	pop hl
+
 	call Guarda_foto_registros
 	di													; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
 ;														; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
 ;														; La rutina [Guarda_foto_registros] activa las interrupciones antes del RET.
+	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
+	ret
+
+
+; --------------------------------------------------------------------------------------------------------------
+;
+;	12/12/23
+;
+
+Inicia_entidad_guia
+
 ; Existe "Entidad_guía" ???
 
 	ld a,(Ctrl_3)
 	bit 1,a
-	jr nz,1F 
+	ret nz 
 
 ; Inicia Entidad_guía:
 
 	ld hl,Ctrl_2
 	set 5,(hl)											; Fija la 1ª entidad como "Entidad_guía".
-
 	ld hl,Ctrl_3
 	set 1,(hl)											; El bit 1 de (Ctrl_3) a "1" indica que existe una "Entidad_guía".									
 
-1 call Store_Restore_cajas	 					    	; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -1218,7 +1239,7 @@ Store_Restore_cajas
 
 	ld hl,Filas
 	ld de,(Puntero_store_caja) 							; Puntero que se desplaza por las distintas entidades.
-	ld bc,63
+	ld bc,65
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
 ; 	Entidad_sospechosa. 20/4/23
@@ -1242,7 +1263,7 @@ Store_Restore_cajas
 	jr z,2F
 
 	ld de,Filas
-	ld bc,63
+	ld bc,65
 	ldir
 
 2 call Incrementa_punteros_de_cajas
@@ -1268,7 +1289,7 @@ Restore_entidad push hl
 
 	ld hl,(Puntero_store_caja)						; (Puntero_store_caja) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,63
+	ld bc,65
 	ldir
 
 	pop bc
@@ -1308,7 +1329,7 @@ Restore_Amadeus	push hl
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Filas
-	ld bc,63
+	ld bc,65
 	ldir
 	pop bc
 	pop de
@@ -1328,7 +1349,7 @@ Restore_Amadeus	push hl
 ;	DESTRUYE: HL y BC y DE.
 
 Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
-	ld bc,63
+	ld bc,65
 	ldir
 	ret
 
@@ -1341,7 +1362,7 @@ Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeu
 ;	Destruye: HL,BC,DE,A
 
 Borra_datos_entidad ld hl,Filas
-	ld bc,62
+	ld bc,64
 	xor a
 	ld (hl),a
 	ld de,Filas+1
@@ -1561,7 +1582,7 @@ Guarda_parametros_DRAW
 
 	ld hl,Filas
 	ld de,Almacen_de_parametros_DRAW
-	ld bc,63
+	ld bc,65
 	ldir
 	ret
 
@@ -1569,7 +1590,7 @@ Recupera_parametros_DRAW
 
 	ld hl,Almacen_de_parametros_DRAW
 	ld de,Filas
-	ld bc,63
+	ld bc,65
 	ldir
 	ret
 
