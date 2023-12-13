@@ -623,6 +623,8 @@ Main
 
 	ld hl,Ctrl_2
 	set 5,(hl)
+	ld hl,Ctrl_3
+	set 1,(hl)
 
 ; Impacto ???
 
@@ -716,7 +718,9 @@ Main
 17 call Store_Restore_cajas
 
 	pop bc
-	djnz 15B
+	
+	dec b
+	jp nz,15B
 
 ;! Activando estas líneas podemos habilitar 2 explosiones en el mismo FRAME.
 ; Hemos gestionado todas las unidades.
@@ -928,6 +932,8 @@ Inicia_entidad	call Inicia_Puntero_objeto
 	di													; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
 ;														; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
 ;														; La rutina [Guarda_foto_registros] activa las interrupciones antes del RET.
+	call Actualiza_Puntero_de_almacen_de_mov_masticados
+
 	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	ret
 
@@ -952,6 +958,36 @@ Inicia_entidad_guia
 	ld hl,Ctrl_3
 	set 1,(hl)											; El bit 1 de (Ctrl_3) a "1" indica que existe una "Entidad_guía".									
 
+	ld hl,Almacen_de_movimientos_masticados+6			
+	ld (Puntero_de_almacen_de_mov_masticados),hl
+
+	ret
+
+; --------------------------------------------------------------------------------------------------------------
+;
+;	13/12/23
+;
+
+Actualiza_Puntero_de_almacen_de_mov_masticados 
+
+;	Entidad_guía ???
+
+	ld a,(Ctrl_2)
+	bit 5,a
+	ret z	
+
+	push hl
+	push bc
+
+	ld hl,(Puntero_de_almacen_de_mov_masticados)
+	ld bc,6
+	and a
+	adc hl,bc
+	ld (Puntero_de_almacen_de_mov_masticados),hl
+
+	pop bc
+	pop hl
+
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -967,6 +1003,7 @@ Guarda_foto_entidad_a_pintar
 
 	call Draw 											
 	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
+	call Actualiza_Puntero_de_almacen_de_mov_masticados
 	ret													; Modificamos también el (End_Snapshot) correspondiente al álbum en el que nos encontramos.
 
 ; --------------------------------------------------------------------------------------------------------------

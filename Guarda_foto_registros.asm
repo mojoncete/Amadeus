@@ -37,6 +37,9 @@ Guarda_foto_registros
 
 ;   Se trata de una entidad guía ???
 
+
+    
+
     ld a,(Ctrl_2)
     bit 5,a
     jr z,9F
@@ -45,14 +48,11 @@ Guarda_foto_registros
 ;   Guardamos las variables_de_borrado en el {Almacen_de_movimientos_masticados}. Compondrán el siguiente movimiento de_
 ;   _las entidades fantasma.
 
+    ld sp,(Puntero_de_almacen_de_mov_masticados)
 
-;    jr $
-
-;    ld sp,(Puntero_de_almacen_de_mov_masticados)
-
-;    push hl
-;    push ix
-;    push iy
+    push hl
+    push ix
+    push iy
 
 ; En 1er lugar guardaremos las variables de borrado del siguiente cuadro.
 
