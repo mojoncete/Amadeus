@@ -69,8 +69,22 @@ Mov_down
 	jr nc,1F 														
 
 ; ------------------------------
+;
+;	15/12/15
+
 ;	call Reaparece_arriba
 	call Reinicio
+
+;	Homos generado todos los movimientos posibles de esta entidad.
+;	Si se trata de una Entidad_guía dejará de serlo.
+
+	ld a,(Ctrl_2)
+	bit 5,a
+	jr z,3F
+
+	res 5,a
+	ld (Ctrl_2),a
+	
 ; ------------------------------
 
 	jr 3F

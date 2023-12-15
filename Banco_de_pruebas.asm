@@ -113,7 +113,8 @@ Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y 
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
 
 Almacen_de_movimientos_masticados equ $5cd0				; Guardaremos los movimientos masticados que ha hido generando la entidad guía.
-
+;														;! $6f8f es donde se guarda el último movimiento masticado de BADSAT.
+;														; 4799 bytes, 4,8Kb.
 Album_de_fotos equ $7000	;	(7000h - 7055h).		; En (Album_de_fotos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y las llamadas a las rutinas de impresión.   
 ;                               				        ; De momento situamos este almacén en $7000. La capacidad del album será de 7 entidades.  
@@ -704,7 +705,7 @@ Main
 
 	ld a,(Ctrl_0)
 	bit 4,a
-	jr z,17F                                       	    ; Omitimos BORRAR/PINTAR si no hay movimiento.
+	jr z,17F                                       	    ; Si no ha habido movimiento, NO HEMOS BORRADO, NI VAMOS A PINTAR NADA.!!!
 
 ; Voy a utilizar una rutina de lectura de teclado para disparar con cualquier entidad.
 ; [[[
@@ -803,7 +804,7 @@ Gestiona_Amadeus
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	27/05/23
+;	15/12/23
 
 Mov_obj 
 
@@ -888,11 +889,11 @@ Mov_obj
 
 ; ---------
 
-1 call Prepara_var_pintado	 			                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´.         
-	call Repone_datos_de_borrado
+1 call Prepara_var_pintado	 			                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´en su {Variables_de_pintado}.      
+	call Repone_datos_de_borrado 						; BORRAMOS !!!. Guardamos la foto de las {Variables_de_borrado} en Album_de_fotos.
 	call Limpia_Variables_de_borrado
 
-3 ret													; _de la misma.
+3 ret													
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -920,23 +921,38 @@ Mov_Amadeus
 ;
 ;	Inicia Entidades y fija "Entidad_guía".
 
-Inicia_entidad	call Inicia_Puntero_objeto
+Inicia_entidad	
+
+	call Inicia_entidad_guia							; Determina si esta entidad es, o no es, una "Entidad_guía".
+	call Inicia_Puntero_objeto
 	call Recompone_posicion_inicio
 	call Draw
-
-	push hl
-	call Inicia_entidad_guia							; Determina si esta entidad es, o no es, una "Entidad_guía".
-	pop hl
-
+	call Guarda_movimiento_masticado
 	call Guarda_foto_registros
 	di													; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
 ;														; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
 ;														; La rutina [Guarda_foto_registros] activa las interrupciones antes del RET.
-	call Actualiza_Puntero_de_almacen_de_mov_masticados
-
 	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	ret
 
+
+; -----------------------------------------------------------------------------------
+;
+;	15/12/23
+;
+;	Inicia Entidades y fija "Entidad_guía".
+
+Guarda_movimiento_masticado	ld a,(Ctrl_2)
+	bit 5,a
+	ret z
+	ld (Stack),sp
+	ld sp,(Puntero_de_almacen_de_mov_masticados)
+	push hl
+    push ix
+    push iy
+    ld sp,(Stack)
+    call Actualiza_Puntero_de_almacen_de_mov_masticados
+    ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -1002,8 +1018,10 @@ Guarda_foto_entidad_a_pintar
 ; LLegados a este punto SIEMPRE tenemos cargadas las Variables_de_pintado en DRAW.
 
 	call Draw 											
+
+	call Guarda_movimiento_masticado
+
 	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
-	call Actualiza_Puntero_de_almacen_de_mov_masticados
 	ret													; Modificamos también el (End_Snapshot) correspondiente al álbum en el que nos encontramos.
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -1549,7 +1567,6 @@ Repone_datos_de_borrado_Amadeus
 Repone_datos_de_borrado
 
 	di
-
 	ld de,(Stack_snapshot)
 	ld hl,Variables_de_borrado
 	ld bc,6

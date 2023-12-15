@@ -35,28 +35,9 @@ Guarda_foto_registros
 
     ld (Stack),sp                                 ; Guardo SP en (Stack).
 
-;   Se trata de una entidad guía ???
-
-
-    
-
-    ld a,(Ctrl_2)
-    bit 5,a
-    jr z,9F
-
-;   Entidad_guía. 
-;   Guardamos las variables_de_borrado en el {Almacen_de_movimientos_masticados}. Compondrán el siguiente movimiento de_
-;   _las entidades fantasma.
-
-    ld sp,(Puntero_de_almacen_de_mov_masticados)
-
-    push hl
-    push ix
-    push iy
-
 ; En 1er lugar guardaremos las variables de borrado del siguiente cuadro.
 
-9 ld sp,Variables_de_borrado+6
+    ld sp,Variables_de_borrado+6
 
     push hl
     push ix
