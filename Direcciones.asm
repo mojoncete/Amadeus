@@ -78,6 +78,13 @@ Mov_down
 ;	Homos generado todos los movimientos posibles de esta entidad.
 ;	Si se trata de una Entidad_guía dejará de serlo.
 
+	ld a,(Ctrl_3)
+	bit 3,a
+	jr nz,3F
+
+	bit 2,a
+	jr nz,3F
+	
 	ld a,(Ctrl_2)
 	bit 5,a
 	jr z,3F
@@ -91,13 +98,16 @@ Mov_down
 ;															; _a la siguiente entidad como "Entidad_guía".
 ;	Reinicializa (Puntero_de_almacen_de_mov_masticados).
 
-	ld hl,Almacen_de_movimientos_masticados
+
+4 ld hl,Almacen_de_movimientos_masticados
 	ld (Puntero_de_almacen_de_mov_masticados),hl 			; Reinicializa (Puntero_de_almacen_de_mov_masticados). Sitúa el puntero_
+
+	jr 3F
 ;															; _ al principio del almacén, (a partir de ahora ejecutaremos "movimientos masticados").
 ;															; Ya no somos "Entidad_guía".
 ; ------------------------------
 
-	jr 3F
+
 1 call NextScan
 	ld (Posicion_actual),hl
     djnz 2B

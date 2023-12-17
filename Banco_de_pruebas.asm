@@ -124,7 +124,7 @@ Album_de_fotos_disparos equ $7056 ; (7056h - 70abh).		; En (Album_de_fotos_dispa
 ;														; 55 Bytes.
 
 Album_de_fotos_Amadeus equ $70ac ; (70ach - 70c0h) ; 14 bytes.
-Almacen_de_parametros_DRAW equ $70c1 ; ($70c1 - $7123) ; 61 bytes.
+Almacen_de_parametros_DRAW equ $70c1 ; ($70c1 - $7123) ; 65 bytes.
 
 ; 54h es el espacio necesario en (Album_de_fotos) para 7 entidades/disparos en pantalla.
 
@@ -628,7 +628,7 @@ Main
 	bit 2,a
 	jr nz,22F
 
-; Activa "Entidad_guía".
+; Activa "Entidad_guía" siempre que no esté ya completo el almacén de productos_masticados.
 
 	ld hl,Ctrl_2
 	set 5,(hl)
@@ -713,26 +713,14 @@ Main
 
 	ld a,(Ctrl_0)
 	bit 4,a
-	jr nz,23F                                       	    ; Si no ha habido movimiento, NO HEMOS BORRADO, NI VAMOS A PINTAR NADA.!!!
+	jr z,17F                                       	    ; Si no ha habido movimiento, NO HEMOS BORRADO, NI VAMOS A PINTAR NADA.!!!
 
 ; Voy a utilizar una rutina de lectura de teclado para disparar con cualquier entidad.
 ; [[[
 ;	call Detecta_disparo_entidad
 ; ]]]
 
-
-; 17/12/23
-
-;	NO HA HABIDO MOVIMIENTO.
-
-	di
-	ld a,(Ctrl_3)
-	bit 2,a 
-	jr nz,$
-	ei
-	jr 17F
-
-23 call Guarda_foto_entidad_a_pintar					; PINTAMOS !!!!!!!!!!!!!!!!!!
+	call Guarda_foto_entidad_a_pintar					; PINTAMOS !!!!!!!!!!!!!!!!!!
 
 	ld hl,Ctrl_0
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
@@ -878,17 +866,23 @@ Mov_obj
 
 	jr 3F
 
+;	NO HAY EXPLOSIÓN ----- ----- ----- ----- -----
+
 2 xor a
 	ld (Ctrl_0),a 										; El bit4 de (Ctrl_0) puede estar alzado debido al movimiento de Amadeus.
 
 ; Movemos Entidades malignas.
-; Se trata de una "Entidad_guía" ???
+; Se trata de una "Entidad_guía" ???. Si es así ejecutamos la rutina que construye el patrón de movimiento.
 
 	ld a,(Ctrl_2)
 	bit 5,a
-	jr z,7F
+	jr nz,8F
 
-	call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
+	ld hl,Ctrl_0										; Movemos una entidad 
+	set 4,(hl)
+	jr 7F
+
+8 call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
 
 	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
 	bit 4,a
@@ -897,7 +891,7 @@ Mov_obj
 ; Ha habido desplazamiento de la entidad maligna.
 ; Ha llegado a zona de AMADEUS ???
 
-	ld a,(Coordenada_y)
+7 ld a,(Coordenada_y)
 	cp $14
 	jr c,1F						
 
@@ -915,8 +909,8 @@ Mov_obj
 
 ; ---------
 
-1 call Prepara_var_pintado	 			                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´en su {Variables_de_pintado}.      
-7 call Repone_datos_de_borrado 							; BORRAMOS !!!. Guardamos la foto de las {Variables_de_borrado} en Album_de_fotos.
+1 call Prepara_var_pintado	 			                	; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´en su {Variables_de_pintado}.      
+	call Repone_datos_de_borrado 							; BORRAMOS !!!. Guardamos la foto de las {Variables_de_borrado} en Album_de_fotos.
 	call Limpia_Variables_de_borrado
 
 3 ret													
@@ -1043,12 +1037,66 @@ Guarda_foto_entidad_a_pintar
 
 ; LLegados a este punto SIEMPRE tenemos cargadas las Variables_de_pintado en DRAW.
 
-	call Draw 											
+	ld a,(Ctrl_0)
+	bit 6,a
+	jr nz,2F
 
+	ld a,(Ctrl_3)
+	bit 3,a
+	jr z,1F
+	
+	call Prepara_registros_con_mov_masticados
+	ret
+	
+1 bit 2,a
+	jr z,2F
+
+; Hemos completado todos los movimientos masticados.
+
+	res 2,a
+	set 3,a
+	ld (Ctrl_3),a
+
+2 call Draw 											
 	call Guarda_movimiento_masticado
-
 	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
-	ret													; Modificamos también el (End_Snapshot) correspondiente al álbum en el que nos encontramos.
+
+	ret													
+
+; --------------------------------------------------------------------------------------------------------------
+;
+;	17/12/23
+
+Prepara_registros_con_mov_masticados ld (Stack),sp
+	ld sp,(Puntero_de_almacen_de_mov_masticados)
+	pop iy
+	pop ix
+	pop hl
+	ld (Puntero_de_almacen_de_mov_masticados),sp
+	ld sp,(Stack)
+
+	call Guarda_foto_registros							
+
+	push hl
+	push bc
+
+	ld hl,$6f90
+	ld bc,(Puntero_de_almacen_de_mov_masticados)
+	and a
+	sbc hl,bc
+
+	di
+	jr z,$
+	ei
+
+;	ld hl,Almacen_de_movimientos_masticados
+;	ld (Puntero_de_almacen_de_mov_masticados),hl
+
+	pop bc
+	pop hl
+
+
+	ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -1593,28 +1641,6 @@ Repone_datos_de_borrado_Amadeus
 Repone_datos_de_borrado
 
 	di
-	ld de,(Stack_snapshot)
-	ld hl,Variables_de_borrado
-	ld bc,6
-	ldir
-	ei
-
-	ex de,hl
-	ld (Stack_snapshot),hl
-
-	ret
-
-; ----------------------------------------------------------------------
-;
-;	17/12/23
-;
-
-Repone_movimientos_masticados
-
-	di
-
-	jr $
-
 	ld de,(Stack_snapshot)
 	ld hl,Variables_de_borrado
 	ld bc,6
