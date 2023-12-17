@@ -620,6 +620,14 @@ Main
 	bit 1,a
 	jr nz,22F
 
+; Almacén de "Movimientos_masticados" lleno ???
+; Una "Entidad_guía" a dejado de serlo ???, (Reinicio??).
+; En ese caso NO SE ACTIVA UNA NUEVA "ENTIDAD_GUÍA".
+
+	ld a,(Ctrl_3)
+	bit 2,a
+	jr nz,22F
+
 ; Activa "Entidad_guía".
 
 	ld hl,Ctrl_2
@@ -705,13 +713,26 @@ Main
 
 	ld a,(Ctrl_0)
 	bit 4,a
-	jr z,17F                                       	    ; Si no ha habido movimiento, NO HEMOS BORRADO, NI VAMOS A PINTAR NADA.!!!
+	jr nz,23F                                       	    ; Si no ha habido movimiento, NO HEMOS BORRADO, NI VAMOS A PINTAR NADA.!!!
 
 ; Voy a utilizar una rutina de lectura de teclado para disparar con cualquier entidad.
 ; [[[
 ;	call Detecta_disparo_entidad
 ; ]]]
-	call Guarda_foto_entidad_a_pintar					; PINTAMOS !!!!!!!!!!!!!!!!!!
+
+
+; 17/12/23
+
+;	NO HA HABIDO MOVIMIENTO.
+
+	di
+	ld a,(Ctrl_3)
+	bit 2,a 
+	jr nz,$
+	ei
+	jr 17F
+
+23 call Guarda_foto_entidad_a_pintar					; PINTAMOS !!!!!!!!!!!!!!!!!!
 
 	ld hl,Ctrl_0
     res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
@@ -861,6 +882,11 @@ Mov_obj
 	ld (Ctrl_0),a 										; El bit4 de (Ctrl_0) puede estar alzado debido al movimiento de Amadeus.
 
 ; Movemos Entidades malignas.
+; Se trata de una "Entidad_guía" ???
+
+	ld a,(Ctrl_2)
+	bit 5,a
+	jr z,7F
 
 	call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
 
@@ -890,7 +916,7 @@ Mov_obj
 ; ---------
 
 1 call Prepara_var_pintado	 			                ; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´en su {Variables_de_pintado}.      
-	call Repone_datos_de_borrado 						; BORRAMOS !!!. Guardamos la foto de las {Variables_de_borrado} en Album_de_fotos.
+7 call Repone_datos_de_borrado 							; BORRAMOS !!!. Guardamos la foto de las {Variables_de_borrado} en Album_de_fotos.
 	call Limpia_Variables_de_borrado
 
 3 ret													
@@ -1578,7 +1604,29 @@ Repone_datos_de_borrado
 
 	ret
 
-; -----------------------------------------------------------------------------------
+; ----------------------------------------------------------------------
+;
+;	17/12/23
+;
+
+Repone_movimientos_masticados
+
+	di
+
+	jr $
+
+	ld de,(Stack_snapshot)
+	ld hl,Variables_de_borrado
+	ld bc,6
+	ldir
+	ei
+
+	ex de,hl
+	ld (Stack_snapshot),hl
+
+	ret
+
+; --------------------------------------------------------------------------------------
 
 Pinta_Amadeus 
 

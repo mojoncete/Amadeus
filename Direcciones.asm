@@ -70,7 +70,7 @@ Mov_down
 
 ; ------------------------------
 ;
-;	15/12/15
+;	17/12/15
 
 ;	call Reaparece_arriba
 	call Reinicio
@@ -84,7 +84,17 @@ Mov_down
 
 	res 5,a
 	ld (Ctrl_2),a
-	
+	ld hl,Ctrl_3
+	res 1,(hl)
+	set 2,(hl)												; Indica que una Entidad_guía a generado todos sus "movimientos masticados".
+;															; El bit2 de (Ctrl_3) evita que la rutina [Main], (cuando gestione entidades), coloque_
+;															; _a la siguiente entidad como "Entidad_guía".
+;	Reinicializa (Puntero_de_almacen_de_mov_masticados).
+
+	ld hl,Almacen_de_movimientos_masticados
+	ld (Puntero_de_almacen_de_mov_masticados),hl 			; Reinicializa (Puntero_de_almacen_de_mov_masticados). Sitúa el puntero_
+;															; _ al principio del almacén, (a partir de ahora ejecutaremos "movimientos masticados").
+;															; Ya no somos "Entidad_guía".
 ; ------------------------------
 
 	jr 3F
