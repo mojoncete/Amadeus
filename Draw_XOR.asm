@@ -4,7 +4,9 @@
 ;
 ; DRAW. ************************************************************************************************************************************************************************************
 
-Draw call Prepara_draw 
+Draw 
+
+	call Prepara_draw 
 	ld a,h 						 					; El objeto existe, o se está iniciando?. Si se está iniciando, (Posicion_inicio = Posicion_actual) y saltamos_
 	and a 											; _a la subrutina [Inicializacion] donde asignaremos cuadrante y límites.
 	jr z,2F

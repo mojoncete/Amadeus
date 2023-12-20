@@ -132,7 +132,7 @@ Almacen_de_parametros_DRAW equ $70c1 ; ($70c1 - $7123) ; 65 bytes.
 ; Variables. 
 ; ****************************************************************************************************************************************************************************************** 
 ;
-; 12/12//23
+; 20/12//23
 ;
 ; Variables de DRAW. (Motor principal).				
 ;
@@ -356,7 +356,8 @@ Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una únic
 ;
 ;															BIT 0, "1" Indica que el FRAME está completo, (hemos podido hacer la foto de todas las entidades).
 ;															BIT 1, "1" Indica que "EXISTE" Entidad_guía.
-
+;															BIT 2, "1" Indica que el {Almacen_de_movimientos_masticados} está completo. Cuando esto ocurre_
+;																_ no se inicia una nueva "Entidad_guía".
 ; Gestión de Disparos.
 
 Numero_de_disparotes db 0	
@@ -429,7 +430,8 @@ START
 4 call Prepara_cajas 									 ; (Niveles.asm).
 	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en la 1ª entidad del_
 ;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.
-	call Restore_entidad
+
+	call Restore_entidad								 ; Vuelca en DRAW los parámetros de la 1º entidad, (Caja_1).
 
 	ld hl,Numero_parcial_de_entidades
 	ld b,(hl)
@@ -869,7 +871,7 @@ Mov_obj
 ;	NO HAY EXPLOSIÓN ----- ----- ----- ----- -----
 
 2 xor a
-	ld (Ctrl_0),a 										; El bit4 de (Ctrl_0) puede estar alzado debido al movimiento de Amadeus.
+	ld (Ctrl_0),a 										; El bit4 de (Ctrl_0) puede estar alzado debido al movimiento de Amadeus. Inicializamos.
 
 ; Movemos Entidades malignas.
 ; Se trata de una "Entidad_guía" ???. Si es así ejecutamos la rutina que construye el patrón de movimiento.
@@ -878,8 +880,8 @@ Mov_obj
 	bit 5,a
 	jr nz,8F
 
-	ld hl,Ctrl_0										; Movemos una entidad 
-	set 4,(hl)
+	ld hl,Ctrl_0										; Movemos una entidad "FANTASMA". Activamos el FLAG de movimiento y evitamos_
+	set 4,(hl)											; _ ejecutar la rutina de Movimiento.
 	jr 7F
 
 8 call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
@@ -939,7 +941,7 @@ Mov_Amadeus
 ;
 ;	12/12/23
 ;
-;	Inicia Entidades y fija "Entidad_guía".
+;	Inicia la entidad y la fija como "Entidad_guía" si aún no hay ninguna. (Fija la primera entidad que iniciamos). 
 
 Inicia_entidad	
 
@@ -960,18 +962,24 @@ Inicia_entidad
 ;
 ;	15/12/23
 ;
-;	Inicia Entidades y fija "Entidad_guía".
+;	Guarda el "movimiento_masticado" en el {Almacen_de_movimientos_masticados} si se trata de una "entidad_guía".
+;	Actualiza el (Puntero_de_almacen_de_mov_masticados) tras el guardado.
 
 Guarda_movimiento_masticado	ld a,(Ctrl_2)
 	bit 5,a
-	ret z
+	ret z 												; Salimos si se trata de una entidad guía.
+
 	ld (Stack),sp
-	ld sp,(Puntero_de_almacen_de_mov_masticados)
+	ld sp,(Puntero_de_almacen_de_mov_masticados)		; Guardamos el movimiento masticado en el almacén.
+
 	push hl
     push ix
     push iy
+ 
     ld sp,(Stack)
-    call Actualiza_Puntero_de_almacen_de_mov_masticados
+
+    call Actualiza_Puntero_de_almacen_de_mov_masticados ; Actualizamos (Puntero_de_almacen_de_mov_masticados).
+
     ret
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -1010,7 +1018,7 @@ Actualiza_Puntero_de_almacen_de_mov_masticados
 
 	ld a,(Ctrl_2)
 	bit 5,a
-	ret z	
+	ret z												; Salimos si se trata de una entidad guía.
 
 	push hl
 	push bc
@@ -1039,17 +1047,42 @@ Guarda_foto_entidad_a_pintar
 
 	ld a,(Ctrl_0)
 	bit 6,a
-	jr nz,2F
+	jr z,5F
 
-	ld a,(Ctrl_3)
+	call Draw
+	call Guarda_foto_registros
+
+	ret
+
+; Está lleno el {Almacen_de_movimientos_masticados}. ?
+
+5 ld a,(Ctrl_3)
 	bit 3,a
 	jr z,1F
 	
-	call Prepara_registros_con_mov_masticados
-	ret
+; {Almacen_de_movimientos_masticados} lleno. Se trata de una "ENTIDAD_FANTASMA".
+
+4 call Prepara_registros_con_mov_masticados	; (Tb Guarda_foto_registros).
 	
-1 bit 2,a
-	jr z,2F
+	ret
+
+; Entidad_guía o fantasma ???
+
+1 ld a,(Ctrl_2)
+	bit 5,a
+	jr nz,2F
+
+; ENTIDAD_FANTASMA, preparo los "movimientos_masticados" y guardo_foto.
+
+	jr 4B
+
+; ENTIDAD_GUÍA:
+; Se acaba de llenar el almacén ???. Si no es así seguimos ejecutando [DRAW] y continuaremos_
+; _guardando "movimientos_masticados". 
+
+2 ld a,(Ctrl_3)
+	bit 2,a
+	jr z,3F
 
 ; Hemos completado todos los movimientos masticados.
 
@@ -1057,7 +1090,7 @@ Guarda_foto_entidad_a_pintar
 	set 3,a
 	ld (Ctrl_3),a
 
-2 call Draw 											
+3 call Draw 											
 	call Guarda_movimiento_masticado
 	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
 
@@ -1069,9 +1102,11 @@ Guarda_foto_entidad_a_pintar
 
 Prepara_registros_con_mov_masticados ld (Stack),sp
 	ld sp,(Puntero_de_almacen_de_mov_masticados)
+
 	pop iy
 	pop ix
 	pop hl
+
 	ld (Puntero_de_almacen_de_mov_masticados),sp
 	ld sp,(Stack)
 

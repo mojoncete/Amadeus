@@ -81,7 +81,6 @@ Mov_down
 	ld a,(Ctrl_3)
 	bit 3,a
 	jr nz,3F
-
 	bit 2,a
 	jr nz,3F
 	
