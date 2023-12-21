@@ -132,7 +132,7 @@ Almacen_de_parametros_DRAW equ $70c1 ; ($70c1 - $7123) ; 65 bytes.
 ; Variables. 
 ; ****************************************************************************************************************************************************************************************** 
 ;
-; 20/12//23
+; 21/12//23
 ;
 ; Variables de DRAW. (Motor principal).				
 ;
@@ -195,6 +195,9 @@ Puntero_de_almacen_de_mov_masticados defw Almacen_de_movimientos_masticados
 
 ;	Almacén donde la entidad guía va guardando comportamiento ya calculado, (rutinas DRAW).
 ;	Almacén donde una entidad "sombra" recoge el siguiente desplazamiento ya masticado, (para imprimir).
+
+Contador_de_mov_masticados defw 0						; Contador de 16bits. La "Entidad_guía" lo aumenta en una unidad cada vez que hace el "pushado" de las tres_
+;														; _palabras que componen el "movimiento_masticado".  
 
 ; Variables de funcionamiento de las rutinas de movimiento. (Mov_left), (Mov_right), (Mov_up), (Mov_down).
 
@@ -283,7 +286,7 @@ Ctrl_2 db 0
 
 Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
-;! 65 Bytes por entidad.
+;! 67 Bytes por entidad.
 
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
 ;					         		---------;      ;---------
@@ -960,14 +963,14 @@ Inicia_entidad
 
 ; -----------------------------------------------------------------------------------
 ;
-;	15/12/23
+;	21/12/23
 ;
 ;	Guarda el "movimiento_masticado" en el {Almacen_de_movimientos_masticados} si se trata de una "entidad_guía".
 ;	Actualiza el (Puntero_de_almacen_de_mov_masticados) tras el guardado.
 
 Guarda_movimiento_masticado	ld a,(Ctrl_2)
 	bit 5,a
-	ret z 												; Salimos si se trata de una entidad guía.
+	ret z 												; Salimos si NO se trata de una entidad guía.
 
 	ld (Stack),sp
 	ld sp,(Puntero_de_almacen_de_mov_masticados)		; Guardamos el movimiento masticado en el almacén.
@@ -978,8 +981,16 @@ Guarda_movimiento_masticado	ld a,(Ctrl_2)
  
     ld sp,(Stack)
 
-    call Actualiza_Puntero_de_almacen_de_mov_masticados ; Actualizamos (Puntero_de_almacen_de_mov_masticados).
+    push hl
 
+   	ld hl,(Contador_de_mov_masticados)					; Incrementa en una unidad el (Contador_de_mov_masticados).
+	inc hl
+	ld (Contador_de_mov_masticados),hl
+
+	pop hl
+
+    call Actualiza_Puntero_de_almacen_de_mov_masticados ; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
+;														; _ el (Contador_de_mov_masticados).    
     ret
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -1009,7 +1020,7 @@ Inicia_entidad_guia
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	13/12/23
+;	21/12/23
 ;
 
 Actualiza_Puntero_de_almacen_de_mov_masticados 
@@ -1018,7 +1029,7 @@ Actualiza_Puntero_de_almacen_de_mov_masticados
 
 	ld a,(Ctrl_2)
 	bit 5,a
-	ret z												; Salimos si se trata de una entidad guía.
+	ret z												; Salimos si NO se trata de una entidad guía.
 
 	push hl
 	push bc
@@ -1049,11 +1060,14 @@ Guarda_foto_entidad_a_pintar
 	bit 6,a
 	jr z,5F
 
+; Guarda la foto de Amadeus.
+
 	call Draw
 	call Guarda_foto_registros
 
 	ret
 
+; ENTIDADES!
 ; Está lleno el {Almacen_de_movimientos_masticados}. ?
 
 5 ld a,(Ctrl_3)
@@ -1113,23 +1127,23 @@ Prepara_registros_con_mov_masticados ld (Stack),sp
 	call Guarda_foto_registros							
 
 	push hl
-	push bc
 
-	ld hl,$6f90
-	ld bc,(Puntero_de_almacen_de_mov_masticados)
-	and a
-	sbc hl,bc
+	ld hl,(Contador_de_mov_masticados)
+	dec hl
+	ld (Contador_de_mov_masticados),hl
+
+	inc h
+	dec h
+	jr nz,1F
+	inc l
+	dec l
+	jr nz,1F
 
 	di
-	jr z,$
+	jr $
 	ei
 
-;	ld hl,Almacen_de_movimientos_masticados
-;	ld (Puntero_de_almacen_de_mov_masticados),hl
-
-	pop bc
-	pop hl
-
+1 pop hl
 
 	ret
 
@@ -1384,7 +1398,7 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 
 ; *************************************************************************************************************************************************************
 ;
-;	14/5/23
+;	21/12/23
 ;
 ;	Almacena los datos de la 1ª entidad del Indice_de_entidades, (que tenemos cargado en DRAW), en su respectiva BASE DE DATOS.
 ;	Cargamos en DRAW los datos de la 2ª entidad del Indice_de_entidades, (de su BASE DE DATOS).
@@ -1403,7 +1417,7 @@ Store_Restore_cajas
 
 	ld hl,Filas
 	ld de,(Puntero_store_caja) 							; Puntero que se desplaza por las distintas entidades.
-	ld bc,65
+	ld bc,67
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 
 ; 	Entidad_sospechosa. 20/4/23
@@ -1427,7 +1441,7 @@ Store_Restore_cajas
 	jr z,2F
 
 	ld de,Filas
-	ld bc,65
+	ld bc,67
 	ldir
 
 2 call Incrementa_punteros_de_cajas
@@ -1443,7 +1457,7 @@ Store_Restore_cajas
 
 ; **************************************************************************************************
 ;
-;	12/05/23
+;	21/12/23
 ;
 ;	Cargamos los datos de la entidad señalada por el puntero (Puntero_store_caja).
 
@@ -1453,7 +1467,7 @@ Restore_entidad push hl
 
 	ld hl,(Puntero_store_caja)						; (Puntero_store_caja) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,65
+	ld bc,67
 	ldir
 
 	pop bc
@@ -1481,7 +1495,7 @@ Incrementa_punteros_de_cajas
 
 ; **************************************************************************************************
 ;
-;	25/01/23
+;	21/12/23
 ;
 ;	Restore_Amadeus
 ;
@@ -1493,7 +1507,7 @@ Restore_Amadeus	push hl
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Filas
-	ld bc,65
+	ld bc,67
 	ldir
 	pop bc
 	pop de
@@ -1502,7 +1516,7 @@ Restore_Amadeus	push hl
 
 ; *************************************************************************************************************************************************************
 ;
-;	29/04/23
+;	21/12/23
 ;
 ;	Store_Amadeus
 ;
@@ -1513,20 +1527,20 @@ Restore_Amadeus	push hl
 ;	DESTRUYE: HL y BC y DE.
 
 Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
-	ld bc,65
+	ld bc,67
 	ldir
 	ret
 
 ; -----------------------------------------------------------
 ;
-;	27/04/23
+;	21/12/23
 ;
 ; 	Limpia los datos del almacén de entidades de DRAW, (donde se encuentra la "entidad impactada").
 ;
 ;	Destruye: HL,BC,DE,A
 
 Borra_datos_entidad ld hl,Filas
-	ld bc,64
+	ld bc,66
 	xor a
 	ld (hl),a
 	ld de,Filas+1
@@ -1739,13 +1753,13 @@ Actualiza_relojes
 
 ; ---------------------------------------------------------------
 ;
-;	27/9/23
+;	21/12/23
 
 Guarda_parametros_DRAW
 
 	ld hl,Filas
 	ld de,Almacen_de_parametros_DRAW
-	ld bc,65
+	ld bc,67
 	ldir
 	ret
 
@@ -1753,7 +1767,7 @@ Recupera_parametros_DRAW
 
 	ld hl,Almacen_de_parametros_DRAW
 	ld de,Filas
-	ld bc,65
+	ld bc,67
 	ldir
 	ret
 
