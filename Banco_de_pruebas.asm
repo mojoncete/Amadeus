@@ -123,8 +123,8 @@ Album_de_fotos_disparos equ $7056 ; (7056h - 70abh).		; En (Album_de_fotos_dispa
 
 ;														; 55 Bytes.
 
-Album_de_fotos_Amadeus equ $70ac ; (70ach - 70c0h) ; 14 bytes.
-Almacen_de_parametros_DRAW equ $70c1 ; ($70c1 - $7123) ; 65 bytes.
+Album_de_fotos_Amadeus equ $70ac ; (70ach - 70b8h) ; 12 bytes.
+Almacen_de_parametros_DRAW equ $70b9 ; ($70b9 - $70fb) ; 66 bytes.
 
 ; 54h es el espacio necesario en (Album_de_fotos) para 7 entidades/disparos en pantalla.
 
