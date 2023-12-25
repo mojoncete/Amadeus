@@ -100,10 +100,10 @@ FRAME ld (Stack_3),sp
 ; Constantes. 
 ; ****************************************************************************************************************************************************************************************** 
 ;
-; 10/11/23
+; 25/12/23
 
 ;
-; Constantes generales.
+; Constantes.
 ;
 
 Sprite_vacio equ $f000
@@ -112,7 +112,7 @@ Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto e
 Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
 
-Almacen_de_movimientos_masticados equ $5cd0				; Guardaremos los movimientos masticados que ha hido generando la entidad guía.
+Almacen_de_movimientos_masticados_Entidad_1 equ $5cd0	; Guardaremos los movimientos masticados que ha hido generando la entidad guía.
 ;														;! $6f8f es donde se guarda el último movimiento masticado de BADSAT.
 ;														; 4799 bytes, 4,8Kb.
 Album_de_fotos equ $7000	;	(7000h - 7055h).		; En (Album_de_fotos) vamos a ir almacenando los valores_
@@ -132,7 +132,7 @@ Almacen_de_parametros_DRAW equ $70c1 ; ($70c1 - $7123) ; 65 bytes.
 ; Variables. 
 ; ****************************************************************************************************************************************************************************************** 
 ;
-; 21/12//23
+; 25/12//23
 ;
 ; Variables de DRAW. (Motor principal).				
 ;
@@ -191,7 +191,7 @@ Variables_de_pintado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES
 Puntero_de_impresion defw 0								; Contiene el puntero de impresión, (calculado por DRAW). Esta dirección la utilizará la rutina_
 ;														; _ [Guarda_coordenadas_X] y [Compara_coordenadas_X] para detectar la colisión ENTIDAD-AMADEUS.
 
-Puntero_de_almacen_de_mov_masticados defw Almacen_de_movimientos_masticados
+Puntero_de_almacen_de_mov_masticados defw Almacen_de_movimientos_masticados_Entidad_1
 
 ;	Almacén donde la entidad guía va guardando comportamiento ya calculado, (rutinas DRAW).
 ;	Almacén donde una entidad "sombra" recoge el siguiente desplazamiento ya masticado, (para imprimir).
@@ -294,6 +294,8 @@ Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
 ; Variables de funcionamiento, (No incluidas en base de datos de entidades), a partir de aquí!!!!!
 
+; Contador_general_de_mov_masticados_Entidad_1 defw 0		; Contador general de "movimientos masticados" de la Entidad_1. 
+
 Ctrl_1 db 0 											; Byte de control de propósito general.
 
 ;														DESCRIPCIÓN:
@@ -332,7 +334,6 @@ Puntero_indice_ENTIDADES defw 0 						; Se desplazará por el índice de entidad
 Datos_de_entidad defw 0									; Contiene los bytes de información de la entidad hacia la que apunta el 
 ;														; _ puntero (Indice_entidades).
 
-
 ;---------------------------------------------------------------------------------------------------------------
 ;
 ;	18/11/23
@@ -359,7 +360,7 @@ Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una únic
 ;
 ;															BIT 0, "1" Indica que el FRAME está completo, (hemos podido hacer la foto de todas las entidades).
 ;															BIT 1, "1" Indica que "EXISTE" Entidad_guía.
-;															BIT 2, "1" Indica que el {Almacen_de_movimientos_masticados} está completo. Cuando esto ocurre_
+;															BIT 2, "1" Indica que el {Almacen_de_movimientos_masticados_Entidad_1} está completo. Cuando esto ocurre_
 ;																_ no se inicia una nueva "Entidad_guía".
 ; Gestión de Disparos.
 
@@ -915,7 +916,7 @@ Mov_obj
 ; ---------
 
 1 call Prepara_var_pintado	 			                	; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´en su {Variables_de_pintado}.      
-	call Repone_datos_de_borrado 							; BORRAMOS !!!. Guardamos la foto de las {Variables_de_borrado} en Album_de_fotos.
+	call Repone_datos_de_borrado 							;! BORRAMOS !!!. Guardamos la foto de las {Variables_de_borrado} en Album_de_fotos.
 	call Limpia_Variables_de_borrado
 
 3 ret													
@@ -965,7 +966,7 @@ Inicia_entidad
 ;
 ;	21/12/23
 ;
-;	Guarda el "movimiento_masticado" en el {Almacen_de_movimientos_masticados} si se trata de una "entidad_guía".
+;	Guarda el "movimiento_masticado" en el {Almacen_de_movimientos_masticados_Entidad_1} si se trata de una "entidad_guía".
 ;	Actualiza el (Puntero_de_almacen_de_mov_masticados) tras el guardado.
 
 Guarda_movimiento_masticado	ld a,(Ctrl_2)
@@ -1013,7 +1014,7 @@ Inicia_entidad_guia
 	ld hl,Ctrl_3
 	set 1,(hl)											; El bit 1 de (Ctrl_3) a "1" indica que existe una "Entidad_guía".									
 
-	ld hl,Almacen_de_movimientos_masticados+6			
+	ld hl,Almacen_de_movimientos_masticados_Entidad_1+6			
 	ld (Puntero_de_almacen_de_mov_masticados),hl
 
 	ret
@@ -1068,16 +1069,15 @@ Guarda_foto_entidad_a_pintar
 	ret
 
 ; ENTIDADES!
-; Está lleno el {Almacen_de_movimientos_masticados}. ?
+; Está lleno el {Almacen_de_movimientos_masticados_Entidad_1}. ?
 
 5 ld a,(Ctrl_3)
 	bit 3,a
 	jr z,1F
 	
-; {Almacen_de_movimientos_masticados} lleno. Se trata de una "ENTIDAD_FANTASMA".
+; {Almacen_de_movimientos_masticados_Entidad_1} lleno. Se trata de una "ENTIDAD_FANTASMA".
 
 4 call Prepara_registros_con_mov_masticados	; (Tb Guarda_foto_registros).
-	
 	ret
 
 ; Entidad_guía o fantasma ???
@@ -1112,14 +1112,29 @@ Guarda_foto_entidad_a_pintar
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	17/12/23
+;	21/12/23
+;
+;	Prepara los registros IY, IX e HL con las tres "palabras" que definen un "Movimiento_masticado".
+;
+;		IY contiene (Puntero_objeto).
+;		IX contiene el puntero de impresión.
+;		HL contiene la dirección de la rutina de impresión.
+;
+;	Guarda la foto del "Movimiento_masticado" en el Album_de_fotos.
+;	Actualiza el (Puntero_de_almacen_de_mov_masticados)
+;	Decrementa el (Contador_de_mov_masticados)
+;
+;		Cuando (Contador_de_mov_masticados)="0" se Reinicia el movimiento masticado:
+;			El (Puntero_de_almacen_de_mov_masticados) se sitúa al principio del almacén.
+;			El (Contador_de_mov_masticados) vuelve a adoptar el máximo valor de mov_masticados de su "Entidad_guía".
+
 
 Prepara_registros_con_mov_masticados ld (Stack),sp
 	ld sp,(Puntero_de_almacen_de_mov_masticados)
 
 	pop iy
 	pop ix
-	pop hl
+	pop hl														; Se cargan los registros con el movimiento_masticado y se actualiza (Puntero_de_almacen_de_mov_masticados).
 
 	ld (Puntero_de_almacen_de_mov_masticados),sp
 	ld sp,(Stack)
@@ -1130,7 +1145,9 @@ Prepara_registros_con_mov_masticados ld (Stack),sp
 
 	ld hl,(Contador_de_mov_masticados)
 	dec hl
-	ld (Contador_de_mov_masticados),hl
+	ld (Contador_de_mov_masticados),hl 							; Decrementamos (Contador_de_mov_masticados). Ha llegado a "0" ?.
+
+; "0" ??
 
 	inc h
 	dec h
@@ -1139,9 +1156,18 @@ Prepara_registros_con_mov_masticados ld (Stack),sp
 	dec l
 	jr nz,1F
 
-	di
-	jr $
-	ei
+; El (Contador_de_mov_masticados) a llegado a "0". Situamos el (Puntero_de_almacen_de_mov_masticados) al principio del almacén.
+; Reinicializamos (Contador_de_mov_masticados).
+
+	ld hl,Almacen_de_movimientos_masticados_Entidad_1
+	ld (Puntero_de_almacen_de_mov_masticados),hl
+
+	ld hl,$0320
+	ld (Contador_de_mov_masticados),hl
+
+;	di
+;	jr $
+;	ei
 
 1 pop hl
 

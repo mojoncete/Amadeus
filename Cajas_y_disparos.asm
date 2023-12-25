@@ -141,7 +141,7 @@ ctrl_desplz_amadeus	db 0							; (CTRL_DESPLZ).
 
 p.imp.amadeus defw 0 								; Puntero_de_impresion.
 
-	defw Almacen_de_movimientos_masticados			; Puntero_de_almacen_de_mov_masticados
+	defw Almacen_de_movimientos_masticados_Entidad_1; Puntero_de_almacen_de_mov_masticados
 	defw 0 											; Contador_de_mov_masticados
 
 	db $40,0										; (Ctrl_0) / (Obj_dibujado).
@@ -187,7 +187,7 @@ Caja_1 db 0,0										; (Filas) / (Columns).
 
 	defw 0 											; Puntero_de_impresion.
 
-	defw Almacen_de_movimientos_masticados			; Puntero_de_almacen_de_mov_masticados
+	defw Almacen_de_movimientos_masticados_Entidad_1; Puntero_de_almacen_de_mov_masticados
 	defw 0 											; Contador_de_mov_masticados
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
@@ -233,7 +233,7 @@ Caja_2 db 0,0										; (Filas) / (Columns).
 
 	defw 0 											; Puntero_de_impresion.
 
-	defw Almacen_de_movimientos_masticados			; Puntero_de_almacen_de_mov_masticados
+	defw Almacen_de_movimientos_masticados_Entidad_1; Puntero_de_almacen_de_mov_masticados
 	defw 0 											; Contador_de_mov_masticados
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
@@ -279,7 +279,7 @@ Caja_3 db 0,0										; (Filas) / (Columns).
 
 	defw 0 											; Puntero_de_impresion.
 
-	defw Almacen_de_movimientos_masticados			; Puntero_de_almacen_de_mov_masticados
+	defw Almacen_de_movimientos_masticados_Entidad_1; Puntero_de_almacen_de_mov_masticados
 	defw 0 											; Contador_de_mov_masticados
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
@@ -325,7 +325,7 @@ Caja_4 db 0,0										; (Filas) / (Columns).
 
 	defw 0 											; Puntero_de_impresion.
 
-	defw Almacen_de_movimientos_masticados			; Puntero_de_almacen_de_mov_masticados
+	defw Almacen_de_movimientos_masticados_Entidad_1; Puntero_de_almacen_de_mov_masticados
 	defw 0 											; Contador_de_mov_masticados
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
@@ -371,7 +371,7 @@ Caja_5 db 0,0										; (Filas) / (Columns).
 
 	defw 0 											; Puntero_de_impresion.
 
-	defw Almacen_de_movimientos_masticados			; Puntero_de_almacen_de_mov_masticados
+	defw Almacen_de_movimientos_masticados_Entidad_1; Puntero_de_almacen_de_mov_masticados
 	defw 0 											; Contador_de_mov_masticados
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
@@ -417,7 +417,7 @@ Caja_6 db 0,0										; (Filas) / (Columns).
 
 	defw 0 											; Puntero_de_impresion.
 
-	defw Almacen_de_movimientos_masticados			; Puntero_de_almacen_de_mov_masticados
+	defw Almacen_de_movimientos_masticados_Entidad_1; Puntero_de_almacen_de_mov_masticados
 	defw 0 											; Contador_de_mov_masticados
 
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)
@@ -463,7 +463,7 @@ Caja_7 db 0,0										; (Filas) / (Columns).
 
 	defw 0 											; Puntero_de_impresion.
 
-	defw Almacen_de_movimientos_masticados			; Puntero_de_almacen_de_mov_masticados
+	defw Almacen_de_movimientos_masticados_Entidad_1; Puntero_de_almacen_de_mov_masticados
 	defw 0 											; Contador_de_mov_masticados
 		
 	db 0,0											; (Ctrl_0) / (Obj_dibujado)

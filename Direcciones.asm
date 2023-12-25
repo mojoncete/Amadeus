@@ -97,7 +97,7 @@ Mov_down
 ;															; _a la siguiente entidad como "Entidad_guía".
 ;	Reinicializa (Puntero_de_almacen_de_mov_masticados).
 
-4 ld hl,Almacen_de_movimientos_masticados
+4 ld hl,Almacen_de_movimientos_masticados_Entidad_1
 	ld (Puntero_de_almacen_de_mov_masticados),hl 			; Reinicializa (Puntero_de_almacen_de_mov_masticados). Sitúa el puntero_
 
 	jr 3F
