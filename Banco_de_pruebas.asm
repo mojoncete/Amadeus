@@ -105,7 +105,7 @@ FRAME ld (Stack_3),sp
 ;
 ; Constantes.
 ;
-
+ 
 Sprite_vacio equ $f000
 Centro_arriba equ $0160 								; Emplearemos estas constantes en la rutina de `recolocación´ del objeto:_
 Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto en las dos primeras constantes_
@@ -294,7 +294,7 @@ Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
 ; Variables de funcionamiento, (No incluidas en base de datos de entidades), a partir de aquí!!!!!
 
-; Contador_general_de_mov_masticados_Entidad_1 defw 0		; Contador general de "movimientos masticados" de la Entidad_1. 
+;Contador_general_de_mov_masticados_Entidad_1 defw 0		; Contador general de "movimientos masticados" de la Entidad_1.
 
 Ctrl_1 db 0 											; Byte de control de propósito general.
 
