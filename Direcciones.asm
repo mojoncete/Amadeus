@@ -70,41 +70,34 @@ Mov_down
 
 ; ------------------------------
 ;
-;	17/12/15
+;	28/12/15
 
 ;	call Reaparece_arriba
 	call Reinicio
 
-;	Homos generado todos los movimientos posibles de esta entidad.
-;	Si se trata de una Entidad_guía dejará de serlo.
+;	Homos generado todos los movimientos posibles de esta "Entidad_guía".
+;	Recordamos que ´solo las "Entidades_guía" ejecutan las rutinas de movimiento.
 
 	ld a,(Ctrl_3)
 	bit 3,a
 	jr nz,3F
-	bit 2,a
-	jr nz,3F
+;	bit 2,a
+;	jr nz,3F
 	
-	ld a,(Ctrl_2)
-	bit 5,a
-	jr z,3F
+;	ld a,(Ctrl_2)
+;	bit 5,a
+;	jr z,3F
 
-	res 5,a
-	ld (Ctrl_2),a
+;	res 5,a
+;	ld (Ctrl_2),a
+
 	ld hl,Ctrl_3
-	res 1,(hl)
+;	res 1,(hl)
 	set 2,(hl)												; Indica que una Entidad_guía a generado todos sus "movimientos masticados".
+	jr 3F
 ;															; El bit2 de (Ctrl_3) evita que la rutina [Main], (cuando gestione entidades), coloque_
 ;															; _a la siguiente entidad como "Entidad_guía".
-;	Reinicializa (Puntero_de_almacen_de_mov_masticados).
-
-4 ld hl,Almacen_de_movimientos_masticados_Entidad_1
-	ld (Puntero_de_almacen_de_mov_masticados),hl 			; Reinicializa (Puntero_de_almacen_de_mov_masticados). Sitúa el puntero_
-
-	jr 3F
-;															; _ al principio del almacén, (a partir de ahora ejecutaremos "movimientos masticados").
-;															; Ya no somos "Entidad_guía".
 ; ------------------------------
-
 
 1 call NextScan
 	ld (Posicion_actual),hl

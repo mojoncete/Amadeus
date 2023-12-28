@@ -657,7 +657,6 @@ Main
 
 	ld (hl),4 											; Reiniciamos el temporizador de la explosión,_
 ;														; _,(velocidad de la explosión).
-
 ; !!!!!!!! Explosiónnnnnnnnn 20/9/23
 
 	call Repone_datos_de_borrado
@@ -990,6 +989,19 @@ Guarda_movimiento_masticado	ld a,(Ctrl_2)
 
 	pop hl
 
+; Este ha sido el último "movimiento_masticado" que hemos guardado ???
+; Si es así, hemos de reinicializar el (Puntero_de_mov_masticados) y el (Contador_de_mov_masticados) de la entidad.
+
+	ld a,(Ctrl_3)
+	bit 3,a
+
+;! Debugggg
+	di
+	jr nz,$
+	ei
+
+;! Tengo k convertir la entidad_guía en entidad_fantasma. Reinicializar el (Contador_de_mov_masticados) a "0". Poner el (Puntero_de_almacen_de_mov_masticados) al principio del almacén...
+
     call Actualiza_Puntero_de_almacen_de_mov_masticados ; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
 ;														; _ el (Contador_de_mov_masticados).    
     ret
@@ -1048,7 +1060,7 @@ Actualiza_Puntero_de_almacen_de_mov_masticados
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	31/08/23
+;	28/12/23
 ;
 ;	(Guardo la foto de la entidad ejecutando DRAW, pues ha habido movimiento del Sprite y una posible_
 ;   _recolocación. Guarda la IMÁGEN DE LA ENTIDAD A PINTAR. 
@@ -1080,11 +1092,17 @@ Guarda_foto_entidad_a_pintar
 4 call Prepara_registros_con_mov_masticados	; (Tb Guarda_foto_registros).
 	ret
 
-; Entidad_guía o fantasma ???
+; Hemos completado el último movimiento del patrón de movimientos ???, se ha aplicado REINICIO ???
 
-1 ld a,(Ctrl_2)
+1 ld a,(Ctrl_3)
+	bit 2,a
+	jr nz,6F
+
+; Entidad guía o fantasma ???
+
+	ld a,(Ctrl_2)
 	bit 5,a
-	jr nz,2F
+	jr nz,3F
 
 ; ENTIDAD_FANTASMA, preparo los "movimientos_masticados" y guardo_foto.
 
@@ -1098,9 +1116,10 @@ Guarda_foto_entidad_a_pintar
 	bit 2,a
 	jr z,3F
 
-; Hemos completado todos los movimientos masticados.
+; Hemos completado todos los movimientos masticados. Se trata de una "Entidad_fantasma" recién creada.
+; Vamos a `generar el último "movimiento_masticado". A partir de este momento esta "Entidad_fantasma", (recién creada), pasa a guardar fotos de movimientos masticaditos.
 
-	res 2,a
+6 res 2,a
 	set 3,a
 	ld (Ctrl_3),a
 

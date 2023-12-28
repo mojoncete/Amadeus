@@ -198,7 +198,7 @@ Codo_izquierda_abajo db $11,$11,$a1,1          ; Arriba/Izq. 1rep.
 
 ; ----- ----- ----- ----- -----
 ;
-;   27/06/23
+;   28/12/23
 
 Movimiento 
 
@@ -245,9 +245,15 @@ Desplazamiento_iniciado
 
     call Aplica_desplazamiento
 
+; Si en el último desplazamiento aplicado hemos aplicado reinicio, salimos del movimiento.
+
+    ld a,(Ctrl_3)
+    bit 2,a
+    ret nz
+
     ld a,(Ctrl_2)
     bit 4,a
-    ret nz                              ; Salimos si se ha producido reinicio.
+    ret nz                                                      ; Salimos si se ha producido reinicio.
 
 3 ld hl,Repetimos_desplazamiento
     dec (hl)
@@ -431,6 +437,14 @@ Aplica_desplazamiento
     bit 6,(hl)
     jr z,2F
     call Mov_down
+
+; Se ha aplicado reinicio ???
+; Si es así, dejamos de aplicar desplazamiento, (RET).
+
+    ld a,(Ctrl_3)
+    bit 2,a
+    ret nz
+
 2 ld hl, (Puntero_mov)
     bit 5,(hl)
     jr z,3F
