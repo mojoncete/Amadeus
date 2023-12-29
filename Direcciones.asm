@@ -81,19 +81,12 @@ Mov_down
 	ld a,(Ctrl_3)
 	bit 3,a
 	jr nz,3F
-;	bit 2,a
-;	jr nz,3F
-	
-;	ld a,(Ctrl_2)
-;	bit 5,a
-;	jr z,3F
 
-;	res 5,a
-;	ld (Ctrl_2),a
+	res 1,a
+	set 2,a												; Indica que una Entidad_guía a generado todos sus "movimientos masticados".
 
-	ld hl,Ctrl_3
-;	res 1,(hl)
-	set 2,(hl)												; Indica que una Entidad_guía a generado todos sus "movimientos masticados".
+	ld (Ctrl_3),a
+
 	jr 3F
 ;															; El bit2 de (Ctrl_3) evita que la rutina [Main], (cuando gestione entidades), coloque_
 ;															; _a la siguiente entidad como "Entidad_guía".

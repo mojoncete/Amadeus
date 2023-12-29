@@ -17,6 +17,9 @@ FRAME ld (Stack_3),sp
 
 ; Guardo registros.
 
+	ld a,7	
+	out ($fe),a												; Borde blanco.
+
 	ex af,af'	
 	push af	;af'
 	exx
@@ -38,13 +41,17 @@ FRAME ld (Stack_3),sp
 
 ; Pintamos entidades/Amadeus y gestionamos álbumes de fotos de entidades.
 
-	ld a,1
-	out ($fe),a
-	call Pinta_entidades
-	call Pinta_Amadeus
-	ld a,2
-	out ($fe),a
+	ld a,2	
+	out ($fe),a												
+	call Pinta_entidades									; Borde rojo.
 
+	ld a,6	
+	out ($fe),a												
+	call Pinta_Amadeus										; Borde amarillo.
+
+
+	ld a,7	
+	out ($fe),a												; Borde blanco.
 	call Guarda_parametros_DRAW
 	call Restore_Amadeus
 
@@ -56,7 +63,12 @@ FRAME ld (Stack_3),sp
 
 	call Detecta_colision_nave_entidad 
 
-1 call Gestiona_Amadeus
+1 ld a,4	
+	out ($fe),a												
+	call Gestiona_Amadeus
+
+	ld a,7	
+	out ($fe),a												; Borde blanco.
 	ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
 	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
 
@@ -64,8 +76,6 @@ FRAME ld (Stack_3),sp
 
 	call Recupera_parametros_DRAW
 	call Actualiza_relojes
-	ld a,0
-	out ($fe),a
 
 	ld hl,Ctrl_3
 	res 0,(hl)	
@@ -88,6 +98,10 @@ FRAME ld (Stack_3),sp
 	ld sp,(Stack_3)
 
 	ei
+
+	ld a,1												; Borde azul.
+	out ($fe),a
+
 	ret									 
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
@@ -294,7 +308,7 @@ Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
 ; Variables de funcionamiento, (No incluidas en base de datos de entidades), a partir de aquí!!!!!
 
-;Contador_general_de_mov_masticados_Entidad_1 defw 0		; Contador general de "movimientos masticados" de la Entidad_1.
+Contador_general_de_mov_masticados_Entidad_1 defw 0		; Contador general de "movimientos masticados" de la Entidad_1.
 
 Ctrl_1 db 0 											; Byte de control de propósito general.
 
@@ -513,6 +527,9 @@ Main
 ;														; Si (Numero_de_entidades) > "7", cuando el bloque de 7 cajas esté a "0" se inicializaráa _
 ;														; _un 2º bloque.
 
+	ld a,1
+	out ($fe),a
+
 	ld a,(Clock_Entidades_en_curso)	
 	ld b,a
 	ld a,(Contador_de_frames)
@@ -551,7 +568,7 @@ Main
 	ld a,(Clock_Entidades_en_curso)
 ;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
 ;! _ IMPREDECIBLE !!!!
-	add 50
+	add 100
 	ld (Clock_Entidades_en_curso),a
 
 ; -------------------------------------------------------------------------------------------------------------
@@ -622,24 +639,24 @@ Main
 ; Existe "Entidad_guía" ???.
 ; Si la Entidad_guía ha sido fulminada hemos de reemplazarla.
 
-	ld a,(Ctrl_3)
-	bit 1,a
-	jr nz,22F
+;	ld a,(Ctrl_3)
+;	bit 1,a
+;	jr nz,22F
 
 ; Almacén de "Movimientos_masticados" lleno ???
 ; Una "Entidad_guía" a dejado de serlo ???, (Reinicio??).
 ; En ese caso NO SE ACTIVA UNA NUEVA "ENTIDAD_GUÍA".
 
-	ld a,(Ctrl_3)
-	bit 2,a
-	jr nz,22F
+;	ld a,(Ctrl_3)
+;	bit 3,a
+;	jr nz,22F
 
 ; Activa "Entidad_guía" siempre que no esté ya completo el almacén de productos_masticados.
 
-	ld hl,Ctrl_2
-	set 5,(hl)
-	ld hl,Ctrl_3
-	set 1,(hl)
+;	ld hl,Ctrl_2
+;	set 5,(hl)
+;	ld hl,Ctrl_3
+;	set 1,(hl)
 
 ; Impacto ???
 
@@ -963,17 +980,17 @@ Inicia_entidad
 
 ; -----------------------------------------------------------------------------------
 ;
-;	21/12/23
+;	28/12/23
 ;
 ;	Guarda el "movimiento_masticado" en el {Almacen_de_movimientos_masticados_Entidad_1} si se trata de una "entidad_guía".
 ;	Actualiza el (Puntero_de_almacen_de_mov_masticados) tras el guardado.
 
 Guarda_movimiento_masticado	ld a,(Ctrl_2)
 	bit 5,a
-	ret z 												; Salimos si NO se trata de una entidad guía.
+	ret z 													; Salimos si NO se trata de una entidad guía.
 
 	ld (Stack),sp
-	ld sp,(Puntero_de_almacen_de_mov_masticados)		; Guardamos el movimiento masticado en el almacén.
+	ld sp,(Puntero_de_almacen_de_mov_masticados)			; Guardamos el movimiento masticado en el almacén.
 
 	push hl
     push ix
@@ -983,27 +1000,16 @@ Guarda_movimiento_masticado	ld a,(Ctrl_2)
 
     push hl
 
-   	ld hl,(Contador_de_mov_masticados)					; Incrementa en una unidad el (Contador_de_mov_masticados).
+   	ld hl,(Contador_de_mov_masticados)						; Incrementa en una unidad el (Contador_de_mov_masticados).
 	inc hl
 	ld (Contador_de_mov_masticados),hl
 
+	ld (Contador_general_de_mov_masticados_Entidad_1),hl	; Cuando la entidad pase de guía a fantasma, el "contador general" indicará el nº máximo de movimientos masticados creados.	
+
 	pop hl
 
-; Este ha sido el último "movimiento_masticado" que hemos guardado ???
-; Si es así, hemos de reinicializar el (Puntero_de_mov_masticados) y el (Contador_de_mov_masticados) de la entidad.
-
-	ld a,(Ctrl_3)
-	bit 3,a
-
-;! Debugggg
-	di
-	jr nz,$
-	ei
-
-;! Tengo k convertir la entidad_guía en entidad_fantasma. Reinicializar el (Contador_de_mov_masticados) a "0". Poner el (Puntero_de_almacen_de_mov_masticados) al principio del almacén...
-
-    call Actualiza_Puntero_de_almacen_de_mov_masticados ; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
-;														; _ el (Contador_de_mov_masticados).    
+    call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
+;															; _ el (Contador_de_mov_masticados).    
     ret
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -1067,8 +1073,6 @@ Actualiza_Puntero_de_almacen_de_mov_masticados
 
 Guarda_foto_entidad_a_pintar 
 
-; LLegados a este punto SIEMPRE tenemos cargadas las Variables_de_pintado en DRAW.
-
 	ld a,(Ctrl_0)
 	bit 6,a
 	jr z,5F
@@ -1127,6 +1131,36 @@ Guarda_foto_entidad_a_pintar
 	call Guarda_movimiento_masticado
 	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
 
+; Este ha sido el último "movimiento_masticado" que hemos guardado ???
+; Si es así, hemos de reinicializar el (Puntero_de_mov_masticados) y el (Contador_de_mov_masticados) de la entidad.
+
+	call Convierte_guia_en_fantasma
+	ret	
+
+; --------------------------------------------------------------------------------------------------------------
+;
+;	28/12/23
+;
+
+Convierte_guia_en_fantasma ld a,(Ctrl_3)
+	bit 3,a
+	ret z												; Salimos aún no hemos generado el último mov_masticado. Aún no puede haber transformación.
+
+;	Convertimos la "Entidad_guía" en "Entidad_fantasma".
+
+	ld hl,Ctrl_2
+	res 5,(hl)											; La entidad deja de ser una entidad guía.
+
+;	Reinicializamos el (Puntero_de_almacen_de_mov_masticados).
+
+	ld hl,Almacen_de_movimientos_masticados_Entidad_1
+	ld (Puntero_de_almacen_de_mov_masticados),hl
+
+;	Reinicializamos el (Contador_de_mov_masticados).
+
+	ld hl,0
+	ld (Contador_de_mov_masticados),hl
+
 	ret													
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -1162,33 +1196,18 @@ Prepara_registros_con_mov_masticados ld (Stack),sp
 
 	push hl
 
-	ld hl,(Contador_de_mov_masticados)
-	dec hl
-	ld (Contador_de_mov_masticados),hl 							; Decrementamos (Contador_de_mov_masticados). Ha llegado a "0" ?.
+	ld hl,(Contador_de_mov_masticados)							; Actualizamos counter.
+	inc hl
+	ld (Contador_de_mov_masticados),hl 							
 
-; "0" ??
+;	Reinicializmos si hemos completado todos los movimientos masticados.
 
-	inc h
-	dec h
-	jr nz,1F
-	inc l
-	dec l
-	jr nz,1F
+	ld bc,(Contador_general_de_mov_masticados_Entidad_1)
+	and a
+	sbc hl,bc
+	call z,Convierte_guia_en_fantasma
 
-; El (Contador_de_mov_masticados) a llegado a "0". Situamos el (Puntero_de_almacen_de_mov_masticados) al principio del almacén.
-; Reinicializamos (Contador_de_mov_masticados).
-
-	ld hl,Almacen_de_movimientos_masticados_Entidad_1
-	ld (Puntero_de_almacen_de_mov_masticados),hl
-
-	ld hl,$0320
-	ld (Contador_de_mov_masticados),hl
-
-;	di
-;	jr $
-;	ei
-
-1 pop hl
+	pop hl
 
 	ret
 
@@ -1749,9 +1768,6 @@ Repone_datos_de_borrado
 ; --------------------------------------------------------------------------------------
 
 Pinta_Amadeus 
-
-	ld a,6
-    out ($fe),a										; Amarillo
 
    	call Calcula_malotes_Amadeus 
 	call Extrae_foto_Amadeus
