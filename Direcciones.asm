@@ -79,11 +79,11 @@ Mov_down
 ;	Recordamos que ´solo las "Entidades_guía" ejecutan las rutinas de movimiento.
 
 	ld a,(Ctrl_3)
-	bit 3,a
-	jr nz,3F
+;	bit 3,a
+;	jr nz,3F
 
 	res 1,a
-	set 2,a												; Indica que una Entidad_guía a generado todos sus "movimientos masticados".
+	set 2,a													; Indica que una Entidad_guía a generado todos sus "movimientos masticados".
 
 	ld (Ctrl_3),a
 

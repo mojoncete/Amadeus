@@ -15,9 +15,19 @@
 
 FRAME ld (Stack_3),sp
 
+;! debuggg
+
+;	ld a,(Contador_de_frames_2)
+;	cp 1
+;	jr nz,99F
+;	ld a,(Contador_de_frames)
+;	cp $b2	;	$b2
+;	jr z,$
+;	jr nc,$
+
 ; Guardo registros.
 
-	ld a,7	
+99 ld a,7	
 	out ($fe),a												; Borde blanco.
 
 	ex af,af'	
@@ -38,7 +48,6 @@ FRAME ld (Stack_3),sp
 ; En 1er lugar guardamos los 61 bytes de la entidad alojada en DRAW para restaurarlos antes de salir de la_
 ; _ rutina de interrupción. (Para gestionar Amadeus hemos de introducir sus datos en DRAW).
 
-
 ; Pintamos entidades/Amadeus y gestionamos álbumes de fotos de entidades.
 
 	ld a,2	
@@ -48,7 +57,6 @@ FRAME ld (Stack_3),sp
 	ld a,6	
 	out ($fe),a												
 	call Pinta_Amadeus										; Borde amarillo.
-
 
 	ld a,7	
 	out ($fe),a												; Borde blanco.
@@ -68,7 +76,7 @@ FRAME ld (Stack_3),sp
 	call Gestiona_Amadeus
 
 	ld a,7	
-	out ($fe),a												; Borde blanco.
+	out ($fe),a											; Borde blanco.
 	ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
 	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
 
@@ -404,7 +412,7 @@ Contador_de_frames db 0
 Contador_de_frames_2 db 0	 
 
 Clock_explosion db 4
-Clock_Entidades_en_curso db 30
+Clock_Entidades_en_curso db 20
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
 Disparo_Amadeus db 1									; A "1", se puede generar disparo.
@@ -536,18 +544,6 @@ Main
 	cp b
 	jr nz,13F
 
-; Es probable que en el ciclo anterior NO HAYAMOS EJECUTADO [FRAME], (por tener desactivadas las interrupciones en ese momento, rutinas: _
-; _ [Guarda_foto_registros] y [Repone_datos_de_borrado]. 
-; En ese caso, corregiremos el "NO CONTEO" de (Contador_de_frames) incrementándolo en "1" y volviendo a comparar con (Clock_Entidades_en_curso).
-; Si la comparativa resulta positiva, actualizaremos (Contador_de_frames), evitando así la pérdida de sincronismo.
-
-;	inc a
-;	cp b
-;	jr nz,13F
-
-
-;23 ld (Contador_de_frames),a
-
 ; Si aún quedan entidades por aparecer del bloque de entidades, (7 cajas), incrementaremos (Entidades_en_curso) y calcularemos_ 
 ; _ (Clock_Entidades_en_curso) para la siguiente entidad.
 
@@ -557,8 +553,6 @@ Main
 	cp b
 	jr z,13F
 	jr nc,13F
-
-; --- --- --- --- ---
 
 	inc a
 	ld (Entidades_en_curso),a
@@ -1081,7 +1075,6 @@ Guarda_foto_entidad_a_pintar
 
 	call Draw
 	call Guarda_foto_registros
-
 	ret
 
 ; ENTIDADES!
@@ -1479,10 +1472,12 @@ Store_Restore_cajas
 ;	STORE !!!!!
 ;	Guarda la entidad cargada en Draw en su correspondiente DB.
 
+;	di
 	ld hl,Filas
 	ld de,(Puntero_store_caja) 							; Puntero que se desplaza por las distintas entidades.
 	ld bc,67
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
+;	ei
 
 ; 	Entidad_sospechosa. 20/4/23
 
@@ -1504,9 +1499,11 @@ Store_Restore_cajas
 	push af
 	jr z,2F
 
+;	di
 	ld de,Filas
 	ld bc,67
 	ldir
+;	ei
 
 2 call Incrementa_punteros_de_cajas
 
