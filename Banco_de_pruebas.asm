@@ -17,19 +17,6 @@ FRAME ld (Stack_3),sp
 
 ;! debuggg
 
-;	ld a,(Contador_de_frames_2)
-;	cp 1
-;	jr nz,99F
-;	ld a,(Contador_de_frames)
-;	cp $b2	;	$b2
-;	jr z,$
-;	jr nc,$
-
-; Guardo registros.
-
-99 ld a,7	
-	out ($fe),a												; Borde blanco.
-
 	ex af,af'	
 	push af	;af'
 	exx
@@ -45,6 +32,7 @@ FRAME ld (Stack_3),sp
 	push ix
 	push iy
 
+
 ; En 1er lugar guardamos los 61 bytes de la entidad alojada en DRAW para restaurarlos antes de salir de la_
 ; _ rutina de interrupción. (Para gestionar Amadeus hemos de introducir sus datos en DRAW).
 
@@ -54,39 +42,39 @@ FRAME ld (Stack_3),sp
 	out ($fe),a												
 	call Pinta_entidades									; Borde rojo.
 
-	ld a,6	
-	out ($fe),a												
-	call Pinta_Amadeus										; Borde amarillo.
+;	ld a,6	
+;	out ($fe),a												
+;	call Pinta_Amadeus										; Borde amarillo.
 
 	ld a,7	
 	out ($fe),a												; Borde blanco.
-	call Guarda_parametros_DRAW
-	call Restore_Amadeus
+;	call Guarda_parametros_DRAW
+;	call Restore_Amadeus
 
 ; Posible colisión Entidad-Amadeus ???
 
-	ld a,(Impacto2)	
-	bit 2,a
-	jr z,1F
+;	ld a,(Impacto2)	
+;	bit 2,a
+;	jr z,1F
 
-	call Detecta_colision_nave_entidad 
+;	call Detecta_colision_nave_entidad 
 
-1 ld a,4	
-	out ($fe),a												
-	call Gestiona_Amadeus
+;1 ld a,4	
+;	out ($fe),a												
+;	call Gestiona_Amadeus
 
-	ld a,7	
-	out ($fe),a											; Borde blanco.
-	ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
-	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
+;	ld a,7	
+;	out ($fe),a											; Borde blanco.
+;	ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
+;	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
 
 ; Restauramos los parámetros de la entidad que había alojada en DRAW "antes de gestionar AMADEUS".
 
-	call Recupera_parametros_DRAW
+;	call Recupera_parametros_DRAW
 	call Actualiza_relojes
 
 	ld hl,Ctrl_3
-	res 0,(hl)	
+	res 0,(hl)											; Reinicia el flag de FRAME completo.
 
 	pop iy
 	pop ix
@@ -144,7 +132,6 @@ Album_de_fotos_disparos equ $7056 ; (7056h - 70abh).		; En (Album_de_fotos_dispa
 ;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´. 
 
 ;														; 55 Bytes.
-
 Album_de_fotos_Amadeus equ $70ac ; (70ach - 70b8h) ; 12 bytes.
 Almacen_de_parametros_DRAW equ $70b9 ; ($70b9 - $70fb) ; 66 bytes.
 
@@ -633,24 +620,24 @@ Main
 ; Existe "Entidad_guía" ???.
 ; Si la Entidad_guía ha sido fulminada hemos de reemplazarla.
 
-;	ld a,(Ctrl_3)
-;	bit 1,a
-;	jr nz,22F
+	ld a,(Ctrl_3)
+	bit 1,a
+	jr nz,22F
 
 ; Almacén de "Movimientos_masticados" lleno ???
 ; Una "Entidad_guía" a dejado de serlo ???, (Reinicio??).
 ; En ese caso NO SE ACTIVA UNA NUEVA "ENTIDAD_GUÍA".
 
-;	ld a,(Ctrl_3)
-;	bit 3,a
-;	jr nz,22F
+	ld a,(Ctrl_3)
+	bit 3,a
+	jr nz,22F
 
 ; Activa "Entidad_guía" siempre que no esté ya completo el almacén de productos_masticados.
 
-;	ld hl,Ctrl_2
-;	set 5,(hl)
-;	ld hl,Ctrl_3
-;	set 1,(hl)
+	ld hl,Ctrl_2
+	set 5,(hl)
+	ld hl,Ctrl_3
+	set 1,(hl)
 
 ; Impacto ???
 
@@ -757,8 +744,10 @@ Main
 
 16 ld hl,Ctrl_3
 	set 0,(hl)											; Frame completo. 
+
 	xor a
 	out ($fe),a
+
 	ei
 	halt 
 
@@ -835,7 +824,7 @@ Mov_obj
 
 	ld a,(Ctrl_2)
 	bit 1,a
-	jr z,2F												; Se ha iniciado la EXPLOSIÓN???									
+	jr z,2F											; Se ha iniciado la EXPLOSIÓN???									
 
 ; Explosión:
 
@@ -843,7 +832,7 @@ Mov_obj
 	and a
 	jr nz,4F
 
-; Una alimaña menos!!!!!!!!!1
+;!  Una alimaña menos!!!!!!!!!1
 
 ; Se trataba de una Entidad_guía ???
 
@@ -853,6 +842,9 @@ Mov_obj
 
 	ld hl,Ctrl_3
 	res 1,(hl) 										; FLAG (Existencia de Entidad_guía) a "0".
+
+;!! Cuando se elimina a una entidad_guía tenemos que limpiar el almacen_de_mov_masticados de esta entidad. Así el siguiente movimiento_
+;!! _generado puede ser distinto, (aletoriedad).
 
 5 call Borra_datos_entidad							; Borramos todos los datos de la entidad.
 	ld hl,Numero_parcial_de_entidades				; Una alimaña menos.
@@ -1120,7 +1112,10 @@ Guarda_foto_entidad_a_pintar
 	set 3,a
 	ld (Ctrl_3),a
 
-3 call Draw 											
+
+;	Esto sólo lo ejecuta una entidad guía.
+
+3 	call Draw 											
 	call Guarda_movimiento_masticado
 	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
 
@@ -1208,7 +1203,9 @@ Prepara_registros_con_mov_masticados ld (Stack),sp
 ;
 ;	19/9/23
 
-Prepara_var_pintado ld hl,Filas
+Prepara_var_pintado 
+
+	ld hl,Filas
 	ld de,Variables_de_pintado
 	ld bc,8
 	ldir
@@ -1216,7 +1213,9 @@ Prepara_var_pintado ld hl,Filas
 
 ; --------------------------------------------------------------------------------------------------------------
 
-Repone_pintar ld hl,Variables_de_pintado
+Repone_pintar 
+
+	ld hl,Variables_de_pintado
 	ld de,Filas
 	ld bc,8
 	ldir
@@ -1472,12 +1471,12 @@ Store_Restore_cajas
 ;	STORE !!!!!
 ;	Guarda la entidad cargada en Draw en su correspondiente DB.
 
-;	di
+	di
 	ld hl,Filas
 	ld de,(Puntero_store_caja) 							; Puntero que se desplaza por las distintas entidades.
 	ld bc,67
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
-;	ei
+	ei
 
 ; 	Entidad_sospechosa. 20/4/23
 
@@ -1499,11 +1498,11 @@ Store_Restore_cajas
 	push af
 	jr z,2F
 
-;	di
+	di
 	ld de,Filas
 	ld bc,67
 	ldir
-;	ei
+	ei
 
 2 call Incrementa_punteros_de_cajas
 
