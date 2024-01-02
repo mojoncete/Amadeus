@@ -32,7 +32,6 @@ FRAME ld (Stack_3),sp
 	push ix
 	push iy
 
-
 ; En 1er lugar guardamos los 61 bytes de la entidad alojada en DRAW para restaurarlos antes de salir de la_
 ; _ rutina de interrupción. (Para gestionar Amadeus hemos de introducir sus datos en DRAW).
 
