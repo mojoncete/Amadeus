@@ -97,7 +97,7 @@ Disparo_11 defw 0
 ;	21/12/23
 ;
 
-Indice_de_cajas										 ; ! 67 Bytes por entidad.
+Indice_de_cajas_de_entidades						; ! 67 Bytes por entidad.
 
 	defw Caja_1
 	defw Caja_2
@@ -144,9 +144,8 @@ p.imp.amadeus defw 0 								; Puntero_de_impresion.
 	defw Almacen_de_movimientos_masticados_Entidad_1; Puntero_de_almacen_de_mov_masticados
 	defw 0 											; Contador_de_mov_masticados
 
-	db $40,0										; (Ctrl_0) / (Obj_dibujado).
+	db $40											; (Ctrl_0).
 
-	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0,0										; (Incrementa_puntero) / (Incrementa_puntero_backup) / (Repetimos_desplazamiento).
 
@@ -190,9 +189,8 @@ Caja_1 db 0,0										; (Filas) / (Columns).
 	defw Almacen_de_movimientos_masticados_Entidad_1; Puntero_de_almacen_de_mov_masticados
 	defw 0 											; Contador_de_mov_masticados
 
-	db 0,0											; (Ctrl_0) / (Obj_dibujado)
+	db 0											; (Ctrl_0).
 
-	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0,0										; (Incrementa_puntero) / (Incrementa_puntero_backup) / (Repetimos_desplazamiento).
 
@@ -236,9 +234,8 @@ Caja_2 db 0,0										; (Filas) / (Columns).
 	defw Almacen_de_movimientos_masticados_Entidad_1; Puntero_de_almacen_de_mov_masticados
 	defw 0 											; Contador_de_mov_masticados
 
-	db 0,0											; (Ctrl_0) / (Obj_dibujado)
+	db 0											; (Ctrl_0).
 
-	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0,0										; (Incrementa_puntero) / (Incrementa_puntero_backup) / (Repetimos_desplazamiento).
 
@@ -282,9 +279,8 @@ Caja_3 db 0,0										; (Filas) / (Columns).
 	defw Almacen_de_movimientos_masticados_Entidad_1; Puntero_de_almacen_de_mov_masticados
 	defw 0 											; Contador_de_mov_masticados
 
-	db 0,0											; (Ctrl_0) / (Obj_dibujado)
+	db 0											; (Ctrl_0).
 
-	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0,0										; (Incrementa_puntero) / (Incrementa_puntero_backup) / (Repetimos_desplazamiento).
 
@@ -328,9 +324,8 @@ Caja_4 db 0,0										; (Filas) / (Columns).
 	defw Almacen_de_movimientos_masticados_Entidad_1; Puntero_de_almacen_de_mov_masticados
 	defw 0 											; Contador_de_mov_masticados
 
-	db 0,0											; (Ctrl_0) / (Obj_dibujado)
+	db 0											; (Ctrl_0).
 
-	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0,0										; (Incrementa_puntero) / (Incrementa_puntero_backup) / (Repetimos_desplazamiento).
 
@@ -374,9 +369,8 @@ Caja_5 db 0,0										; (Filas) / (Columns).
 	defw Almacen_de_movimientos_masticados_Entidad_1; Puntero_de_almacen_de_mov_masticados
 	defw 0 											; Contador_de_mov_masticados
 
-	db 0,0											; (Ctrl_0) / (Obj_dibujado)
+	db 0											; (Ctrl_0).
 
-	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0,0										; (Incrementa_puntero) / (Incrementa_puntero_backup) / (Repetimos_desplazamiento).
 
@@ -420,9 +414,8 @@ Caja_6 db 0,0										; (Filas) / (Columns).
 	defw Almacen_de_movimientos_masticados_Entidad_1; Puntero_de_almacen_de_mov_masticados
 	defw 0 											; Contador_de_mov_masticados
 
-	db 0,0											; (Ctrl_0) / (Obj_dibujado)
+	db 0											; (Ctrl_0).
 
-	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0,0										; (Incrementa_puntero) / (Incrementa_puntero_backup) / (Repetimos_desplazamiento).
 
@@ -466,9 +459,8 @@ Caja_7 db 0,0										; (Filas) / (Columns).
 	defw Almacen_de_movimientos_masticados_Entidad_1; Puntero_de_almacen_de_mov_masticados
 	defw 0 											; Contador_de_mov_masticados
 		
-	db 0,0											; (Ctrl_0) / (Obj_dibujado)
+	db 0											; (Ctrl_0).
 
-	db 0											; (Autoriza_movimiento).
 	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
 	db 0,0,0										; (Incrementa_puntero) / (Incrementa_puntero_backup) / (Repetimos_desplazamiento).
 
@@ -505,6 +497,8 @@ Entidad_1 db 2,2		                     		; (Filas) / (Columns).
 	db 1											; (Cuad_objeto).
 	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 	defw Indice_mov_Baile_de_BadSat					; (Puntero_indice_mov) 
+	db 3											; (Frames_explosion).
+
 
 Entidad_2 db 2,2		                     		; (Filas) / (Columns).
 	db %00000010									; (Attr).
@@ -514,3 +508,4 @@ Entidad_2 db 2,2		                     		; (Filas) / (Columns).
 	db 1											; (Cuad_objeto).
 	db 1,1,1,1                                      ; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 	defw Indice_mov_Baile_de_BadSat				    ; (Puntero_indice_mov) 
+	db 3											; (Frames_explosion).

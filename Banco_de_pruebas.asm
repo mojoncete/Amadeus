@@ -419,9 +419,9 @@ Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos
 ; 														; _ que definen el NIVEL.
 ; Y todo comienza aquí .....
 ;
-; Rutina principal *************************************************************************************************************************************************************************
+; 	INICIO  *************************************************************************************************************************************************************************
 ;
-;	16/11/22	
+;	5/1/24
 
 START 
 
@@ -438,12 +438,16 @@ START
 
 ; INICIALIZACIÓN.
 
-	call Inicializa_Punteros_de_nivel					 ; Inicializa. 1er NIVEL.
-4 call Prepara_cajas 									 ; (Niveles.asm).
-	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en la 1ª entidad del_
-;														 ; _ índice y (Puntero_restore-entidades) en la 2ª.
+	call Inicializa_Punteros_de_nivel					 ; Prepara el 1er Nivel del juego.
+;														 ; Situa (Puntero_indice_NIVELES) el el primer defw., (nivel) del índice de niveles.
+;														 ; Inicializa (Numero_de_entidades) con el nº total de malotes del nivel.
+;														 ; Inicializa (Datos_de_nivel) con el `tipo´ de la 1ª entidad del nivel. 
+4 call Prepara_cajas_de_entidades						 
 
-	call Restore_entidad								 ; Vuelca en DRAW los parámetros de la 1º entidad, (Caja_1).
+
+	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en el 1er .db de la 1ª entidad del_
+;														 ; _ índice y (Puntero_restore-entidades) en el 2º .defw del Índice de entidades.
+	call Restore_entidad								 ; Vuelca en DRAW la 1ª Caja_de_entidades.
 
 	ld hl,Numero_parcial_de_entidades
 	ld b,(hl)
@@ -1232,10 +1236,10 @@ Repone_pintar
  
 Inicia_punteros_de_cajas 
 
-	ld hl,Indice_de_cajas
+	ld hl,Indice_de_cajas_de_entidades
     call Extrae_address
     ld (Puntero_store_caja),hl
-	ld hl,Indice_de_cajas+2
+	ld hl,Indice_de_cajas_de_entidades+2
 	ld (Indice_restore_caja),hl
 	call Extrae_address
 	ld (Puntero_restore_caja),hl
