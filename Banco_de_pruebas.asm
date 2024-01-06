@@ -425,7 +425,7 @@ Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos
 
 START 
 
-	ld sp,$ffff											; Situamos el inicio de Stack.
+	ld sp,0												; Situamos el inicio de Stack.
 	ld a,$a9 											; Habilitamos el modo 2 de interrupciones y fijamos el salto a $a9ff
 	ld i,a 												; Byte alto de la dirección donde se encuentra nuestro vector de interrupciones en el registro I. ($a9). El byte bajo será siempre $ff.
 	IM 2 											    ; Habilitamos el modo 2 de INTERRUPCIONES.
