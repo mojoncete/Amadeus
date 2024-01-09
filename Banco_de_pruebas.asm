@@ -120,10 +120,10 @@ Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto e
 Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
 
-Almacen_de_movimientos_masticados_Entidad_1 equ $5cd0	; Guardaremos los movimientos masticados que ha hido generando la entidad guía.
-;														;! $6f95 es donde se guarda el último movimiento masticado de BADSAT.
+Almacen_de_movimientos_masticados_Entidad_1 equ $eb30	; $eb3a - $fdff ..... $12c5 / 4805 bytes. Guardaremos los movimientos masticados que ha hido generando la entidad guía.
+;														
 ;														; 4805 bytes, 4,8Kb.
-Almacen_de_movimientos_masticados_Amadeus equ $6fa0
+Almacen_de_movimientos_masticados_Amadeus equ $e854		; $e854 - $eb39 ..... $2e5 / 741 bytes.
 
 
 
@@ -203,7 +203,7 @@ Variables_de_pintado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES
 Puntero_de_impresion defw 0								; Contiene el puntero de impresión, (calculado por DRAW). Esta dirección la utilizará la rutina_
 ;														; _ [Guarda_coordenadas_X] y [Compara_coordenadas_X] para detectar la colisión ENTIDAD-AMADEUS.
 
-Puntero_de_almacen_de_mov_masticados defw Almacen_de_movimientos_masticados_Entidad_1
+Puntero_de_almacen_de_mov_masticados defw 0
 
 ;	Almacén donde la entidad guía va guardando comportamiento ya calculado, (rutinas DRAW).
 ;	Almacén donde una entidad "sombra" recoge el siguiente desplazamiento ya masticado, (para imprimir).
@@ -478,6 +478,9 @@ START
 3 call Restore_Amadeus
 	call Inicia_Puntero_objeto
 	call Draw
+
+	call Guarda_movimiento_masticado	;! Provisional
+
 	call Guarda_foto_registros
 	call Guarda_datos_de_borrado_Amadeus
 
@@ -932,7 +935,9 @@ Mov_obj
 
 Mov_Amadeus 
 
-	call Movimiento_Amadeus 							; MOVEMOS AMADEUS.
+;	call Movimiento_Amadeus 							; MOVEMOS AMADEUS.
+
+	call Mov_right
 
 	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
 	bit 4,a
@@ -973,41 +978,11 @@ Inicia_entidad
 ;	Guarda el "movimiento_masticado" en el {Almacen_de_movimientos_masticados_Entidad_1} si se trata de una "entidad_guía".
 ;	Actualiza el (Puntero_de_almacen_de_mov_masticados) tras el guardado.
 
-Guarda_movimiento_masticado	ld a,(Ctrl_2)
-	bit 5,a
-	ret z 													; Salimos si NO se trata de una entidad guía.
+Guarda_movimiento_masticado	
 
-	ld (Stack),sp
-	ld sp,(Puntero_de_almacen_de_mov_masticados)			; Guardamos el movimiento masticado en el almacén.
-
-	push hl
-    push ix
-    push iy
- 
-    ld sp,(Stack)
-
-    push hl
-
-   	ld hl,(Contador_de_mov_masticados)						; Incrementa en una unidad el (Contador_de_mov_masticados).
-	inc hl
-	ld (Contador_de_mov_masticados),hl
-
-	ld (Contador_general_de_mov_masticados_Entidad_1),hl	; Cuando la entidad pase de guía a fantasma, el "contador general" indicará el nº máximo de movimientos masticados creados.	
-
-	pop hl
-
-    call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
-;															; _ el (Contador_de_mov_masticados).    
-    ret
-
-; -----------------------------------------------------------------------------------
-;
-;	9/1/24
-;
-;	Guarda el "movimiento_masticado" en el {Almacen_de_movimientos_masticados_Amadeus}.
-;	Actualiza el (Puntero_de_almacen_de_mov_masticados) tras el guardado.
-
-Guarda_movimiento_masticado_Amadeus	
+;	ld a,(Ctrl_2)
+;	bit 5,a
+;	ret z 													; Salimos si NO se trata de una entidad guía.
 
 	ld (Stack),sp
 	ld sp,(Puntero_de_almacen_de_mov_masticados)			; Guardamos el movimiento masticado en el almacén.
@@ -1052,23 +1027,20 @@ Inicia_entidad_guia
 	ld hl,Ctrl_3
 	set 1,(hl)											; El bit 1 de (Ctrl_3) a "1" indica que existe una "Entidad_guía".									
 
-	ld hl,Almacen_de_movimientos_masticados_Entidad_1+6			
-	ld (Puntero_de_almacen_de_mov_masticados),hl
-
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	21/12/23
+;	9/1/24
 ;
 
 Actualiza_Puntero_de_almacen_de_mov_masticados 
 
 ;	Entidad_guía ???
 
-	ld a,(Ctrl_2)
-	bit 5,a
-	ret z												; Salimos si NO se trata de una entidad guía.
+;	ld a,(Ctrl_2)
+;	bit 5,a
+;	ret z												; Salimos si NO se trata de una entidad guía.
 
 	push hl
 	push bc
@@ -1100,7 +1072,15 @@ Guarda_foto_entidad_a_pintar
 ; Guarda la foto de Amadeus.
 
 	call Draw
+
+	call Guarda_movimiento_masticado	;! Provisional
+
 	call Guarda_foto_registros
+
+;	di
+;	jr $
+;	ei
+
 	ret
 
 ; ENTIDADES!

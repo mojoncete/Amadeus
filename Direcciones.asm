@@ -171,19 +171,22 @@ Reponne_punntero_objeto	ld a,(Ctrl_2)
 ; 	Desplaza el Sprite (x)Pixels a la derecha.
 ;
 
-Mov_right ld hl,Ctrl_0
+Mov_right ld a,(Ctrl_0)
+	bit 6,a
+	jr z,10F 														; Amadeus o Entidad ???																								
+
+	call Stop_Amadeus_right											; Estamos moviendo Amadeus???????. Si es así hemos de comprobar que no hemos llegado al char.30 de la línea, [Stop_Amadeus].
+	ret z 															; Salimos de Mov_right si hemos llegado al char.30.
+
+	ld hl,Ctrl_0
+	set 4,(hl)
+	jr 8F
+
+10 ld hl,Ctrl_0
 	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
 ; 																	; _esta información para evitar que la entidad se vuelva borrar/pintar_
 ; 																	; _ en el caso de que no lo haya.
-	ld a,(Ctrl_0)
-	bit 6,a
-	jr z,10F 														; Estamos moviendo Amadeus???????. Si es así hemos de comprobar que no hemos llegado al char.30 de la línea, [Stop_Amadeus].
-
-	call Stop_Amadeus_right
-	ret z 															; Salimos de Mov_right si hemos llegado al char.30.
-	jr 8F
-
-10 ld a,(Coordenada_X)	 	  										; Estamos en el char. 31?								
+	ld a,(Coordenada_X)	 	  										; Estamos en el char. 31?								
 	cp 31															; Si no es así, saltamos a [3] para seguir con el desplazamiento progrmado.
 	jr nz,8F
 

@@ -170,9 +170,16 @@ Datos_de_entidad_a_caja
 
 	ld bc,7
 	ldir										; Hemos volcado (Posicion_inicio), (Cuad_objeto) y [(Vel_left) / (Vel_right) / (Vel_up) / (Vel_down)].
+;												; HL, (origen), apunta ahora al .db (Puntero_de_almacen_de_mov_masticados), hay que situar DE.
+
+	ld bc,19
+	call Situa_DE 								; DE, (destino), situado ahora correctamente: (Puntero_de_almacen_de_mov_masticados).
+
+	ld bc,2
+	ldir 										; Hemos volcado (Puntero_de_almacen_de_mov_masticados).
 ;												; HL, (origen), apunta ahora al .db (Puntero_indice_mov), hay que situar DE.
 
-	ld bc,24
+	ld bc,3															
 	call Situa_DE 								; DE, (destino), situado ahora correctamente: (Puntero_indice_mov).
 
 	ld bc,2
