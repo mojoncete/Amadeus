@@ -126,7 +126,7 @@ ctrl_desplz_amadeus	db 0							; (CTRL_DESPLZ).
 	defw 0		 									; (Puntero_DESPLZ_der).
 	defw 0											; (Puntero_DESPLZ_izq).
 
-	defw $50de										; (Posicion_inicio).
+	defw $50c1										; (Posicion_inicio).		$50c1 - $50de
 	db 4 											; (Cuad_objeto).
 	db 2,2,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 
@@ -141,7 +141,7 @@ ctrl_desplz_amadeus	db 0							; (CTRL_DESPLZ).
 
 p.imp.amadeus defw 0 								; Puntero_de_impresion.
 
-	defw Almacen_de_movimientos_masticados_Entidad_1; Puntero_de_almacen_de_mov_masticados
+	defw Almacen_de_movimientos_masticados_Amadeus  ; Puntero_de_almacen_de_mov_masticados
 	defw 0 											; Contador_de_mov_masticados
 
 	db $40											; (Ctrl_0).

@@ -1,6 +1,5 @@
-;	29/12/23
+;	9/1/24
 
-	
 	DEVICE ZXSPECTRUM48
 
 	org $a9ff 	
@@ -32,44 +31,44 @@ FRAME ld (Stack_3),sp
 	push ix
 	push iy
 
-; En 1er lugar guardamos los 61 bytes de la entidad alojada en DRAW para restaurarlos antes de salir de la_
-; _ rutina de interrupción. (Para gestionar Amadeus hemos de introducir sus datos en DRAW).
-
 ; Pintamos entidades/Amadeus y gestionamos álbumes de fotos de entidades.
 
 	ld a,2	
 	out ($fe),a												
 	call Pinta_entidades									; Borde rojo.
 
-;	ld a,6	
-;	out ($fe),a												
-;	call Pinta_Amadeus										; Borde amarillo.
+	ld a,6	
+	out ($fe),a												
+	call Pinta_Amadeus										; Borde amarillo.
+
+; En 1er lugar guardamos los 67 bytes de la entidad alojada en DRAW para restaurarlos antes de salir de la_
+; _ rutina de interrupción. (Para gestionar Amadeus hemos de introducir sus datos en DRAW).
 
 	ld a,7	
 	out ($fe),a												; Borde blanco.
-;	call Guarda_parametros_DRAW
-;	call Restore_Amadeus
+	call Guarda_parametros_DRAW
+	call Restore_Amadeus
 
 ; Posible colisión Entidad-Amadeus ???
 
-;	ld a,(Impacto2)	
-;	bit 2,a
-;	jr z,1F
+	ld a,(Impacto2)	
+	bit 2,a
+	jr z,1F
 
-;	call Detecta_colision_nave_entidad 
+	call Detecta_colision_nave_entidad 
 
-;1 ld a,4	
-;	out ($fe),a												
-;	call Gestiona_Amadeus
+1 ld a,4	
+	out ($fe),a												
+	call Gestiona_Amadeus
 
-;	ld a,7	
-;	out ($fe),a											; Borde blanco.
-;	ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
-;	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
+	ld a,7	
+	out ($fe),a											; Borde blanco.
+	ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
+	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
 
 ; Restauramos los parámetros de la entidad que había alojada en DRAW "antes de gestionar AMADEUS".
 
-;	call Recupera_parametros_DRAW
+	call Recupera_parametros_DRAW
 	call Actualiza_relojes
 
 	ld hl,Ctrl_3
@@ -122,8 +121,13 @@ Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y 
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
 
 Almacen_de_movimientos_masticados_Entidad_1 equ $5cd0	; Guardaremos los movimientos masticados que ha hido generando la entidad guía.
-;														;! $6f8f es donde se guarda el último movimiento masticado de BADSAT.
-;														; 4799 bytes, 4,8Kb.
+;														;! $6f95 es donde se guarda el último movimiento masticado de BADSAT.
+;														; 4805 bytes, 4,8Kb.
+Almacen_de_movimientos_masticados_Amadeus equ $6fa0
+
+
+
+
 Album_de_fotos equ $7000	;	(7000h - 7055h).		; En (Album_de_fotos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y las llamadas a las rutinas de impresión.   
 ;                               				        ; De momento situamos este almacén en $7000. La capacidad del album será de 7 entidades.  
@@ -454,10 +458,6 @@ START
 	inc b
 	dec b
 	jr z,3F										   		 ; Si no hay entidades, cargamos AMADEUS.
-
-;	Cada vez que iniciamos una entidad, hay que hacer una llamada a (Inicia_Puntero_objeto). 
-;   Inicialmente tengo cargada la 1ª entidad en DRAW.	
-;	Pintamos el resto de entidades:
 
 ;	INICIA ENTIDADES !!!!!
 
@@ -966,7 +966,6 @@ Inicia_entidad
 	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	ret
 
-
 ; -----------------------------------------------------------------------------------
 ;
 ;	28/12/23
@@ -977,6 +976,38 @@ Inicia_entidad
 Guarda_movimiento_masticado	ld a,(Ctrl_2)
 	bit 5,a
 	ret z 													; Salimos si NO se trata de una entidad guía.
+
+	ld (Stack),sp
+	ld sp,(Puntero_de_almacen_de_mov_masticados)			; Guardamos el movimiento masticado en el almacén.
+
+	push hl
+    push ix
+    push iy
+ 
+    ld sp,(Stack)
+
+    push hl
+
+   	ld hl,(Contador_de_mov_masticados)						; Incrementa en una unidad el (Contador_de_mov_masticados).
+	inc hl
+	ld (Contador_de_mov_masticados),hl
+
+	ld (Contador_general_de_mov_masticados_Entidad_1),hl	; Cuando la entidad pase de guía a fantasma, el "contador general" indicará el nº máximo de movimientos masticados creados.	
+
+	pop hl
+
+    call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
+;															; _ el (Contador_de_mov_masticados).    
+    ret
+
+; -----------------------------------------------------------------------------------
+;
+;	9/1/24
+;
+;	Guarda el "movimiento_masticado" en el {Almacen_de_movimientos_masticados_Amadeus}.
+;	Actualiza el (Puntero_de_almacen_de_mov_masticados) tras el guardado.
+
+Guarda_movimiento_masticado_Amadeus	
 
 	ld (Stack),sp
 	ld sp,(Puntero_de_almacen_de_mov_masticados)			; Guardamos el movimiento masticado en el almacén.
