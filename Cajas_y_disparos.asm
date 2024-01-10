@@ -496,7 +496,7 @@ Entidad_1 db 2,2		                     			; (Filas) / (Columns).
 	defw $4003	                             	    	; (Posicion_inicio).
 	db 1												; (Cuad_objeto).
 	db 1,1,1,1                                      	; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-	defw Almacen_de_movimientos_masticados_Entidad_1+6	; (Puntero_de_almacen_de_mov_masticados)
+	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
 	defw Indice_mov_Baile_de_BadSat						; (Puntero_indice_mov) 
 	db 3												; (Frames_explosion).
 
@@ -507,6 +507,6 @@ Entidad_2 db 2,2		                     			; (Filas) / (Columns).
 	defw $5040                                      	; (Posicion_inicio).
 	db 1												; (Cuad_objeto).
 	db 1,1,1,1                                      	; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-	defw Almacen_de_movimientos_masticados_Entidad_1+6	; (Puntero_de_almacen_de_mov_masticados)
+	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
 	defw Indice_mov_Baile_de_BadSat				    	; (Puntero_indice_mov) 
 	db 3												; (Frames_explosion).
