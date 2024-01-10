@@ -37,38 +37,38 @@ FRAME ld (Stack_3),sp
 	out ($fe),a												
 	call Pinta_entidades									; Borde rojo.
 
-	ld a,6	
-	out ($fe),a												
-	call Pinta_Amadeus										; Borde amarillo.
+;	ld a,6	
+;	out ($fe),a												
+;	call Pinta_Amadeus										; Borde amarillo.
 
 ; En 1er lugar guardamos los 67 bytes de la entidad alojada en DRAW para restaurarlos antes de salir de la_
 ; _ rutina de interrupción. (Para gestionar Amadeus hemos de introducir sus datos en DRAW).
 
-	ld a,7	
-	out ($fe),a												; Borde blanco.
-	call Guarda_parametros_DRAW
-	call Restore_Amadeus
+;	ld a,7	
+;	out ($fe),a												; Borde blanco.
+;	call Guarda_parametros_DRAW
+;	call Restore_Amadeus
 
 ; Posible colisión Entidad-Amadeus ???
 
-	ld a,(Impacto2)	
-	bit 2,a
-	jr z,1F
+;	ld a,(Impacto2)	
+;	bit 2,a
+;	jr z,1F
 
-	call Detecta_colision_nave_entidad 
+;	call Detecta_colision_nave_entidad 
 
-1 ld a,4	
-	out ($fe),a												
-	call Gestiona_Amadeus
+;1 ld a,4	
+;	out ($fe),a												
+;	call Gestiona_Amadeus
 
-	ld a,7	
-	out ($fe),a											; Borde blanco.
-	ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
-	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
+;	ld a,7	
+;	out ($fe),a											; Borde blanco.
+;	ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
+;	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
 
 ; Restauramos los parámetros de la entidad que había alojada en DRAW "antes de gestionar AMADEUS".
 
-	call Recupera_parametros_DRAW
+;	call Recupera_parametros_DRAW
 	call Actualiza_relojes
 
 	ld hl,Ctrl_3
@@ -120,10 +120,10 @@ Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto e
 Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
 
-Almacen_de_movimientos_masticados_Entidad_1 equ $eb30	; $eb3a - $fdff ..... $12c5 / 4805 bytes. Guardaremos los movimientos masticados que ha hido generando la entidad guía.
-;														
-;														; 4805 bytes, 4,8Kb.
-Almacen_de_movimientos_masticados_Amadeus equ $e854		; $e854 - $eb39 ..... $2e5 / 741 bytes.
+Almacen_de_movimientos_masticados_Entidad_1 equ $eb00	; $eb00 - $ff09 ..... $1409 / 5129 bytes. Guardaremos los movimientos masticados que ha hido generando la entidad guía.
+;														; 												
+
+Almacen_de_movimientos_masticados_Amadeus equ $e700		
 
 
 
@@ -455,42 +455,44 @@ START
 
 	ld hl,Numero_parcial_de_entidades
 	ld b,(hl)
-	inc b
-	dec b
-	jr z,3F										   		 ; Si no hay entidades, cargamos AMADEUS.
+;	inc b
+;	dec b
+;	jr z,3F										   		 ; Si no hay entidades, cargamos AMADEUS.
 
 ;	INICIA ENTIDADES !!!!!
 
-1 push bc  												; Guardo el contador de entidades.
-	call Inicia_entidad
-	pop bc
-	djnz 1B  											; Decremento el contador de entidades.
+	call Construye_movimientos_masticados_entidad
+
+;1 push bc  												; Guardo el contador de entidades.
+;	call Inicia_entidad
+;	pop bc
+;	djnz 1B  											; Decremento el contador de entidades.
 
 ; Si Amadeus ya está iniciado, saltamos a [Inicia_punteros_de_cajas] y [Restore_entidad].
 ; (Esto se dá cuando se inicia una nueva oleada).
 
-	ld a,(Ctrl_1)
-	bit 3,a
-	jr nz,5F											; Loop
+;	ld a,(Ctrl_1)
+;	bit 3,a
+;	jr nz,5F											; Loop
 
 ; 	INICIA AMADEUS !!!!!
 
-3 call Restore_Amadeus
-	call Inicia_Puntero_objeto
-	call Draw
+;3 call Restore_Amadeus
+;	call Inicia_Puntero_objeto
+;	call Draw
 
-	call Guarda_movimiento_masticado	;! Provisional
+;	call Guarda_movimiento_masticado	;! Provisional
 
-	call Guarda_foto_registros
-	call Guarda_datos_de_borrado_Amadeus
+;	call Guarda_foto_registros
+;	call Guarda_datos_de_borrado_Amadeus
 
-	ld de,Amadeus_db
-	call Store_Amadeus
+;	ld de,Amadeus_db
+;	call Store_Amadeus
 
 ; 	INICIA DISPAROS !!!!!
 
-	call Inicia_Puntero_Disparo_Entidades
-	call Inicia_Puntero_Disparo_Amadeus
+;	call Inicia_Puntero_Disparo_Entidades
+;	call Inicia_Puntero_Disparo_Amadeus
 
 ; Una vez inicializadas las entidades y Amadeus, Cargamos la 1ª entidad en DRAW.
 
@@ -959,7 +961,7 @@ Mov_Amadeus
 
 Inicia_entidad	
 
-	call Inicia_entidad_guia							; Determina si esta entidad es, o no es, una "Entidad_guía".
+;	call Inicia_entidad_guia							; Determina si esta entidad es, o no es, una "Entidad_guía".
 	call Inicia_Puntero_objeto
 	call Recompone_posicion_inicio
 	call Draw
@@ -973,16 +975,42 @@ Inicia_entidad
 
 ; -----------------------------------------------------------------------------------
 ;
+;	10/01/24
+;
+;
+
+Construye_movimientos_masticados_entidad	
+
+	call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
+;															; _ el (Contador_de_mov_masticados).    
+	call Inicia_Puntero_objeto
+	call Recompone_posicion_inicio
+1 call Draw
+	call Guarda_movimiento_masticado
+	call Movimiento
+	jr 1B
+
+;	Hemos completado el almacén de movimientos masticados de la entidad.
+;	Reinicializamos (Puntero_de_almacen_de_mov_masticados).
+
+	ld hl,Almacen_de_movimientos_masticados_Entidad_1
+	ld (Puntero_de_almacen_de_mov_masticados),hl
+
+;	Reinicializamos el (Contador_de_mov_masticados).
+
+	ld hl,0
+	ld (Contador_de_mov_masticados),hl
+
+	ret
+
+; -----------------------------------------------------------------------------------
+;
 ;	28/12/23
 ;
-;	Guarda el "movimiento_masticado" en el {Almacen_de_movimientos_masticados_Entidad_1} si se trata de una "entidad_guía".
+;	Guarda el "movimiento_masticado" en el {Almacen_de_movimientos_masticados} de la entidad.
 ;	Actualiza el (Puntero_de_almacen_de_mov_masticados) tras el guardado.
 
 Guarda_movimiento_masticado	
-
-;	ld a,(Ctrl_2)
-;	bit 5,a
-;	ret z 													; Salimos si NO se trata de una entidad guía.
 
 	ld (Stack),sp
 	ld sp,(Puntero_de_almacen_de_mov_masticados)			; Guardamos el movimiento masticado en el almacén.
@@ -1031,16 +1059,10 @@ Inicia_entidad_guia
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	9/1/24
+;	10/1/24
 ;
 
 Actualiza_Puntero_de_almacen_de_mov_masticados 
-
-;	Entidad_guía ???
-
-;	ld a,(Ctrl_2)
-;	bit 5,a
-;	ret z												; Salimos si NO se trata de una entidad guía.
 
 	push hl
 	push bc
@@ -1152,16 +1174,6 @@ Convierte_guia_en_fantasma ld a,(Ctrl_3)
 
 	ld hl,Ctrl_2
 	res 5,(hl)											; La entidad deja de ser una entidad guía.
-
-;	Reinicializamos el (Puntero_de_almacen_de_mov_masticados).
-
-	ld hl,Almacen_de_movimientos_masticados_Entidad_1
-	ld (Puntero_de_almacen_de_mov_masticados),hl
-
-;	Reinicializamos el (Contador_de_mov_masticados).
-
-	ld hl,0
-	ld (Contador_de_mov_masticados),hl
 
 	ret													
 
