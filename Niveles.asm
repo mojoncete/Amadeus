@@ -145,7 +145,7 @@ Avanza_caja_de_entidades ld (Puntero_store_caja),hl
 
 ; ----------------------------------------------------------------------------------------------------------
 ;
-;	5/1/24
+;	11/1/24
 ;
 ;	Vuelca los .db significativos del tipo de entidad a la caja de entidades.
 
@@ -156,8 +156,8 @@ Datos_de_entidad_a_caja
 
 	ld de,(Puntero_store_caja) 					; DE apunta al 1er .db de la caja de entidades vacía.
 
-	ld bc,2
-	ldir 										; Hemos volcado (Filas) y (Columns).
+	ld bc,3
+	ldir 										; Hemos volcado (Tipo), (Filas) y (Columns).
 ;												; HL, (origen), apunta ahora al .db (attr.), hay que situar DE.
 	ld bc,7
 	call Situa_DE 								; DE, (destino), situado ahora correctamente: (attr).
@@ -177,16 +177,9 @@ Datos_de_entidad_a_caja
 
 	ld bc,2
 	ldir 										; Hemos volcado (Puntero_de_almacen_de_mov_masticados).
-;												; HL, (origen), apunta ahora al .db (Puntero_indice_mov), hay que situar DE.
-
-	ld bc,3															
-	call Situa_DE 								; DE, (destino), situado ahora correctamente: (Puntero_indice_mov).
-
-	ld bc,2
-	ldir 										; Hemos volcado (Puntero_indice_mov).
 ;												; HL, (origen), apunta ahora al .db (Frames_explosion), hay que situar DE.
 
-	ld bc,15															
+	ld bc,8															
 	call Situa_DE 								; DE, (destino), situado ahora correctamente: (Frames_explosion).
 
 	ld a,(hl)

@@ -150,6 +150,10 @@ Almacen_de_parametros_DRAW equ $70b9 ; ($70b9 - $70fb) ; 66 bytes.
 ;
 ; (Variables_de_borrado) *** (Variables_de_pintado).	8 Bytes.
 
+Tipo db 0												; Clase de la entidad. Cada `tipo´ de Entidad tiene unas características únicas que lo distinguen de otros tipos: 
+;															- Patrón de movimiento.
+;															- Aspecto
+
 Filas db 0												; Filas. [DRAW]
 Columns db 0  											; Nº de columnas. [DRAW]
 Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
@@ -239,6 +243,42 @@ Ctrl_0 db 0 											; Byte de control. A través de este byte de control. Las
 ; 															   _ Utilizo la información que proporciona este BIT para modificar (CTRL_DESPLZ) si el siguiente movimiento_
 ; 															   _ se va a producir a la izquierda. "1" DERECHA - "0" IZQUIERDA.
 
+; Variables de funcionamiento. [DRAW].
+
+Columnas db 0
+Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado en función del tamaño del Sprite. Si el objeto llega a esta línea se modifica_    
+; 														; _(Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
+Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta columna se modifica (Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
+
+; variables de control general.
+
+Ctrl_2 db 0 											
+;														BIT 0, Los sprites se inician con un `sprite vacío', (sprite formado por "ceros"), cuando la rutina_
+;															_ [Guarda_foto_registros] guarda su 1ª imagen.
+;															_ Más adelante las rutinas [Mov_left] y [Mov_right] restauraran (Puntero_objeto). Si el 1er movimiento
+; 															_ que hace la entidad después de iniciarse es hacia arriba/abajo no se restaurará (Puntero_objeto), pués_
+; 															_ las rutinas [Mov_up] y [Mov_down] no necesitan modificar el sprite.
+;															_ El bit5 a "1" nos indica que el sprite se inicia por arriba o por abajo y por lo tanto hay que restaurar_
+;															_ (Puntero_objeto) con (Repone_puntero_objeto) una vez iniciado y realizada su 1ª `foto'.
+;														
+;														BIT 1, Este bit a "1" indica que se ha iniciado el proceso de EXPLOSIÓN en una entidad.
+;														BIT 2, Este bit es activado por [Movimiento]. Indica que hemos `iniciado un desplazamiento'._
+;															_ Evita que volvamos a iniciar el desplazamiento cada vez que ejecutemos [Movimiento].
+;														BIT 3, Indica que (Cola_de_desplazamiento)="254". Esto quiere decir que repetiremos (1-255 veces),_
+;															_ el último MOVIMIENTO que hayamos ejecutado.
+;														BIT 4, ???
+;														BIT 5, Este bit a "1" indica que esta entidad es una "Entidad_guía".
+
+Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
+
+;! 56 Bytes por entidad.
+
+; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
+;					         		---------;      ;---------
+
+
+; Variables de funcionamiento, (No incluidas en base de datos de entidades), a partir de aquí!!!!!
+
 ; Movimiento. ------------------------------------------------------------------------------------------------------
 
 Puntero_indice_mov defw 0							    ; Puntero índice del patrón de movimiento de la entidad. "0" No hay movimiento.
@@ -268,44 +308,6 @@ Cola_de_desplazamiento db 0								; Este byte indica:
 ;														;	"$ff" ..... Bucle infinito de repetición. 
 ;														;				Nunca vamos a saltar a la siguiente cadena de movimiento del índice,_	
 ;														;				,_ (si es que la hay). Volvemos a inicializar (Puntero_mov) con (Puntero_indice_mov).	
-
-
-; Variables de funcionamiento. [DRAW].
-
-Columnas db 0
-Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado en función del tamaño del Sprite. Si el objeto llega a esta línea se modifica_    
-; 														; _(Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
-Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta columna se modifica (Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
-
-; variables de control general.
-
-Ctrl_2 db 0 											
-;														BIT 0, Los sprites se inician con un `sprite vacío', (sprite formado por "ceros"), cuando la rutina_
-;															_ [Guarda_foto_registros] guarda su 1ª imagen.
-;															_ Más adelante las rutinas [Mov_left] y [Mov_right] restauraran (Puntero_objeto). Si el 1er movimiento
-; 															_ que hace la entidad después de iniciarse es hacia arriba/abajo no se restaurará (Puntero_objeto), pués_
-; 															_ las rutinas [Mov_up] y [Mov_down] no necesitan modificar el sprite.
-;															_ El bit5 a "1" nos indica que el sprite se inicia por arriba o por abajo y por lo tanto hay que restaurar_
-;															_ (Puntero_objeto) con (Repone_puntero_objeto) una vez iniciado y realizada su 1ª `foto'.
-;														
-;														BIT 1, Este bit a "1" indica que se ha iniciado el proceso de EXPLOSIÓN en una entidad.
-;														BIT 2, Este bit es activado por [Movimiento]. Indica que hemos `iniciado un desplazamiento'._
-;															_ Evita que volvamos a iniciar el desplazamiento cada vez que ejecutemos [Movimiento].
-;														BIT 3, Indica que (Cola_de_desplazamiento)="254". Esto quiere decir que repetiremos (1-255 veces),_
-;															_ el último MOVIMIENTO que hayamos ejecutado.
-;														BIT 4, ???
-;														BIT 5, Este bit a "1" indica que esta entidad es una "Entidad_guía".
-
-Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
-
-;! 67 Bytes por entidad.
-
-; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
-;					         		---------;      ;---------
-
-
-; Variables de funcionamiento, (No incluidas en base de datos de entidades), a partir de aquí!!!!!
-
 Contador_general_de_mov_masticados_Entidad_1 defw 0		; Contador general de "movimientos masticados" de la Entidad_1.
 
 Ctrl_1 db 0 											; Byte de control de propósito general.
@@ -348,7 +350,7 @@ Datos_de_entidad defw 0									; Contiene los bytes de información de la entid
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;	18/11/23
+;	11/01/24
 ;
 ;	Álbumes.
 
@@ -371,9 +373,7 @@ End_Snapshot_Amadeus defw Album_de_fotos_Amadeus
 Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una única entidad.
 ;
 ;															BIT 0, "1" Indica que el FRAME está completo, (hemos podido hacer la foto de todas las entidades).
-;															BIT 1, "1" Indica que "EXISTE" Entidad_guía.
-;															BIT 2, "1" Indica que el {Almacen_de_movimientos_masticados_Entidad_1} está completo. Cuando esto ocurre_
-;																_ no se inicia una nueva "Entidad_guía".
+;															BIT 1, "1" Indica que el {Almacen_de_movimientos_masticados_Entidad_1} está completo. 
 ; Gestión de Disparos.
 
 Numero_de_disparotes db 0	
@@ -448,10 +448,14 @@ START
 ;														 ; Inicializa (Datos_de_nivel) con el `tipo´ de la 1ª entidad del nivel. 
 4 call Prepara_cajas_de_entidades						 
 
-
 	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en el 1er .db de la 1ª entidad del_
 ;														 ; _ índice y (Puntero_restore-entidades) en el 2º .defw del Índice de entidades.
 	call Restore_entidad								 ; Vuelca en DRAW la 1ª Caja_de_entidades.
+
+	jr $
+
+
+
 
 	ld hl,Numero_parcial_de_entidades
 	ld b,(hl)
@@ -461,12 +465,10 @@ START
 
 ;	INICIA ENTIDADES !!!!!
 
-	call Construye_movimientos_masticados_entidad
-
-;1 push bc  												; Guardo el contador de entidades.
-;	call Inicia_entidad
-;	pop bc
-;	djnz 1B  											; Decremento el contador de entidades.
+1 push bc  												; Guardo el contador de entidades.
+	call Inicia_entidad
+	pop bc
+	djnz 1B  											; Decremento el contador de entidades.
 
 ; Si Amadeus ya está iniciado, saltamos a [Inicia_punteros_de_cajas] y [Restore_entidad].
 ; (Esto se dá cuando se inicia una nueva oleada).
@@ -961,11 +963,30 @@ Mov_Amadeus
 
 Inicia_entidad	
 
-;	call Inicia_entidad_guia							; Determina si esta entidad es, o no es, una "Entidad_guía".
-	call Inicia_Puntero_objeto
-	call Recompone_posicion_inicio
-	call Draw
-	call Guarda_movimiento_masticado
+; Averiguamos el tipo de entidad.
+
+	ld hl,Tipo
+	dec (hl)
+	jr z,Entidad_tipo_1
+	jr $
+
+Entidad_tipo_1
+
+	ld a,(Ctrl_3)
+	bit 1,a
+	jr nz,$												; Ya están construidos los movimientos masticados de esta entidad.
+
+; Prepara 
+
+	jr $
+
+; Construimos los movimientos masticados de este tipo de entidad.
+
+	call Construye_movimientos_masticados_entidad
+
+
+
+
 	call Guarda_foto_registros
 	di													; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
 ;														; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
@@ -1500,7 +1521,7 @@ Store_Restore_cajas
 	di
 	ld hl,Filas
 	ld de,(Puntero_store_caja) 							; Puntero que se desplaza por las distintas entidades.
-	ld bc,67
+	ld bc,56
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 	ei
 
@@ -1526,7 +1547,7 @@ Store_Restore_cajas
 
 	di
 	ld de,Filas
-	ld bc,67
+	ld bc,56
 	ldir
 	ei
 
@@ -1553,7 +1574,7 @@ Restore_entidad push hl
 
 	ld hl,(Puntero_store_caja)						; (Puntero_store_caja) apunta a la dbase de la 1ª entidad.
 	ld de,Filas 										
-	ld bc,67
+	ld bc,56
 	ldir
 
 	pop bc
@@ -1593,7 +1614,7 @@ Restore_Amadeus	push hl
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Filas
-	ld bc,67
+	ld bc,56
 	ldir
 	pop bc
 	pop de
@@ -1613,7 +1634,7 @@ Restore_Amadeus	push hl
 ;	DESTRUYE: HL y BC y DE.
 
 Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
-	ld bc,67
+	ld bc,56
 	ldir
 	ret
 
@@ -1626,7 +1647,7 @@ Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeu
 ;	Destruye: HL,BC,DE,A
 
 Borra_datos_entidad ld hl,Filas
-	ld bc,66
+	ld bc,55
 	xor a
 	ld (hl),a
 	ld de,Filas+1
@@ -1842,7 +1863,7 @@ Guarda_parametros_DRAW
 
 	ld hl,Filas
 	ld de,Almacen_de_parametros_DRAW
-	ld bc,67
+	ld bc,56
 	ldir
 	ret
 
@@ -1850,7 +1871,7 @@ Recupera_parametros_DRAW
 
 	ld hl,Almacen_de_parametros_DRAW
 	ld de,Filas
-	ld bc,67
+	ld bc,56
 	ldir
 	ret
 

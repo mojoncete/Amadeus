@@ -1,7 +1,11 @@
 
-; Cajas de DRAW y disparos. Índices de disparos y cajas. 
+; Cajas de entidades, Amadeus y disparos. Índices de disparos y cajas. 
+; Índice de Patrón de movimiento para tipo de entidad.
 
-; 13/05/23
+; 11/01/24
+
+Indice_de_mov_segun_tipo_de_entidad defw Indice_mov_Baile_de_BadSat
+	defw 0
 
 ; Control. %00000001 00000001 
 ;
@@ -97,7 +101,7 @@ Disparo_11 defw 0
 ;	9/1/24
 ;
 
-Indice_de_cajas_de_entidades						; ! 67 Bytes por entidad.
+Indice_de_cajas_de_entidades						; ! 56 Bytes por entidad.
 
 	defw Caja_1
 	defw Caja_2
@@ -112,7 +116,7 @@ Indice_de_cajas_de_entidades						; ! 67 Bytes por entidad.
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Amadeus_db db 2,2										; (Filas) / (Columns).
+Amadeus_db db 0,2,2										; (Tipo) / (Filas) / (Columns).
 	defw 0		 										; (Posicion_actual).
 	defw 0	 											; (Puntero_objeto).
 	db 0,0												; (Coordenada_X) / (Coordenada_Y).
@@ -158,7 +162,7 @@ p.imp.amadeus defw 0 									; Puntero_de_impresion.
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Caja_1 db 0,0										; (Filas) / (Columns).
+Caja_1 db 0,0,0										; (Tipo) / (Filas) / (Columns).
 	defw 0											; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
 	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
@@ -190,12 +194,6 @@ Caja_1 db 0,0										; (Filas) / (Columns).
 	defw 0 											; Contador_de_mov_masticados
 
 	db 0											; (Ctrl_0).
-
-	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
-	db 0,0,0										; (Incrementa_puntero) / (Incrementa_puntero_backup) / (Repetimos_desplazamiento).
-
-	db 0,0											; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
-	db 0											; (Cola_de_desplazamiento).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
@@ -203,7 +201,7 @@ Caja_1 db 0,0										; (Filas) / (Columns).
 
 ; ---------- ---------- ---------- ---------- ----------	
 
-Caja_2 db 0,0										; (Filas) / (Columns).
+Caja_2 db 0,0,0										; (Tipo) / (Filas) / (Columns).
 	defw 0											; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
 	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
@@ -235,12 +233,6 @@ Caja_2 db 0,0										; (Filas) / (Columns).
 	defw 0 											; Contador_de_mov_masticados
 
 	db 0											; (Ctrl_0).
-
-	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
-	db 0,0,0										; (Incrementa_puntero) / (Incrementa_puntero_backup) / (Repetimos_desplazamiento).
-
-	db 0,0											; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
-	db 0											; (Cola_de_desplazamiento).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
@@ -248,7 +240,7 @@ Caja_2 db 0,0										; (Filas) / (Columns).
 
 ; ---------- ---------- ---------- ---------- ----------	
 
-Caja_3 db 0,0										; (Filas) / (Columns).
+Caja_3 db 0,0,0										; (Tipo) / (Filas) / (Columns).
 	defw 0											; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
 	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
@@ -280,12 +272,6 @@ Caja_3 db 0,0										; (Filas) / (Columns).
 	defw 0 											; Contador_de_mov_masticados
 
 	db 0											; (Ctrl_0).
-
-	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
-	db 0,0,0										; (Incrementa_puntero) / (Incrementa_puntero_backup) / (Repetimos_desplazamiento).
-
-	db 0,0											; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
-	db 0											; (Cola_de_desplazamiento).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
@@ -293,7 +279,7 @@ Caja_3 db 0,0										; (Filas) / (Columns).
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Caja_4 db 0,0										; (Filas) / (Columns).
+Caja_4 db 0,0,0										; (Tipo) / (Filas) / (Columns).
 	defw 0											; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
 	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
@@ -325,12 +311,6 @@ Caja_4 db 0,0										; (Filas) / (Columns).
 	defw 0 											; Contador_de_mov_masticados
 
 	db 0											; (Ctrl_0).
-
-	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
-	db 0,0,0										; (Incrementa_puntero) / (Incrementa_puntero_backup) / (Repetimos_desplazamiento).
-
-	db 0,0											; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
-	db 0											; (Cola_de_desplazamiento).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
@@ -338,7 +318,7 @@ Caja_4 db 0,0										; (Filas) / (Columns).
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Caja_5 db 0,0										; (Filas) / (Columns).
+Caja_5 db 0,0,0										; (Tipo) / (Filas) / (Columns).
 	defw 0											; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
 	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
@@ -370,12 +350,6 @@ Caja_5 db 0,0										; (Filas) / (Columns).
 	defw 0 											; Contador_de_mov_masticados
 
 	db 0											; (Ctrl_0).
-
-	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
-	db 0,0,0										; (Incrementa_puntero) / (Incrementa_puntero_backup) / (Repetimos_desplazamiento).
-
-	db 0,0											; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
-	db 0											; (Cola_de_desplazamiento).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
@@ -383,7 +357,7 @@ Caja_5 db 0,0										; (Filas) / (Columns).
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Caja_6 db 0,0										; (Filas) / (Columns).
+Caja_6 db 0,0,0										; (Tipo) / (Filas) / (Columns).
 	defw 0											; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
 	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
@@ -415,12 +389,6 @@ Caja_6 db 0,0										; (Filas) / (Columns).
 	defw 0 											; Contador_de_mov_masticados
 
 	db 0											; (Ctrl_0).
-
-	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
-	db 0,0,0										; (Incrementa_puntero) / (Incrementa_puntero_backup) / (Repetimos_desplazamiento).
-
-	db 0,0											; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
-	db 0											; (Cola_de_desplazamiento).
 
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
@@ -428,7 +396,7 @@ Caja_6 db 0,0										; (Filas) / (Columns).
 
 ; ---------- ---------- ---------- ---------- ----------	
 
-Caja_7 db 0,0										; (Filas) / (Columns).
+Caja_7 db 0,0,0										; (Tipo) / (Filas) / (Columns).
 	defw 0											; (Posicion_actual).
 	defw 0 											; (Puntero_objeto).
 	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
@@ -461,19 +429,13 @@ Caja_7 db 0,0										; (Filas) / (Columns).
 		
 	db 0											; (Ctrl_0).
 
-	defw 0,0,0	 									; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
-	db 0,0,0										; (Incrementa_puntero) / (Incrementa_puntero_backup) / (Repetimos_desplazamiento).
-
-	db 0,0											; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
-	db 0											; (Cola_de_desplazamiento).
-
 	db 0 											; (Columnas).									
 	defw 0											; (Limite_horizontal).
 	db 0,0,0										; (Limite_vertical), (Ctrl_2), (Frames_explosion).
 
 ; -------------------------------------------------------------------------------------
 ;
-;	20/05/23
+;	11/1/24
 ;
 ;	TIPOS de "Entidades maliciosas" que quieren conquistar la Tierra.	
 ;
@@ -489,7 +451,7 @@ Indice_de_entidades
 
 ;	BADSAT, (Satélite malvado).	
 
-Entidad_1 db 2,2		                     			; (Filas) / (Columns).
+Entidad_1 db 1,2,2		                     			; (Tipo) / (Filas) / (Columns).
 	db %00000100										; (Attr).
 	defw Indice_Badsat_der								; (Indice_Sprite_der).
 	defw Indice_Badsat_izq								; (Indice_Sprite_izq).
@@ -497,10 +459,9 @@ Entidad_1 db 2,2		                     			; (Filas) / (Columns).
 	db 1												; (Cuad_objeto).
 	db 1,1,1,1                                      	; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
-	defw Indice_mov_Baile_de_BadSat						; (Puntero_indice_mov) 
 	db 3												; (Frames_explosion).
 
-Entidad_2 db 2,2		                     			; (Filas) / (Columns).
+Entidad_2 db 1,2,2		                     			; (Tipo) / (Filas) / (Columns).
 	db %00000010										; (Attr).
 	defw Indice_Badsat_der								; (Indice_Sprite_der).
 	defw Indice_Badsat_izq								; (Indice_Sprite_izq).
@@ -508,5 +469,4 @@ Entidad_2 db 2,2		                     			; (Filas) / (Columns).
 	db 1												; (Cuad_objeto).
 	db 1,1,1,1                                      	; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
-	defw Indice_mov_Baile_de_BadSat				    	; (Puntero_indice_mov) 
 	db 3												; (Frames_explosion).
