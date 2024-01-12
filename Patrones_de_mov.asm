@@ -522,7 +522,7 @@ Incrementa_Puntero_indice_mov
 
 ;! Reinicia el Patrón de movimiento.    
 
-    call z,Inicializa_Puntero_indice_mov
+    call z,Inicializa_Puntero_indice_mov_2
 
     xor a                                   ; Siempre salimos de la rutina con el flag "Z" activo.
 
@@ -535,7 +535,7 @@ Incrementa_Puntero_indice_mov
 ;
 ;   Inicializa_Puntero_indice_mov
 
-Inicializa_Puntero_indice_mov 
+Inicializa_Puntero_indice_mov_2 
 
 ; Existe etiqueta de bucle principal???
 
@@ -566,5 +566,12 @@ Inicializa_Puntero_indice_mov
     ld (Incrementa_puntero),a
 4 ret
 
-
+Inicializa_Puntero_indice_mov ld a,(Tipo)
+    call Calcula_salto_en_BC
+    ld hl,Indice_de_mov_segun_tipo_de_entidad
+    and a
+    adc hl,bc
+    call Extrae_address
+    ld (Puntero_indice_mov),hl
+    ret
 

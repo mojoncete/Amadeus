@@ -70,22 +70,16 @@ Mov_down
 
 ; ------------------------------
 ;
-;	30/12/15
+;	12/01/24
 
 ;	call Reaparece_arriba
 	call Reinicio
 
-	di
-	jr $
-	ei
-	
 ;	Homos generado todos los movimientos posibles de esta "Entidad_guía".
-;	Recordamos que ´solo las "Entidades_guía" ejecutan las rutinas de movimiento.
 
-;	ld a,(Ctrl_3)
-;	res 1,a
-;	set 2,a													; Indica que una Entidad_guía a generado todos sus "movimientos masticados".
-;	ld (Ctrl_3),a
+	ld a,(Ctrl_3)
+	set 1,a
+	ld (Ctrl_3),a
 
 	jr 3F
 ;															; El bit2 de (Ctrl_3) evita que la rutina [Main], (cuando gestione entidades), coloque_

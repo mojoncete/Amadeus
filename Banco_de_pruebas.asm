@@ -144,16 +144,17 @@ Almacen_de_parametros_DRAW equ $70b9 ; ($70b9 - $70fb) ; 66 bytes.
 ; Variables. 
 ; ****************************************************************************************************************************************************************************************** 
 ;
-; 25/12//23
+; 12/01/24
 ;
 ; Variables de DRAW. (Motor principal).				
 ;
 ; (Variables_de_borrado) *** (Variables_de_pintado).	8 Bytes.
 
+Variables_DRAW
+
 Tipo db 0												; Clase de la entidad. Cada `tipo´ de Entidad tiene unas características únicas que lo distinguen de otros tipos: 
 ;															- Patrón de movimiento.
 ;															- Aspecto
-
 Filas db 0												; Filas. [DRAW]
 Columns db 0  											; Nº de columnas. [DRAW]
 Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
@@ -373,7 +374,13 @@ End_Snapshot_Amadeus defw Album_de_fotos_Amadeus
 Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una única entidad.
 ;
 ;															BIT 0, "1" Indica que el FRAME está completo, (hemos podido hacer la foto de todas las entidades).
-;															BIT 1, "1" Indica que el {Almacen_de_movimientos_masticados_Entidad_1} está completo. 
+;															BIT 1, "1" Indica que hemos completado todo el patrón de movimientos de este tipo de entidad.
+;																_ El almacén de movimientos masticados de este tipo de entidad quedará completo. ([Inicia_entidad]).
+
+Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una única entidad.
+;
+;															BIT 0, "1" Indica que el almacén de movimientos de la Entidad_1 está completo.
+
 ; Gestión de Disparos.
 
 Numero_de_disparotes db 0	
@@ -451,11 +458,6 @@ START
 	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en el 1er .db de la 1ª entidad del_
 ;														 ; _ índice y (Puntero_restore-entidades) en el 2º .defw del Índice de entidades.
 	call Restore_entidad								 ; Vuelca en DRAW la 1ª Caja_de_entidades.
-
-	jr $
-
-
-
 
 	ld hl,Numero_parcial_de_entidades
 	ld b,(hl)
@@ -965,26 +967,28 @@ Inicia_entidad
 
 ; Averiguamos el tipo de entidad.
 
-	ld hl,Tipo
-	dec (hl)
+	ld a,(Tipo)
+	dec a
 	jr z,Entidad_tipo_1
 	jr $
 
 Entidad_tipo_1
 
-	ld a,(Ctrl_3)
-	bit 1,a
-	jr nz,$												; Ya están construidos los movimientos masticados de esta entidad.
+	ld hl,Ctrl_4
+	bit 0,(hl)
+	jr nz,$
 
-; Prepara 
+	set 4,(hl)											; Activa FLAG. Indica que el Almacen_de_mov_masticados de la Entidad_1 está completo.
 
-	jr $
+; Inicializa el puntero (Puntero_indice_mov).
+
+	call Inicializa_Puntero_indice_mov
 
 ; Construimos los movimientos masticados de este tipo de entidad.
 
 	call Construye_movimientos_masticados_entidad
 
-
+	jr $
 
 
 	call Guarda_foto_registros
@@ -1002,6 +1006,9 @@ Entidad_tipo_1
 
 Construye_movimientos_masticados_entidad	
 
+	ld hl,(Puntero_de_almacen_de_mov_masticados)			; Guardamos en la pila la dirección inicial del puntero, (para reiniciarlo más tarde).
+	push hl
+
 	call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
 ;															; _ el (Contador_de_mov_masticados).    
 	call Inicia_Puntero_objeto
@@ -1009,12 +1016,18 @@ Construye_movimientos_masticados_entidad
 1 call Draw
 	call Guarda_movimiento_masticado
 	call Movimiento
-	jr 1B
+
+	ld a,(Ctrl_3)											; El bit1 de (Ctrl_3) a "1" indica que hemos completado todo el patrón de movimiento_
+	bit 1,a 												; _ que corresponde a esta entidad.
+	jr z,1B
 
 ;	Hemos completado el almacén de movimientos masticados de la entidad.
 ;	Reinicializamos (Puntero_de_almacen_de_mov_masticados).
 
-	ld hl,Almacen_de_movimientos_masticados_Entidad_1
+
+	jr $
+
+	pop hl 													; Recuperamos la dirección inicial de (Puntero_de_almacen_de_mov_masticados).
 	ld (Puntero_de_almacen_de_mov_masticados),hl
 
 ;	Reinicializamos el (Contador_de_mov_masticados).
@@ -1042,15 +1055,13 @@ Guarda_movimiento_masticado
  
     ld sp,(Stack)
 
-    push hl
+;    push hl
 
    	ld hl,(Contador_de_mov_masticados)						; Incrementa en una unidad el (Contador_de_mov_masticados).
 	inc hl
 	ld (Contador_de_mov_masticados),hl
 
-	ld (Contador_general_de_mov_masticados_Entidad_1),hl	; Cuando la entidad pase de guía a fantasma, el "contador general" indicará el nº máximo de movimientos masticados creados.	
-
-	pop hl
+;	pop hl
 
     call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
 ;															; _ el (Contador_de_mov_masticados).    
@@ -1058,35 +1069,14 @@ Guarda_movimiento_masticado
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	12/12/23
+;	12/1/24
 ;
-
-Inicia_entidad_guia
-
-; Existe "Entidad_guía" ???
-
-	ld a,(Ctrl_3)
-	bit 1,a
-	ret nz 
-
-; Inicia Entidad_guía:
-
-	ld hl,Ctrl_2
-	set 5,(hl)											; Fija la 1ª entidad como "Entidad_guía".
-	ld hl,Ctrl_3
-	set 1,(hl)											; El bit 1 de (Ctrl_3) a "1" indica que existe una "Entidad_guía".									
-
-	ret
-
-; --------------------------------------------------------------------------------------------------------------
-;
-;	10/1/24
-;
+;	INPUTS: HL a de contener (Puntero_de_almacen_de_mov_masticados).
 
 Actualiza_Puntero_de_almacen_de_mov_masticados 
 
-	push hl
-	push bc
+;	push hl
+;	push bc
 
 	ld hl,(Puntero_de_almacen_de_mov_masticados)
 	ld bc,6
@@ -1094,8 +1084,8 @@ Actualiza_Puntero_de_almacen_de_mov_masticados
 	adc hl,bc
 	ld (Puntero_de_almacen_de_mov_masticados),hl
 
-	pop bc
-	pop hl
+;	pop bc
+;	pop hl
 
 	ret
 
@@ -1573,7 +1563,7 @@ Restore_entidad push hl
  	push bc
 
 	ld hl,(Puntero_store_caja)						; (Puntero_store_caja) apunta a la dbase de la 1ª entidad.
-	ld de,Filas 										
+	ld de,Variables_DRAW 										
 	ld bc,56
 	ldir
 

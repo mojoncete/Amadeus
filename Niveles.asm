@@ -110,7 +110,9 @@ Prepara_cajas_de_entidades
 
 ;	------------------------------------------------------------------------------------
 ;
-;	5/1/24
+;	12/01/24
+;
+;	INPUTS:	A contiene el (Tipo) de entidad. 
 ;
 ;	Esta pequeña sub-rutina carga BC con 0,2,4,6,8 ... en función del tipo de entidad: (1,2,3,4,...). 
 ;	Calcula "el salto" para situarnos en los DATOS de la ENTIDAD correcta del índice de entidades según el tipo de entidad.
