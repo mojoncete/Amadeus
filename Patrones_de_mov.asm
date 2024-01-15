@@ -531,7 +531,7 @@ Incrementa_Puntero_indice_mov
 
 ; ---------- --------- --------- ---------- ----------
 ;
-;   24/07/23
+;   15/01/24
 ;
 ;   Inicializa_Puntero_indice_mov
 
@@ -575,3 +575,9 @@ Inicializa_Puntero_indice_mov ld a,(Tipo)
     ld (Puntero_indice_mov),hl
     ret
 
+Situa_en_Contador_general_de_mov_masticados ld a,(Tipo)
+    call Calcula_salto_en_BC
+    ld hl,Contador_general_de_mov_masticados_Entidad_1
+    and a
+    adc hl,bc
+    ret

@@ -122,11 +122,7 @@ Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_de
 
 Almacen_de_movimientos_masticados_Entidad_1 equ $eb00	; $eb00 - $ff09 ..... $1409 / 5129 bytes. Guardaremos los movimientos masticados que ha hido generando la entidad guía.
 ;														; 												
-
 Almacen_de_movimientos_masticados_Amadeus equ $e700		
-
-
-
 
 Album_de_fotos equ $7000	;	(7000h - 7055h).		; En (Album_de_fotos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y las llamadas a las rutinas de impresión.   
@@ -280,6 +276,13 @@ Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
 ; Variables de funcionamiento, (No incluidas en base de datos de entidades), a partir de aquí!!!!!
 
+; Contadores de 16 bits.
+
+Contador_general_de_mov_masticados_Entidad_1 defw 0  	; 8 Bytes.
+Contador_general_de_mov_masticados_Entidad_2 defw 0
+Contador_general_de_mov_masticados_Entidad_3 defw 0
+Contador_general_de_mov_masticados_Entidad_4 defw 0
+
 ; Movimiento. ------------------------------------------------------------------------------------------------------
 
 Puntero_indice_mov defw 0							    ; Puntero índice del patrón de movimiento de la entidad. "0" No hay movimiento.
@@ -309,7 +312,7 @@ Cola_de_desplazamiento db 0								; Este byte indica:
 ;														;	"$ff" ..... Bucle infinito de repetición. 
 ;														;				Nunca vamos a saltar a la siguiente cadena de movimiento del índice,_	
 ;														;				,_ (si es que la hay). Volvemos a inicializar (Puntero_mov) con (Puntero_indice_mov).	
-Contador_general_de_mov_masticados_Entidad_1 defw 0		; Contador general de "movimientos masticados" de la Entidad_1.
+; Contador_general_de_mov_masticados_Entidad_1 defw 0		; Contador general de "movimientos masticados" de la Entidad_1.
 
 Ctrl_1 db 0 											; Byte de control de propósito general.
 
@@ -469,6 +472,11 @@ START
 
 1 push bc  												; Guardo el contador de entidades.
 	call Inicia_entidad
+
+
+	jr $
+
+
 	pop bc
 	djnz 1B  											; Decremento el contador de entidades.
 
@@ -988,10 +996,14 @@ Entidad_tipo_1
 
 	call Construye_movimientos_masticados_entidad
 
-	jr $
+; Tenemos todos los movimientos masticados de este tipo de entidad generados y guardados en su correspondiente almacén.
+; (Puntero_de_almacen_de_mov_masticados) de esta entidad está situado al principio del almacen.
+; (Contador_de_mov_masticados) de esta entidad contiene: el nº total de mov. masticados de este tipo de entidad.
+; Lo tenemos todo preparado para cargar los registros con el mov. masticado y hacer la correspondiente foto.
 
-
+	call Cargamos_registros_con_mov_masticado
 	call Guarda_foto_registros
+
 	di													; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
 ;														; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
 ;														; La rutina [Guarda_foto_registros] activa las interrupciones antes del RET.
@@ -1024,16 +1036,21 @@ Construye_movimientos_masticados_entidad
 ;	Hemos completado el almacén de movimientos masticados de la entidad.
 ;	Reinicializamos (Puntero_de_almacen_de_mov_masticados).
 
-
-	jr $
-
 	pop hl 													; Recuperamos la dirección inicial de (Puntero_de_almacen_de_mov_masticados).
 	ld (Puntero_de_almacen_de_mov_masticados),hl
 
-;	Reinicializamos el (Contador_de_mov_masticados).
 
-	ld hl,0
-	ld (Contador_de_mov_masticados),hl
+; Guardamos el nº total de movimientos masticados de esta entidad en su (Contador_general_de_mov_masticados). 
+
+	call Situa_en_Contador_general_de_mov_masticados
+
+; HL apunta al 1er byte del (Contador_general_de_mov_masticados) de esta entidad.
+; Guardamos (Contador_de_mov_masticados) en el (Contador_general_de_mov_masticados) de esta entidad.
+
+	ld bc,(Contador_de_mov_masticados)
+	ld (hl),c
+	inc hl
+	ld (hl),b
 
 	ret
 
@@ -1086,6 +1103,31 @@ Actualiza_Puntero_de_almacen_de_mov_masticados
 
 ;	pop bc
 ;	pop hl
+
+	ret
+
+; --------------------------------------------------------------------------------------------------------------
+;
+;	15/01/24
+;
+;	Cargamos los registros_
+;	_ HL,IX e IY con las 3 palabras que componen el movimiento masticado a ejecutar.
+;	
+;	HL contiene la dirección de la rutina de impresión.
+;	IX contiene el puntero de impresión.
+;	IY contiene (Puntero_objeto).
+ 
+
+Cargamos_registros_con_mov_masticado ld (Stack),sp
+	ld sp,(Puntero_de_almacen_de_mov_masticados)
+
+	pop iy
+	pop ix
+	pop hl
+
+	ld (Puntero_de_almacen_de_mov_masticados),sp 					; Actualiza (Puntero_de_almacen_de_mov_masticados).
+
+	ld sp,(Stack)
 
 	ret
 

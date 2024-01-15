@@ -2,9 +2,11 @@
 ; Cajas de entidades, Amadeus y disparos. Índices de disparos y cajas. 
 ; Índice de Patrón de movimiento para tipo de entidad.
 
-; 11/01/24
+; 15/01/24
 
 Indice_de_mov_segun_tipo_de_entidad defw Indice_mov_Baile_de_BadSat
+;	defw ...
+; 	defw ...
 	defw 0
 
 ; Control. %00000001 00000001 
