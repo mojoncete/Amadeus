@@ -1543,15 +1543,16 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 
 Store_Restore_cajas  
 
-	push hl 
-	push de
- 	push bc
+;	push hl 
+;	push de
+; 	push bc
 
 ;	STORE !!!!!
 ;	Guarda la entidad cargada en Draw en su correspondiente DB.
 
+
 	di
-	ld hl,Filas
+	ld hl,Variables_DRAW
 	ld de,(Puntero_store_caja) 							; Puntero que se desplaza por las distintas entidades.
 	ld bc,56
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
@@ -1578,7 +1579,11 @@ Store_Restore_cajas
 	jr z,2F
 
 	di
-	ld de,Filas
+	jr $
+	ei
+
+	di
+	ld de,Variables_DRAW
 	ld bc,56
 	ldir
 	ei
@@ -1588,9 +1593,9 @@ Store_Restore_cajas
 	pop af
 	jr z,1B
 
-	pop bc
-	pop de
-	pop hl
+;	pop bc
+;	pop de
+;	pop hl
 
 	ret
 
@@ -1645,7 +1650,7 @@ Restore_Amadeus	push hl
 	push de
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
-	ld de,Filas
+	ld de,Variables_DRAW
 	ld bc,56
 	ldir
 	pop bc
@@ -1665,7 +1670,7 @@ Restore_Amadeus	push hl
 ;
 ;	DESTRUYE: HL y BC y DE.
 
-Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeus.
+Store_Amadeus ld hl,Variables_DRAW											; Cargamos en DRAW los parámetros de Amadeus.
 	ld bc,56
 	ldir
 	ret
@@ -1678,11 +1683,11 @@ Store_Amadeus ld hl,Filas											; Cargamos en DRAW los parámetros de Amadeu
 ;
 ;	Destruye: HL,BC,DE,A
 
-Borra_datos_entidad ld hl,Filas
+Borra_datos_entidad ld hl,Variables_DRAW
 	ld bc,55
 	xor a
 	ld (hl),a
-	ld de,Filas+1
+	ld de,Variables_DRAW+1
 	ldir
 	ret
 
@@ -1893,7 +1898,7 @@ Actualiza_relojes
 
 Guarda_parametros_DRAW
 
-	ld hl,Filas
+	ld hl,Variables_DRAW
 	ld de,Almacen_de_parametros_DRAW
 	ld bc,56
 	ldir
@@ -1902,7 +1907,7 @@ Guarda_parametros_DRAW
 Recupera_parametros_DRAW
 
 	ld hl,Almacen_de_parametros_DRAW
-	ld de,Filas
+	ld de,Variables_DRAW
 	ld bc,56
 	ldir
 	ret
