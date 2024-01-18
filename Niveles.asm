@@ -79,6 +79,18 @@ Prepara_cajas_de_entidades
 
 	ld hl,(Datos_de_nivel)
 
+; Esta inializado este tipo de entidad ???
+
+	jr $
+
+
+
+
+
+
+
+
+
 ; En este punto:
 ;
 ; HL está situado en los .db del Nivel que indican el `tipo´ de entidad a volcar en la caja de entidades.
@@ -93,7 +105,7 @@ Prepara_cajas_de_entidades
 	call Situa_en_datos_de_entidad				; Sitúa HL en el 1er .db de la entidad que tenemos que volcar en la caja.
 ;												; Actualiza (Datos_de_entidad) con esa dirección.
 
-	call Datos_de_entidad_a_caja				; Vuelca los datos de la entidad en la caja.
+	call Datos_de_entidad_a_DRAW				; Vuelca los datos de la entidad en DRAW.
 
 	ld hl,(Indice_restore_caja)					; AVANZA CAJA.
 	call Extrae_address   
@@ -149,14 +161,14 @@ Avanza_caja_de_entidades ld (Puntero_store_caja),hl
 ;
 ;	11/1/24
 ;
-;	Vuelca los .db significativos del tipo de entidad a la caja de entidades.
+;	Vuelca los .db significativos del tipo de entidad a DRAW.
 
-Datos_de_entidad_a_caja 	
+Datos_de_entidad_a_DRAW 	
 
 ; En este punto:
 ; HL apunta al 1er .db de DATOS de la entidad que tenemos que volcar en la caja DRAW.
 
-	ld de,(Puntero_store_caja) 					; DE apunta al 1er .db de la caja de entidades vacía.
+	ld de,Variables_DRAW	 					; DE apunta al 1er .db de las variables DRAW
 
 	ld bc,3
 	ldir 										; Hemos volcado (Tipo), (Filas) y (Columns).
