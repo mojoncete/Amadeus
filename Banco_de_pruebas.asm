@@ -146,7 +146,7 @@ Almacen_de_parametros_DRAW equ $70b9 ; ($70b9 - $70fb) ; 66 bytes.
 ;
 ; (Variables_de_borrado) *** (Variables_de_pintado).	8 Bytes.
 
-Variables_DRAW
+Variables_DRAW ; -----------------------------------------------------------------------------------------------
 
 Tipo db 0												; Clase de la entidad. Cada `tipo´ de Entidad tiene unas características únicas que lo distinguen de otros tipos: 
 ;															- Patrón de movimiento.
@@ -196,10 +196,10 @@ Impacto db 0											; Si después del movimiento de la entidad, (Impacto) se 
 ; 														; Hay que comprobar la posible colisión después de mover Amadeus. En este caso, (Impacto2)="3".
 Variables_de_borrado ds 6 							
 												
-Variables_de_pintado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
-	defw 0
-	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
-	db 0,0,0,0
+;Variables_de_pintado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
+;	defw 0
+;	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
+;	db 0,0,0,0
 
 Puntero_de_impresion defw 0								; Contiene el puntero de impresión, (calculado por DRAW). Esta dirección la utilizará la rutina_
 ;														; _ [Guarda_coordenadas_X] y [Compara_coordenadas_X] para detectar la colisión ENTIDAD-AMADEUS.
@@ -278,7 +278,7 @@ Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
 ; Contadores de 16 bits.
 
-Contador_general_de_mov_masticados_Entidad_1 defw 0  	; 8 Bytes.
+Contador_general_de_mov_masticados_Entidad_1 defw 0  	
 Contador_general_de_mov_masticados_Entidad_2 defw 0
 Contador_general_de_mov_masticados_Entidad_3 defw 0
 Contador_general_de_mov_masticados_Entidad_4 defw 0
@@ -902,19 +902,19 @@ Mov_obj
 ; Movemos Entidades malignas.
 ; Se trata de una "Entidad_guía" ???. Si es así ejecutamos la rutina que construye el patrón de movimiento.
 
-	ld a,(Ctrl_2)
-	bit 5,a
-	jr nz,8F
+;	ld a,(Ctrl_2)
+;	bit 5,a
+;	jr nz,8F
 
-	ld hl,Ctrl_0										; Movemos una entidad "FANTASMA". Activamos el FLAG de movimiento y evitamos_
-	set 4,(hl)											; _ ejecutar la rutina de Movimiento.
-	jr 7F
+;	ld hl,Ctrl_0										; Movemos una entidad "FANTASMA". Activamos el FLAG de movimiento y evitamos_
+;	set 4,(hl)											; _ ejecutar la rutina de Movimiento.
+;	jr 7F
 
-8 call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
+;8 call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
 
-	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
-	bit 4,a
-	ret z
+;	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
+;	bit 4,a
+;	ret z
 
 ; Ha habido desplazamiento de la entidad maligna.
 ; Ha llegado a zona de AMADEUS ???
@@ -937,7 +937,9 @@ Mov_obj
 
 ; ---------
 
-1 call Prepara_var_pintado	 			                	; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´en su {Variables_de_pintado}.      
+1 
+
+;	call Prepara_var_pintado	 			                	; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´en su {Variables_de_pintado}.      
 	call Repone_datos_de_borrado 							;! BORRAMOS !!!. Guardamos la foto de las {Variables_de_borrado} en Album_de_fotos.
 	call Limpia_Variables_de_borrado
 
@@ -959,7 +961,7 @@ Mov_Amadeus
 
 ; ---------
 
-    call Prepara_var_pintado			                ; HEMOS DESPLAZADO AMADEUS.!!!. Almaceno las `VARIABLES DE PINTADO´.         
+;    call Prepara_var_pintado			                ; HEMOS DESPLAZADO AMADEUS.!!!. Almaceno las `VARIABLES DE PINTADO´.         
 	call Repone_datos_de_borrado_Amadeus
 	call Limpia_Variables_de_borrado
 
@@ -1282,23 +1284,23 @@ Prepara_registros_con_mov_masticados ld (Stack),sp
 ;
 ;	19/9/23
 
-Prepara_var_pintado 
+;Prepara_var_pintado 
 
-	ld hl,Filas
-	ld de,Variables_de_pintado
-	ld bc,8
-	ldir
-	ret
+;	ld hl,Filas
+;	ld de,Variables_de_pintado
+;	ld bc,8
+;	ldir
+;	ret
 
 ; --------------------------------------------------------------------------------------------------------------
 
-Repone_pintar 
+;Repone_pintar 
 
-	ld hl,Variables_de_pintado
-	ld de,Filas
-	ld bc,8
-	ldir
-	ret	
+;	ld hl,Variables_de_pintado
+;	ld de,Filas
+;	ld bc,8
+;	ldir
+;	ret	
 
 ; *************************************************************************************************************************************************************
 ;
@@ -1557,6 +1559,8 @@ Store_Restore_cajas
 	ld bc,56
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 	ei
+
+	jr $
 
 ; 	Entidad_sospechosa. 20/4/23
 

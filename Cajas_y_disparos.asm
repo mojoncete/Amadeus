@@ -100,10 +100,10 @@ Disparo_11 defw 0
 ;
 ;	Índice de cajas de entidades.
 ;
-;	9/1/24
+;	18/1/24
 ;
 
-Indice_de_cajas_de_entidades						; ! 56 Bytes por entidad.
+Indice_de_cajas_de_entidades						
 
 	defw Caja_1
 	defw Caja_2
@@ -164,276 +164,96 @@ p.imp.amadeus defw 0 									; Puntero_de_impresion.
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Caja_1 db 0,0,0										; (Tipo) / (Filas) / (Columns).
-	defw 0											; (Posicion_actual).
-	defw 0 											; (Puntero_objeto).
-	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
+; Cada caja tiene 19 bytes !!!
 
-	db %00000000 									; (Attr).
-
-	defw 0											; (Indice_Sprite_der).
-	defw 0											; (Indice_Sprite_izq).
-	defw 0											; (Puntero_DESPLZ_der).
-	defw 0											; (Puntero_DESPLZ_izq).
-
-	defw 0											; (Posicion_inicio).
-	db 0											; (Cuad_objeto).
-
-	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-
-	db 0											; Impacto. "1" existe impacto en la entidad.
-
-	ds 6											; Variables_de_borrado 
-
-	db 0,0											; Variables_de_pintado 
-	defw 0											;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
-
-	defw 0 											; Puntero_de_impresion.
-
-	defw 0											; Puntero_de_almacen_de_mov_masticados
-	defw 0 											; Contador_de_mov_masticados
-
-	db 0											; (Ctrl_0).
-
-	db 0 											; (Columnas).									
-	defw 0											; (Limite_horizontal).
-	db 0,0,0										; (Limite_vertical), (Ctrl_2), (Frames_explosion).
+Caja_1 db 0,0											; (Coordenada_X) / (Coordenada_Y).
+	db %00000000										; (Attr).
+	db 0												; (Cuad_objeto).
+	db 0												; (Impacto).
+	ds 6												; (Variables_de_borrado).
+	defw 0												; (Puntero_de_impresion).
+	defw 0												; (Puntero_de_almacen_de_mov_masticados).
+	defw 0 												; (Contador_de_mov_masticados).
+	db 0												; (Ctrl_0).
+	db 0												; (Ctrl_2). 
 
 ; ---------- ---------- ---------- ---------- ----------	
 
-Caja_2 db 0,0,0										; (Tipo) / (Filas) / (Columns).
-	defw 0											; (Posicion_actual).
-	defw 0 											; (Puntero_objeto).
-	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
-
-	db %00000000 									; (Attr).
-
-	defw 0											; (Indice_Sprite_der).
-	defw 0											; (Indice_Sprite_izq).
-	defw 0											; (Puntero_DESPLZ_der).
-	defw 0											; (Puntero_DESPLZ_izq).
-
-	defw 0											; (Posicion_inicio).
-	db 0											; (Cuad_objeto).
-
-	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-
-	db 0											; Impacto. "1" existe impacto en la entidad.
-
-	ds 6											; Variables_de_borrado 
-
-	db 0,0											; Variables_de_pintado 
-	defw 0											;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
-
-	defw 0 											; Puntero_de_impresion.
-
-	defw 0											; Puntero_de_almacen_de_mov_masticados
-	defw 0 											; Contador_de_mov_masticados
-
-	db 0											; (Ctrl_0).
-
-	db 0 											; (Columnas).									
-	defw 0											; (Limite_horizontal).
-	db 0,0,0										; (Limite_vertical), (Ctrl_2), (Frames_explosion).
+Caja_2 db 0,0											; (Coordenada_X) / (Coordenada_Y).
+	db %00000000										; (Attr).
+	db 0												; (Cuad_objeto).
+	db 0												; (Impacto).
+	ds 6												; (Variables_de_borrado).
+	defw 0												; (Puntero_de_impresion).
+	defw 0												; (Puntero_de_almacen_de_mov_masticados).
+	defw 0 												; (Contador_de_mov_masticados).
+	db 0												; (Ctrl_0).
+	db 0												; (Ctrl_2). 
 
 ; ---------- ---------- ---------- ---------- ----------	
 
-Caja_3 db 0,0,0										; (Tipo) / (Filas) / (Columns).
-	defw 0											; (Posicion_actual).
-	defw 0 											; (Puntero_objeto).
-	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
-
-	db %00000000 									; (Attr).
-
-	defw 0											; (Indice_Sprite_der).
-	defw 0											; (Indice_Sprite_izq).
-	defw 0											; (Puntero_DESPLZ_der).
-	defw 0											; (Puntero_DESPLZ_izq).
-
-	defw 0											; (Posicion_inicio).
-	db 0											; (Cuad_objeto).
-
-	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-
-	db 0											; Impacto. "1" existe impacto en la entidad.
-
-	ds 6											; Variables_de_borrado 
-
-	db 0,0											; Variables_de_pintado 
-	defw 0											;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
-
-	defw 0 											; Puntero_de_impresion.
-
-	defw 0											; Puntero_de_almacen_de_mov_masticados
-	defw 0 											; Contador_de_mov_masticados
-
-	db 0											; (Ctrl_0).
-
-	db 0 											; (Columnas).									
-	defw 0											; (Limite_horizontal).
-	db 0,0,0										; (Limite_vertical), (Ctrl_2), (Frames_explosion).
+Caja_3 db 0,0											; (Coordenada_X) / (Coordenada_Y).
+	db %00000000										; (Attr).
+	db 0												; (Cuad_objeto).
+	db 0												; (Impacto).
+	ds 6												; (Variables_de_borrado).
+	defw 0												; (Puntero_de_impresion).
+	defw 0												; (Puntero_de_almacen_de_mov_masticados).
+	defw 0 												; (Contador_de_mov_masticados).
+	db 0												; (Ctrl_0).
+	db 0												; (Ctrl_2). 
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Caja_4 db 0,0,0										; (Tipo) / (Filas) / (Columns).
-	defw 0											; (Posicion_actual).
-	defw 0 											; (Puntero_objeto).
-	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
-
-	db %00000000 									; (Attr).
-
-	defw 0											; (Indice_Sprite_der).
-	defw 0											; (Indice_Sprite_izq).
-	defw 0											; (Puntero_DESPLZ_der).
-	defw 0											; (Puntero_DESPLZ_izq).
-
-	defw 0											; (Posicion_inicio).
-	db 0											; (Cuad_objeto).
-
-	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-
-	db 0											; Impacto. "1" existe impacto en la entidad.
-
-	ds 6											; Variables_de_borrado 
-
-	db 0,0											; Variables_de_pintado 
-	defw 0											;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
-
-	defw 0 											; Puntero_de_impresion.
-
-	defw 0											; Puntero_de_almacen_de_mov_masticados
-	defw 0 											; Contador_de_mov_masticados
-
-	db 0											; (Ctrl_0).
-
-	db 0 											; (Columnas).									
-	defw 0											; (Limite_horizontal).
-	db 0,0,0										; (Limite_vertical), (Ctrl_2), (Frames_explosion).
+Caja_4 db 0,0											; (Coordenada_X) / (Coordenada_Y).
+	db %00000000										; (Attr).
+	db 0												; (Cuad_objeto).
+	db 0												; (Impacto).
+	ds 6												; (Variables_de_borrado).
+	defw 0												; (Puntero_de_impresion).
+	defw 0												; (Puntero_de_almacen_de_mov_masticados).
+	defw 0 												; (Contador_de_mov_masticados).
+	db 0												; (Ctrl_0).
+	db 0												; (Ctrl_2). 
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Caja_5 db 0,0,0										; (Tipo) / (Filas) / (Columns).
-	defw 0											; (Posicion_actual).
-	defw 0 											; (Puntero_objeto).
-	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
-
-	db %00000000 									; (Attr).
-
-	defw 0											; (Indice_Sprite_der).
-	defw 0											; (Indice_Sprite_izq).
-	defw 0											; (Puntero_DESPLZ_der).
-	defw 0											; (Puntero_DESPLZ_izq).
-
-	defw 0											; (Posicion_inicio).
-	db 0											; (Cuad_objeto).
-
-	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-
-	db 0											; Impacto. "1" existe impacto en la entidad.
-
-	ds 6											; Variables_de_borrado 
-
-	db 0,0											; Variables_de_pintado 
-	defw 0											;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
-
-	defw 0 											; Puntero_de_impresion.
-
-	defw 0											; Puntero_de_almacen_de_mov_masticados
-	defw 0 											; Contador_de_mov_masticados
-
-	db 0											; (Ctrl_0).
-
-	db 0 											; (Columnas).									
-	defw 0											; (Limite_horizontal).
-	db 0,0,0										; (Limite_vertical), (Ctrl_2), (Frames_explosion).
+Caja_5 db 0,0											; (Coordenada_X) / (Coordenada_Y).
+	db %00000000										; (Attr).
+	db 0												; (Cuad_objeto).
+	db 0												; (Impacto).
+	ds 6												; (Variables_de_borrado).
+	defw 0												; (Puntero_de_impresion).
+	defw 0												; (Puntero_de_almacen_de_mov_masticados).
+	defw 0 												; (Contador_de_mov_masticados).
+	db 0												; (Ctrl_0).
+	db 0												; (Ctrl_2). 
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Caja_6 db 0,0,0										; (Tipo) / (Filas) / (Columns).
-	defw 0											; (Posicion_actual).
-	defw 0 											; (Puntero_objeto).
-	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
-
-	db %00000000 									; (Attr).
-
-	defw 0											; (Indice_Sprite_der).
-	defw 0											; (Indice_Sprite_izq).
-	defw 0											; (Puntero_DESPLZ_der).
-	defw 0											; (Puntero_DESPLZ_izq).
-
-	defw 0											; (Posicion_inicio).
-	db 0											; (Cuad_objeto).
-
-	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-
-	db 0											; Impacto. "1" existe impacto en la entidad.
-
-	ds 6											; Variables_de_borrado 
-
-	db 0,0											; Variables_de_pintado 
-	defw 0											;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
-
-	defw 0 											; Puntero_de_impresion.
-
-	defw 0											; Puntero_de_almacen_de_mov_masticados
-	defw 0 											; Contador_de_mov_masticados
-
-	db 0											; (Ctrl_0).
-
-	db 0 											; (Columnas).									
-	defw 0											; (Limite_horizontal).
-	db 0,0,0										; (Limite_vertical), (Ctrl_2), (Frames_explosion).
+Caja_6 db 0,0											; (Coordenada_X) / (Coordenada_Y).
+	db %00000000										; (Attr).
+	db 0												; (Cuad_objeto).
+	db 0												; (Impacto).
+	ds 6												; (Variables_de_borrado).
+	defw 0												; (Puntero_de_impresion).
+	defw 0												; (Puntero_de_almacen_de_mov_masticados).
+	defw 0 												; (Contador_de_mov_masticados).
+	db 0												; (Ctrl_0).
+	db 0												; (Ctrl_2). 
 
 ; ---------- ---------- ---------- ---------- ----------	
 
-Caja_7 db 0,0,0										; (Tipo) / (Filas) / (Columns).
-	defw 0											; (Posicion_actual).
-	defw 0 											; (Puntero_objeto).
-	db 0,0,0										; (Coordenada_X) / (Coordenada_Y) / (CTRL_DESPLZ).
-
-	db %00000000 									; (Attr).
-
-	defw 0											; (Indice_Sprite_der).
-	defw 0											; (Indice_Sprite_izq).
-	defw 0											; (Puntero_DESPLZ_der).
-	defw 0											; (Puntero_DESPLZ_izq).
-
-	defw 0											; (Posicion_inicio).
-	db 0											; (Cuad_objeto).
-
-	db 0,0,0,0										; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
-
-	db 0											; Impacto. "1" existe impacto en la entidad.
-
-	ds 6											; Variables_de_borrado 
-
-	db 0,0											; Variables_de_pintado 
-	defw 0											;	" " " " " " "
-	defw 0											;	" " " " " " "
-	db 0,0,0,0										;	" " " " " " "
-
-	defw 0 											; Puntero_de_impresion.
-
-	defw 0											; Puntero_de_almacen_de_mov_masticados
-	defw 0 											; Contador_de_mov_masticados
-		
-	db 0											; (Ctrl_0).
-
-	db 0 											; (Columnas).									
-	defw 0											; (Limite_horizontal).
-	db 0,0,0										; (Limite_vertical), (Ctrl_2), (Frames_explosion).
+Caja_7 db 0,0											; (Coordenada_X) / (Coordenada_Y).
+	db %00000000										; (Attr).
+	db 0												; (Cuad_objeto).
+	db 0												; (Impacto).
+	ds 6												; (Variables_de_borrado).
+	defw 0												; (Puntero_de_impresion).
+	defw 0												; (Puntero_de_almacen_de_mov_masticados).
+	defw 0 												; (Contador_de_mov_masticados).
+	db 0												; (Ctrl_0).
+	db 0												; (Ctrl_2). 
 
 ; -------------------------------------------------------------------------------------
 ;
@@ -451,13 +271,15 @@ Indice_de_entidades
 	defw Entidad_1
 	defw Entidad_2
 
+;	DEFINICIONES DE ENTIDADES. (20 Bytes).
+
 ;	BADSAT, (Satélite malvado).	
 
 Entidad_1 db 1,2,2		                     			; (Tipo) / (Filas) / (Columns).
-	db %00000100										; (Attr).
+	db %00000010										; (Attr).
 	defw Indice_Badsat_der								; (Indice_Sprite_der).
 	defw Indice_Badsat_izq								; (Indice_Sprite_izq).
-	defw $4003	                             	    	; (Posicion_inicio).
+	defw $5040                                      	; (Posicion_inicio).
 	db 1												; (Cuad_objeto).
 	db 1,1,1,1                                      	; (Vel_left) / (Vel_right) / (Vel_up) / (Vel_down).
 	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
