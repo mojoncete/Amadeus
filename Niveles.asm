@@ -74,22 +74,24 @@ Prepara_cajas_de_entidades
 	call Extrae_address   
 	call Avanza_caja_de_entidades								; Situa (Puntero_store_caja) en el 1er .db de la caja que vamos a preparar.
 ;																; Situa (Indice_restore_caja) en el siguiente .defw del índice de cajas de entidades.
-
 	call Inicializa_Numero_parcial_de_entidades					; Actualiza (Numero_de_entidades) y (Numero_parcial_de_entidades).
 
 	ld hl,(Datos_de_nivel)
 
-; Esta inializado este tipo de entidad ???
+;
+	ld a,(hl)
+	dec a
+	jr nz,$														; STOP si no es una entidad de tipo 1.
 
-	jr $
+	ld hl,Ctrl_4
+	bit 0,(hl)
+	jr nz,$														; STOP si ya hemos generado todos los movimientos masticados de una entidad Tipo 1.
+	set 4,(hl)													; FLAG que indica que hemos completado todos los movimientos masticados de una entidad tipo 1.
 
+;	La 1ª entidad del Nivel es una Entidad de tipo 1. 
+;	Vamos a cargar la definición de una entidad de tipo 1 en DRAW para poder generar todos sus movimientos masticados.
 
-
-
-
-
-
-
+	ld hl,(Datos_de_nivel)
 
 ; En este punto:
 ;
@@ -101,11 +103,12 @@ Prepara_cajas_de_entidades
 	ld a,(hl)									; A contiene el TIPO de ENTIDAD que almacenaremos en la caja.
 	call Calcula_salto_en_BC					; Calcula salto para situarnos en los "datos" de la entidad correcta del indice de entidades.
 
-	ld hl,Indice_de_entidades
-	call Situa_en_datos_de_entidad				; Sitúa HL en el 1er .db de la entidad que tenemos que volcar en la caja.
-;												; Actualiza (Datos_de_entidad) con esa dirección.
+	ld hl,Indice_de_definiciones_de_entidades
+	call Situa_en_datos_de_entidad				; Sitúa HL en el 1er .db de la definición de entidad tipo que tenemos que volcar en DRAW.
+;												
+	call Datos_de_entidad_a_DRAW				; Vuelca los datos de la definición en DRAW.
 
-	call Datos_de_entidad_a_DRAW				; Vuelca los datos de la entidad en DRAW.
+	jr $
 
 	ld hl,(Indice_restore_caja)					; AVANZA CAJA.
 	call Extrae_address   
@@ -159,14 +162,14 @@ Avanza_caja_de_entidades ld (Puntero_store_caja),hl
 
 ; ----------------------------------------------------------------------------------------------------------
 ;
-;	11/1/24
+;	18/1/24
 ;
 ;	Vuelca los .db significativos del tipo de entidad a DRAW.
 
 Datos_de_entidad_a_DRAW 	
 
 ; En este punto:
-; HL apunta al 1er .db de DATOS de la entidad que tenemos que volcar en la caja DRAW.
+; HL apunta al 1er .db de DATOS de la definición de la entidad que tenemos que volcar en la caja DRAW.
 
 	ld de,Variables_DRAW	 					; DE apunta al 1er .db de las variables DRAW
 
@@ -182,21 +185,20 @@ Datos_de_entidad_a_DRAW
 	ld bc,4
 	call Situa_DE 								; DE, (destino), situado ahora correctamente: (Posicion_inicio).
 
-	ld bc,7
-	ldir										; Hemos volcado (Posicion_inicio), (Cuad_objeto) y [(Vel_left) / (Vel_right) / (Vel_up) / (Vel_down)].
+	ld bc,3
+	ldir										; Hemos volcado (Posicion_inicio) y (Cuad_objeto).
 ;												; HL, (origen), apunta ahora al .db (Puntero_de_almacen_de_mov_masticados), hay que situar DE.
 
-	ld bc,19
+	ld bc,9
 	call Situa_DE 								; DE, (destino), situado ahora correctamente: (Puntero_de_almacen_de_mov_masticados).
 
 	ld bc,2
 	ldir 										; Hemos volcado (Puntero_de_almacen_de_mov_masticados).
-;												; HL, (origen), apunta ahora al .db (Frames_explosion), hay que situar DE.
 
 	ld bc,8															
 	call Situa_DE 								; DE, (destino), situado ahora correctamente: (Frames_explosion).
 
-	ld a,(hl)
+	ld a,3 										; 3 FRAMES de explosión.!!!!!!!!!!!!!!
 	ld (de),a 									; Vuelco (Frames_explosion).
 
 	ret

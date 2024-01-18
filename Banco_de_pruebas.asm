@@ -140,11 +140,10 @@ Almacen_de_parametros_DRAW equ $70b9 ; ($70b9 - $70fb) ; 66 bytes.
 ; Variables. 
 ; ****************************************************************************************************************************************************************************************** 
 ;
-; 12/01/24
+; 18/01/24
 ;
-; Variables de DRAW. (Motor principal).				
+; Variables de DRAW. (Motor principal).	42 Bytes.	
 ;
-; (Variables_de_borrado) *** (Variables_de_pintado).	8 Bytes.
 
 Variables_DRAW ; -----------------------------------------------------------------------------------------------
 
@@ -186,20 +185,10 @@ Cuad_objeto db 0										; Almacena el cuadrante de pantalla donde se encuentra
 
 ; Variables de objeto. (Características).
 
-Vel_left db 0 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
-Vel_right db 0 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
-Vel_up db 0 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
-Vel_down db 0 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
-
 Impacto db 0											; Si después del movimiento de la entidad, (Impacto) se coloca a "1",_
 ;														; _ existen muchas posibilidades de que esta entidad haya colisionado con Amadeus. 
 ; 														; Hay que comprobar la posible colisión después de mover Amadeus. En este caso, (Impacto2)="3".
 Variables_de_borrado ds 6 							
-												
-;Variables_de_pintado db 0,0 							; Pequeño almacén donde guardaremos, (ANTES DE DESPLAZAR), las variables requeridas por [DRAW]. Filas, Columns, Posicion_actual y CTRL_DESPLZ.
-;	defw 0
-;	defw 0 												; Estas variables se modifican una vez desplazado el objeto. Nuestra intención es: PINTAR1-MOVER-BORRAR1-PINTAR2...
-;	db 0,0,0,0
 
 Puntero_de_impresion defw 0								; Contiene el puntero de impresión, (calculado por DRAW). Esta dirección la utilizará la rutina_
 ;														; _ [Guarda_coordenadas_X] y [Compara_coordenadas_X] para detectar la colisión ENTIDAD-AMADEUS.
@@ -268,13 +257,18 @@ Ctrl_2 db 0
 
 Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
-;! 56 Bytes por entidad.
-
 ; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
+
 ;					         		---------;      ;---------
 
-
 ; Variables de funcionamiento, (No incluidas en base de datos de entidades), a partir de aquí!!!!!
+
+; Perfil de velocidad.
+
+Vel_left db 0 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
+Vel_right db 0 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
+Vel_up db 0 											; Velocidad subida. Nº de píxeles que desplazamos el objeto hacia arriba. (De 1 a 7px).
+Vel_down db 0 											; Velocidad bajada. Nº de píxeles que desplazamos el objeto hacia abajo. (De 1 a 7px).
 
 ; Contadores de 16 bits.
 
@@ -447,7 +441,6 @@ START
 
 	ld a,%00000111
 	call Cls
-
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
 ; INICIALIZACIÓN.
@@ -456,8 +449,6 @@ START
 ;														 ; Situa (Puntero_indice_NIVELES) el el primer defw., (nivel) del índice de niveles.
 ;														 ; Inicializa (Numero_de_entidades) con el nº total de malotes del nivel.
 ;														 ; Inicializa (Datos_de_nivel) con el `tipo´ de la 1ª entidad del nivel. 
-
-	jr $
 
 4 call Prepara_cajas_de_entidades						 
 
@@ -475,10 +466,6 @@ START
 
 1 push bc  												; Guardo el contador de entidades.
 	call Inicia_entidad
-
-
-	jr $
-
 
 	pop bc
 	djnz 1B  											; Decremento el contador de entidades.
@@ -1559,7 +1546,7 @@ Store_Restore_cajas
 	di
 	ld hl,Variables_DRAW
 	ld de,(Puntero_store_caja) 							; Puntero que se desplaza por las distintas entidades.
-	ld bc,56
+	ld bc,42
 	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
 	ei
 
@@ -1591,7 +1578,7 @@ Store_Restore_cajas
 
 	di
 	ld de,Variables_DRAW
-	ld bc,56
+	ld bc,42
 	ldir
 	ei
 
@@ -1618,7 +1605,7 @@ Restore_entidad push hl
 
 	ld hl,(Puntero_store_caja)						; (Puntero_store_caja) apunta a la dbase de la 1ª entidad.
 	ld de,Variables_DRAW 										
-	ld bc,56
+	ld bc,42
 	ldir
 
 	pop bc
@@ -1658,7 +1645,7 @@ Restore_Amadeus	push hl
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
 	ld de,Variables_DRAW
-	ld bc,56
+	ld bc,42
 	ldir
 	pop bc
 	pop de
@@ -1678,7 +1665,7 @@ Restore_Amadeus	push hl
 ;	DESTRUYE: HL y BC y DE.
 
 Store_Amadeus ld hl,Variables_DRAW											; Cargamos en DRAW los parámetros de Amadeus.
-	ld bc,56
+	ld bc,42
 	ldir
 	ret
 
@@ -1691,7 +1678,7 @@ Store_Amadeus ld hl,Variables_DRAW											; Cargamos en DRAW los parámetros 
 ;	Destruye: HL,BC,DE,A
 
 Borra_datos_entidad ld hl,Variables_DRAW
-	ld bc,55
+	ld bc,41
 	xor a
 	ld (hl),a
 	ld de,Variables_DRAW+1
@@ -1907,7 +1894,7 @@ Guarda_parametros_DRAW
 
 	ld hl,Variables_DRAW
 	ld de,Almacen_de_parametros_DRAW
-	ld bc,56
+	ld bc,42
 	ldir
 	ret
 
@@ -1915,7 +1902,7 @@ Recupera_parametros_DRAW
 
 	ld hl,Almacen_de_parametros_DRAW
 	ld de,Variables_DRAW
-	ld bc,56
+	ld bc,42
 	ldir
 	ret
 
