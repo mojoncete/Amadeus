@@ -528,7 +528,6 @@ Incrementa_Puntero_indice_mov
 
     ret
 
-
 ; ---------- --------- --------- ---------- ----------
 ;
 ;   15/01/24
@@ -566,18 +565,11 @@ Inicializa_Puntero_indice_mov_2
     ld (Incrementa_puntero),a
 4 ret
 
-Inicializa_Puntero_indice_mov ld a,(Tipo)
-    call Calcula_salto_en_BC
-    ld hl,Indice_de_mov_segun_tipo_de_entidad
-    and a
-    adc hl,bc
-    call Extrae_address
-    ld (Puntero_indice_mov),hl
-    ret
-
 Situa_en_Contador_general_de_mov_masticados ld a,(Tipo)
     call Calcula_salto_en_BC
     ld hl,Contador_general_de_mov_masticados_Entidad_1
     and a
     adc hl,bc
     ret
+
+ 

@@ -1,12 +1,10 @@
-; 13/05/23
+; 19/1/24
 
 Indice_de_niveles
 
 	defw Nivel_1
 	defw Nivel_2
-	defw Nivel_3
-	defw Nivel_4
-	defw Nivel_5
+
 ;	...
 ;	...
 ;	+ Niveles ...
@@ -14,48 +12,54 @@ Indice_de_niveles
 	defw 0
 	defw 0
 
-Nivel_1 db 1	                                ; Nº de entidades.
+Nivel_1 db 1									; Nº de entidades.
+	db 1,1,1,1	                                ; Velocidades. Vel_left, Vel_right, Vel_up, Vel_downa. (1, 2, 4 u 8 px). 
 	db 1										; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.		
+
 Nivel_2 db 12									; Nº de entidades.
+	db 1,1,1,2									; Velocidades. Vel_left, Vel_right, Vel_up, Vel_downa. (1, 2, 4 u 8 px). 
 	db 2,1,1,1,1,2								; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.			
 	db 2,1,1,1,1,2
-Nivel_3 db 15									; Nº de entidades.	 
-	db 3,1,1,1,1 								; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.			
-	db 3,1,1,1,1 
-	db 3,1,1,1,1 	
-Nivel_4 db 17									; Nº de entidades.
-	db 4,1,1,1,1 								; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.			
-	db 4,1,1,1,1
-	db 4,1,1,1,1
-	db 2,3
-Nivel_5 db 20									; Nº de entidades. 
-	db 5,1,1,1,1 								; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.			
-	db 5,1,1,1,1 
-	db 5,1,1,1,1 								; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.			
-	db 5,1,1,1,1
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;   5/1/24
+;   19/1/24
 ;
-;	Sitúa (Puntero_indice_NIVELES) en el 1er Nivel del índice de niveles.
-;	Carga el nº de entidades del 1er nivel en (Numero_de_entidades). 
-;	Sitúa el puntero (Datos_de_nivel) en el 1er byte que indica el tipo de entidad que se va a cargar_
-;	_en la caja DRAW correspondiente.
+;	Carga el nº de entidades del nivel en (Numero_de_entidades). 
+;	Fija los perfiles de velocidad según el Nivel de dificultad.
+;	Sitúa el puntero (Datos_de_nivel) en la dirección de memoria donde se encuentra el .db que define el (Tipo)_
+;	_ de la 1ª entidad del Nivel.
 ;	
 ;	MODIFICA: HL,DE y A. 
 ;	ACTUALIZA: (Puntero_indice_NIVELES), (Numero_de_entidades) y (Datos_de_nivel).
 
-Inicializa_Punteros_de_nivel 
+Inicializa_Nivel 
 
-	ld hl,Indice_de_niveles
-	ld (Puntero_indice_NIVELES),hl				 ; Situamos (Puntero_indice_NIVELES) en el 1er Nivel del índice.
+	ld hl,(Puntero_indice_NIVELES)
 	call Extrae_address   
 	ld a,(hl)
 	ld (Numero_de_entidades),a					 ; Fijamos el nº de entidades que tiene el nivel.
 	inc hl
-	ld (Datos_de_nivel),hl						 ; (Datos_de_nivel) ahora apunta a la dirección de mem. donde se encuentra el 1er dato que_ 
-	ret 										 ; _ construye el nivel, (tipo de la 1ª entidad).
+	call Fija_velocidades					     ; Perfiles_de_velocidad según Nivel.
+	ld (Datos_de_nivel),hl						 ; (Datos_de_nivel) ahora apunta a la dirección de mem. donde se encuentra el .db que indica__ 
+	call Inicializa_Puntero_indice_mov			 ; Inicializa (Puntero_indice_mov) según el (Tipo) de Entidad. (Coreografía).
+	ret 										 ; _ el (Tipo) de la 1ª entidad del Nivel.
+
+; ----------------------
+
+Fija_velocidades ld de,Perfiles_de_velocidad
+	ld bc,4
+	ldir
+	ret
+
+Inicializa_Puntero_indice_mov ld a,(hl)     	 ; Cargamos A con el (Tipo) de la 1ª entidad del Nivel.       
+    call Calcula_salto_en_BC
+    ld hl,Indice_de_mov_segun_tipo_de_entidad
+    and a
+    adc hl,bc
+    call Extrae_address
+    ld (Puntero_indice_mov),hl
+    ret
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
@@ -63,7 +67,7 @@ Inicializa_Punteros_de_nivel
 ;
 ;	Destruye A,BC,HL,DE
 
-;	Esta rutina se encarga de preparar las CAJAS DE ENTIDADES con un tipo de entidad.
+;	Esta rutina se encarga de preparar las CAJAS DE ENTIDADES.
 ;	El tipo de entidad que vamos a `volcar´ en cada caja viene determinado por el valor de (Datos_de_nivel).
 
 Prepara_cajas_de_entidades
@@ -76,9 +80,9 @@ Prepara_cajas_de_entidades
 ;																; Situa (Indice_restore_caja) en el siguiente .defw del índice de cajas de entidades.
 	call Inicializa_Numero_parcial_de_entidades					; Actualiza (Numero_de_entidades) y (Numero_parcial_de_entidades).
 
-	ld hl,(Datos_de_nivel)
+;	TIPO DE ENTIDAD.
 
-;
+	ld hl,(Datos_de_nivel)
 	ld a,(hl)
 	dec a
 	jr nz,$														; STOP si no es una entidad de tipo 1.
@@ -101,12 +105,12 @@ Prepara_cajas_de_entidades
 1 push bc 										; Guardo el nº de cajas a rellenar.
 
 	ld a,(hl)									; A contiene el TIPO de ENTIDAD que almacenaremos en la caja.
-	call Calcula_salto_en_BC					; Calcula salto para situarnos en los "datos" de la entidad correcta del indice de entidades.
+	call Calcula_salto_en_BC					; Calcula el salto para situarnos en la definición de entidad correcta de indice de [Indice_de_definiciones_de_entidades].
 
 	ld hl,Indice_de_definiciones_de_entidades
-	call Situa_en_datos_de_entidad				; Sitúa HL en el 1er .db de la definición de entidad tipo que tenemos que volcar en DRAW.
+	call Situa_en_datos_de_definicion			; Sitúa HL en el 1er .db de la definición de entidad tipo que tenemos que volcar en DRAW.
 ;												
-	call Datos_de_entidad_a_DRAW				; Vuelca los datos de la definición en DRAW.
+	call Definicion_de_entidad_a_bandeja_DRAW	; Vuelca los datos de la definición en DRAW.
 
 	jr $
 
@@ -140,12 +144,12 @@ Calcula_salto_en_BC sla a
 
 ; ------------------------------------------------------------------
 ;
-;	5/1/24
+;	19/1/24
 ;
-;	Sitúa HL en el 1er .db de la entidad que tenemos que volcar en la caja.
+;	Sitúa HL en el 1er .db de la definición de la entidad que tenemos que volcar en la bandeja DRAW.
 ;	Actualiza (Datos_de_entidad) con esa dirección.
 
-Situa_en_datos_de_entidad and a
+Situa_en_datos_de_definicion and a
 	adc hl,bc
 	call Extrae_address   
     ld (Datos_de_entidad),hl					
@@ -162,14 +166,18 @@ Avanza_caja_de_entidades ld (Puntero_store_caja),hl
 
 ; ----------------------------------------------------------------------------------------------------------
 ;
-;	18/1/24
+;	19/1/24
 ;
-;	Vuelca los .db significativos del tipo de entidad a DRAW.
+;	Introduce una definición de entidad en la bandeja DRAW para generar los "movimientos masticados" de este tipo_
+;	_ de entidad.
+;
+;	INPUTS: HL apunta al 1er .db de datos de la definición de la entidad.
+;			DE apunta al 1er .db de la bandeja DRAW, (Tipo).
+; 
+;	MODIFICA: HL,DE y BC
 
-Datos_de_entidad_a_DRAW 	
 
-; En este punto:
-; HL apunta al 1er .db de DATOS de la definición de la entidad que tenemos que volcar en la caja DRAW.
+Definicion_de_entidad_a_bandeja_DRAW 	
 
 	ld de,Variables_DRAW	 					; DE apunta al 1er .db de las variables DRAW
 
@@ -248,7 +256,7 @@ Inicializa_Numero_parcial_de_entidades
 ;! RESET para pruebas. Omitir esta línea en modo normal.
 ;! REINICIA EL NIVEL !!!!!!!!!!!!!!!!!!!!!!!!!!
 
-	call Inicializa_Punteros_de_nivel					 ; Inicializa. 1er NIVEL. 
+	call Inicializa_Nivel							 ; Inicializa el 1er NIVEL. 
 
 ; ---------- ---------- ----------
 

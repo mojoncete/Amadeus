@@ -263,7 +263,7 @@ Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
 ; Variables de funcionamiento, (No incluidas en base de datos de entidades), a partir de aquí!!!!!
 
-; Perfil de velocidad.
+Perfiles_de_velocidad
 
 Vel_left db 0 											; Velocidad izquierda. Nº de píxeles que desplazamos el objeto a izquierda. 1, 2, 4 u 8 px.
 Vel_right db 0 											; Velocidad derecha. Nº de píxeles que desplazamos el objeto a derecha. 1, 2, 4 u 8 px.
@@ -445,11 +445,15 @@ START
 
 ; INICIALIZACIÓN.
 
-	call Inicializa_Punteros_de_nivel					 ; Prepara el 1er Nivel del juego.
+;	Inicializa 1er Nivel.
+
+	ld hl,Indice_de_niveles
+	ld (Puntero_indice_NIVELES),hl						 ; Situamos (Puntero_indice_NIVELES) en el 1er Nivel del índice.
+	call Inicializa_Nivel								 ; Prepara el 1er Nivel del juego.
 ;														 ; Situa (Puntero_indice_NIVELES) el el primer defw., (nivel) del índice de niveles.
 ;														 ; Inicializa (Numero_de_entidades) con el nº total de malotes del nivel.
 ;														 ; Inicializa (Datos_de_nivel) con el `tipo´ de la 1ª entidad del nivel. 
-
+	
 4 call Prepara_cajas_de_entidades						 
 
 	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en el 1er .db de la 1ª entidad del_
@@ -464,11 +468,11 @@ START
 
 ;	INICIA ENTIDADES !!!!!
 
-1 push bc  												; Guardo el contador de entidades.
-	call Inicia_entidad
+;1 push bc  												; Guardo el contador de entidades.
+;	call Inicia_entidad
 
-	pop bc
-	djnz 1B  											; Decremento el contador de entidades.
+;	pop bc
+;	djnz 1B  											; Decremento el contador de entidades.
 
 ; Si Amadeus ya está iniciado, saltamos a [Inicia_punteros_de_cajas] y [Restore_entidad].
 ; (Esto se dá cuando se inicia una nueva oleada).
@@ -963,22 +967,7 @@ Mov_Amadeus
 ;
 ;	Inicia la entidad y la fija como "Entidad_guía" si aún no hay ninguna. (Fija la primera entidad que iniciamos). 
 
-Inicia_entidad	
-
-; Averiguamos el tipo de entidad.
-
-	ld a,(Tipo)
-	dec a
-	jr z,Entidad_tipo_1
-	jr $
-
-Entidad_tipo_1
-
-	ld hl,Ctrl_4
-	bit 0,(hl)
-	jr nz,$
-
-	set 4,(hl)											; Activa FLAG. Indica que el Almacen_de_mov_masticados de la Entidad_1 está completo.
+;	Inicia_entidad	
 
 ; Inicializa el puntero (Puntero_indice_mov).
 
