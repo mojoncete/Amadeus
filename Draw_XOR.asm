@@ -18,7 +18,8 @@ Draw
 	ld (Posicion_actual),hl							; Indicamos que (Posicion_actual) = (Posicion_inicio) y saltamos a la subrutina [Inicializacion], (donde asignaremos_			
 	call Inicializacion   							; _(Limite_horizontal), (Limite_vertical) y (Cuad_objeto). También asignaremos las coordenadas X e Y. (Posición 0,0)_
 ;													; _la esquina superior izquierda de la pantalla.	
-	call  Inicia_Puntero_mov						; El objeto está inicializado. Antes de salir inicializamos tb el puntero de movimiento de la entidad.
+
+	call Inicia_Puntero_mov							; El objeto está inicializado. Antes de salir inicializamos tb el puntero de movimiento de la entidad.
 
 1 ld a,(Ctrl_0)
 	bit 5,a

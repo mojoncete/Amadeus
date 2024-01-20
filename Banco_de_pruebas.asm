@@ -963,37 +963,7 @@ Mov_Amadeus
 
 ; -----------------------------------------------------------------------------------
 ;
-;	12/12/23
-;
-;	Inicia la entidad y la fija como "Entidad_guía" si aún no hay ninguna. (Fija la primera entidad que iniciamos). 
-
-;	Inicia_entidad	
-
-; Inicializa el puntero (Puntero_indice_mov).
-
-	call Inicializa_Puntero_indice_mov
-
-; Construimos los movimientos masticados de este tipo de entidad.
-
-	call Construye_movimientos_masticados_entidad
-
-; Tenemos todos los movimientos masticados de este tipo de entidad generados y guardados en su correspondiente almacén.
-; (Puntero_de_almacen_de_mov_masticados) de esta entidad está situado al principio del almacen.
-; (Contador_de_mov_masticados) de esta entidad contiene: el nº total de mov. masticados de este tipo de entidad.
-; Lo tenemos todo preparado para cargar los registros con el mov. masticado y hacer la correspondiente foto.
-
-	call Cargamos_registros_con_mov_masticado
-	call Guarda_foto_registros
-
-	di													; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
-;														; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
-;														; La rutina [Guarda_foto_registros] activa las interrupciones antes del RET.
-	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
-	ret
-
-; -----------------------------------------------------------------------------------
-;
-;	10/01/24
+;	20/01/24
 ;
 ;
 
@@ -1004,8 +974,10 @@ Construye_movimientos_masticados_entidad
 
 	call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
 ;															; _ el (Contador_de_mov_masticados).    
-	call Inicia_Puntero_objeto
+	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
+;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
 	call Recompone_posicion_inicio
+
 1 call Draw
 	call Guarda_movimiento_masticado
 	call Movimiento
@@ -1457,10 +1429,10 @@ Extrae_address ld e,(hl)
 
 ; *************************************************************************************************************************************************************
 ;
-;	7/2/23
+;	20/1/24
 ;
 ;	Iniciamos (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq). 
-;	Estos punteros señalan al Sprite a pintar tras cada movimiento.
+;	Sitúa (Puntero_objeto) en el Sprite correspondiente en función de su (Posicion_inicio).
 ;
 ;   Destruye HL y BC !!!!!, 
 ;
@@ -1476,7 +1448,7 @@ Inicia_Puntero_objeto
 	pop af
 	jr z,1F
 	call Inicia_puntero_objeto_der
-	jr 1F
+	ret
 
 ; Arrancamos desde la parte izquierda de la pantalla.
 ; Iniciamos (Indice_Sprite_der).  
@@ -1501,16 +1473,6 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 	ld hl,(Indice_Sprite_der)							; Cuando "Iniciamos el Sprite a izquierda",_					
 	ld (Puntero_DESPLZ_der),hl							; _situamos (Puntero_DESPLZ_der) en el último defw_
 	ret
-
-; Tenemos que activar el bit6 de (Ctrl_0) si el Sprite que hemos cargado es AMADEUS.
-
-1 ld hl,Amadeus
-	ld bc,(Puntero_objeto)
-	sub hl,bc
-	ret nz
-	ld hl,Ctrl_0
-	set 6,(hl) 											; Cuando activamos Amadeus lo indicamos alzando el bit6 de (Ctrl_0). Esta información la utilizaremos para limitar los movimientos_
-	ret 												; _de nuestra nave en los extremos.
 
 ; *************************************************************************************************************************************************************
 ;

@@ -102,17 +102,42 @@ Prepara_cajas_de_entidades
 ; HL está situado en los .db del Nivel que indican el `tipo´ de entidad a volcar en la caja de entidades.
 ; B contiene (Numero_parcial_de_entidades), (nº de cajas que vamos a rellenar).
 
-1 push bc 										; Guardo el nº de cajas a rellenar.
+1 push bc 												; Guardo el nº de cajas a rellenar.
 
-	ld a,(hl)									; A contiene el TIPO de ENTIDAD que almacenaremos en la caja.
-	call Calcula_salto_en_BC					; Calcula el salto para situarnos en la definición de entidad correcta de indice de [Indice_de_definiciones_de_entidades].
+	ld a,(hl)											; A contiene el TIPO de ENTIDAD que almacenaremos en la caja.
+	call Calcula_salto_en_BC							; Calcula el salto para situarnos en la definición de entidad correcta de indice de [Indice_de_definiciones_de_entidades].
 
 	ld hl,Indice_de_definiciones_de_entidades
-	call Situa_en_datos_de_definicion			; Sitúa HL en el 1er .db de la definición de entidad tipo que tenemos que volcar en DRAW.
+	call Situa_en_datos_de_definicion					; Sitúa HL en el 1er .db de la definición de entidad tipo que tenemos que volcar en DRAW.
 ;												
-	call Definicion_de_entidad_a_bandeja_DRAW	; Vuelca los datos de la definición en DRAW.
+	call Definicion_de_entidad_a_bandeja_DRAW			; Vuelca los datos de la definición en DRAW.
+	call Construye_movimientos_masticados_entidad
+
+; Tenemos todos los movimientos masticados de este tipo de entidad generados y guardados en su correspondiente almacén.
+; (Puntero_de_almacen_de_mov_masticados) de esta entidad está situado al principio del almacen.
+; (Contador_de_mov_masticados) de esta entidad contiene: el nº total de mov. masticados de este tipo de entidad.
+; Contador_general_de_mov_masticados de este tipo de entidad actualizado.
+; Lo tenemos todo preparado para cargar los registros con el mov. masticado y hacer la correspondiente foto.
+
+	call Cargamos_registros_con_mov_masticado
+	call Guarda_foto_registros
+	di													; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
+
+;														; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
+;														; La rutina [Guarda_foto_registros] activa las interrupciones antes del RET.
 
 	jr $
+
+	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
+	ret
+
+
+
+
+
+
+
+
 
 	ld hl,(Indice_restore_caja)					; AVANZA CAJA.
 	call Extrae_address   
