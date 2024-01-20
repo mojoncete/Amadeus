@@ -402,7 +402,18 @@ primcuad
 	ld hl,Limite_vertical
 	ld (hl),$12
 	ex af,af
-1 call Genera_coordenadas
+
+1 push bc
+	push hl
+	push de
+
+	ld hl,(Posicion_actual)
+	call Genera_coordenadas
+
+	pop de
+	pop hl
+	pop bc
+
 	ld hl,Ctrl_0
 	set 5,(hl)
 	ret

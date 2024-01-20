@@ -1,6 +1,6 @@
 ; ------------------------------------------------------------------------
 ;
-;	02/04/23
+;	20/1/24
 ;
 ;	Proporciona las coordenadas del objeto a imprimir.
 ;	Fila superior "0", Columna izquierda "0".
@@ -9,13 +9,7 @@
 ;
 ;	Modifica: A,BC y DE.
 
-Genera_coordenadas push bc
-	push hl
-	push de
-
-	ld hl,(Posicion_actual)
-
-	ld a,l
+Genera_coordenadas ld a,l
 	and $1f
 	ld (Coordenada_X),a 								; Coordenada Y del sprite, (0-$1f). Columnas.
 
@@ -39,10 +33,6 @@ Genera_coordenadas push bc
 
 2 ld a,e
 	ld (Coordenada_y),a
-
-	pop de
-	pop hl
-	pop bc
 
 	ret
 

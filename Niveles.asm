@@ -80,7 +80,7 @@ Prepara_cajas_de_entidades
 ;																; Situa (Indice_restore_caja) en el siguiente .defw del índice de cajas de entidades.
 	call Inicializa_Numero_parcial_de_entidades					; Actualiza (Numero_de_entidades) y (Numero_parcial_de_entidades).
 
-;	TIPO DE ENTIDAD.
+Tipo_de_entidad
 
 	ld hl,(Datos_de_nivel)
 	ld a,(hl)
@@ -126,29 +126,26 @@ Prepara_cajas_de_entidades
 ;														; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
 ;														; La rutina [Guarda_foto_registros] activa las interrupciones antes del RET.
 
+; Antes de guardar los parámetros de esta entidad en su correspondiente caja hay que actualizar coordenadas.
+
 	jr $
+
+	ld hl,(Puntero_de_impresion)
+	call Genera_coordenadas
 
 	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
 	ret
 
+;	ld hl,(Indice_restore_caja)					; AVANZA CAJA.
+;	call Extrae_address   
+;	call Avanza_caja_de_entidades
 
+;	ld hl,(Datos_de_nivel)
+;	inc hl
+;	ld (Datos_de_nivel),hl						; SIGUIENTE TIPO DE ENTIDAD.
 
-
-
-
-
-
-
-	ld hl,(Indice_restore_caja)					; AVANZA CAJA.
-	call Extrae_address   
-	call Avanza_caja_de_entidades
-
-	ld hl,(Datos_de_nivel)
-	inc hl
-	ld (Datos_de_nivel),hl						; SIGUIENTE TIPO DE ENTIDAD.
-
-	pop bc
-	djnz 1B
+;	pop bc
+;	djnz 1B
 
 	ret
 
