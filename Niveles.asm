@@ -121,19 +121,26 @@ Tipo_de_entidad
 
 	call Cargamos_registros_con_mov_masticado
 	call Guarda_foto_registros
-	di													; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
+	di	
+
+;														; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
 
 ;														; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
 ;														; La rutina [Guarda_foto_registros] activa las interrupciones antes del RET.
 
-; Antes de guardar los parámetros de esta entidad en su correspondiente caja hay que actualizar coordenadas.
+; Actualizamos (Contador_de_mov_masticados) tras la foto.	
 
 	jr $
+
+; Antes de guardar los parámetros de esta entidad en su correspondiente caja hay que actualizar coordenadas.
 
 	ld hl,(Puntero_de_impresion)
 	call Genera_coordenadas
 
 	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
+
+
+
 	ret
 
 ;	ld hl,(Indice_restore_caja)					; AVANZA CAJA.
@@ -233,12 +240,61 @@ Definicion_de_entidad_a_bandeja_DRAW
 
 	ret
 
-; ---------- -------------- ----------------
+; ----------------------------------------------------------------------------------------------------------
+;
+;	22/01/24
+;
+;	Guarda la definición que ha generado los movimientos masticados de este tipo de entidad en su correspondiente caja.
+;	
+;	Las cajas contienen entidades iniciadas:
+;
+;	Disponen de un (Puntero_de_impresión), (Coordenadas X e Y), ...
+;
+;	OUTPUT: HL apunta al .db (Ctrl_2) de la bandeja DRAW.
+;			DE apunta al 1er .db de la siguiente caja de entidades.
+; 
+;	MODIFICA: HL,DE y BC
+
+Parametros_de_bandeja_DRAW_a_caja ld hl,Variables_DRAW+7	; HL situado en (Coordenada_X) de la bandeja DRAW.
+	ld de,(Puntero_store_caja) 								; DE situado en el 1er .db de la correspondiente caja de entidades.
+	ld bc,2
+	ldir 													; Hemos volcado (Coordenada_X) y (Coordenada_y).
+;															; DE apunta ahora a (Attr) de la caja de entidades. Hemos de recolocar HL.
+	inc hl
+	ld a,(hl)			 									; HL, situado ahora correctamente: (attr).
+	ld (de),a
+	inc de 													; DE apunta a (Impacto), situamos HL.
+
+	ld bc,12
+	call Situa_HL								
+	ld a,(hl)			 									; HL, situado ahora correctamente: (Impacto).
+	ld (de),a
+	inc de 													; (Impacto), volcado a la caja.
+;															; DE situado ahora en (Puntero_de_impresion).
+	ld bc,7
+	call Situa_HL
+	ld bc,7
+	ldir													; Hemos volcado (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados), _
+; 															; _ (Contador_de_mov_masticados) y (Ctrl_0).	
+;															; HL apunta ahora a (Columnas).
+	ld bc,4
+	call Situa_HL
+	ld a,(hl)
+	ld (de),a 												; Volcamos (Ctrl_2).
+	inc de 										
+
+	ret
+
+; -------------------------------------------------------------
 
 Situa_DE ex de,hl
 	and a
 	adc hl,bc
 	ex de,hl								
+	ret
+
+Situa_HL and a
+	adc hl,bc
 	ret
 
 ;---------------------------------------------------------------------------------------------------------------

@@ -995,7 +995,7 @@ Construye_movimientos_masticados_entidad
 
 ; Guardamos el nº total de movimientos masticados de esta entidad en su (Contador_general_de_mov_masticados). 
 
-	call Situa_en_Contador_general_de_mov_masticados
+	call Vuelca_en_Contador_general_de_mov_masticados
 
 ; HL apunta al 1er byte del (Contador_general_de_mov_masticados) de esta entidad.
 ; Guardamos (Contador_de_mov_masticados) en el (Contador_general_de_mov_masticados) de esta entidad.
@@ -1097,7 +1097,7 @@ Guarda_foto_entidad_a_pintar
 	bit 6,a
 	jr z,5F
 
-; Guarda la foto de Amadeus.
+;	Guarda la foto de Amadeus.
 
 	call Draw
 
@@ -1105,9 +1105,9 @@ Guarda_foto_entidad_a_pintar
 
 	call Guarda_foto_registros
 
-;	di
-;	jr $
-;	ei
+	di
+	jr $
+	ei
 
 	ret
 
@@ -1120,7 +1120,8 @@ Guarda_foto_entidad_a_pintar
 	
 ; {Almacen_de_movimientos_masticados_Entidad_1} lleno. Se trata de una "ENTIDAD_FANTASMA".
 
-4 call Prepara_registros_con_mov_masticados	; (Tb Guarda_foto_registros).
+4
+;	call Prepara_registros_con_mov_masticados	; (Tb Guarda_foto_registros).
 	ret
 
 ; Hemos completado el último movimiento del patrón de movimientos ???, se ha aplicado REINICIO ???
@@ -1164,72 +1165,8 @@ Guarda_foto_entidad_a_pintar
 ; Este ha sido el último "movimiento_masticado" que hemos guardado ???
 ; Si es así, hemos de reinicializar el (Puntero_de_mov_masticados) y el (Contador_de_mov_masticados) de la entidad.
 
-	call Convierte_guia_en_fantasma
+;	call Convierte_guia_en_fantasma
 	ret	
-
-; --------------------------------------------------------------------------------------------------------------
-;
-;	28/12/23
-;
-
-Convierte_guia_en_fantasma ld a,(Ctrl_3)
-	bit 3,a
-	ret z												; Salimos aún no hemos generado el último mov_masticado. Aún no puede haber transformación.
-
-;	Convertimos la "Entidad_guía" en "Entidad_fantasma".
-
-	ld hl,Ctrl_2
-	res 5,(hl)											; La entidad deja de ser una entidad guía.
-
-	ret													
-
-; --------------------------------------------------------------------------------------------------------------
-;
-;	21/12/23
-;
-;	Prepara los registros IY, IX e HL con las tres "palabras" que definen un "Movimiento_masticado".
-;
-;		IY contiene (Puntero_objeto).
-;		IX contiene el puntero de impresión.
-;		HL contiene la dirección de la rutina de impresión.
-;
-;	Guarda la foto del "Movimiento_masticado" en el Album_de_fotos.
-;	Actualiza el (Puntero_de_almacen_de_mov_masticados)
-;	Decrementa el (Contador_de_mov_masticados)
-;
-;		Cuando (Contador_de_mov_masticados)="0" se Reinicia el movimiento masticado:
-;			El (Puntero_de_almacen_de_mov_masticados) se sitúa al principio del almacén.
-;			El (Contador_de_mov_masticados) vuelve a adoptar el máximo valor de mov_masticados de su "Entidad_guía".
-
-
-Prepara_registros_con_mov_masticados ld (Stack),sp
-	ld sp,(Puntero_de_almacen_de_mov_masticados)
-
-	pop iy
-	pop ix
-	pop hl														; Se cargan los registros con el movimiento_masticado y se actualiza (Puntero_de_almacen_de_mov_masticados).
-
-	ld (Puntero_de_almacen_de_mov_masticados),sp
-	ld sp,(Stack)
-
-	call Guarda_foto_registros							
-
-	push hl
-
-	ld hl,(Contador_de_mov_masticados)							; Actualizamos counter.
-	inc hl
-	ld (Contador_de_mov_masticados),hl 							
-
-;	Reinicializmos si hemos completado todos los movimientos masticados.
-
-	ld bc,(Contador_general_de_mov_masticados_Entidad_1)
-	and a
-	sbc hl,bc
-	call z,Convierte_guia_en_fantasma
-
-	pop hl
-
-	ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -1446,7 +1383,7 @@ Inicia_Puntero_objeto
 	push af
 	call z,Inicia_puntero_objeto_izq
 	pop af
-	jr z,1F
+	ret z
 	call Inicia_puntero_objeto_der
 	ret
 
@@ -1491,52 +1428,47 @@ Store_Restore_cajas
 ; 	push bc
 
 ;	STORE !!!!!
-;	Guarda la entidad cargada en Draw en su correspondiente DB.
+;	Guarda los parámetros de la bandeja DRAW en la correspondiente caja de entidades..
 
-
-	di
-	ld hl,Variables_DRAW
-	ld de,(Puntero_store_caja) 							; Puntero que se desplaza por las distintas entidades.
-	ld bc,42
-	ldir												; Hemos GUARDADO los parámetros de la 1ª entidad en su base de datos.
-	ei
-
-	jr $
+	call Parametros_de_bandeja_DRAW_a_caja
 
 ; 	Entidad_sospechosa. 20/4/23
 
-	ld a,(Impacto)
-	and a
-	jr z,1F
+;	ld a,(Impacto)
+;	and a
+;	jr z,1F
 
-	ld hl,(Puntero_store_caja) 							; Si la rutina [Compara_coordenadas_X] detecta que hay_
-	ld bc,25                          					; _ una entidad en zona de Amadeus, guardaremos la direccíon_
-	and a 												; _ donde se encuentra su .db (Impacto) para poder ponerlo a_
-	adc hl,bc 											; _ "0" más adelante.
-	ld (Entidad_sospechosa_de_colision),hl
+;	ld hl,(Puntero_store_caja) 							; Si la rutina [Compara_coordenadas_X] detecta que hay_
+;	ld bc,25                          					; _ una entidad en zona de Amadeus, guardaremos la direccíon_
+;	and a 												; _ donde se encuentra su .db (Impacto) para poder ponerlo a_
+;	adc hl,bc 											; _ "0" más adelante.
+;	ld (Entidad_sospechosa_de_colision),hl
 	
 ;	Incrementa el puntero STORE. Guarda los datos de `Entidad´+1 en Draw, (Puntero RESTORE).
 
-1 ld hl,(Puntero_restore_caja)
-	ld a,(hl)
-	and a
-	push af
-	jr z,2F
-
-	di
 	jr $
-	ei
 
-	di
-	ld de,Variables_DRAW
-	ld bc,42
-	ldir
-	ei
+
+;1 ld hl,(Puntero_restore_caja)
+;	ld a,(hl)
+;	and a
+;	push af
+;	jr z,2F
+
+;	di
+;	jr $
+;	ei
+
+;	di
+;	ld de,Variables_DRAW
+;	ld bc,42
+;	ldir
+;	ei
 
 2 call Incrementa_punteros_de_cajas
 
-	pop af
-	jr z,1B
+;	pop af
+;	jr z,1B
 
 ;	pop bc
 ;	pop de

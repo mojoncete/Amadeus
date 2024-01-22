@@ -565,7 +565,7 @@ Inicializa_Puntero_indice_mov_2
     ld (Incrementa_puntero),a
 4 ret
 
-Situa_en_Contador_general_de_mov_masticados ld a,(Tipo)
+Vuelca_en_Contador_general_de_mov_masticados ld a,(Tipo)
     call Calcula_salto_en_BC
     ld hl,Contador_general_de_mov_masticados_Entidad_1
     and a

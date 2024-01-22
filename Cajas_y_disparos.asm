@@ -148,12 +148,14 @@ p.imp.amadeus defw 0 									; Puntero_de_impresion.
 	db 0,0,0											; (Limite_vertical), (Ctrl_2), (Frames_explosion).
 
 ; ---------- ---------- ---------- ---------- ----------
-
-; Cada caja tiene 19 bytes !!!
+;
+;	22/01/24
+;
+; 	Cada caja tiene 12 bytes !!!
 
 Caja_1 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 	db %00000000										; (Attr).
-	db 0												; (Cuad_objeto).
+;	db 0												; (Cuad_objeto).
 	db 0												; (Impacto).
 	defw 0												; (Puntero_de_impresion).
 	defw 0												; (Puntero_de_almacen_de_mov_masticados).
@@ -165,7 +167,7 @@ Caja_1 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 
 Caja_2 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 	db %00000000										; (Attr).
-	db 0												; (Cuad_objeto).
+;	db 0												; (Cuad_objeto).
 	db 0												; (Impacto).
 	defw 0												; (Puntero_de_impresion).
 	defw 0												; (Puntero_de_almacen_de_mov_masticados).
@@ -177,7 +179,7 @@ Caja_2 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 
 Caja_3 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 	db %00000000										; (Attr).
-	db 0												; (Cuad_objeto).
+;	db 0												; (Cuad_objeto).
 	db 0												; (Impacto).
 	defw 0												; (Puntero_de_impresion).
 	defw 0												; (Puntero_de_almacen_de_mov_masticados).
@@ -189,7 +191,7 @@ Caja_3 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 
 Caja_4 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 	db %00000000										; (Attr).
-	db 0												; (Cuad_objeto).
+;	db 0												; (Cuad_objeto).
 	db 0												; (Impacto).
 	defw 0												; (Puntero_de_impresion).
 	defw 0												; (Puntero_de_almacen_de_mov_masticados).
@@ -201,7 +203,7 @@ Caja_4 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 
 Caja_5 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 	db %00000000										; (Attr).
-	db 0												; (Cuad_objeto).
+;	db 0												; (Cuad_objeto).
 	db 0												; (Impacto).
 	defw 0												; (Puntero_de_impresion).
 	defw 0												; (Puntero_de_almacen_de_mov_masticados).
@@ -213,7 +215,7 @@ Caja_5 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 
 Caja_6 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 	db %00000000										; (Attr).
-	db 0												; (Cuad_objeto).
+;	db 0												; (Cuad_objeto).
 	db 0												; (Impacto).
 	defw 0												; (Puntero_de_impresion).
 	defw 0												; (Puntero_de_almacen_de_mov_masticados).
@@ -225,7 +227,7 @@ Caja_6 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 
 Caja_7 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 	db %00000000										; (Attr).
-	db 0												; (Cuad_objeto).
+;	db 0												; (Cuad_objeto).
 	db 0												; (Impacto).
 	defw 0												; (Puntero_de_impresion).
 	defw 0												; (Puntero_de_almacen_de_mov_masticados).
