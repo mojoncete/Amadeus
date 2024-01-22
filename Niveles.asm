@@ -12,9 +12,9 @@ Indice_de_niveles
 	defw 0
 	defw 0
 
-Nivel_1 db 1									; Nº de entidades.
+Nivel_1 db 3									; Nº de entidades.
 	db 1,1,1,1	                                ; Velocidades. Vel_left, Vel_right, Vel_up, Vel_downa. (1, 2, 4 u 8 px). 
-	db 1										; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.		
+	db 1,1,1									; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.		
 
 Nivel_2 db 12									; Nº de entidades.
 	db 1,1,1,2									; Velocidades. Vel_left, Vel_right, Vel_up, Vel_downa. (1, 2, 4 u 8 px). 
@@ -74,43 +74,44 @@ Prepara_cajas_de_entidades
 
 ; Preparamos los punteros de las cajas de entidades:
 
-	ld hl,Indice_de_cajas_de_entidades
-	call Extrae_address   
-	call Avanza_caja_de_entidades								; Situa (Puntero_store_caja) en el 1er .db de la caja que vamos a preparar.
-;																; Situa (Indice_restore_caja) en el siguiente .defw del índice de cajas de entidades.
+	call Inicia_punteros_de_cajas								; Situa (Puntero_store_caja) en el 1er .db de la 1ª caja del índice de entidades.
+;																; Situa (Puntero_restore_caja) en el 1er .db de la 2ª caja del índice de cajas de entidades.
 	call Inicializa_Numero_parcial_de_entidades					; Actualiza (Numero_de_entidades) y (Numero_parcial_de_entidades).
+
+	ld hl,(Datos_de_nivel)										; Tipo de la 1ª entidad del Nivel.
 
 Tipo_de_entidad
 
-	ld hl,(Datos_de_nivel)
 	ld a,(hl)
 	dec a
 	jr nz,$														; STOP si no es una entidad de tipo 1.
 
 	ld hl,Ctrl_4
-	bit 0,(hl)
-	jr nz,$														; STOP si ya hemos generado todos los movimientos masticados de una entidad Tipo 1.
-	set 4,(hl)													; FLAG que indica que hemos completado todos los movimientos masticados de una entidad tipo 1.
+	set 0,(hl)													; FLAG que indica que se trata de una entidad de (Tipo) 1.
 
 ;	La 1ª entidad del Nivel es una Entidad de tipo 1. 
 ;	Vamos a cargar la definición de una entidad de tipo 1 en DRAW para poder generar todos sus movimientos masticados.
 
-	ld hl,(Datos_de_nivel)
+2 ld hl,(Datos_de_nivel)
 
 ; En este punto:
 ;
 ; HL está situado en los .db del Nivel que indican el `tipo´ de entidad a volcar en la caja de entidades.
 ; B contiene (Numero_parcial_de_entidades), (nº de cajas que vamos a rellenar).
 
-1 push bc 												; Guardo el nº de cajas a rellenar.
+1 push bc 														; Guardo el nº de cajas a rellenar.
 
-	ld a,(hl)											; A contiene el TIPO de ENTIDAD que almacenaremos en la caja.
-	call Calcula_salto_en_BC							; Calcula el salto para situarnos en la definición de entidad correcta de indice de [Indice_de_definiciones_de_entidades].
+	ld a,(hl)													; A contiene el TIPO de ENTIDAD que almacenaremos en la caja.
+	call Calcula_salto_en_BC									; Calcula el salto para situarnos en la definición de entidad correcta de indice de [Indice_de_definiciones_de_entidades].
 
 	ld hl,Indice_de_definiciones_de_entidades
-	call Situa_en_datos_de_definicion					; Sitúa HL en el 1er .db de la definición de entidad tipo que tenemos que volcar en DRAW.
+	call Situa_en_datos_de_definicion							; Sitúa HL en el 1er .db de la definición de entidad tipo que tenemos que volcar en DRAW.
 ;												
-	call Definicion_de_entidad_a_bandeja_DRAW			; Vuelca los datos de la definición en DRAW.
+;	Este (Tipo) de entidad ya dispone de movimientos masticados ???
+
+	jr $ ;!!!!!!!!!!!!
+
+	call Definicion_de_entidad_a_bandeja_DRAW					; Vuelca los datos de la definición en DRAW.
 	call Construye_movimientos_masticados_entidad
 
 ; Tenemos todos los movimientos masticados de este tipo de entidad generados y guardados en su correspondiente almacén.
@@ -119,41 +120,68 @@ Tipo_de_entidad
 ; Contador_general_de_mov_masticados de este tipo de entidad actualizado.
 ; Lo tenemos todo preparado para cargar los registros con el mov. masticado y hacer la correspondiente foto.
 
+	call Activa_FLAG_mov_masticados_completos
+
+
 	call Cargamos_registros_con_mov_masticado
 	call Guarda_foto_registros
 	di	
 
-;														; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
+;																; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
 
-;														; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
-;														; La rutina [Guarda_foto_registros] activa las interrupciones antes del RET.
+;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
+;																; La rutina [Guarda_foto_registros] activa las interrupciones antes del RET.
 
 ; Actualizamos (Contador_de_mov_masticados) tras la foto.	
 
-	jr $
+	call Decrementa_Contador_de_mov_masticados
 
 ; Antes de guardar los parámetros de esta entidad en su correspondiente caja hay que actualizar coordenadas.
 
 	ld hl,(Puntero_de_impresion)
 	call Genera_coordenadas
 
-	call Store_Restore_cajas	 					    ; Guardo los parámetros de la 1ª entidad y sitúa (Puntero_store_caja) en la siguiente.
+	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
+	call Incrementa_punteros_de_cajas							; Nos situamos en la siguiente caja de entidades.
 
+	ld hl,(Datos_de_nivel)										; Nos situamos en el .db que define el (Tipo) de la siguiente_
+	inc hl 														; _ entidad del Nivel.
 
+	pop bc 														; Recuperamos (Numero_parcial_de_entidades), (nº de cajas que vamos a rellenar)
+	djnz Tipo_de_entidad
 
 	ret
+; ---------------------------------------------------------------------
+;
+;	22/01/24
 
-;	ld hl,(Indice_restore_caja)					; AVANZA CAJA.
-;	call Extrae_address   
-;	call Avanza_caja_de_entidades
+Decrementa_Contador_de_mov_masticados ld hl,(Contador_de_mov_masticados)
+	dec hl
+	ld (Contador_de_mov_masticados),hl
+	ret
 
-;	ld hl,(Datos_de_nivel)
-;	inc hl
-;	ld (Datos_de_nivel),hl						; SIGUIENTE TIPO DE ENTIDAD.
+; ---------------------------------------------------------------------
+;
+;	22/01/24
 
-;	pop bc
-;	djnz 1B
+Activa_FLAG_mov_masticados_completos ld hl,Ctrl_4
+	bit 0,(hl)
+	jr nz,1F
+	bit 1,(hl)
+	jr nz,2F
+	bit 2,(hl)
+	jr nz,3F
+	bit 3,(hl)
+	jr nz,4F
+	ret
 
+1 set 4,(hl)
+	ret
+2 set 5,(hl)
+	ret
+3 set 6,(hl)
+	ret
+4 set 7,(hl)
 	ret
 
 ;	------------------------------------------------------------------------------------
@@ -186,12 +214,12 @@ Situa_en_datos_de_definicion and a
 
 ; ------------------------------------------------------------------
 
-Avanza_caja_de_entidades ld (Puntero_store_caja),hl
-	inc de
-	inc de	
-	ex de,hl
-	ld (Indice_restore_caja),hl 				; Indice_de_cajas_de_entidades +2.
-	ret
+; Avanza_caja_de_entidades ld (Puntero_store_caja),hl
+; 	inc de
+; 	inc de	
+; 	ex de,hl
+; 	ld (Indice_restore_caja),hl 				; Indice_de_cajas_de_entidades +2.
+; 	ret
 
 ; ----------------------------------------------------------------------------------------------------------
 ;

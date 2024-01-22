@@ -456,8 +456,8 @@ START
 	
 4 call Prepara_cajas_de_entidades						 
 
-	call Inicia_punteros_de_cajas 						 ; Sitúa (Puntero_store_caja) en el 1er .db de la 1ª entidad del_
-;														 ; _ índice y (Puntero_restore-entidades) en el 2º .defw del Índice de entidades.
+;	call Inicia_punteros_de_cajas 						 ; Situa (Puntero_store_caja) en el 1er .db de la 1ª caja del índice de entidades. 
+;														 ; Situa (Puntero_restore-caja) en el 1er .db de la 2ª caja del índice de entidades.
 	call Restore_entidad								 ; Vuelca en DRAW la 1ª Caja_de_entidades.
 
 	ld hl,Numero_parcial_de_entidades
@@ -502,7 +502,8 @@ START
 
 ; Una vez inicializadas las entidades y Amadeus, Cargamos la 1ª entidad en DRAW.
 
-5 call Inicia_punteros_de_cajas 
+5 
+;	call Inicia_punteros_de_cajas 
 	call Restore_entidad
 
 	ld a,(Ctrl_1)
@@ -1423,15 +1424,6 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 
 Store_Restore_cajas  
 
-;	push hl 
-;	push de
-; 	push bc
-
-;	STORE !!!!!
-;	Guarda los parámetros de la bandeja DRAW en la correspondiente caja de entidades..
-
-	call Parametros_de_bandeja_DRAW_a_caja
-
 ; 	Entidad_sospechosa. 20/4/23
 
 ;	ld a,(Impacto)
@@ -1446,7 +1438,7 @@ Store_Restore_cajas
 	
 ;	Incrementa el puntero STORE. Guarda los datos de `Entidad´+1 en Draw, (Puntero RESTORE).
 
-	jr $
+;	jr $
 
 
 ;1 ld hl,(Puntero_restore_caja)
@@ -1465,14 +1457,8 @@ Store_Restore_cajas
 ;	ldir
 ;	ei
 
-2 call Incrementa_punteros_de_cajas
+;2 call Incrementa_punteros_de_cajas
 
-;	pop af
-;	jr z,1B
-
-;	pop bc
-;	pop de
-;	pop hl
 
 	ret
 
