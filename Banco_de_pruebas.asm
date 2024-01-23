@@ -374,9 +374,23 @@ Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una únic
 ;															BIT 1, "1" Indica que hemos completado todo el patrón de movimientos de este tipo de entidad.
 ;																_ El almacén de movimientos masticados de este tipo de entidad quedará completo. ([Inicia_entidad]).
 
-Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una única entidad.
+Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una única entidad. Lo utiliza la rutina [Inicia_entidad].
 ;
-;															BIT 0, "1" Indica que el almacén de movimientos de la Entidad_1 está completo.
+;                                                           Los bits (0-3) indican el (Tipo) de entidad que estamos iniciando.
+;
+;                                                          	BIT 0 (Ctrl_4) ..... Entidad de (Tipo)_1.
+;															BIT 1 (Ctrl_4) ..... Entidad de (Tipo)_2.
+;	                                                        BIT 2 (Ctrl_4) ..... Entidad de (Tipo)_3.
+;	                                                        BIT 3 (Ctrl_4) ..... Entidad de (Tipo)_4.
+;
+;															Los bits (4-7) indican que (Tipo) de entidad tiene todos sus movimientos_
+;															_ masticados ya generados.
+;
+;															BIT 4 (Ctrl_4) ..... MOV_MASTICADOS GENERADOS. Entidad de (Tipo)_1.
+;															BIT 5 (Ctrl_4) ..... MOV_MASTICADOS GENERADOS. Entidad de (Tipo)_2.
+;	                                                        BIT 6 (Ctrl_4) ..... MOV_MASTICADOS GENERADOS. Entidad de (Tipo)_3.
+;	                                                        BIT 7 (Ctrl_4) ..... MOV_MASTICADOS GENERADOS. Entidad de (Tipo)_4.
+
 
 ; Gestión de Disparos.
 

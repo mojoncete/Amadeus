@@ -80,19 +80,11 @@ Prepara_cajas_de_entidades
 
 	ld hl,(Datos_de_nivel)										; Tipo de la 1ª entidad del Nivel.
 
-Tipo_de_entidad
+2 ld (Datos_de_nivel),hl 										; Actualizamos. Ahora nos encontramos en la siguiente entidad del Nivel.
 
-	ld a,(hl)
-	dec a
-	jr nz,$														; STOP si no es una entidad de tipo 1.
+	call Activa_FLAG_Tipo_de_entidad							; La rutina identifica el (Tipo) de entidad que vamos a iniciar.					
 
-	ld hl,Ctrl_4
-	set 0,(hl)													; FLAG que indica que se trata de una entidad de (Tipo) 1.
-
-;	La 1ª entidad del Nivel es una Entidad de tipo 1. 
-;	Vamos a cargar la definición de una entidad de tipo 1 en DRAW para poder generar todos sus movimientos masticados.
-
-2 ld hl,(Datos_de_nivel)
+	ld hl,(Datos_de_nivel)
 
 ; En este punto:
 ;
@@ -109,9 +101,19 @@ Tipo_de_entidad
 ;												
 ;	Este (Tipo) de entidad ya dispone de movimientos masticados ???
 
-	jr $ ;!!!!!!!!!!!!
+	push hl
+	call Busca_mov_masticados_segun_tipo
+	pop hl
 
-	call Definicion_de_entidad_a_bandeja_DRAW					; Vuelca los datos de la definición en DRAW.
+	and a
+	jr z,3F													; A="1" Indica que los mov_masticados de este (Tipo) de entidad ya están generados.
+
+; 	Este (Tipo) de entidad DISPONE DE MOV_MASTICADOS.
+
+	jr $
+
+
+3 call Definicion_de_entidad_a_bandeja_DRAW					; Vuelca los datos de la definición en DRAW.
 	call Construye_movimientos_masticados_entidad
 
 ; Tenemos todos los movimientos masticados de este tipo de entidad generados y guardados en su correspondiente almacén.
@@ -120,9 +122,8 @@ Tipo_de_entidad
 ; Contador_general_de_mov_masticados de este tipo de entidad actualizado.
 ; Lo tenemos todo preparado para cargar los registros con el mov. masticado y hacer la correspondiente foto.
 
-	call Activa_FLAG_mov_masticados_completos
-
-
+	call Activa_FLAG_mov_masticados_completos					; Activa el FLAG que indica que este (Tipo) de entidad tiene todos sus_
+;																; _ Mov_masticados ya generados.
 	call Cargamos_registros_con_mov_masticado
 	call Guarda_foto_registros
 	di	
@@ -142,15 +143,30 @@ Tipo_de_entidad
 	call Genera_coordenadas
 
 	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
+
+; Limpiamos la bandeja DRAW.
+
+; xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
 	call Incrementa_punteros_de_cajas							; Nos situamos en la siguiente caja de entidades.
+
+; Inicializa los FLAGS que indican el (Tipo) de entidad que vamos a iniciar, pues pasamos a iniciar la siguiente_
+; _ entidad del Nivel.
+
+	ld a,(Ctrl_4)
+	and $f0
+	ld (Ctrl_4),a 												; Mantenemos FLAGS que indican MOV_MASTICADOS.
+
+; Siguiente entidad del Nivel.
 
 	ld hl,(Datos_de_nivel)										; Nos situamos en el .db que define el (Tipo) de la siguiente_
 	inc hl 														; _ entidad del Nivel.
 
 	pop bc 														; Recuperamos (Numero_parcial_de_entidades), (nº de cajas que vamos a rellenar)
-	djnz Tipo_de_entidad
+	djnz 2B
 
 	ret
+
 ; ---------------------------------------------------------------------
 ;
 ;	22/01/24
@@ -183,6 +199,105 @@ Activa_FLAG_mov_masticados_completos ld hl,Ctrl_4
 	ret
 4 set 7,(hl)
 	ret
+
+; ---------------------------------------------------------------------
+;
+;	23/01/24
+;
+;	Activamos el FLAG correspondiente a cada tipo de entidad.
+;
+;	bit_0 (Ctrl_4) ..... Entidad de (Tipo)_1.
+;	bit_1 (Ctrl_4) ..... Entidad de (Tipo)_2.
+;	bit_2 (Ctrl_4) ..... Entidad de (Tipo)_3.
+;	bit_3 (Ctrl_4) ..... Entidad de (Tipo)_4.
+
+;	INPUTS: HL contiene (Datos_de_nivel), (tipo de entidad que estamos iniciando).
+
+Activa_FLAG_Tipo_de_entidad ld a,(hl)
+	dec a
+	jr nz,1F
+
+; --- Tipo_1
+
+	ld hl,Ctrl_4
+	set 0,(hl)
+	ret
+
+1 dec a
+	jr nz,2F
+
+; --- Tipo_2
+
+	ld hl,Ctrl_4
+	set 1,(hl)
+	ret
+
+2 dec a
+	jr nz,3F
+
+; --- Tipo_3
+
+	ld hl,Ctrl_4
+	set 2,(hl)
+	ret
+
+; --- Tipo_3
+
+3 ld hl,Ctrl_4
+	set 2,(hl)
+	ret
+
+; ---------------------------------------------------------------------
+;
+;	22/01/24
+
+Busca_mov_masticados_segun_tipo ld hl,Ctrl_4
+	bit 0,(hl)
+	jr nz,1F
+
+	bit 1,(hl)
+	jr nz,2F
+
+	bit 2,(hl)
+	jr nz,3F
+
+	bit 3,(hl)
+	jr nz,4F
+	jr 6F
+
+; Entidad_de_Tipo_1.
+
+1 bit 4,(hl)	
+	jr z,6F
+	jr 5F
+
+; Entidad_de_Tipo_2.
+
+2 bit 5,(hl)	
+	jr z,6F
+	jr 5F
+
+; Entidad_de_Tipo_3.
+
+3 bit 6,(hl)	
+	jr z,6F
+	jr 5F
+
+; Entidad_de_Tipo_4.
+
+4 bit 7,(hl)	
+	jr z,6F
+
+; Esta entidad TIENE MOV_MASTICADOS.
+
+5 xor a
+	inc a
+	ret
+
+; Esta entidad NO TIENE MOV_MASTICADOS.
+
+6 xor a
+	ret	
 
 ;	------------------------------------------------------------------------------------
 ;
