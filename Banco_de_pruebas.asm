@@ -145,7 +145,7 @@ Almacen_de_parametros_DRAW equ $70b9 ; ($70b9 - $70fb) ; 66 bytes.
 ; Variables de DRAW. (Motor principal).	42 Bytes.	
 ;
 
-Variables_DRAW ; -----------------------------------------------------------------------------------------------
+Bandeja_DRAW ; -----------------------------------------------------------------------------------------------
 
 Tipo db 0												; Clase de la entidad. Cada `tipo´ de Entidad tiene unas características únicas que lo distinguen de otros tipos: 
 ;															- Patrón de movimiento.
@@ -1010,7 +1010,7 @@ Construye_movimientos_masticados_entidad
 
 ; Guardamos el nº total de movimientos masticados de esta entidad en su (Contador_general_de_mov_masticados). 
 
-	call Vuelca_en_Contador_general_de_mov_masticados
+	call Situa_en_Contador_general_de_mov_masticados
 
 ; HL apunta al 1er byte del (Contador_general_de_mov_masticados) de esta entidad.
 ; Guardamos (Contador_de_mov_masticados) en el (Contador_general_de_mov_masticados) de esta entidad.
@@ -1466,7 +1466,7 @@ Store_Restore_cajas
 ;	ei
 
 ;	di
-;	ld de,Variables_DRAW
+;	ld de,Bandeja_DRAW
 ;	ld bc,42
 ;	ldir
 ;	ei
@@ -1487,7 +1487,7 @@ Restore_entidad push hl
  	push bc
 
 	ld hl,(Puntero_store_caja)						; (Puntero_store_caja) apunta a la dbase de la 1ª entidad.
-	ld de,Variables_DRAW 										
+	ld de,Bandeja_DRAW 										
 	ld bc,42
 	ldir
 
@@ -1527,7 +1527,7 @@ Restore_Amadeus	push hl
 	push de
  	push bc
 	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
-	ld de,Variables_DRAW
+	ld de,Bandeja_DRAW
 	ld bc,42
 	ldir
 	pop bc
@@ -1547,7 +1547,7 @@ Restore_Amadeus	push hl
 ;
 ;	DESTRUYE: HL y BC y DE.
 
-Store_Amadeus ld hl,Variables_DRAW											; Cargamos en DRAW los parámetros de Amadeus.
+Store_Amadeus ld hl,Bandeja_DRAW											; Cargamos en DRAW los parámetros de Amadeus.
 	ld bc,42
 	ldir
 	ret
@@ -1560,11 +1560,11 @@ Store_Amadeus ld hl,Variables_DRAW											; Cargamos en DRAW los parámetros 
 ;
 ;	Destruye: HL,BC,DE,A
 
-Borra_datos_entidad ld hl,Variables_DRAW
+Borra_datos_entidad ld hl,Bandeja_DRAW
 	ld bc,41
 	xor a
 	ld (hl),a
-	ld de,Variables_DRAW+1
+	ld de,Bandeja_DRAW+1
 	ldir
 	ret
 
@@ -1775,7 +1775,7 @@ Actualiza_relojes
 
 Guarda_parametros_DRAW
 
-	ld hl,Variables_DRAW
+	ld hl,Bandeja_DRAW
 	ld de,Almacen_de_parametros_DRAW
 	ld bc,42
 	ldir
@@ -1784,7 +1784,7 @@ Guarda_parametros_DRAW
 Recupera_parametros_DRAW
 
 	ld hl,Almacen_de_parametros_DRAW
-	ld de,Variables_DRAW
+	ld de,Bandeja_DRAW
 	ld bc,42
 	ldir
 	ret

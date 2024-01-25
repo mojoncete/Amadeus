@@ -98,23 +98,37 @@ Prepara_cajas_de_entidades
 
 	ld hl,Indice_de_definiciones_de_entidades
 	call Situa_en_datos_de_definicion							; Sitúa HL en el 1er .db de la definición de entidad tipo que tenemos que volcar en DRAW.
-;												
+
+	call Definicion_de_entidad_a_bandeja_DRAW					; Vuelca los datos de la definición en DRAW.
+
 ;	Este (Tipo) de entidad ya dispone de movimientos masticados ???
 
-	push hl
 	call Busca_mov_masticados_segun_tipo
-	pop hl
 
 	and a
-	jr z,3F													; A="1" Indica que los mov_masticados de este (Tipo) de entidad ya están generados.
+	jr z,3F														; A="1" Indica que los mov_masticados de este (Tipo) de entidad ya están generados.
 
 ; 	Este (Tipo) de entidad DISPONE DE MOV_MASTICADOS.
 
+;	Actualizamos el (Contador_de_mov_masticados) de esta entidad con el (Contador_general_de_mov_masticados)_
+;	_ de este tipo de entidad.
+
+	call Situa_en_Contador_general_de_mov_masticados
+
+	; Guardamos (Contador_de_mov_masticados) en el (Contador_general_de_mov_masticados) de esta entidad.
+
+	; HL apunta al bye bajo del (Contador_general_de_mov_masticados) de esta entidad.
+
+; Guardamos el nº total de movimientos masticados de esta entidad en su (Contador_general_de_mov_masticados). 
+
+	call Situa_en_Contador_general_de_mov_masticados
+
+; HL apunta al 1er byte del (Contador_general_de_mov_masticados) de esta entidad.
+; Cargamos (Contador_de_mov_masticados) con el (Contador_general_de_mov_masticados) de este (Tipo) de entidad.
+
 	jr $
 
-
-3 call Definicion_de_entidad_a_bandeja_DRAW					; Vuelca los datos de la definición en DRAW.
-	call Construye_movimientos_masticados_entidad
+3 call Construye_movimientos_masticados_entidad
 
 ; Tenemos todos los movimientos masticados de este tipo de entidad generados y guardados en su correspondiente almacén.
 ; (Puntero_de_almacen_de_mov_masticados) de esta entidad está situado al principio del almacen.
@@ -124,12 +138,11 @@ Prepara_cajas_de_entidades
 
 	call Activa_FLAG_mov_masticados_completos					; Activa el FLAG que indica que este (Tipo) de entidad tiene todos sus_
 ;																; _ Mov_masticados ya generados.
-	call Cargamos_registros_con_mov_masticado
+4 call Cargamos_registros_con_mov_masticado
+
 	call Guarda_foto_registros
 	di	
-
 ;																; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
-
 ;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
 ;																; La rutina [Guarda_foto_registros] activa las interrupciones antes del RET.
 
@@ -143,8 +156,7 @@ Prepara_cajas_de_entidades
 	call Genera_coordenadas
 
 	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
-
-; Limpiamos la bandeja DRAW.
+	call Limpiamos_bandeja_DRAW
 
 ; xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -164,6 +176,20 @@ Prepara_cajas_de_entidades
 
 	pop bc 														; Recuperamos (Numero_parcial_de_entidades), (nº de cajas que vamos a rellenar)
 	djnz 2B
+
+	ret
+
+; ---------------------------------------------------------------------
+;
+;	25/01/24
+
+Limpiamos_bandeja_DRAW ld hl,Bandeja_DRAW
+	ld b,42
+	xor a
+
+1 ld (hl),a
+	inc hl 
+	djnz 1B
 
 	ret
 
@@ -351,7 +377,7 @@ Situa_en_datos_de_definicion and a
 
 Definicion_de_entidad_a_bandeja_DRAW 	
 
-	ld de,Variables_DRAW	 					; DE apunta al 1er .db de las variables DRAW
+	ld de,Bandeja_DRAW	 						; DE apunta al 1er .db de la bandeja_DRAW
 
 	ld bc,3
 	ldir 										; Hemos volcado (Tipo), (Filas) y (Columns).
@@ -398,7 +424,7 @@ Definicion_de_entidad_a_bandeja_DRAW
 ; 
 ;	MODIFICA: HL,DE y BC
 
-Parametros_de_bandeja_DRAW_a_caja ld hl,Variables_DRAW+7	; HL situado en (Coordenada_X) de la bandeja DRAW.
+Parametros_de_bandeja_DRAW_a_caja ld hl,Bandeja_DRAW+7		; HL situado en (Coordenada_X) de la bandeja DRAW.
 	ld de,(Puntero_store_caja) 								; DE situado en el 1er .db de la correspondiente caja de entidades.
 	ld bc,2
 	ldir 													; Hemos volcado (Coordenada_X) y (Coordenada_y).
