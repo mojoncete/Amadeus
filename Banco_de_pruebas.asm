@@ -35,6 +35,7 @@ FRAME ld (Stack_3),sp
 
 	ld a,2	
 	out ($fe),a												
+
 	call Pinta_entidades									; Borde rojo.
 
 ;	ld a,6	
@@ -114,7 +115,7 @@ FRAME ld (Stack_3),sp
 ; Constantes.
 ;
  
-Sprite_vacio equ $f000
+Sprite_vacio equ $eae0
 Centro_arriba equ $0160 								; Emplearemos estas constantes en la rutina de `recolocación´ del objeto:_
 Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto en las dos primeras constantes_
 Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
@@ -468,25 +469,20 @@ START
 ;														 ; Inicializa (Numero_de_entidades) con el nº total de malotes del nivel.
 ;														 ; Inicializa (Datos_de_nivel) con el `tipo´ de la 1ª entidad del nivel. 
 	
-4 call Prepara_cajas_de_entidades						 
+;	Provisional, (para desarrollo).
 
-;	call Inicia_punteros_de_cajas 						 ; Situa (Puntero_store_caja) en el 1er .db de la 1ª caja del índice de entidades. 
-;														 ; Situa (Puntero_restore-caja) en el 1er .db de la 2ª caja del índice de entidades.
-	call Restore_entidad								 ; Vuelca en DRAW la 1ª Caja_de_entidades.
-
-	ld hl,Numero_parcial_de_entidades
-	ld b,(hl)
+	;-
+;	ld hl,Numero_parcial_de_entidades
+;	ld b,(hl)
 ;	inc b
 ;	dec b
-;	jr z,3F										   		 ; Si no hay entidades, cargamos AMADEUS.
+;	jr z,3F	;-									   		 ; Si no hay entidades, cargamos AMADEUS.
 
-;	INICIA ENTIDADES !!!!!
+4 call Inicia_Entidades						 
 
-;1 push bc  												; Guardo el contador de entidades.
-;	call Inicia_entidad
-
-;	pop bc
-;	djnz 1B  											; Decremento el contador de entidades.
+	call Inicia_punteros_de_cajas						 ; Situa (Puntero_store_caja) en el 1er .db de la 1ª caja del índice de entidades.
+;														 ; Situa (Puntero_restore_caja) en el 1er .db de la 2ª caja del índice de cajas de entidades.
+	call Restore_entidad								 ; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
 
 ; Si Amadeus ya está iniciado, saltamos a [Inicia_punteros_de_cajas] y [Restore_entidad].
 ; (Esto se dá cuando se inicia una nueva oleada).
@@ -516,9 +512,8 @@ START
 
 ; Una vez inicializadas las entidades y Amadeus, Cargamos la 1ª entidad en DRAW.
 
-5 
-;	call Inicia_punteros_de_cajas 
-	call Restore_entidad
+;5 call Inicia_punteros_de_cajas 
+;	call Restore_entidad
 
 	ld a,(Ctrl_1)
 	bit 3,a
@@ -553,6 +548,9 @@ Main
 
 	ld a,1
 	out ($fe),a
+
+	di
+	jr $
 
 	ld a,(Clock_Entidades_en_curso)	
 	ld b,a
@@ -1478,22 +1476,43 @@ Store_Restore_cajas
 
 ; **************************************************************************************************
 ;
-;	21/12/23
+;	26/01/24
 ;
-;	Cargamos los datos de la entidad señalada por el puntero (Puntero_store_caja).
+;	Cargamos los datos de la caja de entidades señalada por el puntero (Puntero_store_caja) a la BANDEJA_DRAW.
 
-Restore_entidad push hl 
-	push de
- 	push bc
+Restore_entidad 
+
 
 	ld hl,(Puntero_store_caja)						; (Puntero_store_caja) apunta a la dbase de la 1ª entidad.
-	ld de,Bandeja_DRAW 										
-	ld bc,42
-	ldir
+	ld de,Bandeja_DRAW+7							; Nos situamos en (Coordenada_X) de la bandeja DRAW. 										
+	ld bc,2
+	ldir 											; Hemos transferido (Coordenada_X) y (Coordenada_Y) a la bandeja.
 
-	pop bc
-	pop de
-	pop hl
+	inc de
+	ld a,(hl)
+	ld (de),a 										; Transferimos (Attr).
+	inc hl
+
+	ld bc,12
+	call Situa_DE
+
+	ld a,(hl)
+	ld (de),a 										; Transferimos (Impacto).					
+	inc hl
+
+	ld bc,7
+	call Situa_DE
+
+	ld bc,7
+	ldir 											; Transferimos (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados),_
+; 													; _ (Contador_de_mov_masticados) y (Ctrl_0).	
+
+	ld bc,4
+	call Situa_DE	
+
+	ld a,(hl)
+	ld (de),a 										; Transferimos (Ctrl_2).
+
 	ret
 
 ; **************************************************************************************************

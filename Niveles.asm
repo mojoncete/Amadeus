@@ -12,9 +12,9 @@ Indice_de_niveles
 	defw 0
 	defw 0
 
-Nivel_1 db 3									; Nº de entidades.
+Nivel_1 db 1									; Nº de entidades.
 	db 1,1,1,1	                                ; Velocidades. Vel_left, Vel_right, Vel_up, Vel_downa. (1, 2, 4 u 8 px). 
-	db 1,1,1									; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.		
+	db 1										; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.		
 
 Nivel_2 db 12									; Nº de entidades.
 	db 1,1,1,2									; Velocidades. Vel_left, Vel_right, Vel_up, Vel_downa. (1, 2, 4 u 8 px). 
@@ -70,7 +70,7 @@ Inicializa_Puntero_indice_mov ld a,(hl)     	 ; Cargamos A con el (Tipo) de la 1
 ;	Esta rutina se encarga de preparar las CAJAS DE ENTIDADES.
 ;	El tipo de entidad que vamos a `volcar´ en cada caja viene determinado por el valor de (Datos_de_nivel).
 
-Prepara_cajas_de_entidades
+Inicia_Entidades
 
 ; Preparamos los punteros de las cajas de entidades:
 
@@ -126,7 +126,17 @@ Prepara_cajas_de_entidades
 ; HL apunta al 1er byte del (Contador_general_de_mov_masticados) de esta entidad.
 ; Cargamos (Contador_de_mov_masticados) con el (Contador_general_de_mov_masticados) de este (Tipo) de entidad.
 
-	jr $
+	ld c,(hl)
+	inc hl
+	ld b,(hl) 													; BC contiene los mov_masticados totales de esta entidad.
+
+	ld l,c
+	ld h,b
+
+	ld (Contador_de_mov_masticados),hl
+
+	jr 4F
+
 
 3 call Construye_movimientos_masticados_entidad
 
