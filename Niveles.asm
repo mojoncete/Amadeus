@@ -12,9 +12,9 @@ Indice_de_niveles
 	defw 0
 	defw 0
 
-Nivel_1 db 1									; Nº de entidades.
+Nivel_1 db 3									; Nº de entidades.
 	db 1,1,1,1	                                ; Velocidades. Vel_left, Vel_right, Vel_up, Vel_downa. (1, 2, 4 u 8 px). 
-	db 1										; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.		
+	db 1,1,1									; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.		
 
 Nivel_2 db 12									; Nº de entidades.
 	db 1,1,1,2									; Velocidades. Vel_left, Vel_right, Vel_up, Vel_downa. (1, 2, 4 u 8 px). 
@@ -148,17 +148,7 @@ Inicia_Entidades
 
 	call Activa_FLAG_mov_masticados_completos					; Activa el FLAG que indica que este (Tipo) de entidad tiene todos sus_
 ;																; _ Mov_masticados ya generados.
-4 call Cargamos_registros_con_mov_masticado
-
-	call Guarda_foto_registros
-	di	
-;																; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
-;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
-;																; La rutina [Guarda_foto_registros] activa las interrupciones antes del RET.
-
-; Actualizamos (Contador_de_mov_masticados) tras la foto.	
-
-	call Decrementa_Contador_de_mov_masticados
+4 call Guarda_foto_de_mov_masticado
 
 ; Antes de guardar los parámetros de esta entidad en su correspondiente caja hay que actualizar coordenadas.
 
@@ -166,6 +156,7 @@ Inicia_Entidades
 	call Genera_coordenadas
 
 	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
+
 	call Limpiamos_bandeja_DRAW
 
 ; xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -187,6 +178,21 @@ Inicia_Entidades
 	pop bc 														; Recuperamos (Numero_parcial_de_entidades), (nº de cajas que vamos a rellenar)
 	djnz 2B
 
+	ret
+
+; ---------------------------------------------------------------------
+;
+;	29/01/24
+
+Guarda_foto_de_mov_masticado call Cargamos_registros_con_mov_masticado
+	call Guarda_foto_registros
+	di	
+;																; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
+;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
+;																; La rutina [Guarda_foto_registros] activa las interrupciones antes del RET.
+; Actualizamos (Contador_de_mov_masticados) tras la foto.	
+
+	call Decrementa_Contador_de_mov_masticados
 	ret
 
 ; ---------------------------------------------------------------------
@@ -449,9 +455,11 @@ Parametros_de_bandeja_DRAW_a_caja ld hl,Bandeja_DRAW+7		; HL situado en (Coorden
 	ld a,(hl)			 									; HL, situado ahora correctamente: (Impacto).
 	ld (de),a
 	inc de 													; (Impacto), volcado a la caja.
-;															; DE situado ahora en (Puntero_de_impresion).
-	ld bc,7
-	call Situa_HL
+;															; DE situado ahora en (Variables_de_borrado).
+	inc hl
+	ld bc,6
+	ldir 													; Hemos volcado las (Variables_de_borrado).
+; 															; DE situado ahora en (Puntero_de_impresión).
 	ld bc,7
 	ldir													; Hemos volcado (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados), _
 ; 															; _ (Contador_de_mov_masticados) y (Ctrl_0).	

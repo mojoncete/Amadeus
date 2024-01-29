@@ -546,11 +546,8 @@ Main
 ;														; Si (Numero_de_entidades) > "7", cuando el bloque de 7 cajas esté a "0" se inicializaráa _
 ;														; _un 2º bloque.
 
-	ld a,1
-	out ($fe),a
-
-	di
-	jr $
+;	ld a,1
+;	out ($fe),a
 
 	ld a,(Clock_Entidades_en_curso)	
 	ld b,a
@@ -583,33 +580,36 @@ Main
 
 ; Habilita disparos.
 
-13 ld hl,Disparo_Amadeus
-	ld de,CLOCK_repone_disparo_Amadeus
-	call Habilita_disparos 								; 30 Frames como mínimo entre cada disparo de Amadeus.
+13 
 
-	ld hl,Disparo_entidad 								; El nº de frames mínimo entre disparos de entidad será_
-	ld de,CLOCK_repone_disparo_entidad 					; _ variable y variará en función de la dificultad.
-	call Habilita_disparos 								
+;	ld hl,Disparo_Amadeus
+;	ld de,CLOCK_repone_disparo_Amadeus
+;	call Habilita_disparos 								; 30 Frames como mínimo entre cada disparo de Amadeus.
+
+;	ld hl,Disparo_entidad 								; El nº de frames mínimo entre disparos de entidad será_
+;	ld de,CLOCK_repone_disparo_entidad 					; _ variable y variará en función de la dificultad.
+;	call Habilita_disparos 								
 
 ; COLISIONES.
 
-	call Selector_de_impactos							; Analizamos el contenido de (Impacto2).
+;	call Selector_de_impactos							; Analizamos el contenido de (Impacto2).
 
 ; Bit 0 a "1" Impacto en entidad por disparo. ($01)
 ; Bit 1 a "1" Impacto en Amadeus por disparo. ($02)
 ; Bit 2 a "1" Colisión de Amadeus con entidad, (sin disparo). ($04)
 
-	xor a
-	ld (Impacto2),a										; Flag (Impacto2) a "0".
+;	xor a
+;	ld (Impacto2),a										; Flag (Impacto2) a "0".
 
-	call Inicia_punteros_de_cajas 
-12 call Restore_entidad 								; Vuelca los datos de la entidad, hacia la que apunta (Puntero_store_caja),_
+;	call Inicia_punteros_de_cajas 
+;12 call Restore_entidad 								; Vuelca los datos de la entidad, hacia la que apunta (Puntero_store_caja),_
 ; 														; _ en DRAW.
-	ld a,(Filas)
-	and a
-	jr nz,10F 											; Nos situamos en la 1ª entidad NO VACÍA del índice de ENTIDADES.
-	call Incrementa_punteros_de_cajas
-	jr 12B
+
+;	ld a,(Filas)
+;	and a
+;	jr nz,10F 											; Nos situamos en la 1ª entidad NO VACÍA del índice de ENTIDADES.
+;	call Incrementa_punteros_de_cajas
+;	jr 12B
 
 ; ---------------------------------------------------------------------------------------
 
@@ -741,19 +741,22 @@ Main
 
 7 call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
 
-	ld a,(Ctrl_0)
-	bit 4,a
-	jr z,17F                                       	    ; Si no ha habido movimiento, NO HEMOS BORRADO, NI VAMOS A PINTAR NADA.!!!
+;	ld a,(Ctrl_0)
+;	bit 4,a
+;	jr z,17F                                       	    ; Si no ha habido movimiento, NO HEMOS BORRADO, NI VAMOS A PINTAR NADA.!!!
 
 ; Voy a utilizar una rutina de lectura de teclado para disparar con cualquier entidad.
 ; [[[
 ;	call Detecta_disparo_entidad
 ; ]]]
 
-	call Guarda_foto_entidad_a_pintar					; PINTAMOS !!!!!!!!!!!!!!!!!!
+	call Guarda_foto_de_mov_masticado					; PINTAMOS !!!!!!!!!!!!!!!!!!
 
-	ld hl,Ctrl_0
-    res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
+;	ld hl,Ctrl_0
+;    res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
+
+	di
+	jr $
 
 17 call Store_Restore_cajas
 
@@ -945,9 +948,8 @@ Mov_obj
 ; ---------
 
 1 
-
 ;	call Prepara_var_pintado	 			                	; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´en su {Variables_de_pintado}.      
-	call Repone_datos_de_borrado 							;! BORRAMOS !!!. Guardamos la foto de las {Variables_de_borrado} en Album_de_fotos.
+	call Repone_datos_de_borrado 								; ! BORRAMOS !!!. Guardamos la foto de las {Variables_de_borrado} en Album_de_fotos.
 	call Limpia_Variables_de_borrado
 
 3 ret													
@@ -1112,16 +1114,9 @@ Guarda_foto_entidad_a_pintar
 
 ;	Guarda la foto de Amadeus.
 
-	call Draw
-
-	call Guarda_movimiento_masticado	;! Provisional
-
+;	call Draw
+;	call Guarda_movimiento_masticado	;! Provisional
 	call Guarda_foto_registros
-
-	di
-	jr $
-	ei
-
 	ret
 
 ; ENTIDADES!
@@ -1500,8 +1495,10 @@ Restore_entidad
 	ld (de),a 										; Transferimos (Impacto).					
 	inc hl
 
-	ld bc,7
-	call Situa_DE
+	inc de
+
+	ld bc,6
+	ldir
 
 	ld bc,7
 	ldir 											; Transferimos (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados),_
