@@ -514,15 +514,15 @@ START
 ;5 call Inicia_punteros_de_cajas 
 ;	call Restore_entidad
 
-	ld a,(Ctrl_1)
-	bit 3,a
-	jr z,6F
+;	ld a,(Ctrl_1)
+;	bit 3,a
+;	jr z,6F
 
 ; Se ha producido `RECARGA' de las cajas DRAW, RES 3(HL).
 
-	ld hl,Ctrl_1
-	res 3,(hl)
-	jr Main
+;	ld hl,Ctrl_1
+;	res 3,(hl)
+;	jr Main
 
 ; Entidades y Amadeus iniciados. Esperamos a [FRAME].
 
@@ -617,18 +617,18 @@ Main
 	and a
 	jr nz,11F
 
-	ld hl,Ctrl_1
-	bit 4,(hl)
-	jp nz,16F
+;	ld hl,Ctrl_1;
+;	bit 4,(hl)
+;	jp nz,16F
 
 ;! Cuando hemos destruido a todas las entidades del bloque preparamos una NUEVA OLEADA !!!!!
 
-	ld hl,Ctrl_1
-	set 3,(hl)											; Señal de RECARGA de las cajas DRAW activada. NUEVA OLEADA !!!!!!!!
+;	ld hl,Ctrl_1
+;	set 3,(hl)											; Señal de RECARGA de las cajas DRAW activada. NUEVA OLEADA !!!!!!!!
 
-	ld a,(Contador_de_frames)
-	inc a
-	ld (Activa_recarga_cajas),a
+;	ld a,(Contador_de_frames)
+;	inc a
+;	ld (Activa_recarga_cajas),a
 
 ; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- ----- 
 
@@ -648,89 +648,89 @@ Main
 ; Existe "Entidad_guía" ???.
 ; Si la Entidad_guía ha sido fulminada hemos de reemplazarla.
 
-	ld a,(Ctrl_3)
-	bit 1,a
-	jr nz,22F
+;	ld a,(Ctrl_3)
+;	bit 1,a
+;	jr nz,22F
 
 ; Almacén de "Movimientos_masticados" lleno ???
 ; Una "Entidad_guía" a dejado de serlo ???, (Reinicio??).
 ; En ese caso NO SE ACTIVA UNA NUEVA "ENTIDAD_GUÍA".
 
-	ld a,(Ctrl_3)
-	bit 3,a
-	jr nz,22F
+;;	ld a,(Ctrl_3)
+;;	bit 3,a
+;;	jr nz,22F
 
 ; Activa "Entidad_guía" siempre que no esté ya completo el almacén de productos_masticados.
 
-	ld hl,Ctrl_2
-	set 5,(hl)
-	ld hl,Ctrl_3
-	set 1,(hl)
+;	ld hl,Ctrl_2
+;	set 5,(hl)
+;	ld hl,Ctrl_3
+;	set 1,(hl)
 
 ; Impacto ???
 
-22 ld a,(Impacto)										 
-	and a
-	jr z,8F
+;22 ld a,(Impacto)										 
+;	and a
+;	jr z,8F
 
 ; Hay Impacto en esta entidad.
 
-	ld hl,Clock_explosion								; _ a gestionar la siguiente entidad, JR 6F.
-	dec (hl)
-	jp nz,17F
+;	ld hl,Clock_explosion								; _ a gestionar la siguiente entidad, JR 6F.
+;	dec (hl)
+;	jp nz,17F
 
 ;! Velocidad de la animación de la explosión.
 
-	ld (hl),4 											; Reiniciamos el temporizador de la explosión,_
+;	ld (hl),4 											; Reiniciamos el temporizador de la explosión,_
 ;														; _,(velocidad de la explosión).
 ; !!!!!!!! Explosiónnnnnnnnn 20/9/23
 
-	call Repone_datos_de_borrado
-	call Limpia_Variables_de_borrado					; Guarda los datos de la entidad `impactada´ para borrarla.
+;	call Repone_datos_de_borrado
+;	call Limpia_Variables_de_borrado					; Guarda los datos de la entidad `impactada´ para borrarla.
 
 ;!!!!!! Desintegración/Explosión!!!!!!!!!!!
 
-	ld a,(Ctrl_2)
-	bit 1,a
-	jr nz,7F											; Se han iniciado los punteros de explosión???									
+;	ld a,(Ctrl_2)
+;	bit 1,a
+;	jr nz,7F											; Se han iniciado los punteros de explosión???									
 
 ; Inicialización del proceso de explosión. Omitimos si ya hemos imprimido el 1er FRAME de la explosión.
 
-	ld a,(CTRL_DESPLZ)
-	and a
-	jr nz,18F
+;	ld a,(CTRL_DESPLZ)
+;	and a
+;	jr nz,18F
 
-	ld hl,Indice_Explosion_2x2-2
-	ld (Puntero_DESPLZ_der),hl
-	jr 19F
+;	ld hl,Indice_Explosion_2x2-2
+;	ld (Puntero_DESPLZ_der),hl
+;	jr 19F
 
-18 ld hl,Indice_Explosion_2x3-2
-	ld (Puntero_DESPLZ_der),hl
+;18 ld hl,Indice_Explosion_2x3-2
+;	ld (Puntero_DESPLZ_der),hl
 
-19 ld hl,Ctrl_2											; Activamos el proceso de explosión.
-	set 1,(hl)
-	jr 7F
+;19 ld hl,Ctrl_2											; Activamos el proceso de explosión.
+;	set 1,(hl)
+;	jr 7F
 
 ; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
 ; _con las coordenadas de la entidad almacenada en DRAW.
 
-8 ld a,(Ctrl_1)
-	bit 2,a
-	jr z,7F	
+;8 ld a,(Ctrl_1)
+;	bit 2,a
+;	jr z,7F	
 
-	ld hl,(Coordenadas_disparo_certero)
-	ex de,hl 											; D contiene la coordenada_y del disparo.
+;	ld hl,(Coordenadas_disparo_certero)
+;	ex de,hl 											; D contiene la coordenada_y del disparo.
 ;														; E contiene la coordenada_X del disparo.	
-	ld hl,(Coordenada_X) 								; L COLUMNA (Coordenada_x de la entidad).
+;	ld hl,(Coordenada_X) 								; L COLUMNA (Coordenada_x de la entidad).
 ;														; H FILA, (Coordenada_y de la entidad).	
-	and a
-	sbc hl,de
+;	and a
+;	sbc hl,de
 
-	call Determina_resultado_comparativa
+;	call Determina_resultado_comparativa
 
-	ld a,b
-	and a
-	jr z,7F												; B="0" significa que esta entidad no es la impactada.
+;	ld a,b
+;	and a
+;	jr z,7F												; B="0" significa que esta entidad no es la impactada.
 
 ; ----- ----- -----
 
@@ -760,17 +760,16 @@ Main
 
 	pop bc
 	
-	dec b
-	jp nz,15B
-
-	call Inicia_punteros_de_cajas
+	djnz 15B
+	;
+	call Inicia_punteros_de_cajas 						; Hemos terminado de mover todas las entidades. Nos situamos al principio del índice de entidades.
 
 ;! Activando estas líneas podemos habilitar 2 explosiones en el mismo FRAME.
 ; Hemos gestionado todas las unidades.
 ; Desactivamos el flag de impacto en entidad por disparo de amadeus.
 
-	ld hl,Ctrl_1
-	res 2,(hl)
+;	ld hl,Ctrl_1
+;	res 2,(hl)
 
 16 ld hl,Ctrl_3
 	set 0,(hl)											; Frame completo. 
@@ -783,34 +782,34 @@ Main
 
 ; ----------------------------------------
 
-	ld a,(Ctrl_1) 										; Existe Loop?
-	bit 3,a												; Si este bit es "1". Hay recarga de nueva oleada.
+;	ld a,(Ctrl_1) 										; Existe Loop?
+;	bit 3,a												; Si este bit es "1". Hay recarga de nueva oleada.
 	jp z,Main
 
 ; RECARGA DE NUEVA OLEADA.
 
-	ld a,(Contador_de_frames)
-	ld b,a
-	ld a,(Activa_recarga_cajas)
-	cp b
-	jr z,20F
+;	ld a,(Contador_de_frames)
+;	ld b,a
+;	ld a,(Activa_recarga_cajas)
+;	cp b
+;	jr z,20F
 
-	ld hl,Ctrl_1
-	set 4,(hl)
-	jp Main
+;	ld hl,Ctrl_1
+;	set 4,(hl)
+;	jp Main
 
-20 ld hl,Ctrl_1
-	res 4,(hl)
+;20 ld hl,Ctrl_1
+;	res 4,(hl)
 
-	ld a,(Contador_de_frames)
+;	ld a,(Contador_de_frames)
 
 ;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
 ;! _ IMPREDECIBLE !!!!
 
-	add 10
-	ld (Clock_Entidades_en_curso),a
+;	add 10
+;	ld (Clock_Entidades_en_curso),a
 
-	jp 4B
+;	jp 4B
 
 	ret
 
@@ -818,7 +817,7 @@ Main
 ;
 ;	16/11/23
 
-Gestiona_Amadeus
+;;Gestiona_Amadeus
 
 ;! Activa/desactiva impacto con Amadeus.
 
@@ -826,25 +825,25 @@ Gestiona_Amadeus
 ;	and a
 ;	jr nz,2F
 
-	call Mov_Amadeus
+;;	call Mov_Amadeus
 
-2 ld a,(Ctrl_0)
-	bit 4,a
-	jr z,1F                                            ; Omitimos BORRAR/PINTAR si no hay movimiento.
+;;2 ld a,(Ctrl_0)
+;;	bit 4,a
+;;	jr z,1F                                            ; Omitimos BORRAR/PINTAR si no hay movimiento.
 
-	call Guarda_foto_entidad_a_pintar
-	call Guarda_datos_de_borrado_Amadeus
+;;	call Guarda_foto_entidad_a_pintar
+;;	call Guarda_datos_de_borrado_Amadeus
 
-1 ld hl,Ctrl_0	
-    res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
+;;1 ld hl,Ctrl_0	
+;;    res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
 
-	call Motor_de_disparos								; Borra/mueve/pinta cada uno de los disparos y crea un nuevo album de fotos.
+;;	call Motor_de_disparos								; Borra/mueve/pinta cada uno de los disparos y crea un nuevo album de fotos.
 
 ; Calculamos el nº de malotes y de disparotes para pintarlos nada más comenzar el siguiente FRAME.
 
-	call Calcula_numero_de_disparotes
+;	call Calcula_numero_de_disparotes
 
-	ret
+;;	ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -852,62 +851,61 @@ Gestiona_Amadeus
 
 Mov_obj 
 
-	ld a,(Ctrl_2)
-	bit 1,a
-	jr z,2F											; Se ha iniciado la EXPLOSIÓN???									
+;	ld a,(Ctrl_2)
+;	bit 1,a
+;	jr z,2F											; Se ha iniciado la EXPLOSIÓN???									
 
 ; Explosión:
 
-	ld a,(Frames_explosion)
-	and a
-	jr nz,4F
+;	ld a,(Frames_explosion)
+;	and a
+;	jr nz,4F
 
 ;!  Una alimaña menos!!!!!!!!!1
 
 ; Se trataba de una Entidad_guía ???
 
-	ld a,(Ctrl_2)
-	bit 5,a 										; El bit5 de (Ctrl_2) indica si se trata de una Entidad_guía.
-	jr z,5F
+;	ld a,(Ctrl_2)
+;	bit 5,a 										; El bit5 de (Ctrl_2) indica si se trata de una Entidad_guía.
+;	jr z,5F
 
-	ld hl,Ctrl_3
-	res 1,(hl) 										; FLAG (Existencia de Entidad_guía) a "0".
+;	ld hl,Ctrl_3
+;	res 1,(hl) 										; FLAG (Existencia de Entidad_guía) a "0".
 
 ;!! Cuando se elimina a una entidad_guía tenemos que limpiar el almacen_de_mov_masticados de esta entidad. Así el siguiente movimiento_
 ;!! _generado puede ser distinto, (aletoriedad).
 
-5 call Borra_datos_entidad							; Borramos todos los datos de la entidad.
-	ld hl,Numero_parcial_de_entidades				; Una alimaña menos.
-	dec (hl)
-	ld hl,Entidades_en_curso
-	dec (hl)
-	ld hl,Numero_de_entidades
-	dec (hl)
-	jr 3F
+;5 call Borra_datos_entidad							; Borramos todos los datos de la entidad.
+;	ld hl,Numero_parcial_de_entidades				; Una alimaña menos.
+;	dec (hl)
+;	ld hl,Entidades_en_curso
+;	dec (hl)
+;	ld hl,Numero_de_entidades
+;	dec (hl)
+;	jr 3F
 	
 ; -----
 
 ;	`Movemos´ la explosión.
 
-4 ld hl,(Puntero_DESPLZ_der)
-	inc hl
-	inc hl
-	ld (Puntero_DESPLZ_der),hl
-	call Extrae_address
-	ld (Puntero_objeto),hl
+;4 ld hl,(Puntero_DESPLZ_der)
+;	inc hl
+;	inc hl
+;	call Extrae_address
+;;	ld (Puntero_objeto),hl
 
-	ld hl,Frames_explosion
-	dec (hl)
+;;	ld hl,Frames_explosion
+;;	dec (hl)
 
-	ld hl,Ctrl_0
-	set 4,(hl)
+;;	ld hl,Ctrl_0
+;;	set 4,(hl);;
 
-	jr 3F
+;;	jr 3F
 
 ;	NO HAY EXPLOSIÓN ----- ----- ----- ----- -----
 
-2 xor a
-	ld (Ctrl_0),a 										; El bit4 de (Ctrl_0) puede estar alzado debido al movimiento de Amadeus. Inicializamos.
+;2 xor a
+;	ld (Ctrl_0),a 										; El bit4 de (Ctrl_0) puede estar alzado debido al movimiento de Amadeus. Inicializamos.
 
 ; Movemos Entidades malignas.
 ; Se trata de una "Entidad_guía" ???. Si es así ejecutamos la rutina que construye el patrón de movimiento.
@@ -938,10 +936,10 @@ Mov_obj
 ;	Si la entidad en curso entra en zona de Amadeus, generamos y guardamos las 2 o 3 columnas que ocupa la entidad_ 
 ;	_ y las 2 o 3 columnas que ocupa Amadeus y las comparamos por si hubiera coincidencia. 
 
-	di
-	call Genera_coordenadas_X
-	call Compara_coordenadas_X 
-	ei
+;	di
+;	call Genera_coordenadas_X
+;	call Compara_coordenadas_X 
+;	ei
 
 ;	En el caso de existir coincidencia colocamos a "1" el .db (Impacto) de la entidad en curso y el bit2 del flag (Impacto2).
 
@@ -1010,7 +1008,7 @@ Construye_movimientos_masticados_entidad
 
 ; Guardamos el nº total de movimientos masticados de esta entidad en su (Contador_general_de_mov_masticados). 
 
-	call Situa_en_Contador_general_de_mov_masticados
+	call Situa_en_contador_general_de_mov_masticados
 
 ; HL apunta al 1er byte del (Contador_general_de_mov_masticados) de esta entidad.
 ; Guardamos (Contador_de_mov_masticados) en el (Contador_general_de_mov_masticados) de esta entidad.
@@ -1427,8 +1425,12 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 
 Restore_entidad 
 
+	ld hl,(Puntero_store_caja)						
+	ld de,Bandeja_DRAW
+	ld a,(hl)
+	ld (de),a
+	inc hl 											; (Tipo).
 
-	ld hl,(Puntero_store_caja)						; (Puntero_store_caja) apunta a la dbase de la 1ª entidad.
 	ld de,Bandeja_DRAW+7							; Nos situamos en (Coordenada_X) de la bandeja DRAW. 										
 	ld bc,2
 	ldir 											; Hemos transferido (Coordenada_X) y (Coordenada_Y) a la bandeja.
@@ -1438,8 +1440,7 @@ Restore_entidad
 	ld (de),a 										; Transferimos (Attr).
 	inc hl
 
-	ld bc,12
-	call Situa_DE
+	ld de,Bandeja_DRAW+22
 
 	ld a,(hl)
 	ld (de),a 										; Transferimos (Impacto).					
@@ -1453,9 +1454,7 @@ Restore_entidad
 	ld bc,7
 	ldir 											; Transferimos (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados),_
 ; 													; _ (Contador_de_mov_masticados) y (Ctrl_0).	
-
-	ld bc,4
-	call Situa_DE	
+	ld de,Bandeja_DRAW+40
 
 	ld a,(hl)
 	ld (de),a 										; Transferimos (Ctrl_2).

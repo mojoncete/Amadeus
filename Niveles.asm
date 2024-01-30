@@ -113,30 +113,10 @@ Inicia_Entidades
 ;	Actualizamos el (Contador_de_mov_masticados) de esta entidad con el (Contador_general_de_mov_masticados)_
 ;	_ de este tipo de entidad.
 
-	call Situa_en_Contador_general_de_mov_masticados
-
-	; Guardamos (Contador_de_mov_masticados) en el (Contador_general_de_mov_masticados) de esta entidad.
-
-	; HL apunta al bye bajo del (Contador_general_de_mov_masticados) de esta entidad.
-
-; Guardamos el nº total de movimientos masticados de esta entidad en su (Contador_general_de_mov_masticados). 
-
-	call Situa_en_Contador_general_de_mov_masticados
-
-; HL apunta al 1er byte del (Contador_general_de_mov_masticados) de esta entidad.
-; Cargamos (Contador_de_mov_masticados) con el (Contador_general_de_mov_masticados) de este (Tipo) de entidad.
-
-	ld c,(hl)
-	inc hl
-	ld b,(hl) 													; BC contiene los mov_masticados totales de esta entidad.
-
-	ld l,c
-	ld h,b
-
-	ld (Contador_de_mov_masticados),hl
+	call Situa_en_contador_general_de_mov_masticados 									
+	call Transfiere_datos_de_contadores
 
 	jr 4F
-
 
 3 call Construye_movimientos_masticados_entidad
 
@@ -253,7 +233,16 @@ Limpiamos_bandeja_DRAW ld hl,Bandeja_DRAW
 
 Decrementa_Contador_de_mov_masticados ld hl,(Contador_de_mov_masticados)
 	dec hl
-	ld (Contador_de_mov_masticados),hl
+
+	inc h
+	dec h
+	jr nz,1F
+
+	ld a,l
+	and a
+	jr z,$
+
+1 ld (Contador_de_mov_masticados),hl
 	ret
 
 ; ---------------------------------------------------------------------
@@ -478,8 +467,13 @@ Definicion_de_entidad_a_bandeja_DRAW
 ; 
 ;	MODIFICA: HL,DE y BC
 
-Parametros_de_bandeja_DRAW_a_caja ld hl,Bandeja_DRAW+7		; HL situado en (Coordenada_X) de la bandeja DRAW.
-	ld de,(Puntero_store_caja) 								; DE situado en el 1er .db de la correspondiente caja de entidades.
+Parametros_de_bandeja_DRAW_a_caja ld hl,Bandeja_DRAW
+	ld de,(Puntero_store_caja) 								
+	ld a,(hl)
+	ld (de),a
+	inc de 													; (Tipo).
+
+	ld hl,Bandeja_DRAW+7									; HL situado en (Coordenada_X) de la bandeja DRAW.
 	ld bc,2
 	ldir 													; Hemos volcado (Coordenada_X) y (Coordenada_y).
 ;															; DE apunta ahora a (Attr) de la caja de entidades. Hemos de recolocar HL.
@@ -488,8 +482,7 @@ Parametros_de_bandeja_DRAW_a_caja ld hl,Bandeja_DRAW+7		; HL situado en (Coorden
 	ld (de),a
 	inc de 													; DE apunta a (Impacto), situamos HL.
 
-	ld bc,12
-	call Situa_HL								
+	ld hl,Bandeja_DRAW+22
 	ld a,(hl)			 									; HL, situado ahora correctamente: (Impacto).
 	ld (de),a
 	inc de 													; (Impacto), volcado a la caja.
@@ -502,8 +495,7 @@ Parametros_de_bandeja_DRAW_a_caja ld hl,Bandeja_DRAW+7		; HL situado en (Coorden
 	ldir													; Hemos volcado (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados), _
 ; 															; _ (Contador_de_mov_masticados) y (Ctrl_0).	
 ;															; HL apunta ahora a (Columnas).
-	ld bc,4
-	call Situa_HL
+	ld hl,Bandeja_DRAW+40
 	ld a,(hl)
 	ld (de),a 												; Volcamos (Ctrl_2).
 	inc de 										

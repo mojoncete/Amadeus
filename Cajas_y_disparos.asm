@@ -151,9 +151,9 @@ p.imp.amadeus defw 0 									; Puntero_de_impresion.
 ;
 ;	22/01/24
 ;
-; 	Cada caja tiene 18 bytes !!!
+; 	Cada caja tiene 19 bytes !!!
 
-Caja_1 db 0,0											; (Coordenada_X) / (Coordenada_Y).
+Caja_1 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	db %00000000										; (Attr).
 ;	db 0												; (Cuad_objeto).
 	db 0												; (Impacto).
@@ -166,7 +166,7 @@ Caja_1 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 
 ; ---------- ---------- ---------- ---------- ----------	
 
-Caja_2 db 0,0											; (Coordenada_X) / (Coordenada_Y).
+Caja_2 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	db %00000000										; (Attr).
 ;	db 0												; (Cuad_objeto).
 	db 0												; (Impacto).
@@ -179,7 +179,7 @@ Caja_2 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 
 ; ---------- ---------- ---------- ---------- ----------	
 
-Caja_3 db 0,0											; (Coordenada_X) / (Coordenada_Y).
+Caja_3 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	db %00000000										; (Attr).
 ;	db 0												; (Cuad_objeto).
 	db 0												; (Impacto).
@@ -192,7 +192,7 @@ Caja_3 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Caja_4 db 0,0											; (Coordenada_X) / (Coordenada_Y).
+Caja_4 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	db %00000000										; (Attr).
 ;	db 0												; (Cuad_objeto).
 	db 0												; (Impacto).
@@ -205,7 +205,7 @@ Caja_4 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Caja_5 db 0,0											; (Coordenada_X) / (Coordenada_Y).
+Caja_5 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	db %00000000										; (Attr).
 ;	db 0												; (Cuad_objeto).
 	db 0												; (Impacto).
@@ -218,7 +218,7 @@ Caja_5 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 
 ; ---------- ---------- ---------- ---------- ----------
 
-Caja_6 db 0,0											; (Coordenada_X) / (Coordenada_Y).
+Caja_6 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y)..
 	db %00000000										; (Attr).
 ;	db 0												; (Cuad_objeto).
 	db 0												; (Impacto).
@@ -231,7 +231,7 @@ Caja_6 db 0,0											; (Coordenada_X) / (Coordenada_Y).
 
 ; ---------- ---------- ---------- ---------- ----------	
 
-Caja_7 db 0,0											; (Coordenada_X) / (Coordenada_Y).
+Caja_7 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y)..
 	db %00000000										; (Attr).
 ;	db 0												; (Cuad_objeto).
 	db 0												; (Impacto).

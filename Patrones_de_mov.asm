@@ -567,15 +567,31 @@ Inicializa_Puntero_indice_mov_2
 
 ; ----------------------------------------------------------------------
 ;
-;   25/01/24
+;   30/01/24
 ;
 ;   Sitúa HL en la dirección donde se encuentra el Contador_general_de_mov_masticados de este (Tipo) de entidad.
 
-Situa_en_Contador_general_de_mov_masticados ld a,(Tipo)
+Situa_en_contador_general_de_mov_masticados ld a,(Tipo)
     call Calcula_salto_en_BC
     ld hl,Contador_general_de_mov_masticados_Entidad_1
     and a
     adc hl,bc
+    ret
+
+; ----------------------------------------------------------------------
+;
+;   30/01/24
+;
+;   Transfiere los datos del Contador_general_de_mov_masticados de este (Tipo) de entidad a (Contador_de_mov_masticados).
+;   
+;   INPUT: HL contiene el contador de 16 bits, (Contador_general_de_mov_masticados de este (Tipo) de entidad).
+
+Transfiere_datos_de_contadores ld c,(hl)
+    inc hl
+    ld b,(hl)                                                   ; BC contiene los mov_masticados totales de esta entidad.
+    ld l,c
+    ld h,b
+    ld (Contador_de_mov_masticados),hl
     ret
 
  
