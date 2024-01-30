@@ -1,6 +1,6 @@
 ; ------------------------------------------------------------------------
 ;
-;	22/1/24
+;	30/1/24
 ;
 ;	Proporciona las coordenadas del objeto a imprimir.
 ;	Fila superior "0", Columna izquierda "0".
@@ -13,15 +13,11 @@ Genera_coordenadas ld a,l
 	and $1f
 	ld (Coordenada_X),a 								; Coordenada Y del sprite, (0-$1f). Columnas.
 
-	ld a,$39											; (Coordenada_y) = "0" si estamos por debajo del 1er scanline de pantalla, (ROM).
-	cp h
-	jr nz,4F
+	ld a,h 												; (Coordenada_y) = "0" si estamos por debajo del 1er scanline de pantalla, (ROM).
+	cp $40
+	jr c,4F
 
-	xor a
-	ld (Coordenada_y),a
-	ret
-
-4 call calcula_tercio
+	call calcula_tercio
 	ld b,a 												; "0", "1" o "1" en función del tercio de pantalla.
 
 	ld e,0
@@ -41,7 +37,10 @@ Genera_coordenadas ld a,l
 
 2 ld a,e
 	ld (Coordenada_y),a
+	ret
 
+4 xor a
+	ld (Coordenada_y),a
 	ret
 
 ; ------------------------------------------------------------------------

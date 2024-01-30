@@ -154,14 +154,9 @@ Inicia_Entidades
 
 	ld hl,(Puntero_de_impresion)
 	call Genera_coordenadas
-
 	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
-
 	call Limpiamos_bandeja_DRAW
-
-; xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-	call Incrementa_punteros_de_cajas							; Nos situamos en la siguiente caja de entidades.
+	call Incrementa_punteros_de_cajas
 
 ; Inicializa los FLAGS que indican el (Tipo) de entidad que vamos a iniciar, pues pasamos a iniciar la siguiente_
 ; _ entidad del Nivel.
@@ -179,6 +174,49 @@ Inicia_Entidades
 	djnz 2B
 
 	ret
+
+; ---------------------------------------------------------------------
+;
+;	30/01/24
+
+
+Store_Restore_cajas	
+
+;	Generamos las coordenadas de la entidad que hemos iniciado o desplazado.
+
+	ld hl,(Puntero_de_impresion)
+	call Genera_coordenadas
+	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
+	call Limpiamos_bandeja_DRAW
+
+; 	Entidad_sospechosa. 20/4/23
+
+;	ld a,(Impacto)
+;	and a
+;	jr z,1F
+
+;	ld hl,(Puntero_store_caja) 							; Si la rutina [Compara_coordenadas_X] detecta que hay_
+;	ld bc,25                          					; _ una entidad en zona de Amadeus, guardaremos la direccíon_
+;	and a 												; _ donde se encuentra su .db (Impacto) para poder ponerlo a_
+;	adc hl,bc 											; _ "0" más adelante.
+;	ld (Entidad_sospechosa_de_colision),hl
+
+
+;1 ld hl,(Puntero_restore_caja)
+;	ld a,(hl)
+;	and a
+;	push af
+;	jr z,2F
+
+;	di
+;	ld de,Bandeja_DRAW
+;	ld bc,42
+;	ldir
+;	ei
+
+2 call Incrementa_punteros_de_cajas
+	ret
+
 
 ; ---------------------------------------------------------------------
 ;

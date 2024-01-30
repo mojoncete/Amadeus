@@ -482,7 +482,6 @@ START
 
 	call Inicia_punteros_de_cajas						 ; Situa (Puntero_store_caja) en el 1er .db de la 1ª caja del índice de entidades.
 ;														 ; Situa (Puntero_restore_caja) en el 1er .db de la 2ª caja del índice de cajas de entidades.
-	call Restore_entidad								 ; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
 
 ; Si Amadeus ya está iniciado, saltamos a [Inicia_punteros_de_cajas] y [Restore_entidad].
 ; (Esto se dá cuando se inicia una nueva oleada).
@@ -644,6 +643,8 @@ Main
 
 15 push bc 												; Nº de entidades en curso.
 
+	call Restore_entidad								; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
+
 ; Existe "Entidad_guía" ???.
 ; Si la Entidad_guía ha sido fulminada hemos de reemplazarla.
 
@@ -755,15 +756,14 @@ Main
 ;	ld hl,Ctrl_0
 ;    res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
 
-	di
-	jr $
-
 17 call Store_Restore_cajas
 
 	pop bc
 	
 	dec b
 	jp nz,15B
+
+	call Inicia_punteros_de_cajas
 
 ;! Activando estas líneas podemos habilitar 2 explosiones en el mismo FRAME.
 ; Hemos gestionado todas las unidades.
@@ -1417,56 +1417,6 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 
 	ld hl,(Indice_Sprite_der)							; Cuando "Iniciamos el Sprite a izquierda",_					
 	ld (Puntero_DESPLZ_der),hl							; _situamos (Puntero_DESPLZ_der) en el último defw_
-	ret
-
-; *************************************************************************************************************************************************************
-;
-;	21/12/23
-;
-;	Almacena los datos de la 1ª entidad del Indice_de_entidades, (que tenemos cargado en DRAW), en su respectiva BASE DE DATOS.
-;	Cargamos en DRAW los datos de la 2ª entidad del Indice_de_entidades, (de su BASE DE DATOS).
-
-;	Modifica (Puntero_store_caja)  y (Puntero_restore_caja) con las direcciones donde se encuentran los datos_
-;	_de la 2ª y 3ª entidad respectivamente.
-
-Store_Restore_cajas  
-
-; 	Entidad_sospechosa. 20/4/23
-
-;	ld a,(Impacto)
-;	and a
-;	jr z,1F
-
-;	ld hl,(Puntero_store_caja) 							; Si la rutina [Compara_coordenadas_X] detecta que hay_
-;	ld bc,25                          					; _ una entidad en zona de Amadeus, guardaremos la direccíon_
-;	and a 												; _ donde se encuentra su .db (Impacto) para poder ponerlo a_
-;	adc hl,bc 											; _ "0" más adelante.
-;	ld (Entidad_sospechosa_de_colision),hl
-	
-;	Incrementa el puntero STORE. Guarda los datos de `Entidad´+1 en Draw, (Puntero RESTORE).
-
-;	jr $
-
-
-;1 ld hl,(Puntero_restore_caja)
-;	ld a,(hl)
-;	and a
-;	push af
-;	jr z,2F
-
-;	di
-;	jr $
-;	ei
-
-;	di
-;	ld de,Bandeja_DRAW
-;	ld bc,42
-;	ldir
-;	ei
-
-;2 call Incrementa_punteros_de_cajas
-
-
 	ret
 
 ; **************************************************************************************************
