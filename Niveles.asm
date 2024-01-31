@@ -12,9 +12,9 @@ Indice_de_niveles
 	defw 0
 	defw 0
 
-Nivel_1 db 3									; Nº de entidades.
+Nivel_1 db 7									; Nº de entidades.
 	db 1,1,1,1	                                ; Velocidades. Vel_left, Vel_right, Vel_up, Vel_downa. (1, 2, 4 u 8 px). 
-	db 1,1,1									; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.		
+	db 1,1,1,1,1,1,1							; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.		
 
 Nivel_2 db 12									; Nº de entidades.
 	db 1,1,1,2									; Velocidades. Vel_left, Vel_right, Vel_up, Vel_downa. (1, 2, 4 u 8 px). 
@@ -204,7 +204,6 @@ Store_Restore_cajas
 
 Guarda_foto_de_mov_masticado call Cargamos_registros_con_mov_masticado
 	call Guarda_foto_registros
-	di	
 ;																; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
 ;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
 ;																; La rutina [Guarda_foto_registros] activa las interrupciones antes del RET.
@@ -407,46 +406,36 @@ Situa_en_datos_de_definicion and a
 
 ; ----------------------------------------------------------------------------------------------------------
 ;
-;	19/1/24
+;	31/1/24
 ;
 ;	Introduce una definición de entidad en la bandeja DRAW para generar los "movimientos masticados" de este tipo_
 ;	_ de entidad.
 ;
 ;	INPUTS: HL apunta al 1er .db de datos de la definición de la entidad.
-;			DE apunta al 1er .db de la bandeja DRAW, (Tipo).
+;			
 ; 
 ;	MODIFICA: HL,DE y BC
 
 
 Definicion_de_entidad_a_bandeja_DRAW 	
 
-	ld de,Bandeja_DRAW	 						; DE apunta al 1er .db de la bandeja_DRAW
-
+	ld de,Bandeja_DRAW	 						; DE apunta al 1er .db de la bandeja_DRAW, (Tipo).
 	ld bc,3
 	ldir 										; Hemos volcado (Tipo), (Filas) y (Columns).
 ;												; HL, (origen), apunta ahora al .db (attr.), hay que situar DE.
-	ld bc,7
-	call Situa_DE 								; DE, (destino), situado ahora correctamente: (attr).
-
+	ld de,Attr									; DE en (Attr).
 	ld bc,5
 	ldir										; Hemos volcado (Attr), (Indice_Sprite_der) y (Indice_Sprite_izq).
 ;												; HL, (origen), apunta ahora al .db (Posicion_inicio), hay que situar DE.
-	ld bc,4
-	call Situa_DE 								; DE, (destino), situado ahora correctamente: (Posicion_inicio).
-
+	ld de,Posicion_inicio 
 	ld bc,3
 	ldir										; Hemos volcado (Posicion_inicio) y (Cuad_objeto).
 ;												; HL, (origen), apunta ahora al .db (Puntero_de_almacen_de_mov_masticados), hay que situar DE.
-
-	ld bc,9
-	call Situa_DE 								; DE, (destino), situado ahora correctamente: (Puntero_de_almacen_de_mov_masticados).
-
+	ld de,Puntero_de_almacen_de_mov_masticados
 	ld bc,2
 	ldir 										; Hemos volcado (Puntero_de_almacen_de_mov_masticados).
 
-	ld bc,8															
-	call Situa_DE 								; DE, (destino), situado ahora correctamente: (Frames_explosion).
-
+	ld de,Frames_explosion
 	ld a,3 										; 3 FRAMES de explosión.!!!!!!!!!!!!!!
 	ld (de),a 									; Vuelco (Frames_explosion).
 
@@ -473,7 +462,7 @@ Parametros_de_bandeja_DRAW_a_caja ld hl,Bandeja_DRAW
 	ld (de),a
 	inc de 													; (Tipo).
 
-	ld hl,Bandeja_DRAW+7									; HL situado en (Coordenada_X) de la bandeja DRAW.
+	ld hl,Coordenada_X										; HL situado en (Coordenada_X) de la bandeja DRAW.
 	ld bc,2
 	ldir 													; Hemos volcado (Coordenada_X) y (Coordenada_y).
 ;															; DE apunta ahora a (Attr) de la caja de entidades. Hemos de recolocar HL.
@@ -482,7 +471,7 @@ Parametros_de_bandeja_DRAW_a_caja ld hl,Bandeja_DRAW
 	ld (de),a
 	inc de 													; DE apunta a (Impacto), situamos HL.
 
-	ld hl,Bandeja_DRAW+22
+	ld hl,Impacto
 	ld a,(hl)			 									; HL, situado ahora correctamente: (Impacto).
 	ld (de),a
 	inc de 													; (Impacto), volcado a la caja.
@@ -495,23 +484,11 @@ Parametros_de_bandeja_DRAW_a_caja ld hl,Bandeja_DRAW
 	ldir													; Hemos volcado (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados), _
 ; 															; _ (Contador_de_mov_masticados) y (Ctrl_0).	
 ;															; HL apunta ahora a (Columnas).
-	ld hl,Bandeja_DRAW+40
+	ld hl,Ctrl_2
 	ld a,(hl)
 	ld (de),a 												; Volcamos (Ctrl_2).
 	inc de 										
 
-	ret
-
-; -------------------------------------------------------------
-
-Situa_DE ex de,hl
-	and a
-	adc hl,bc
-	ex de,hl								
-	ret
-
-Situa_HL and a
-	adc hl,bc
 	ret
 
 ;---------------------------------------------------------------------------------------------------------------

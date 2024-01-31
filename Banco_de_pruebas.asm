@@ -465,6 +465,7 @@ START
 	ld hl,Indice_de_niveles
 	ld (Puntero_indice_NIVELES),hl						 ; Situamos (Puntero_indice_NIVELES) en el 1er Nivel del índice.
 	call Inicializa_Nivel								 ; Prepara el 1er Nivel del juego.
+
 ;														 ; Situa (Puntero_indice_NIVELES) el el primer defw., (nivel) del índice de niveles.
 ;														 ; Inicializa (Numero_de_entidades) con el nº total de malotes del nivel.
 ;														 ; Inicializa (Datos_de_nivel) con el `tipo´ de la 1ª entidad del nivel. 
@@ -761,7 +762,7 @@ Main
 	pop bc
 	
 	djnz 15B
-	;
+	
 	call Inicia_punteros_de_cajas 						; Hemos terminado de mover todas las entidades. Nos situamos al principio del índice de entidades.
 
 ;! Activando estas líneas podemos habilitar 2 explosiones en el mismo FRAME.
@@ -777,7 +778,6 @@ Main
 	xor a
 	out ($fe),a
 
-	ei
 	halt 
 
 ; ----------------------------------------
@@ -1419,7 +1419,7 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 
 ; **************************************************************************************************
 ;
-;	26/01/24
+;	31/01/24
 ;
 ;	Cargamos los datos de la caja de entidades señalada por el puntero (Puntero_store_caja) a la BANDEJA_DRAW.
 
@@ -1431,7 +1431,7 @@ Restore_entidad
 	ld (de),a
 	inc hl 											; (Tipo).
 
-	ld de,Bandeja_DRAW+7							; Nos situamos en (Coordenada_X) de la bandeja DRAW. 										
+	ld de,Coordenada_X								; Nos situamos en (Coordenada_X) de la bandeja DRAW. 										
 	ld bc,2
 	ldir 											; Hemos transferido (Coordenada_X) y (Coordenada_Y) a la bandeja.
 
@@ -1440,7 +1440,7 @@ Restore_entidad
 	ld (de),a 										; Transferimos (Attr).
 	inc hl
 
-	ld de,Bandeja_DRAW+22
+	ld de,Impacto
 
 	ld a,(hl)
 	ld (de),a 										; Transferimos (Impacto).					
@@ -1454,7 +1454,7 @@ Restore_entidad
 	ld bc,7
 	ldir 											; Transferimos (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados),_
 ; 													; _ (Contador_de_mov_masticados) y (Ctrl_0).	
-	ld de,Bandeja_DRAW+40
+	ld de,Ctrl_2
 
 	ld a,(hl)
 	ld (de),a 										; Transferimos (Ctrl_2).
@@ -1675,12 +1675,10 @@ Repone_datos_de_borrado_Amadeus
 
 Repone_datos_de_borrado
 
-	di
 	ld de,(Stack_snapshot)
 	ld hl,Variables_de_borrado
 	ld bc,6
 	ldir
-	ei
 
 	ex de,hl
 	ld (Stack_snapshot),hl

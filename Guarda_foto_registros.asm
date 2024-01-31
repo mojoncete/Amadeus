@@ -31,8 +31,6 @@ Guarda_foto_registros
 ;   El proceso de "escritura en los álbumes de fotos" no puede verse interrumpido por la rutina FRAME, (di/ei)_
 ;   _ durante el proceso de escritura.
 
-    di
-
     ld (Stack),sp                                 ; Guardo SP en (Stack).
 
 ; En 1er lugar guardaremos las variables de borrado del siguiente cuadro.
@@ -101,13 +99,10 @@ Guarda_foto_registros
 
     ld (End_Snapshot_Amadeus),hl    
     ld sp,(Stack)
-    ei
     ret
 
 8 ld (Stack_snapshot),hl
 6 ld sp,(Stack)
-
-    ei
 
     ret
 
