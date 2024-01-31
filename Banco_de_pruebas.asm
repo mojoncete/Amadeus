@@ -483,7 +483,6 @@ START
 
 	call Inicia_punteros_de_cajas						 ; Situa (Puntero_store_caja) en el 1er .db de la 1ª caja del índice de entidades.
 ;														 ; Situa (Puntero_restore_caja) en el 1er .db de la 2ª caja del índice de cajas de entidades.
-
 ; Si Amadeus ya está iniciado, saltamos a [Inicia_punteros_de_cajas] y [Restore_entidad].
 ; (Esto se dá cuando se inicia una nueva oleada).
 
@@ -548,6 +547,8 @@ Main
 
 ;	ld a,1
 ;	out ($fe),a
+
+;	jr $
 
 	ld a,(Clock_Entidades_en_curso)	
 	ld b,a
@@ -635,7 +636,7 @@ Main
 
 11 ld a,(Entidades_en_curso)
 	and a
-	jp z,16F											; Si no hay entidades en curso saltamos a [Avanza_puntero_de_album_de_fotos_de_entidades].
+	jr z,16F											; Si no hay entidades en curso saltamos a [Avanza_puntero_de_album_de_fotos_de_entidades].
 	ld b,a												; No hay entidades que gestionar.
 
 ; ( Código que ejecutamos con cada entidad: ).
@@ -735,11 +736,11 @@ Main
 
 ; ----- ----- -----
 
-	ld a,1												; Esta entidad ha sido alcanzada por un disparo_
-	ld (Impacto),a 										; _de Amadeus. Lo indicamos activando su .db (Impacto).
+;	ld a,1												; Esta entidad ha sido alcanzada por un disparo_
+;	ld (Impacto),a 										; _de Amadeus. Lo indicamos activando su .db (Impacto).
 
-	ld hl,Ctrl_1
-	res 2,(hl)
+;	ld hl,Ctrl_1
+;	res 2,(hl)
 
 7 call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
 
@@ -927,9 +928,9 @@ Mov_obj
 ; Ha habido desplazamiento de la entidad maligna.
 ; Ha llegado a zona de AMADEUS ???
 
-7 ld a,(Coordenada_y)
-	cp $14
-	jr c,1F						
+;7 ld a,(Coordenada_y)
+;	cp $14
+;	jr c,1F						
 
 ; --------- 
 
@@ -945,8 +946,7 @@ Mov_obj
 
 ; ---------
 
-1 
-;	call Prepara_var_pintado	 			                	; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´en su {Variables_de_pintado}.      
+;1 call Prepara_var_pintado	 			                		; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´en su {Variables_de_pintado}.      
 	call Repone_datos_de_borrado 								; ! BORRAMOS !!!. Guardamos la foto de las {Variables_de_borrado} en Album_de_fotos.
 	call Limpia_Variables_de_borrado
 
@@ -1004,7 +1004,6 @@ Construye_movimientos_masticados_entidad
 
 	pop hl 													; Recuperamos la dirección inicial de (Puntero_de_almacen_de_mov_masticados).
 	ld (Puntero_de_almacen_de_mov_masticados),hl
-
 
 ; Guardamos el nº total de movimientos masticados de esta entidad en su (Contador_general_de_mov_masticados). 
 
