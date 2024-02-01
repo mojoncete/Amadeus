@@ -17,7 +17,7 @@
 
 ;	INC SP
 
-    org $7116
+    org $80bf
 
 ;   (Stack_snapshot) se sitúa inicialmente en (Album_de_fotos)=$7000.
 ;   Almacenaremos los datos/registros necesarios de la siguiente manera:

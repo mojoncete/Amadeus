@@ -125,15 +125,15 @@ Almacen_de_movimientos_masticados_Entidad_1 equ $eb00	; $eb00 - $ff09 ..... $140
 ;														; 												
 Almacen_de_movimientos_masticados_Amadeus equ $e700		
 
-Album_de_fotos equ $7000	;	(7000h - 7055h).		; En (Album_de_fotos) vamos a ir almacenando los valores_
+Album_de_fotos equ $8000	;	(8000h - 8055h).		; En (Album_de_fotos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y las llamadas a las rutinas de impresión.   
 ;                               				        ; De momento situamos este almacén en $7000. La capacidad del album será de 7 entidades.  
-Album_de_fotos_disparos equ $7056 ; (7056h - 70abh).		; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
+Album_de_fotos_disparos equ $8056 ; (8056h - 80abh).		; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´. 
 
 ;														; 55 Bytes.
-Album_de_fotos_Amadeus equ $70ac ; (70ach - 70b8h) ; 12 bytes.
-Almacen_de_parametros_DRAW equ $70b9 ; ($70b9 - $70fb) ; 66 bytes.
+Album_de_fotos_Amadeus equ $80ac ; (80ach - 80b8h) ; 12 bytes.
+;Almacen_de_parametros_DRAW equ $80b9 ; ($80b9 - $80fb) ; 66 bytes.
 
 ; 54h es el espacio necesario en (Album_de_fotos) para 7 entidades/disparos en pantalla.
 
@@ -1735,21 +1735,21 @@ Actualiza_relojes
 ;
 ;	21/12/23
 
-Guarda_parametros_DRAW
+;Guarda_parametros_DRAW
 
-	ld hl,Bandeja_DRAW
-	ld de,Almacen_de_parametros_DRAW
-	ld bc,42
-	ldir
-	ret
+;	ld hl,Bandeja_DRAW
+;	ld de,Almacen_de_parametros_DRAW
+;	ld bc,42
+;	ldir
+;	ret
 
-Recupera_parametros_DRAW
+;Recupera_parametros_DRAW
 
-	ld hl,Almacen_de_parametros_DRAW
-	ld de,Bandeja_DRAW
-	ld bc,42
-	ldir
-	ret
+;	ld hl,Almacen_de_parametros_DRAW
+;	ld de,Bandeja_DRAW
+;	ld bc,42
+;	ldir
+;	ret
 
 ; ---------------------------------------------------------------
 
