@@ -130,8 +130,8 @@ Album_de_fotos equ $8000	;	(8000h - 8055h).		; En (Album_de_fotos) vamos a ir al
 ;                               				        ; De momento situamos este almacén en $7000. La capacidad del album será de 7 entidades.  
 Album_de_fotos_disparos equ $8056 ; (8056h - 80abh).		; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´. 
-
 ;														; 55 Bytes.
+
 Album_de_fotos_Amadeus equ $80ac ; (80ach - 80b8h) ; 12 bytes.
 ;Almacen_de_parametros_DRAW equ $80b9 ; ($80b9 - $80fb) ; 66 bytes.
 
@@ -547,8 +547,6 @@ Main
 
 ;	ld a,1
 ;	out ($fe),a
-
-;	jr $
 
 	ld a,(Clock_Entidades_en_curso)	
 	ld b,a
@@ -984,7 +982,6 @@ Construye_movimientos_masticados_entidad
 
 	ld hl,(Puntero_de_almacen_de_mov_masticados)			; Guardamos en la pila la dirección inicial del puntero, (para reiniciarlo más tarde).
 	push hl
-
 	call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
 ;															; _ el (Contador_de_mov_masticados).    
 	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
