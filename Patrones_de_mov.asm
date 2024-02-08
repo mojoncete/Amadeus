@@ -92,7 +92,7 @@ Indice_mov_Baile_de_BadSat defw Bajo_decelerando
     defw Codo_izquierda_abajo
     defw 0                                  ; Fin de patrón de movimiento.
 
-Bajo_decelerando db $12,$11,$4f,1           ; Abajo. 15rep. vel.2         
+Bajo_decelerando db $12,$11,$4f,1           ; Abajo (vel_2). 15rep.        
     db $11,$11,$42,0                        ; Abajo.  2rep. --- Termina movimiento.
 
 F_1 db $11,$11,$41,1                        
@@ -246,12 +246,12 @@ Desplazamiento_iniciado
 ; Si en el último desplazamiento aplicado hemos aplicado reinicio, salimos del movimiento.
 
     ld a,(Ctrl_3)
-    bit 2,a
+    bit 1,a
     ret nz
 
-    ld a,(Ctrl_2)
-    bit 4,a
-    ret nz                                                      ; Salimos si se ha producido reinicio.
+;    ld a,(Ctrl_2)
+;    bit 4,a
+;    ret nz                                                      ; Salimos si se ha producido reinicio.
 
 3 ld hl,Repetimos_desplazamiento
     dec (hl)
@@ -405,10 +405,7 @@ Inicia_Repetimos_movimiento
 ;   
 
 Inicia_Puntero_mov ld hl,(Puntero_indice_mov)
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    ex de,hl
+    call Extrae_address
     ld (Puntero_mov),hl
     ret
     
@@ -439,9 +436,9 @@ Aplica_desplazamiento
 ; Se ha aplicado reinicio ???
 ; Si es así, dejamos de aplicar desplazamiento, (RET).
 
-    ld a,(Ctrl_3)
-    bit 2,a
-    ret nz
+;    ld a,(Ctrl_3)
+;    bit 1,a
+;    ret nz
 
 2 ld hl, (Puntero_mov)
     bit 5,(hl)

@@ -152,7 +152,7 @@ Tipo db 0												; Clase de la entidad. Cada `tipo´ de Entidad tiene unas c
 ;															- Patrón de movimiento.
 ;															- Aspecto
 Filas db 0												; Filas. [DRAW]
-Columns db 0  											; Nº de columnas. [DRAW]
+Columns db 0 	  										; Nº de columnas. [DRAW]
 Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
 Puntero_objeto defw 0									; Donde están los datos para pintar el Sprite.
 Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
