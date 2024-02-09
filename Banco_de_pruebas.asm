@@ -103,6 +103,7 @@ FRAME ld (Stack_3),sp
 
 	include "Sprites_e_indices.asm"
 	include "Cajas_y_disparos.asm"
+	include "Patrones_de_mov.asm"
 	include "Niveles.asm"
 
 ; ******************************************************************************************************************************************************************************************
@@ -1752,15 +1753,16 @@ Actualiza_relojes
 
 ; ---------------------------------------------------------------
 
-	include "Disparo.asm"
+	include "Rutinas_de_inicio_y_niveles.asm"
 	include "Draw_XOR.asm"
 	include "Rutinas_de_impresion_sprites.asm" 
+	include "Direcciones.asm"
+	include "Movimiento.asm"
+	include "Disparo.asm"
+	include "Relojes_y_temporizaciones.asm"
 	include "calcula_tercio.asm"
 	include "Cls.asm"
-	include "Direcciones.asm"
 	include "Genera_coordenadas.asm"
-	include "Relojes_y_temporizaciones.asm"
-	include "Patrones_de_mov.asm"
 	include "Guarda_foto_registros.asm"
 
 	SAVESNA "Pruebas.sna", START
