@@ -51,10 +51,6 @@ Desplazamiento_iniciado
     bit 1,a
     ret nz
 
-;    ld a,(Ctrl_2)
-;    bit 4,a
-;    ret nz                                                      ; Salimos si se ha producido reinicio.
-
 3 ld hl,Repetimos_desplazamiento
     dec (hl)
     ret nz

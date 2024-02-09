@@ -1037,13 +1037,9 @@ Guarda_movimiento_masticado
  
     ld sp,(Stack)
 
-;    push hl
-
    	ld hl,(Contador_de_mov_masticados)						; Incrementa en una unidad el (Contador_de_mov_masticados).
 	inc hl
 	ld (Contador_de_mov_masticados),hl
-
-;	pop hl
 
     call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
 ;															; _ el (Contador_de_mov_masticados).    
@@ -1057,18 +1053,11 @@ Guarda_movimiento_masticado
 
 Actualiza_Puntero_de_almacen_de_mov_masticados 
 
-;	push hl
-;	push bc
-
 	ld hl,(Puntero_de_almacen_de_mov_masticados)
 	ld bc,6
 	and a
 	adc hl,bc
 	ld (Puntero_de_almacen_de_mov_masticados),hl
-
-;	pop bc
-;	pop hl
-
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -1172,28 +1161,6 @@ Guarda_foto_entidad_a_pintar
 
 ;	call Convierte_guia_en_fantasma
 	ret	
-
-; --------------------------------------------------------------------------------------------------------------
-;
-;	19/9/23
-
-;Prepara_var_pintado 
-
-;	ld hl,Filas
-;	ld de,Variables_de_pintado
-;	ld bc,8
-;	ldir
-;	ret
-
-; --------------------------------------------------------------------------------------------------------------
-
-;Repone_pintar 
-
-;	ld hl,Variables_de_pintado
-;	ld de,Filas
-;	ld bc,8
-;	ldir
-;	ret	
 
 ; *************************************************************************************************************************************************************
 ;
@@ -1730,26 +1697,6 @@ Actualiza_relojes
 	ld hl,Contador_de_frames_2	;	5.1 segundos. (Contador_de_frames_2)=$ff ..... 1300.5 segundos, 21.675 minutos.  
 	inc (hl)
 	ret
-
-; ---------------------------------------------------------------
-;
-;	21/12/23
-
-;Guarda_parametros_DRAW
-
-;	ld hl,Bandeja_DRAW
-;	ld de,Almacen_de_parametros_DRAW
-;	ld bc,42
-;	ldir
-;	ret
-
-;Recupera_parametros_DRAW
-
-;	ld hl,Almacen_de_parametros_DRAW
-;	ld de,Bandeja_DRAW
-;	ld bc,42
-;	ldir
-;	ret
 
 ; ---------------------------------------------------------------
 

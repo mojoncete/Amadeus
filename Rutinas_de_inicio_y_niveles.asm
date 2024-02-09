@@ -217,10 +217,16 @@ Decrementa_Contador_de_mov_masticados ld hl,(Contador_de_mov_masticados)
 
 	ld a,l
 	and a
-	jr z,$
+	call z,Reinicia_entidad_maliciosa
 
 1 ld (Contador_de_mov_masticados),hl
 	ret
+
+; ---------------------------------------------------------------------
+;
+;	9/2/24
+
+Reinicia_entidad_maliciosa jr $
 
 ; ---------------------------------------------------------------------
 ;
