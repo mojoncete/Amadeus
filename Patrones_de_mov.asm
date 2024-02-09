@@ -97,6 +97,7 @@ Bajo_decelerando db $12,$11,$4f,1           ; Abajo (vel_2). 15rep.
 
 F_1 db $11,$11,$41,1                        
     db $11,$11,$01,253,8,0                  ; Abajo - Pausa1. 8rep.
+
 F_2 db $11,$11,$41,1                            
     db $11,$11,$02,253,15,254               ; Abajo - Pausa2. 15rep --- Fija puntero de bucle. (Voy por aquí 23/7/23).
 
@@ -122,6 +123,7 @@ Derecha_y_subiendo_1 db $11,$11,$16,1       ; Derecha. 4rep. vel.2
 
 F_3 db $11,$11,$11,1
     db $11,$11,$01,253,4,0
+
 F_4 db $11,$11,$11,1
     db $11,$11,$02,253,8,0
 
@@ -166,11 +168,16 @@ Codo_abajo_izq. db $11,$11,$61,1            ; Abajo/izq. 1rep.
 Izquierda_y_subiendo db $11,$21,$23,1       ; Derecha. 4rep. vel.2
     db $11,$11,$a1,253,6,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
 
+
+
+;! """"""""""""""""""""""""""""""""""""""""""""""""""
+
 Izquierda_y_subiendo_1 db $11,$11,$26,1     ; Derecha. 4rep. vel.2
     db $11,$11,$a1,253,2,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
 
 F_5 db $11,$11,$21,1
     db $11,$11,$01,253,4,0
+
 F_6 db $11,$11,$21,1
     db $11,$11,$02,253,8,0
 
@@ -195,6 +202,13 @@ Codo_izquierda_abajo db $11,$11,$a1,1          ; Arriba/Izq. 1rep.
     db $11,$11,$43,1                           ; Abajo. 3rep.        
     db $11,$11,$61,1                           ; Abajo/Izq. 1rep.
     db $11,$11,$43,0                           ; Abajo. 3rep.
+
+
+
+
+
+
+
 
 ; ----- ----- ----- ----- -----
 ;
