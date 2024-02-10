@@ -20,7 +20,9 @@ Inicializa_Nivel
 	call Fija_velocidades					     ; Perfiles_de_velocidad según Nivel.
 	ld (Datos_de_nivel),hl						 ; (Datos_de_nivel) ahora apunta a la dirección de mem. donde se encuentra el .db que indica__ 
 	call Inicializa_Puntero_indice_mov			 ; Inicializa (Puntero_indice_mov) según el (Tipo) de Entidad. (Coreografía).
-	ret 										 ; _ el (Tipo) de la 1ª entidad del Nivel.
+;												 ; _ el (Tipo) de la 1ª entidad del Nivel.
+	call Inicializa_Puntero_de_almacen_de_mov_masticados
+	ret 										 
 
 ; ----------------------
 
@@ -37,6 +39,15 @@ Inicializa_Puntero_indice_mov ld a,(hl)     	 ; Cargamos A con el (Tipo) de la 1
     call Extrae_address
     ld (Puntero_indice_mov),hl
     ret
+
+Inicializa_Puntero_de_almacen_de_mov_masticados ld a,(Tipo)
+	call Calcula_salto_en_BC
+	ld hl,Almacen_de_movimientos_masticados_Entidad_1
+    and a
+    adc hl,bc
+    call Extrae_address
+	ld (Puntero_de_almacen_de_mov_masticados),hl
+	ret
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
@@ -227,6 +238,15 @@ Decrementa_Contador_de_mov_masticados ld hl,(Contador_de_mov_masticados)
 ;	9/2/24
 
 Reinicia_entidad_maliciosa jr $
+
+; 	En 1er lugar inicializamos el contador.
+
+	call Situa_en_contador_general_de_mov_masticados
+	call Transfiere_datos_de_contadores
+
+;	Inicializamos 
+
+
 
 ; ---------------------------------------------------------------------
 ;
