@@ -275,7 +275,6 @@ Reinicia_entidad_maliciosa
 	ld h,(ix+12)
 
 	ld (Puntero_de_almacen_de_mov_masticados),hl
-	ld hl,(Contador_de_mov_masticados)
 
 ;	Recolocamos el puntero (Stack_snapshot) del álbum de fotos para colocamos justo después del borrado.
 ;	Queremos pintar la entidad en su posición de inicio.
