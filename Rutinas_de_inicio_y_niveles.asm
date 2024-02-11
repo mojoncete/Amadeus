@@ -226,11 +226,17 @@ Decrementa_Contador_de_mov_masticados ld hl,(Contador_de_mov_masticados)
 
 	inc h
 	dec h
-	jr nz,1F
 
-	ld a,l
-	and a
-	call z,Reinicia_entidad_maliciosa
+	call m,Reinicia_entidad_maliciosa
+
+;	jr nz,1F
+
+;	inc l
+;	dec l
+
+;	di
+;	jr z,$
+;	ei
 
 1 ld (Contador_de_mov_masticados),hl
 	ret
@@ -258,6 +264,26 @@ Reinicia_entidad_maliciosa
 	ld h,(ix+12)
 
 	ld (Puntero_de_almacen_de_mov_masticados),hl
+	ld hl,(Contador_de_mov_masticados)
+
+;	Recolocamos el puntero (Stack_snapshot) del álbum de fotos para colocamos justo después del borrado.
+;	Queremos pintar la entidad en su posición de inicio.
+
+	ld hl,(Stack_snapshot)
+	ld bc,6
+	and a
+	sbc hl,bc
+	ld (Stack_snapshot),hl
+
+	call Cargamos_registros_con_mov_masticado
+	call Guarda_foto_registros
+
+	ld hl,(Contador_de_mov_masticados)
+	dec hl
+
+;	di
+;	jr $
+;	ei
 
 	ret
 
