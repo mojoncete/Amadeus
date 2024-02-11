@@ -292,18 +292,8 @@ Reinicia_entidad_maliciosa
 	ld hl,(Contador_de_mov_masticados)
 	dec hl
 
-;	di
-;	jr $
-;	ei
-
 	ret
 
-; 	En 1er lugar inicializamos el contador.
-
-	call Situa_en_contador_general_de_mov_masticados
-	call Transfiere_datos_de_contadores
-
-;	Inicializamos 
 
 
 
