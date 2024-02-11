@@ -122,10 +122,9 @@ Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto e
 Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
 
-Almacen_de_movimientos_masticados_Entidad_1 equ $eb00	; $eb00 - $ff09 ..... $1409 / 5129 bytes. Guardaremos los movimientos masticados que ha hido generando la entidad guía.
-;														; 												
-Almacen_de_movimientos_masticados_Amadeus equ $e700		
 
+Almacen_de_movimientos_masticados_Amadeus equ $e700		
+;
 Album_de_fotos equ $8000	;	(8000h - 8055h).		; En (Album_de_fotos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y las llamadas a las rutinas de impresión.   
 ;                               				        ; De momento situamos este almacén en $7000. La capacidad del album será de 7 entidades.  
@@ -278,6 +277,14 @@ Contador_general_de_mov_masticados_Entidad_1 defw 0
 Contador_general_de_mov_masticados_Entidad_2 defw 0
 Contador_general_de_mov_masticados_Entidad_3 defw 0
 Contador_general_de_mov_masticados_Entidad_4 defw 0
+
+; Almacenes de mov_masticados.
+
+Almacen_de_movimientos_masticados_Entidad_1 defw $eb00	; $eb00 - $ff09 ..... $1409 / 5129 bytes. Guardaremos los movimientos masticados que ha hido generando la entidad guía.
+; .....
+; .....
+; .....
+; .....
 
 ; Movimiento. ------------------------------------------------------------------------------------------------------
 
