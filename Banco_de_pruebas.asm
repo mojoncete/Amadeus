@@ -654,6 +654,16 @@ Main
 
 	call Restore_entidad								; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
 
+
+	ld a,(Ctrl_3)
+	bit 2,a
+	di
+	jr nz,$
+	ei
+
+
+
+
 ; Existe "Entidad_guía" ???.
 ; Si la Entidad_guía ha sido fulminada hemos de reemplazarla.
 
@@ -1676,7 +1686,19 @@ Pinta_entidades
 	bit 0,a
 	ret z
 
-	call Calcula_numero_de_malotes
+	ld a,(Ctrl_3)
+	bit 2,a
+	jr z,1F
+	
+;	Sólo queremos borrar. Estamos reiniciando la entidad. Hemos de modificar (Stack_snapshot) para que la rutina [Extrae_foto_entidades] calcule el nº de malotes correctamente. 	
+
+	ld hl,(Stack_snapshot)
+	ld bc,6
+	and a
+	sbc hl,bc
+	ld (Stack_snapshot),hl
+
+1 call Calcula_numero_de_malotes
 	call Extrae_foto_entidades 						
 	call Limpia_y_reinicia_Stack_Snapshot 
 

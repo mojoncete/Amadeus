@@ -81,11 +81,8 @@ Inicia_Entidades
 
 1 push bc 														; Guardo el nº de cajas a rellenar.
 
-	ld a,(hl)													; A contiene el TIPO de ENTIDAD que almacenaremos en la caja.
-	call Calcula_salto_en_BC									; Calcula el salto para situarnos en la definición de entidad correcta de indice de [Indice_de_definiciones_de_entidades].
-
-	ld hl,Indice_de_definiciones_de_entidades
-	call Situa_en_datos_de_definicion							; Sitúa HL en el 1er .db de la definición de entidad tipo que tenemos que volcar en DRAW.
+	ld a,(hl)
+	call Definicion_segun_tipo 									; Nos situamos en el 1er .db de datos de la definición de este tipo de entidad.
 
 	call Definicion_de_entidad_a_bandeja_DRAW					; Vuelca los datos de la definición en DRAW.
 
@@ -146,6 +143,21 @@ Inicia_Entidades
 
 ; ---------------------------------------------------------------------
 ;
+;	10/02/24
+;
+;	Nos situamos en el 1er .db de datos de la definición de este tipo de entidad.
+;
+;	INPUT: A contiene el TIPO de ENTIDAD que almacenaremos en la caja. 
+
+Definicion_segun_tipo 											
+
+	call Calcula_salto_en_BC									; Calcula el salto para situarnos en la definición de entidad correcta de indice de [Indice_de_definiciones_de_entidades].
+	ld hl,Indice_de_definiciones_de_entidades
+	call Situa_en_datos_de_definicion							; Sitúa HL en el 1er .db de la definición de entidad tipo que tenemos que volcar en DRAW.
+	ret
+
+; ---------------------------------------------------------------------
+;
 ;	30/01/24
 
 
@@ -155,6 +167,7 @@ Store_Restore_cajas
 
 	ld hl,(Puntero_de_impresion)
 	call Genera_coordenadas
+
 	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
 	call Limpiamos_bandeja_DRAW
 
@@ -224,20 +237,66 @@ Decrementa_Contador_de_mov_masticados ld hl,(Contador_de_mov_masticados)
 
 	inc h
 	dec h
-	jr nz,1F
 
-	ld a,l
-	and a
-	call z,Reinicia_entidad_maliciosa
+	call m,Reinicia_entidad_maliciosa
+
+;	jr nz,1F
+
+;	inc l
+;	dec l
+
+;	di
+;	jr z,$
+;	ei
 
 1 ld (Contador_de_mov_masticados),hl
 	ret
 
 ; ---------------------------------------------------------------------
 ;
-;	9/2/24
+;	10/2/24
 
-Reinicia_entidad_maliciosa jr $
+Reinicia_entidad_maliciosa 
+
+;	En 1er lugar actualizamos el (Contador_de_mov_masticados).
+
+	call Situa_en_contador_general_de_mov_masticados 									
+	call Transfiere_datos_de_contadores
+
+; 	En 2º lugar hay que inicializar el (Puntero_de_almacen_de_mov_masticados).
+
+	ld a,(Tipo)
+	call Definicion_segun_tipo
+
+	push hl
+	pop ix
+
+	ld l,(ix+11)
+	ld h,(ix+12)
+
+	ld (Puntero_de_almacen_de_mov_masticados),hl
+	ld hl,(Contador_de_mov_masticados)
+
+;	Recolocamos el puntero (Stack_snapshot) del álbum de fotos para colocamos justo después del borrado.
+;	Queremos pintar la entidad en su posición de inicio.
+
+	ld hl,(Stack_snapshot)
+	ld bc,6
+	and a
+	sbc hl,bc
+	ld (Stack_snapshot),hl
+
+	call Cargamos_registros_con_mov_masticado
+	call Guarda_foto_registros
+
+	ld hl,(Contador_de_mov_masticados)
+	dec hl
+
+;	di
+;	jr $
+;	ei
+
+	ret
 
 ; 	En 1er lugar inicializamos el contador.
 
