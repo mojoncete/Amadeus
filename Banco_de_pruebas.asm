@@ -36,7 +36,11 @@ FRAME ld (Stack_3),sp
 	ld a,2	
 	out ($fe),a												
 
-	call Pinta_entidades									; Borde rojo.
+	ld a,(Ctrl_3)
+	bit 0,a
+	jr z,1F
+
+	call Extrae_foto_entidades 	
 
 ;	ld a,6	
 ;	out ($fe),a												
@@ -70,7 +74,8 @@ FRAME ld (Stack_3),sp
 ; Restauramos los parámetros de la entidad que había alojada en DRAW "antes de gestionar AMADEUS".
 
 ;	call Recupera_parametros_DRAW
-	call Actualiza_relojes
+
+1 call Actualiza_relojes
 
 	ld hl,Ctrl_3
 	res 0,(hl)											; Reinicia el flag de FRAME completo.
@@ -122,6 +127,7 @@ Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto e
 Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
 
+Almacen_de_scanlines_masticados equ $e9df
 Almacen_de_movimientos_masticados_Entidad_1 equ $eb00	; $eb00 - $ff09 ..... $1409 / 5129 bytes. Guardaremos los movimientos masticados que ha hido generando la entidad guía.
 
 Almacen_de_movimientos_masticados_Amadeus equ $e700		
@@ -280,6 +286,8 @@ Contador_general_de_mov_masticados_Entidad_3 defw 0
 Contador_general_de_mov_masticados_Entidad_4 defw 0
 
 ; Movimiento. ------------------------------------------------------------------------------------------------------
+
+Puntero_de_scanlines_masticados defw Almacen_de_scanlines_masticados
 
 Puntero_indice_mov defw 0							    ; Puntero índice del patrón de movimiento de la entidad. "0" No hay movimiento.
 Puntero_mov defw 0										; Guarda la posición de memoria en la que nos encontramos dentro de la cadena de movimiento.
@@ -455,8 +463,8 @@ START
 	IM 2 											    ; Habilitamos el modo 2 de INTERRUPCIONES.
 	DI 													 										 
 
-	ld a,%00000111
-	call Cls
+;	ld a,%00000111
+;	call Cls
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
 ; INICIALIZACIÓN.
@@ -528,7 +536,10 @@ START
 
 ; Entidades y Amadeus iniciados. Esperamos a [FRAME].
 
-6 ld hl,Ctrl_3
+6 
+	call Calcula_numero_de_malotes
+
+	ld hl,Ctrl_3
 	set 0,(hl)											; Frame completo. 
 	ei
 	halt 
@@ -549,6 +560,9 @@ Main
 
 ;	ld a,1
 ;	out ($fe),a
+
+	call Limpia_y_reinicia_Stack_Snapshot 				; Lo 1º que hacemos después de pintar el limpiar el álbum de fotos e inicializar 
+; 													 	; _(Stack_snapshot).
 
 	ld a,(Clock_Entidades_en_curso)	
 	ld b,a
@@ -783,7 +797,11 @@ Main
 ;	ld hl,Ctrl_1
 ;	res 2,(hl)
 
-16 ld hl,Ctrl_3
+16 
+
+	call Calcula_numero_de_malotes
+
+	ld hl,Ctrl_3
 	set 0,(hl)											; Frame completo. 
 
 	xor a
@@ -1242,11 +1260,12 @@ Limpia_Variables_de_borrado ld hl,Variables_de_borrado
 
 ; -------------------------------------------------------------------------------------------------------------
 ;
-; 8/9/23 
+; 	21/02/24 
 ;
-
-; (Numero_de_malotes) lo utiliza la rutina [Extrae_foto_entidades] para borrar/pintar entidades en pantalla.
-; Se calcula dividiendo entre 6 el nº de bytes que contiene el Album_de_fotos.
+;	MODIFICA: AF,HL,BC,DE
+;	
+; 	(Numero_de_malotes) lo utiliza la rutina [Extrae_foto_entidades] para borrar/pintar entidades en pantalla.
+; 	Se calcula dividiendo entre 6 el nº de bytes que contiene el Album_de_fotos.
 
 Calcula_numero_de_malotes 
 
@@ -1668,32 +1687,6 @@ Pinta_Amadeus
    	call Calcula_malotes_Amadeus 
 	call Extrae_foto_Amadeus
 	call Limpia_album_Amadeus
-
-	ret
-
-Pinta_entidades
-
-;	Salimos de la rutina si la foto con todas las entidades a pintar no está completa.		
-
-	ld a,(Ctrl_3)
-	bit 0,a
-	ret z
-
-	ld a,(Ctrl_3)
-	bit 2,a
-	jr z,1F
-	
-;	Sólo queremos borrar. Estamos reiniciando la entidad. Hemos de modificar (Stack_snapshot) para que la rutina [Extrae_foto_entidades] calcule el nº de malotes correctamente. 	
-
-	ld hl,(Stack_snapshot)
-	ld bc,6
-	and a
-	sbc hl,bc
-	ld (Stack_snapshot),hl
-
-1 call Calcula_numero_de_malotes
-	call Extrae_foto_entidades 						
-	call Limpia_y_reinicia_Stack_Snapshot 
 
 	ret
 
