@@ -288,6 +288,7 @@ Contador_general_de_mov_masticados_Entidad_4 defw 0
 ; Movimiento. ------------------------------------------------------------------------------------------------------
 
 Puntero_de_scanlines_masticados defw Almacen_de_scanlines_masticados
+Puntero_de_scanlines_en_album defw Album_de_fotos+2
 
 Puntero_indice_mov defw 0							    ; Puntero índice del patrón de movimiento de la entidad. "0" No hay movimiento.
 Puntero_mov defw 0										; Guarda la posición de memoria en la que nos encontramos dentro de la cadena de movimiento.
@@ -536,8 +537,11 @@ START
 
 ; Entidades y Amadeus iniciados. Esperamos a [FRAME].
 
-6 
-	call Calcula_numero_de_malotes
+6 call Calcula_numero_de_malotes
+
+	call Genera_scanlines_masticados	
+
+;	jr $
 
 	ld hl,Ctrl_3
 	set 0,(hl)											; Frame completo. 
@@ -1044,6 +1048,96 @@ Construye_movimientos_masticados_entidad
 	ld (hl),c
 	inc hl
 	ld (hl),b
+
+	ret
+
+; -----------------------------------------------------------------------------------
+;
+;	22/02/24
+;
+;	INPUTS: Los registros A y B contienen (Numero_de_malotes), venimos de ejecutar [Calcula_numero_de_malotes].
+
+Genera_scanlines_masticados
+
+	ld hl,(Puntero_de_scanlines_en_album) 				; Dirección donde se encuentra el puntero de impresión.
+	ld de, (Puntero_de_scanlines_masticados)
+
+1  push bc 												; Guardamos nº de malotes en la pila.
+
+	ld bc,5 											; Sumando para ir actualizando (Puntero_de_scanlines_en_album).
+
+	ld a,(hl)
+	ld (de),a
+;	ld (hl),e
+
+	inc hl
+	ld a,(hl)
+;	ld (hl),d
+
+	inc de
+	ld (de),a 											; 1er scanline, (Puntero_de_impresion) en el Almacén de scanlines masticados.
+;				                                        ; La dirección donde se encuentra el (Puntero_de_impresion) dentro del almacén de scanlines_masticados_
+; 														; _sustituye al (Puntero_de_impresion) dentro del Album_de_fotos.	
+
+	call Construimos_scanlines 
+
+; Actualizamos (Puntero_de_scanlines_en_album). Nos situamos en el Puntero_de_impresion de la siguiente entidad.
+
+	and a
+	adc hl,bc
+	ld (Puntero_de_scanlines_en_album),hl
+
+	pop bc 												; Recupero (Numero_de_malotes).
+	djnz 1B
+
+	ret
+	
+; --------------------------------------------------------
+
+Construimos_scanlines push hl
+	push bc
+
+	ld b,15
+	dec de
+
+	ld a,(de)
+	ld l,a
+	inc de
+	ld a,(de)
+	ld h,a 												; Puntero_de_impresión en HL.
+
+	inc de
+
+1 call NextScan
+
+; Entramos en memoria de attr.???
+
+; Si es así, decrementamos H. (Repetimos el último scancline).
+
+	ld a,h
+	cp $58
+	jr nz,2F
+
+	ld hl,0 											; Scanline NO IMPRIMIBLE, "0".
+
+2 ld a,l
+	ld (de),a
+	inc de
+	ld a,h
+	ld (de),a
+
+	inc de
+
+	inc h
+	dec h
+	jr z,3F  											; No generamos más escanlines si hemos entrado en memoria de attr.
+
+	djnz 1B 											; 16 scanlines generados.
+
+3 ld (Puntero_de_scanlines_masticados),de 				; Actualizamos puntero.
+
+	pop bc
+	pop hl
 
 	ret
 
