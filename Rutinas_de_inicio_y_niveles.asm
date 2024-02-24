@@ -119,6 +119,7 @@ Inicia_Entidades
 
 	ld hl,(Puntero_de_impresion)
 	call Genera_coordenadas
+	call Genera_scanlines_masticados	
 	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
 	call Limpiamos_bandeja_DRAW
 	call Incrementa_punteros_de_cajas

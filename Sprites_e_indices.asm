@@ -54,6 +54,8 @@ Badsat_izq_f9 DEFB $00,$02,$00,$00,$85,$00,$00,$8A
 	DEFB	$00,$15,$10,$00,$2A,$98,$00,$15
 	DEFB	$00,$00,$0A,$00,$00,$04,$00,$00 ; $F9 (6º DESPLZ a izquierda).
 
+	org $8200
+
 Badsat_izq_fa DEFB $00,$01,$00,$00,$42,$80,$00,$45
 	DEFB	$40,$00,$4A,$A0,$00,$55,$40,$00
 	DEFB	$4A,$80,$0F,$FD,$00,$00,$6C,$00
@@ -131,6 +133,8 @@ Badsat_der_fb DEFB $01,$00,$00,$02,$84,$00,$05,$44
 	DEFB	$00,$75,$00,$01,$FE,$80,$01,$7D
 	DEFB	$40,$00,$22,$A0,$00,$65,$50,$00
 	DEFB	$02,$A0,$00,$01,$40,$00,$00,$80 ; $Fb (4º DESPLZ a derecha).
+
+	org $8400
 
 Badsat_der_fc DEFB $00,$80,$00,$01,$42,$00,$02,$A2
 	DEFB	$00,$05,$52,$00,$02,$AA,$00,$01
@@ -234,6 +238,8 @@ Indice_Explosion_2x2 defw Explosion_2x2_1
 	defw Explosion_2x2_2
 	defw Explosion_2x2_3
 
+	org $8600
+	
 Explosion_2x2_1 DEFB $01,$00,$81,$00,$43,$84,$37,$D8
 	DEFB	$2E,$68,$1B,$70,$17,$F0,$3D,$D8
 	DEFB	$FF,$FE,$33,$B8,$19,$D0,$1F,$60

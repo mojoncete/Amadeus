@@ -127,7 +127,9 @@ Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto e
 Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
 
+Almacen_de_scanlines_masticados_a_borrar equ $e8de
 Almacen_de_scanlines_masticados equ $e9df
+
 Almacen_de_movimientos_masticados_Entidad_1 equ $eb00	; $eb00 - $ff09 ..... $1409 / 5129 bytes. Guardaremos los movimientos masticados que ha hido generando la entidad guía.
 
 Almacen_de_movimientos_masticados_Amadeus equ $e700		
@@ -288,6 +290,8 @@ Contador_general_de_mov_masticados_Entidad_4 defw 0
 ; Movimiento. ------------------------------------------------------------------------------------------------------
 
 Puntero_de_scanlines_masticados defw Almacen_de_scanlines_masticados
+Puntero_de_scanlines_masticados_a_borrar defw Almacen_de_scanlines_masticados_a_borrar
+
 Puntero_de_scanlines_en_album defw Album_de_fotos+2
 
 Puntero_indice_mov defw 0							    ; Puntero índice del patrón de movimiento de la entidad. "0" No hay movimiento.
@@ -475,7 +479,6 @@ START
 	ld hl,Indice_de_niveles
 	ld (Puntero_indice_NIVELES),hl						 ; Situamos (Puntero_indice_NIVELES) en el 1er Nivel del índice.
 	call Inicializa_Nivel								 ; Prepara el 1er Nivel del juego.
-
 ;														 ; Situa (Puntero_indice_NIVELES) el el primer defw., (nivel) del índice de niveles.
 ;														 ; Inicializa (Numero_de_entidades) con el nº total de malotes del nivel.
 ;														 ; Inicializa (Datos_de_nivel) con el `tipo´ de la 1ª entidad del nivel. 
@@ -539,10 +542,6 @@ START
 
 6 call Calcula_numero_de_malotes
 
-	call Genera_scanlines_masticados	
-
-;	jr $
-
 	ld hl,Ctrl_3
 	set 0,(hl)											; Frame completo. 
 	ei
@@ -565,7 +564,13 @@ Main
 ;	ld a,1
 ;	out ($fe),a
 
-	call Limpia_y_reinicia_Stack_Snapshot 				; Lo 1º que hacemos después de pintar el limpiar el álbum de fotos e inicializar 
+
+	di
+	jr $
+	ei
+
+	call Limpia_Almacen_de_scanlines
+	call Limpia_y_reinicia_Stack_Snapshot 				; Lo 1º que hacemos después de pintar es limpiar el álbum de fotos e inicializar 
 ; 													 	; _(Stack_snapshot).
 
 	ld a,(Clock_Entidades_en_curso)	
@@ -665,15 +670,11 @@ Main
 
 	call Restore_entidad								; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
 
-
 	ld a,(Ctrl_3)
 	bit 2,a
 	di
 	jr nz,$
 	ei
-
-
-
 
 ; Existe "Entidad_guía" ???.
 ; Si la Entidad_guía ha sido fulminada hemos de reemplazarla.
@@ -804,13 +805,13 @@ Main
 16 
 
 	call Calcula_numero_de_malotes
+	call Genera_scanlines_masticados	
 
 	ld hl,Ctrl_3
 	set 0,(hl)											; Frame completo. 
 
 	xor a
 	out ($fe),a
-
 	halt 
 
 ; ----------------------------------------
@@ -1020,7 +1021,7 @@ Construye_movimientos_masticados_entidad
 ;															; _ el (Contador_de_mov_masticados).    
 	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
-	call Recompone_posicion_inicio
+;	call Recompone_posicion_inicio
 
 1 call Draw
 	call Guarda_movimiento_masticado
@@ -1053,42 +1054,54 @@ Construye_movimientos_masticados_entidad
 
 ; -----------------------------------------------------------------------------------
 ;
-;	22/02/24
+;	24/02/24
 ;
-;	INPUTS: Los registros A y B contienen (Numero_de_malotes), venimos de ejecutar [Calcula_numero_de_malotes].
 
 Genera_scanlines_masticados
 
 	ld hl,(Puntero_de_scanlines_en_album) 				; Dirección donde se encuentra el puntero de impresión.
-	ld de, (Puntero_de_scanlines_masticados)
-
-1  push bc 												; Guardamos nº de malotes en la pila.
-
-	ld bc,5 											; Sumando para ir actualizando (Puntero_de_scanlines_en_album).
+	ld de,(Puntero_de_scanlines_masticados)
 
 	ld a,(hl)
 	ld (de),a
-;	ld (hl),e
+	ld (hl),e
 
 	inc hl
 	ld a,(hl)
-;	ld (hl),d
+	ld (hl),d
 
 	inc de
 	ld (de),a 											; 1er scanline, (Puntero_de_impresion) en el Almacén de scanlines masticados.
 ;				                                        ; La dirección donde se encuentra el (Puntero_de_impresion) dentro del almacén de scanlines_masticados_
 ; 														; _sustituye al (Puntero_de_impresion) dentro del Album_de_fotos.	
-
+	push de
 	call Construimos_scanlines 
+	pop de
+	dec de
+	
+	push hl
+	ex de,hl
+	ld de,(Puntero_de_scanlines_masticados_a_borrar)
+
+	ld bc,Variables_de_borrado+2
+	ld a,e
+	ld (bc),a
+	inc bc
+	ld a,d
+	ld (bc),a 											; Modificamos las variables de borrado.
+
+	ld bc,32
+	ldir
+	ld (Puntero_de_scanlines_masticados_a_borrar),de
+
+	pop hl
 
 ; Actualizamos (Puntero_de_scanlines_en_album). Nos situamos en el Puntero_de_impresion de la siguiente entidad.
 
+	ld bc,5
 	and a
 	adc hl,bc
 	ld (Puntero_de_scanlines_en_album),hl
-
-	pop bc 												; Recupero (Numero_de_malotes).
-	djnz 1B
 
 	ret
 	
@@ -1138,6 +1151,41 @@ Construimos_scanlines push hl
 
 	pop bc
 	pop hl
+
+	ret
+
+; -----------------------------------------------------------------------------------
+;
+;	24/2/24
+;
+;	MODIFICA: AF,HL,BC,DE
+
+
+;	Limpia el Almacén de los scanlines masticados y reinicializa los punteros (Puntero_de_scanlines_masticados) y_ 
+;	_ (Puntero_de_scanlines_en_album).
+
+Limpia_Almacen_de_scanlines ld hl,(Puntero_de_scanlines_masticados)
+	push hl
+	ld bc,Almacen_de_scanlines_masticados
+	and a
+	sbc hl,bc 																; Calcula bytes a borrar.
+
+	ld b,l
+
+	pop hl
+	dec hl
+
+1 xor a
+	ld (hl),a
+	dec hl
+
+	djnz 1B
+
+	ld hl,Almacen_de_scanlines_masticados
+	ld (Puntero_de_scanlines_masticados),hl
+
+	ld hl,Album_de_fotos+2
+	ld (Puntero_de_scanlines_en_album),hl
 
 	ret
 

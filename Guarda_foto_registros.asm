@@ -128,7 +128,7 @@ Limpia_y_reinicia_Stack_Snapshot
 
 ;   Reinicializa (Stack_snapshot).
 
-    xor a
-    ld (Stack_snapshot),a
+    ld hl,Album_de_fotos
+    ld (Stack_snapshot),hl
 
     ret

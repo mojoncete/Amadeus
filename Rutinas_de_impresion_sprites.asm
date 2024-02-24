@@ -23,37 +23,36 @@ Indice_entidades_incompletas_derecha defw Pinta_enemigo_2x2_derecha
 ;       
 ;   Modifica: DE y HL. 
 
-Pinta_Amadeus_2x2 ld (Stack),sp
-	ld sp,iy
-    ld b,16
-1 pop de
-    ld a,e
-    xor (hl)
-	ld (hl),a
-	inc hl
-    ld a,d
-    xor (hl)
-	ld (hl),a
-	dec hl
-	inc h     
-    ld a,h
-    and 7
-    jr nz,2F            
-    ld a,l              
-    add a,$20           
-    ld l,a
-    jr c,2F              
-    ld a,h              
-    sub 8              
-    ld h,a
-2 ld a,h
-    cp $58
-    jr z,3F
-    djnz 1B
-3 ld sp,(Stack)
-	ret
+Pinta_Amadeus_2x2 ; 1081 t/states
 
-Pinta_Amadeus_3x2 ld (Stack),sp
+    push iy
+    pop de
+
+    ld (Stack),sp
+	ld sp,hl
+    ld b,16
+
+1 pop hl
+
+    ld a,(de)
+    ld (hl),a
+	inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    djnz 1B
+
+    ld sp,(Stack)
+
+	ret
+    
+Pinta_Amadeus_3x2 
+
+;    jr $
+    
+    ld (Stack),sp
 	ld sp,iy
     ld b,8
 1 pop de
