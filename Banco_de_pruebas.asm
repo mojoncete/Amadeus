@@ -650,15 +650,21 @@ Main
 	jr z,16F											; Si no hay entidades en curso saltamos a [Avanza_puntero_de_album_de_fotos_de_entidades].
 	ld b,a												; No hay entidades que gestionar.
 
-	di
-	jr $
-	ei
-
 ; ( Código que ejecutamos con cada entidad: ).
 
 ;	--------------------------------------- GESTIÓN DE ENTIDADES. !!!!!!!!!!
 
 15 push bc 												; Nº de entidades en curso.
+
+
+	di
+	jr $
+	ei
+
+
+
+
+
 
 	call Restore_entidad								; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
 
