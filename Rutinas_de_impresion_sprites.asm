@@ -48,11 +48,7 @@ Pinta_Amadeus_2x2 ; 1081 t/states
 
 	ret
     
-Pinta_Amadeus_3x2 
-
-;    jr $
-    
-    ld (Stack),sp
+Pinta_Amadeus_3x2 ld (Stack),sp
 	ld sp,iy
     ld b,8
 1 pop de

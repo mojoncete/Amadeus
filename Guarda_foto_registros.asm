@@ -35,11 +35,11 @@ Guarda_foto_registros
 
 ; En 1er lugar guardaremos las variables de borrado del siguiente cuadro.
 
-    ld sp,Variables_de_borrado+6
+;    ld sp,Variables_de_borrado+6
 
-    push hl
-    push ix
-    push iy
+;    push hl
+;    push ix
+;    push iy
 
     ld sp,Puntero_de_impresion+2                  ; Almacenamos el (Puntero_de_impresion) actual de la entidad.
     push ix                                       ; Utilizaremos este dato para generar las coordenadas_X que ocupa la entidad y compararlas_
