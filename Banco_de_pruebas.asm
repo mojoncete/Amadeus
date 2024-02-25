@@ -60,6 +60,8 @@ FRAME ld (Stack_3),sp
 ;	bit 2,a
 ;	jr z,1F
 
+	call DELAY
+
 ;	call Detecta_colision_nave_entidad 
 
 ;1 ld a,4	
@@ -535,7 +537,8 @@ START
 
 ; Entidades y Amadeus iniciados. Esperamos a [FRAME].
 
-6 call Calcula_numero_de_malotes
+6 
+	call Calcula_numero_de_malotes
 	call Genera_scanlines_masticados
 
 	ld hl,Ctrl_3
@@ -554,10 +557,8 @@ Main
 ; 														; Inicialmente, (Clock_Entidades_en_curso)="30".
 ;														; (Clock_Entidades_en_curso) define cuando aparecen las entidades en pantalla.
 ;														; Todas las entidades contenidas en un "bloque", (7 cajas), se inicializan en [START].
-;														; Si (Numero_de_entidades) > "7", cuando el bloque de 7 cajas esté a "0" se inicializaráa _
+;														; Si (Numero_de_entidades) > "7", cuando el bloque de 7 cajas esté a "0" se inicializaráa _;		
 ;														; _un 2º bloque.
-
-;	call Limpia_Sprites
 	call Limpia_y_reinicia_Stack_Snapshot 				; Lo 1º que hacemos después de pintar es limpiar el álbum de fotos e inicializar 
 ; 													 	; _(Stack_snapshot).
 
@@ -656,16 +657,7 @@ Main
 
 15 push bc 												; Nº de entidades en curso.
 
-
-	di
-	jr $
-	ei
-
-
-
-
-
-
+	call Limpia_Sprites
 	call Restore_entidad								; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
 
 	ld a,(Ctrl_3)
@@ -801,6 +793,7 @@ Main
 ;	res 2,(hl)
 
 16 
+
 	call Calcula_numero_de_malotes
 	call Genera_scanlines_masticados	
 
@@ -1018,7 +1011,7 @@ Construye_movimientos_masticados_entidad
 ;															; _ el (Contador_de_mov_masticados).    
 	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
-;	call Recompone_posicion_inicio
+	call Recompone_posicion_inicio
 
 1 call Draw
 	call Guarda_movimiento_masticado
@@ -1112,12 +1105,12 @@ Genera_scanlines_masticados
 	and a
 	ret z
 
-	push bc
-
 	ld hl,(Puntero_de_scanlines_en_album) 				; Dirección donde se encuentra el puntero de impresión.
 	ld de,(Puntero_de_scanlines_masticados)
 
-1 ld a,(hl)
+1 push bc
+
+	ld a,(hl)
 	ld (de),a
 	ld (hl),e
 
@@ -1702,7 +1695,7 @@ Pulsa_ENTER ld a,$bf 									; Esperamos la pulsación de la tecla "ENTER".
 
 ;	!!!!!!!! DESTRUYE BC !!!!!!!!!!!
 
-DELAY LD BC,$0320							;$0320 ..... Delay mínimo
+DELAY LD BC,$0900							;$0320 ..... Delay mínimo
 wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: si el Sprite ocupa la 1ª y 2ª_				
 	LD A,B 										
 	AND A

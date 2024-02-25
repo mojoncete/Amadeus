@@ -204,7 +204,9 @@ Store_Restore_cajas
 ;
 ;	29/01/24
 
-Guarda_foto_de_mov_masticado call Cargamos_registros_con_mov_masticado
+Guarda_foto_de_mov_masticado 
+
+	call Cargamos_registros_con_mov_masticado
 	call Guarda_foto_registros
 ;																; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
 ;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.

@@ -266,7 +266,7 @@ Entidad_1 db 1,2,2		                     			; (Tipo) / (Filas) / (Columns).
 	db %00000100										; (Attr).
 	defw Indice_Badsat_der								; (Indice_Sprite_der).
 	defw Indice_Badsat_izq								; (Indice_Sprite_izq).
-	defw $4723	                                     	; (Posicion_inicio).
+	defw $4003	                                     	; (Posicion_inicio).
 	db 1												; (Cuad_objeto).
 	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
 
