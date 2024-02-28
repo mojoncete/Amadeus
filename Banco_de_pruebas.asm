@@ -60,8 +60,6 @@ FRAME ld (Stack_3),sp
 ;	bit 2,a
 ;	jr z,1F
 
-	call DELAY
-
 ;	call Detecta_colision_nave_entidad 
 
 ;1 ld a,4	
@@ -129,18 +127,24 @@ Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto e
 Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
 
-Almacen_de_scanlines_masticados equ $e9df
+Almacen_de_scanlines_masticados_a_borrar equ $e800
+Almacen_de_scanlines_masticados equ $e900
 Almacen_de_movimientos_masticados_Entidad_1 equ $eb00	; $eb00 - $ff09 ..... $1409 / 5129 bytes. Guardaremos los movimientos masticados que ha hido generando la entidad guía.
 Almacen_de_movimientos_masticados_Amadeus equ $e700		
 ;
 Album_de_fotos equ $8000	;	(8000h - 8055h).		; En (Album_de_fotos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y las llamadas a las rutinas de impresión.   
 ;                               				        ; De momento situamos este almacén en $7000. La capacidad del album será de 7 entidades.  
-Album_de_fotos_disparos equ $8056 ; (8056h - 80abh).		; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
+
+Album_de_fotos_de_borrado equ $8056   ;   ($8056 - $80ab).
+
+
+Album_de_fotos_disparos equ $80ac  ;  (8056h - 8101h).	; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´. 
 ;														; 55 Bytes.
 
-Album_de_fotos_Amadeus equ $80ac ; (80ach - 80b8h) ; 12 bytes.
+Album_de_fotos_Amadeus equ $8102  ;  (80ach - 810eh) ; 12 bytes.
+
 ;Almacen_de_parametros_DRAW equ $80b9 ; ($80b9 - $80fb) ; 66 bytes.
 
 ; 54h es el espacio necesario en (Album_de_fotos) para 7 entidades/disparos en pantalla.
@@ -289,6 +293,7 @@ Contador_general_de_mov_masticados_Entidad_4 defw 0
 ; Movimiento. ------------------------------------------------------------------------------------------------------
 
 Puntero_de_scanlines_masticados defw Almacen_de_scanlines_masticados
+Puntero_de_scanlines_masticados_a_borrar defw Almacen_de_scanlines_masticados_a_borrar
 Puntero_de_scanlines_en_album defw Album_de_fotos+2
 
 Puntero_indice_mov defw 0							    ; Puntero índice del patrón de movimiento de la entidad. "0" No hay movimiento.
@@ -540,6 +545,7 @@ START
 6 
 	call Calcula_numero_de_malotes
 	call Genera_scanlines_masticados
+	call Genera_scanlines_masticados_a_borrar
 
 	ld hl,Ctrl_3
 	set 0,(hl)											; Frame completo. 
@@ -559,6 +565,9 @@ Main
 ;														; Todas las entidades contenidas en un "bloque", (7 cajas), se inicializan en [START].
 ;														; Si (Numero_de_entidades) > "7", cuando el bloque de 7 cajas esté a "0" se inicializaráa _;		
 ;														; _un 2º bloque.
+
+	call Limpia_Almacen_de_scanlines_masticados
+	call Construye_album_de_borrado
 	call Limpia_y_reinicia_Stack_Snapshot 				; Lo 1º que hacemos después de pintar es limpiar el álbum de fotos e inicializar 
 ; 													 	; _(Stack_snapshot).
 
@@ -657,7 +666,6 @@ Main
 
 15 push bc 												; Nº de entidades en curso.
 
-	call Limpia_Sprites
 	call Restore_entidad								; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
 
 	ld a,(Ctrl_3)
@@ -1011,7 +1019,7 @@ Construye_movimientos_masticados_entidad
 ;															; _ el (Contador_de_mov_masticados).    
 	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
-	call Recompone_posicion_inicio
+;	call Recompone_posicion_inicio
 
 1 call Draw
 	call Guarda_movimiento_masticado
@@ -1044,54 +1052,61 @@ Construye_movimientos_masticados_entidad
 
 ; -----------------------------------------------------------------------------------
 ;
-;	24/02/24
+;	28/02/24
 ;
 
-Limpia_Sprites 
+Construye_album_de_borrado jr $
+
+; -----------------------------------------------------------------------------------
+;
+;	28/02/24
+;
+
+Limpia_Almacen_de_scanlines_masticados 
 
 	ld hl,(Puntero_de_scanlines_masticados)
 	ld bc,Almacen_de_scanlines_masticados
 	and a
 	sbc hl,bc
-	ret z
+	ret z 												; Salimos. No hay scanlines masticados que copiar.
 
-	srl l 
-	ld b,l
+	push hl
+	pop bc
+
+	ld hl,Almacen_de_scanlines_masticados
+	ld de,Almacen_de_scanlines_masticados+1
+
+	xor a
+	ld (hl),a
+
+	ldir
+
+	ld hl,Almacen_de_scanlines_masticados
+	ld (Puntero_de_scanlines_masticados),hl
+
+	ret
+
+; -----------------------------------------------------------------------------------
+;
+;	28/02/24
+;
+
+Genera_scanlines_masticados_a_borrar	
 
 	ld hl,(Puntero_de_scanlines_masticados)
-	dec hl
+	ld bc,Almacen_de_scanlines_masticados
+	and a
+	sbc hl,bc
+	ret z 												; Salimos. No hay scanlines masticados que copiar.
 
-1 push hl
+	push hl
+	pop bc
 
-	ld a,(hl)
-	ex af,af'
-	dec hl
-	ld a,(hl)
-	ld l,a
-	ex af,af
-	ld h,a
+	ld hl,Almacen_de_scanlines_masticados
+	ld de,Almacen_de_scanlines_masticados_a_borrar
+	ldir
 
-	xor a
-	ld (hl),a
-	inc l
-	ld (hl),a
-
-	pop hl
-
-	xor a
-	ld (hl),a
-	dec hl
-	ld (hl),a
-
-	dec hl
-
-	djnz 1B
-
-	inc hl
-
-	ld (Puntero_de_scanlines_masticados),hl
-	ld hl,Album_de_fotos+2
-	ld (Puntero_de_scanlines_en_album),hl 
+	ld (Puntero_de_scanlines_masticados_a_borrar),de
 
 	ret
 
@@ -1099,11 +1114,12 @@ Limpia_Sprites
 ;
 ;	24/02/24
 ;
+;	INPUTS: A Y B contienen (Numero_de_malotes).
 
 Genera_scanlines_masticados	
 
 	and a
-	ret z
+	ret z 												; Salimos si no hay malotes que pintar.
 
 	ld hl,(Puntero_de_scanlines_en_album) 				; Dirección donde se encuentra el puntero de impresión.
 	ld de,(Puntero_de_scanlines_masticados)

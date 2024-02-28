@@ -14,14 +14,13 @@ Indice_entidades_incompletas_derecha defw Pinta_enemigo_2x2_derecha
 
 ;   Conjunto de rutinas de impresión de Sprites.
 ;
-;   12/12/22
+;   28/2/24
 ;
-;   Inputs: HL contiene (Posicion_actual) de la entidad.
-;           B contendrá: el nº de scanlines que `podemos´ imprimir en pantalla. (ENTIDAD DE 2X2).
-;                        LA MITAD del nº de scanlines que `podemos´imprimir en pantalla. (ENTIDAD DE 3X2).
-;           El puntero de pila apuntará a la dirección de mem. que contenga la variable (Puntero_datas).
+;   Inputs: HL contiene la dirección donde se encuentra el 1er scanline. 
+;           B contendrá: el nº de scanlines que vamos a imprimir en pantalla. (ENTIDAD DE 2X2).
+;           IY contiene los .db que forman el sprite, (Puntero_objeto).
 ;       
-;   Modifica: DE y HL. 
+;   Modifica: AF,HL,BC y DE.
 
 Pinta_Amadeus_2x2 ; 1081 t/states
 
