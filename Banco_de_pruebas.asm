@@ -40,7 +40,7 @@ FRAME ld (Stack_3),sp
 	bit 0,a
 	jr z,1F
 
-	call Extrae_foto_entidades 	
+	call Extrae_Album_de_fotos 	
 
 ;	ld a,6	
 ;	out ($fe),a												
@@ -121,7 +121,7 @@ FRAME ld (Stack_3),sp
 ; Constantes.
 ;
  
-Sprite_vacio equ $eae0
+Sprite_vacio equ $ead0
 Centro_arriba equ $0160 								; Emplearemos estas constantes en la rutina de `recolocación´ del objeto:_
 Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto en las dos primeras constantes_
 Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
@@ -137,7 +137,6 @@ Album_de_fotos equ $8000	;	(8000h - 8055h).		; En (Album_de_fotos) vamos a ir al
 ;                               				        ; De momento situamos este almacén en $7000. La capacidad del album será de 7 entidades.  
 
 Album_de_fotos_de_borrado equ $8056   ;   ($8056 - $80ab).
-
 
 Album_de_fotos_disparos equ $80ac  ;  (8056h - 8101h).	; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´. 
@@ -376,6 +375,11 @@ Stack_2 defw 0											; 2º variable destinada a almacenar el puntero de pila
 ;														; La utiliza la rutina [Extrae_foto_registros].
 Stack_3 defw 0											; Almacena el SP antes de ejecutar FRAME.
 Stack_snapshot defw Album_de_fotos
+
+Stack_snapshot_borrado defw Album_de_fotos_de_borrado+6		 		; Puntero que almacena la rutina de impresión en el [Album_de_fotos_de_borrado].
+Stack_snapshot_borrado_sc defw Album_de_fotos_de_borrado+2			; Puntero que almacena la dirección donde se encuentran los scanlines_masticados_a_borrar.
+
+
 Stack_snapshot_disparos defw Album_de_fotos_disparos
 
 ;End_Snapshot defw Album_de_fotos										
@@ -542,8 +546,7 @@ START
 
 ; Entidades y Amadeus iniciados. Esperamos a [FRAME].
 
-6 
-	call Calcula_numero_de_malotes
+6 call Calcula_numero_de_malotes
 	call Genera_scanlines_masticados
 	call Genera_scanlines_masticados_a_borrar
 
@@ -567,9 +570,12 @@ Main
 ;														; _un 2º bloque.
 
 	call Limpia_Almacen_de_scanlines_masticados
-	call Construye_album_de_borrado
 	call Limpia_y_reinicia_Stack_Snapshot 				; Lo 1º que hacemos después de pintar es limpiar el álbum de fotos e inicializar 
 ; 													 	; _(Stack_snapshot).
+
+	di
+	jr $
+	ei
 
 	ld a,(Clock_Entidades_en_curso)	
 	ld b,a
@@ -1126,15 +1132,33 @@ Genera_scanlines_masticados
 
 1 push bc
 
+	ld iy,(Stack_snapshot_borrado_sc)
+
+	ld a,d
+	dec a
+	ld (iy+0),e
+	ld (iy+1),a
+
+;	Actualizamos (Stack_snapshot_borrado_sc).
+
+	exx
+	push iy
+	pop hl
+	ld bc,6
+	and a
+	adc hl,bc
+	ld (Stack_snapshot_borrado_sc),hl
+	exx
+
 	ld a,(hl)
 	ld (de),a
 	ld (hl),e
 
 	inc hl
+
 	ld a,(hl)
 	ld (hl),d
-
-	inc de
+	inc e
 	ld (de),a 											; 1er scanline, (Puntero_de_impresion) en el Almacén de scanlines masticados.
 ;				                                        ; La dirección donde se encuentra el (Puntero_de_impresion) dentro del almacén de scanlines_masticados_
 ; 														; _sustituye al (Puntero_de_impresion) dentro del Album_de_fotos.	

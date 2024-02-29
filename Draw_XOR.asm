@@ -728,7 +728,7 @@ PreviousScan ld a,h
 ;	Rutina principal de pintado de entidades.
 ;	Extrae la foto del frame, (entidades).
 
-Extrae_foto_entidades 
+Extrae_Album_de_fotos 
 																
 	ld hl,Album_de_fotos+1
 	ld a,(hl)
