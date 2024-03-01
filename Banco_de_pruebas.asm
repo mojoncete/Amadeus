@@ -40,6 +40,7 @@ FRAME ld (Stack_3),sp
 	bit 0,a
 	jr z,1F
 
+
 	call Extrae_Album_de_fotos 	
 
 ;	ld a,6	
