@@ -807,9 +807,20 @@ Main
 	call Calcula_numero_de_malotes 						; Si el nº de malotes es "0" no generamos scanlines masticados.
 	call Genera_scanlines_masticados	
 
+; -----------------------------
+;
+;	Prepara registros para la rutina Borra_sprites.
+
+;	ld hl,(Puntero_de_scanlines_masticados_a_borrar)
+;	ld bc,Almacen_de_scanlines_masticados_a_borrar
+;	and a
+;	sbc hl,bc
+
 	exx
 	ld hl,Semaforo_de_rutinas_de_impresion_utilizadas
-	exx
+	exx	
+
+; -------------------------------
 
 	ld hl,Ctrl_3
 	set 0,(hl)											; Frame completo. 

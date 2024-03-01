@@ -897,7 +897,7 @@ Borra_sprites
 	ld hl,Almacen_de_scanlines_masticados_a_borrar									
 	ld a,(hl)
 	and a
-	ret z 																	; Salimos si el álbum está vacío.
+	ret z 																	; Salimos si no hay scanlines en el álbum.
 
 ;	No hay datos, (entidades para pintar en este frame).
 
@@ -905,4 +905,97 @@ Borra_sprites
 	and a																	
 	ret z
 
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 	jr $
+
+	exx
+	ld a,(hl)
+	exx
+
+	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
+	ld sp,Almacen_de_scanlines_masticados_a_borrar
+	xor a
+	pop hl
+
+; Borra scanline
+
+Borra_2x2 ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
