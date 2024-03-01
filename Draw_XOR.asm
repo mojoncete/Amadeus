@@ -909,6 +909,8 @@ Borra_sprites
 
 	jr $
 
+	ld b,a
+
 	exx
 	ld a,(hl)
 	exx
