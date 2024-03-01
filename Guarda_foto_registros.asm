@@ -30,26 +30,6 @@ Guarda_foto_registros
 
     ld (Stack),sp                                 ; Guardo SP en (Stack).
 
-; Guardamos la dirección de la rutina de impresión, ... , Sprite_vacio en el Album_de_fotos_de_borrado.
-
-    ld sp,(Stack_snapshot_borrado)
-    push hl
-    dec sp
-    dec sp
-    ld de,Sprite_vacio
-    push de
-
-;   Actualizamos (Stack_snapshot_borrado).
-
-    ld sp,(Stack_snapshot_borrado)
-    exx
-    ld hl,6
-    and a
-    adc hl,sp
-    ld sp,hl
-    exx
-    ld (Stack_snapshot_borrado),sp
-
     ld sp,Puntero_de_impresion+2                  ; Almacenamos el (Puntero_de_impresion) actual de la entidad.
     push ix                                       ; Utilizaremos este dato para generar las coordenadas_X que ocupa la entidad y compararlas_
 ;                                                 ; _ con las coordenadas_X de Amadeus.

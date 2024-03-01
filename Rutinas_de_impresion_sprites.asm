@@ -24,6 +24,11 @@ Indice_entidades_incompletas_derecha defw Pinta_enemigo_2x2_derecha
 
 Pinta_Amadeus_2x2 ; 1081 t/states
 
+    exx
+    ld (hl),2
+    inc l
+    exx                     
+
     push iy
     pop de
 
@@ -31,8 +36,7 @@ Pinta_Amadeus_2x2 ; 1081 t/states
 	ld sp,hl
     ld b,16
 
-1 pop hl
-
+    pop hl
     ld a,(de)
     ld (hl),a
 	inc e
@@ -41,7 +45,140 @@ Pinta_Amadeus_2x2 ; 1081 t/states
     ld (hl),a
     inc e
 
-    djnz 1B
+    pop hl
+    ld a,(de)
+    ld (hl),a
+	inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+	inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+	inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+	inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+	inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+	inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+	inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+	inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+	inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+	inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+	inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+	inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+	inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+	inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+	inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
 
     ld sp,(Stack)
 
@@ -50,7 +187,6 @@ Pinta_Amadeus_2x2 ; 1081 t/states
 Pinta_Amadeus_3x2 
 
     jr $
-
 
     ld (Stack),sp
 	ld sp,iy

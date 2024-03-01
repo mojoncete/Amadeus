@@ -729,11 +729,11 @@ PreviousScan ld a,h
 ;	Extrae la foto del frame, (entidades).
 
 Extrae_Album_de_fotos 
-																
-	ld hl,Album_de_fotos+1
+
+	ld hl,Album_de_fotos+1									
 	ld a,(hl)
 	and a
-	ret z 																	; Salimos si no hay datos en el álbum. VACÍO.
+	ret z 																	; Salimos si el álbum está vacío.
 
 ;	No hay datos, (entidades para pintar en este frame).
 
@@ -884,3 +884,25 @@ Imprime_Amadeus db 0,0,0
 	ld (Stack_2),a
 
 	ret
+
+; -----------------------------------------------------------------------------------
+;
+;	01/03/24
+;
+;	Borra los sprites impresos en pantalla.
+;	
+
+Borra_sprites 
+
+	ld hl,Almacen_de_scanlines_masticados_a_borrar									
+	ld a,(hl)
+	and a
+	ret z 																	; Salimos si el álbum está vacío.
+
+;	No hay datos, (entidades para pintar en este frame).
+
+	ld a,(Numero_de_malotes)												; No hay MALOTES. No se ha producido movimiento.
+	and a																	
+	ret z
+
+	jr $
