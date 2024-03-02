@@ -25,7 +25,7 @@ Indice_entidades_incompletas_derecha defw Pinta_enemigo_2x2_derecha
 Pinta_Amadeus_2x2 ; 1081 t/states
 
     exx
-    ld (hl),2
+    ld (hl),1
     inc l
     exx                     
 

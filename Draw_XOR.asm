@@ -901,103 +901,126 @@ Borra_sprites
 
 ;	No hay datos, (entidades para pintar en este frame).
 
-	ld a,(Numero_de_malotes)												; No hay MALOTES. No se ha producido movimiento.
-	and a																	
+	ld a,(Numero_de_malotes)												; No se ha producido movimiento.
+	and a																	; NO BORRAMOS !!!
 	ret z
 
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	jr $
-
-	ld b,a
-
-	exx
+Retorno	exx
 	ld a,(hl)
+	inc l
 	exx
+	dec a
 
-	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
-	ld sp,Almacen_de_scanlines_masticados_a_borrar
-	xor a
+	jr z,Borra_2x2
+	jp Borra_3x2
+
+Borra_2x2 ld (Stack),sp														; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
+	ld sp,(Puntero_de_scanlines_masticados_a_borrar)
+
 	pop hl
 
-; Borra scanline
-
-Borra_2x2 ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-
 	ld (hl),a
 	inc l
 	ld (hl),a
-	inc l
+	
+	pop hl
 
 	ld (hl),a
 	inc l
 	ld (hl),a
-	inc l
+
+	pop hl
 
 	ld (hl),a
 	inc l
 	ld (hl),a
-	inc l
+
+	pop hl
 
 	ld (hl),a
 	inc l
 	ld (hl),a
-	inc l
+	
+	pop hl
 
 	ld (hl),a
 	inc l
 	ld (hl),a
-	inc l
+	
+	pop hl
 
 	ld (hl),a
 	inc l
 	ld (hl),a
-	inc l
+	
+	pop hl
 
 	ld (hl),a
 	inc l
 	ld (hl),a
-	inc l
+	
+	pop hl
 
 	ld (hl),a
 	inc l
 	ld (hl),a
-	inc l
+	
+	pop hl
 
 	ld (hl),a
 	inc l
 	ld (hl),a
-	inc l
+	
+	pop hl
 
 	ld (hl),a
 	inc l
 	ld (hl),a
-	inc l
+	
+	pop hl
 
 	ld (hl),a
 	inc l
 	ld (hl),a
-	inc l
+	
+	pop hl
 
 	ld (hl),a
 	inc l
 	ld (hl),a
-	inc l
+	
+	pop hl
 
 	ld (hl),a
 	inc l
 	ld (hl),a
-	inc l
+	
+	pop hl
 
 	ld (hl),a
 	inc l
 	ld (hl),a
-	inc l
+	
+	pop hl
 
 	ld (hl),a
 	inc l
 	ld (hl),a
+	
+	pop hl
+
+	ld (hl),a
 	inc l
+	ld (hl),a
+	
+	ld (Puntero_de_scanlines_masticados_a_borrar),sp
+
+	ld sp,(Stack)
+
+	djnz Retorno
+
+	ret
+
+Borra_3x2 jr $

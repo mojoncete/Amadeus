@@ -293,7 +293,7 @@ Puntero_de_scanlines_masticados defw Almacen_de_scanlines_masticados
 Puntero_de_scanlines_masticados_a_borrar defw Almacen_de_scanlines_masticados_a_borrar
 Puntero_de_scanlines_en_album defw Album_de_fotos+2
 
-Semaforo_de_rutinas_de_impresion_utilizadas ds 8
+Semaforo_de_rutinas_de_impresion_utilizadas ds 8	;! Para acelerar la rutina de borrado de sprites, hemos de poder desplazarnos por este almacén con 1 byte.!!
 
 Puntero_indice_mov defw 0							    ; Puntero índice del patrón de movimiento de la entidad. "0" No hay movimiento.
 Puntero_mov defw 0										; Guarda la posición de memoria en la que nos encontramos dentro de la cadena de movimiento.
@@ -545,7 +545,7 @@ START
 6 call Calcula_numero_de_malotes
 	call Genera_scanlines_masticados
 
-	exx
+	exx 
 	ld hl,Semaforo_de_rutinas_de_impresion_utilizadas
 	exx
 
@@ -570,6 +570,7 @@ Main
 
 	call Genera_scanlines_masticados_a_borrar
 	call Limpia_Almacen_de_scanlines_masticados
+
 	call Limpia_y_reinicia_Stack_Snapshot 				; Lo 1º que hacemos después de pintar es limpiar el álbum de fotos e inicializar 
 ; 													 	; _(Stack_snapshot).
 
@@ -802,25 +803,11 @@ Main
 ;	ld hl,Ctrl_1
 ;	res 2,(hl)
 
+
 16 
-
-	call Calcula_numero_de_malotes 						; Si el nº de malotes es "0" no generamos scanlines masticados.
+	call Calcula_numero_de_malotes 						; Si el nº de malotes es "0" no generamos scanlines masticados. No ha habido movimiento.
 	call Genera_scanlines_masticados	
-
-; -----------------------------
-;
-;	Prepara registros para la rutina Borra_sprites.
-
-;	ld hl,(Puntero_de_scanlines_masticados_a_borrar)
-;	ld bc,Almacen_de_scanlines_masticados_a_borrar
-;	and a
-;	sbc hl,bc
-
-	exx
-	ld hl,Semaforo_de_rutinas_de_impresion_utilizadas
-	exx	
-
-; -------------------------------
+	call Prepara_Borra_sprites
 
 	ld hl,Ctrl_3
 	set 0,(hl)											; Frame completo. 
@@ -893,6 +880,36 @@ Main
 ;	call Calcula_numero_de_disparotes
 
 ;;	ret
+
+; -----------------------------
+;
+;	Prepara los registros HL' y B para ejecutar la rutina Borra_sprites.
+;
+;	INPUTS: B a de estar a "0".
+
+Prepara_Borra_sprites 
+
+	ld hl,(Puntero_de_scanlines_masticados_a_borrar)
+	ld a,l
+	ret z
+
+	srl a
+
+2 sub 16
+	jr z,1F
+	inc b
+	jr 2B
+
+1 inc b
+
+	exx
+	ld hl,Semaforo_de_rutinas_de_impresion_utilizadas
+	exx	
+
+	ld hl,Almacen_de_scanlines_masticados_a_borrar
+	ld (Puntero_de_scanlines_masticados_a_borrar),hl
+
+	ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -1036,7 +1053,7 @@ Construye_movimientos_masticados_entidad
 ;															; _ el (Contador_de_mov_masticados).    
 	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
-;	call Recompone_posicion_inicio
+	call Recompone_posicion_inicio
 
 1 call Draw
 	call Guarda_movimiento_masticado
@@ -1094,6 +1111,9 @@ Limpia_Almacen_de_scanlines_masticados
 	ld hl,Almacen_de_scanlines_masticados
 	ld (Puntero_de_scanlines_masticados),hl
 
+	ld hl,Album_de_fotos+2
+	ld (Puntero_de_scanlines_en_album),hl
+
 	ret
 
 ; -----------------------------------------------------------------------------------
@@ -1116,7 +1136,7 @@ Genera_scanlines_masticados_a_borrar
 	ld de,Almacen_de_scanlines_masticados_a_borrar
 	ldir
 
-	ld (Puntero_de_scanlines_masticados_a_borrar),de
+	ld (Puntero_de_scanlines_masticados_a_borrar),de	; Situamos el puntero al principio del almacén.
 
 	ret
 
