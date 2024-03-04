@@ -887,6 +887,23 @@ Imprime_Amadeus db 0,0,0
 
 ; -----------------------------------------------------------------------------------
 ;
+;	04/03/24
+;
+;	Borra los sprites impresos en pantalla.
+;	
+
+Limpia_semaforo 
+
+	xor a
+	ld b,8
+	ld hl,Semaforo_de_rutinas_de_impresion_utilizadas
+1 ld (hl),a
+	inc l
+	djnz 1B
+	ret
+
+; -----------------------------------------------------------------------------------
+;
 ;	01/03/24
 ;
 ;	Borra los sprites impresos en pantalla.
@@ -915,6 +932,7 @@ Retorno	exx
 
 	jr z,Borra_2x2
 	jp Borra_3x2
+
 
 Borra_2x2 ld (Stack),sp														; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
 	ld sp,(Puntero_de_scanlines_masticados_a_borrar)
@@ -1023,4 +1041,144 @@ Borra_2x2 ld (Stack),sp														; Guardo el puntero de pila y lo sitúo al 
 
 	ret
 
-Borra_3x2 jr $
+Borra_3x2  ld (Stack),sp														; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
+	ld sp,(Puntero_de_scanlines_masticados_a_borrar)
+
+	xor a
+
+	pop hl
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+	ld (hl),a
+
+	pop hl
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+	ld (hl),a
+	
+	pop hl
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+	ld (hl),a
+
+	pop hl
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+	ld (hl),a
+
+	pop hl
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+	ld (hl),a
+
+	pop hl
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+	ld (hl),a
+	
+	pop hl
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+	ld (hl),a
+
+	pop hl
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+	ld (hl),a
+
+	pop hl
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+	ld (hl),a
+
+	pop hl
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+	ld (hl),a
+	
+	pop hl
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+	ld (hl),a
+
+	pop hl
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+	ld (hl),a
+
+	pop hl
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+	ld (hl),a
+
+	pop hl
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+	ld (hl),a
+	
+	pop hl
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+	ld (hl),a
+
+	pop hl
+
+	ld (hl),a
+	inc l
+	ld (hl),a
+	inc l
+	ld (hl),a
+
+	ld (Puntero_de_scanlines_masticados_a_borrar),sp
+
+	ld sp,(Stack)
+
+	dec b
+	jp z,Retorno
+
+	ret

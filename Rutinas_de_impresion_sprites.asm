@@ -186,71 +186,229 @@ Pinta_Amadeus_2x2 ; 1081 t/states
     
 Pinta_Amadeus_3x2 
 
-    jr $
+    exx
+    ld (hl),2
+    inc l
+    exx                     
+
+    push iy
+    pop de
 
     ld (Stack),sp
-	ld sp,iy
-    ld b,8
-1 pop de
-    ld a,e
-    xor (hl)
-	ld (hl),a
-	inc hl
-    ld a,d
-    xor (hl)
-	ld (hl),a
-	inc hl
-	pop de
-    ld a,e  
-    xor (hl)
-	ld (hl),a
-	dec hl
-	dec hl
-	inc h     
-    ld a,h
-    and 7
-    jr nz,2F          
-    ld a,l             
-    add a,$20           
-    ld l,a
-    jr c,2F              
-    ld a,h             
-    sub 8               
-    ld h,a
-2 ld a,h
-    cp $58
-    jr z,4F
-    ld a,d
-    xor (hl)
+    ld sp,hl
+    ld b,16
+
+    pop hl
+    ld a,(de)
     ld (hl),a
-	pop de
-	inc hl
-    ld a,e
-    xor (hl)
-	ld (hl),a
-	inc hl
-    ld a,d
-    xor (hl)
-	ld (hl),a
-	dec hl
-	dec hl
-	inc h     
-    ld a,h
-    and 7
-    jr nz,3F            
-    ld a,l             
-    add a,$20          
-    ld l,a
-    jr c,3F            
-    ld a,h            
-    sub 8             
-    ld h,a
-3 ld a,h
-    cp $58
-    jr z,4F
-    djnz 1B
-4 ld sp,(Stack)
-	ret
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    pop hl
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+    inc l
+    ld a,(de)
+    ld (hl),a
+    inc e
+
+    ld sp,(Stack)
+
+    ret
 
 ; ---------------------------------------------------
 

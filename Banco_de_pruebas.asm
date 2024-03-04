@@ -41,6 +41,11 @@ FRAME ld (Stack_3),sp
 	jr z,1F
 
 	call Borra_sprites
+	
+	exx
+	ld hl,Semaforo_de_rutinas_de_impresion_utilizadas
+	exx
+
 	call Extrae_Album_de_fotos 	
 
 ;	ld a,6	
@@ -593,6 +598,11 @@ Main
 	inc a
 	ld (Entidades_en_curso),a
 
+	cp 2
+	di
+	jr z,$
+	ei
+
 ; - Define el tiempo que ha de transcurrir para que aparezca la siguiente entidad. ----------------------------
 
 	ld a,(Clock_Entidades_en_curso)
@@ -1113,6 +1123,31 @@ Limpia_Almacen_de_scanlines_masticados
 
 	ld hl,Album_de_fotos+2
 	ld (Puntero_de_scanlines_en_album),hl
+
+	ret
+
+
+Limpia_Almacen_de_scanlines_masticados_a_borrar
+
+	ld hl,(Puntero_de_scanlines_masticados_a_borrar)
+	ld bc,Almacen_de_scanlines_masticados_a_borrar
+	and a
+	sbc hl,bc
+	ret z 												; Salimos. No hay scanlines masticados que copiar.
+
+	push hl
+	pop bc
+
+	ld hl,Almacen_de_scanlines_masticados_a_borrar
+	ld de,Almacen_de_scanlines_masticados_a_borrar+1
+
+	xor a
+	ld (hl),a
+
+	ldir
+
+	ld hl,Almacen_de_scanlines_masticados_a_borrar
+	ld (Puntero_de_scanlines_masticados_a_borrar),hl
 
 	ret
 
