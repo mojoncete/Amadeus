@@ -40,13 +40,14 @@ FRAME ld (Stack_3),sp
 	bit 0,a
 	jr z,1F
 
-	call Borra_sprites
+;	call Borra_sprites
 	
-	exx
-	ld hl,Semaforo_de_rutinas_de_impresion_utilizadas
-	exx
+;	exx
+;	ld hl,Semaforo_de_rutinas_de_impresion_utilizadas
+;	exx
 
-	call Extrae_Album_de_fotos 	
+	call Pinta_Sprites
+;	call Extrae_Album_de_fotos 	
 
 ;	ld a,6	
 ;	out ($fe),a												
@@ -550,9 +551,7 @@ START
 6 call Calcula_numero_de_malotes
 	call Genera_scanlines_masticados
 
-	exx 
-	ld hl,Semaforo_de_rutinas_de_impresion_utilizadas
-	exx
+	jr $
 
 	ld hl,Ctrl_3
 	set 0,(hl)											; Frame completo. 
@@ -1177,7 +1176,7 @@ Genera_scanlines_masticados_a_borrar
 
 ; -----------------------------------------------------------------------------------
 ;
-;	24/02/24
+;	6/03/24
 ;
 ;	INPUTS: A Y B contienen (Numero_de_malotes).
 
@@ -1186,23 +1185,20 @@ Genera_scanlines_masticados
 	and a
 	ret z 												; Salimos si no hay malotes que pintar.
 
-	ld hl,(Puntero_de_scanlines_en_album) 				; Dirección donde se encuentra el puntero de impresión.
-	ld de,(Puntero_de_scanlines_masticados)
+	ld hl,(Puntero_de_scanlines_en_album) 				; Dirección donde se encuentra el 1er puntero de impresión en el álbum de fotos.
+	ld de,(Puntero_de_scanlines_masticados) 			; Inicialmente se encuentra al comienzo del Almacén de scanlines masticados.
 
-1 push bc
-
-	ld a,(hl)
-	ld (de),a
-	ld (hl),e
-
-	inc hl
+1 push bc 												; Guardamos el nº de malotes.
 
 	ld a,(hl)
-	ld (hl),d
-	inc e
+	ld (de),a 											
+
+	inc l
+	inc e 												; Inc. punteros.
+
+	ld a,(hl)
 	ld (de),a 											; 1er scanline, (Puntero_de_impresion) en el Almacén de scanlines masticados.
-;				                                        ; La dirección donde se encuentra el (Puntero_de_impresion) dentro del almacén de scanlines_masticados_
-; 														; _sustituye al (Puntero_de_impresion) dentro del Album_de_fotos.	
+
 	call Construimos_scanlines 
 
 ; Actualizamos (Puntero_de_scanlines_en_album). Nos situamos en el Puntero_de_impresion de la siguiente entidad.
@@ -1219,6 +1215,9 @@ Genera_scanlines_masticados
 	ret
 	
 ; --------------------------------------------------------
+;
+;	A partir del 1er scanline, (Puntero_de_impresion), generamos los 15 scanlines restantes.
+;	La producción de scanlines se detiene cuando entramos en memoria de attr. de pantalla. Esto viene representado con $0000 en el Almacén de scanlines masticados.
 
 Construimos_scanlines push hl
 	push bc
@@ -1248,17 +1247,17 @@ Construimos_scanlines push hl
 
 2 ld a,l
 	ld (de),a
-	inc de
+	inc e
 	ld a,h
 	ld (de),a
 
-	inc de
+	inc e
 
 	inc h
 	dec h
 	jr z,3F  											; No generamos más escanlines si hemos entrado en memoria de attr.
 
-	djnz 1B 											; 16 scanlines generados.
+	djnz 1B 											; 15 scanlines generados.
 
 3 ld (Puntero_de_scanlines_masticados),de 				; Actualizamos puntero.
 
