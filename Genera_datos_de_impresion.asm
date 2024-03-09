@@ -23,7 +23,7 @@
 ;   DE contiene Puntero_objeto.
 ;   IX contiene el Puntero de impresión.
 
-Guarda_foto_registros 
+Genera_datos_de_impresion 
 
     ld (Stack),sp                                 ; Guardo SP en (Stack).
     ld sp,Puntero_de_impresion+2                  ; Almacenamos el (Puntero_de_impresion) actual de la entidad.
@@ -39,39 +39,7 @@ Guarda_foto_registros
     ld (Scanlines_album_SP),hl
 
     ld hl,0
-;                                                 ; _ con las coordenadas_X de Amadeus.
-;    ld sp,Guarda_foto_registros                   ; Sitúo el Stack Pointer en la dirección actual -1
 
-;    push hl                                       ; HL contiene la dirección de la rutina de impresión.
-
-;    push ix                                       ; IX contiene el puntero de impresión.
-;    push iy                                       ; IY contiene (Puntero_objeto).
-
-; Disparo o entidad?
-
-    ld a,(Ctrl_1)
-    bit 0,a
-    jr z,2F
-
-;    ld hl,(Scanlines_album_disparos_SP)
-;    jr 4F
-
-; No es disparo. Entidad/Amadeus ????
-
-2 ld a,(Ctrl_0)
-    bit 6,a
-    jr z,7F
-
-; Guardamos foto de Amadeus.
-
-;    ld hl,(End_Snapshot_Amadeus)
-;    jr 4F
-
-;Vamos a generar los scanlines de una entidad.
-
-4 jr $ 
-
-7 
     jr $
 
     push ix

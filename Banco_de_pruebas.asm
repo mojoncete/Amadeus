@@ -1319,22 +1319,19 @@ Actualiza_Puntero_de_almacen_de_mov_masticados
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	15/01/24
+;	09/03/24
 ;
-;	Cargamos los registros_
-;	_ HL,IX e IY con las 3 palabras que componen el movimiento masticado a ejecutar.
+;	Cargamos los registros DE e IX y actualizamos (Puntero_de_almacen_de_mov_masticados). 
 ;	
-;	HL contiene la dirección de la rutina de impresión.
 ;	IX contiene el puntero de impresión.
-;	IY contiene (Puntero_objeto).
+;	DE contiene (Puntero_objeto).
  
 
 Cargamos_registros_con_mov_masticado ld (Stack),sp
 	ld sp,(Puntero_de_almacen_de_mov_masticados)
 
-	pop de 															; IY contiene Puntero_objeto
+	pop de 															; DE contiene Puntero_objeto
 	pop ix 															; IX contiene Puntero_de_impresion
-;	pop hl
 
 	ld (Puntero_de_almacen_de_mov_masticados),sp 					; Actualiza (Puntero_de_almacen_de_mov_masticados).
 
