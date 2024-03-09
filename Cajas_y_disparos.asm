@@ -136,7 +136,9 @@ ctrl_desplz_amadeus	db 0								; (CTRL_DESPLZ).
 
 p.imp.amadeus defw 0 									; Puntero_de_impresion.
 
-	defw Almacen_de_movimientos_masticados_Amadeus+6  	; Puntero_de_almacen_de_mov_masticados
+;	defw Almacen_de_movimientos_masticados_Amadeus+6  	; Puntero_de_almacen_de_mov_masticados
+	defw 0
+
 	defw 0 												; Contador_de_mov_masticados
 	db $40												; (Ctrl_0).
 	defw 0,0,0	 										; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).

@@ -728,9 +728,9 @@ PreviousScan ld a,h
 ;	Rutina principal de pintado de entidades.
 ;	Extrae la foto del frame, (entidades).
 
-Extrae_Album_de_lineas 
+Extrae_Scanlines_album 
 
-	ld hl,Album_de_lineas+1									
+	ld hl,Scanlines_album+1									
 	ld a,(hl)
 	and a
 	ret z 																	; Salimos si el álbum está vacío.
@@ -743,8 +743,8 @@ Extrae_Album_de_lineas
 
 ; -----------------------------------
 
-	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_lineas
-	ld sp,Album_de_lineas
+	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Scanlines_album
+	ld sp,Scanlines_album
 
 2 pop iy																	; (Puntero_objeto) en IY.
 	pop hl																	; Puntero de impresión de pantalla en HL.
@@ -786,104 +786,104 @@ Imprime db 0,0,0
 ;
 ;	Pinta los disparos generados.
 
-Extrae_foto_disparos
+;Extrae_foto_disparos
 
-	ld hl,Album_de_lineas_disparos+1
-    ld a,(hl)
-    and a
-    ret z		
+;	ld hl,Scanlines_album_disparos+1
+;    ld a,(hl)
+;    and a
+;    ret z		
 
-	ld a,(Numero_de_disparotes)
-	and a
-	ret z
-	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_lineas
-	ld sp,Album_de_lineas_disparos
+;	ld a,(Numero_de_disparotes)
+;	and a
+;	ret z
+;	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Scanlines_album
+;	ld sp,Scanlines_album_disparos
 
-2 pop iy																	; (Puntero_objeto) en IY.
-	pop hl																	; Puntero de impresión de pantalla en HL.
-	pop de																	; Dirección de la rutina de impresión en DE. 
+;2 pop iy																	; (Puntero_objeto) en IY.
+;	pop hl																	; Puntero de impresión de pantalla en HL.
+;	pop de																	; Dirección de la rutina de impresión en DE. 
 
-	ld (Stack_2),sp
-	ld sp,(Stack)
+;	ld (Stack_2),sp
+;	ld sp,(Stack)
 
 ; Fabrica la llamada a la correspondiente rutina de impresión.
 
-	ld a,$cd
-	ld (Imprime2),a
-	ex de,hl
-	ld (Imprime2+1),hl
-	ex de,hl
+;	ld a,$cd
+;	ld (Imprime2),a
+;	ex de,hl
+;	ld (Imprime2+1),hl
+;	ex de,hl
 
 ; Ejecuta la llamada:	CALL $xx,xx
 
-Imprime2 db 0,0,0						
+;Imprime2 db 0,0,0						
 
-	ld a,(Numero_de_disparotes)
-	dec a
-	jr z,1F
- 	ld (Numero_de_disparotes),a	 
+;	ld a,(Numero_de_disparotes)
+;	dec a
+;	jr z,1F
+; 	ld (Numero_de_disparotes),a	 
 
-	ld sp,(Stack_2)
-	jr 2B
+;	ld sp,(Stack_2)
+;	jr 2B
 
-1 xor a
-	ld (Stack_2),a
-	ret
+;1 xor a
+;	ld (Stack_2),a
+;	ret
 
 ; -----------------------------------------------------------------------------------
 ;
 ;	4/9/23
 ;
 ;	Rutina principal de pintado de Amadeus.
-;	Extrae fotos de Album_de_lineas_Amadeus.
+;	Extrae fotos de Scanlines_album_Amadeus.
 
-Extrae_foto_Amadeus	ld hl,Album_de_lineas_Amadeus
-	ld a,(hl)
-	and a
-	ret z 																	; Salimos si no hay datos en el álbum. VACÍO.
+;Extrae_foto_Amadeus	ld hl,Scanlines_album_Amadeus
+;	ld a,(hl)
+;	and a
+;	ret z 																	; Salimos si no hay datos en el álbum. VACÍO.
 
-	ld a,(Numero_de_malotes)												; No hay MALOTES. No se ha producido movimiento.
-	and a																	; No ha aparecido ninguna `nueva entidad'.
-	ret z
+;	ld a,(Numero_de_malotes)												; No hay MALOTES. No se ha producido movimiento.
+;	and a																	; No ha aparecido ninguna `nueva entidad'.
+;	ret z
 
 ; -----------------------------------
 
-	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_lineas
-	ld sp,Album_de_lineas_Amadeus
+;	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Scanlines_album
+;	ld sp,Scanlines_album_Amadeus
 
-2 pop iy																	; (Puntero_objeto) en IY.
-	pop hl																	; Puntero de impresión de pantalla en HL.
-	pop de																	; Dirección de la rutina de impresión en DE. 
+;2 pop iy																	; (Puntero_objeto) en IY.
+;	pop hl																	; Puntero de impresión de pantalla en HL.
+;	pop de																	; Dirección de la rutina de impresión en DE. 
 
-	ld (Stack_2),sp
-	ld sp,(Stack)
+;	ld (Stack_2),sp
+;	ld sp,(Stack)
 
 ; Fabrica la llamada a la correspondiente rutina de impresión.
 
-	ld a,$cd
-	ld (Imprime_Amadeus),a
-	ex de,hl
-	ld (Imprime_Amadeus+1),hl
-	ex de,hl
+;	ld a,$cd
+;	ld (Imprime_Amadeus),a
+;	ex de,hl
+;	ld (Imprime_Amadeus+1),hl
+;	ex de,hl
 
 ; Ejecuta la llamada:	CALL $xx,xx
 
-Imprime_Amadeus db 0,0,0						
+;Imprime_Amadeus db 0,0,0						
 
-	ld (Stack),sp
+;	ld (Stack),sp
 
-	ld a,(Numero_de_malotes)
-	dec a
-	jr z,1F
- 	ld (Numero_de_malotes),a	 
+;	ld a,(Numero_de_malotes)
+;	dec a
+;	jr z,1F
+; 	ld (Numero_de_malotes),a	 
 
-	ld sp,(Stack_2)
-	jr 2B
+;	ld sp,(Stack_2)
+;	jr 2B
 
-1 xor a
-	ld (Stack_2),a
+;1 xor a
+;	ld (Stack_2),a
 
-	ret
+;	ret
 
 ; -----------------------------------------------------------------------------------
 ;
@@ -892,15 +892,15 @@ Imprime_Amadeus db 0,0,0
 ;	Borra los sprites impresos en pantalla.
 ;	
 
-Limpia_semaforo 
+;Limpia_semaforo 
 
-	xor a
-	ld b,8
-	ld hl,Semaforo_de_rutinas_de_impresion_utilizadas
-1 ld (hl),a
-	inc l
-	djnz 1B
-	ret
+;	xor a
+;	ld b,8
+;	ld hl,Semaforo_de_rutinas_de_impresion_utilizadas
+;1 ld (hl),a
+;	inc l
+;	djnz 1B
+;	ret
 
 ; -----------------------------------------------------------------------------------
 ;
@@ -922,276 +922,28 @@ Pinta_Sprites jr $
 ;	Borra los sprites impresos en pantalla.
 ;	
 
-Borra_sprites 
+;Borra_sprites 
 
-	ld hl,Almacen_de_scanlines_masticados_a_borrar									
-	ld a,(hl)
-	and a
-	ret z 																	; Salimos si no hay scanlines en el álbum.
+;	ld hl,Almacen_de_scanlines_masticados_a_borrar									
+;	ld a,(hl)
+;	and a
+;	ret z 																	; Salimos si no hay scanlines en el álbum.
 
 ;	No hay datos, (entidades para pintar en este frame).
 
-	ld a,(Numero_de_malotes)												; No se ha producido movimiento.
-	and a																	; NO BORRAMOS !!!
-	ret z
+;	ld a,(Numero_de_malotes)												; No se ha producido movimiento.
+;	and a																	; NO BORRAMOS !!!
+;	ret z
 
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-Retorno	exx
-	ld a,(hl)
-	inc l
-	exx
-	dec a
+;Retorno	exx
+;	ld a,(hl)
+;	inc l
+;	exx
+;	dec a
 
-	jr z,Borra_2x2
-	jp Borra_3x2
+;	jr z,Borra_2x2
+;	jp Borra_3x2
 
 
-Borra_2x2 ld (Stack),sp														; Guardo el puntero de pila y lo sitúo al principio del Album_de_lineas
-	ld sp,(Puntero_de_scanlines_masticados_a_borrar)
-
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	ld (Puntero_de_scanlines_masticados_a_borrar),sp
-
-	ld sp,(Stack)
-
-	djnz Retorno
-
-	ret
-
-Borra_3x2  ld (Stack),sp														; Guardo el puntero de pila y lo sitúo al principio del Album_de_lineas
-	ld sp,(Puntero_de_scanlines_masticados_a_borrar)
-
-	xor a
-
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-	ld (hl),a
-
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-	ld (hl),a
-
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-	ld (hl),a
-
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-	ld (hl),a
-
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-	ld (hl),a
-
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-	ld (hl),a
-
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-	ld (hl),a
-
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-	ld (hl),a
-
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-	ld (hl),a
-
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-	ld (hl),a
-
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-	ld (hl),a
-
-	pop hl
-
-	ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-	ld (hl),a
-
-	ld (Puntero_de_scanlines_masticados_a_borrar),sp
-
-	ld sp,(Stack)
-
-	dec b
-	jp z,Retorno
-
-	ret

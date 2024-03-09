@@ -280,14 +280,14 @@ Reinicia_entidad_maliciosa
 
 	ld (Puntero_de_almacen_de_mov_masticados),hl
 
-;	Recolocamos el puntero (Album_de_lineas_SP) del álbum de fotos para colocamos justo después del borrado.
+;	Recolocamos el puntero (Scanlines_album_SP) del álbum de fotos para colocamos justo después del borrado.
 ;	Queremos pintar la entidad en su posición de inicio.
 
-	ld hl,(Album_de_lineas_SP)
+	ld hl,(Scanlines_album_SP)
 	ld bc,6
 	and a
 	sbc hl,bc
-	ld (Album_de_lineas_SP),hl
+	ld (Scanlines_album_SP),hl
 
 	call Cargamos_registros_con_mov_masticado
 	call Guarda_foto_registros

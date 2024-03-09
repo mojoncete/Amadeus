@@ -19,7 +19,7 @@
 
     org $80bf
 
-;   (Album_de_lineas_SP) se sitúa inicialmente al comienzo del Album_de_lineas.
+;   (Scanlines_album_SP) se sitúa inicialmente al comienzo del Scanlines_album.
 ;   DE contiene Puntero_objeto.
 ;   IX contiene el Puntero de impresión.
 
@@ -29,14 +29,14 @@ Guarda_foto_registros
     ld sp,Puntero_de_impresion+2                  ; Almacenamos el (Puntero_de_impresion) actual de la entidad.
     push ix                                       ; Utilizaremos este dato para generar las coordenadas_X que ocupa la entidad y compararlas_
 
-    ld hl,(Album_de_lineas_SP)
+    ld hl,(Scanlines_album_SP)
 
     ld a,5
     add l
     ld l,a
 
     ld sp,hl
-    ld (Album_de_lineas_SP),hl
+    ld (Scanlines_album_SP),hl
 
     ld hl,0
 ;                                                 ; _ con las coordenadas_X de Amadeus.
@@ -53,8 +53,8 @@ Guarda_foto_registros
     bit 0,a
     jr z,2F
 
-    ld hl,(Album_de_lineas_disparos_SP)
-    jr 4F
+;    ld hl,(Scanlines_album_disparos_SP)
+;    jr 4F
 
 ; No es disparo. Entidad/Amadeus ????
 
@@ -64,8 +64,8 @@ Guarda_foto_registros
 
 ; Guardamos foto de Amadeus.
 
-    ld hl,(End_Snapshot_Amadeus)
-    jr 4F
+;    ld hl,(End_Snapshot_Amadeus)
+;    jr 4F
 
 ;Vamos a generar los scanlines de una entidad.
 
@@ -100,7 +100,7 @@ Guarda_foto_registros
     bit 0,a
     jr z,5F
     
-    ld (Album_de_lineas_disparos_SP),hl
+;    ld (Scanlines_album_disparos_SP),hl
     jr 6F
 
 ; Entidad o Amadeus ?
@@ -109,11 +109,11 @@ Guarda_foto_registros
     bit 6,a
     jr z,8F
 
-    ld (End_Snapshot_Amadeus),hl    
-    ld sp,(Stack)
+;    ld (End_Snapshot_Amadeus),hl    
+;    ld sp,(Stack)
     ret
 
-8 ld (Album_de_lineas_SP),hl
+8 ld (Scanlines_album_SP),hl
 6 ld sp,(Stack)
 
     ret
@@ -122,11 +122,11 @@ Guarda_foto_registros
 ;
 ;   21/11/23
 
-Limpia_y_reinicia_Album_de_lineas
+Limpia_y_reinicia_Scanlines_album
 
-;   Limpia Album_de_lineas.
+;   Limpia Scanlines_album.
     
-    ld hl,(Album_de_lineas_SP)
+    ld hl,(Scanlines_album_SP)
     ld a,l
     and a
     ret z   ;   Salimos si el álbum está vacío.
@@ -138,9 +138,9 @@ Limpia_y_reinicia_Album_de_lineas
     dec l
     djnz 1B
 
-;   Reinicializa (Album_de_lineas_SP).
+;   Reinicializa (Scanlines_album_SP).
 
-    ld hl,Album_de_lineas
-    ld (Album_de_lineas_SP),hl
+    ld hl,Scanlines_album
+    ld (Scanlines_album_SP),hl
 
     ret
