@@ -264,7 +264,7 @@ Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta column
 
 Ctrl_2 db 0 											
 ;														BIT 0, Los sprites se inician con un `sprite vacío', (sprite formado por "ceros"), cuando la rutina_
-;															_ [Guarda_foto_registros] guarda su 1ª imagen.
+;															_ [Genera_datos_de_impresion] guarda su 1ª imagen.
 ;															_ Más adelante las rutinas [Mov_left] y [Mov_right] restauraran (Puntero_objeto). Si el 1er movimiento
 ; 															_ que hace la entidad después de iniciarse es hacia arriba/abajo no se restaurará (Puntero_objeto), pués_
 ; 															_ las rutinas [Mov_up] y [Mov_down] no necesitan modificar el sprite.
@@ -343,7 +343,7 @@ Ctrl_1 db 0 											; Byte de control de propósito general.
 ;														DESCRIPCIÓN:
 ;
 ;														BIT 0, La rutina de generación de disparos, [Genera_disparo], pone este bit a "1" para indicar a la_
-;															_ rutina [Guarda_foto_registros] que los datos a guardar pertenecen a un disparo y no a una entidad,_
+;															_ rutina [Genera_datos_de_impresion] que los datos a guardar pertenecen a un disparo y no a una entidad,_
 ;															_ por lo tanto hemos de almacenarlos en `Scanlines_album_disparos´ en lugar de `Scanlines_album´.
 ;														BIT 1, Este bit indica que el disparo sale de la pantalla, ($4000-$57ff).
 ;														BIT 2, Este bit a "1" indica que un disparo de Amadeus ha alcanzado a una entidad. Como no sabemos cual,_
@@ -369,7 +369,7 @@ Numero_de_entidades db 0								; Nº total de entidades maliciosas que contiene
 Numero_parcial_de_entidades db 7						; Nº de cajas que contiene un bloque de entidades. (7 Cajas).
 Entidades_en_curso db 0									; ..... ..... .....
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
-;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
+;														; Esta variable es utilizada por la rutina [Genera_datos_de_impresion]_
 ;														; _ para actualizar el puntero (Scanlines_album_SP) o reiniciarlo cuando_
 ;														; _ (Numero_de_malotes)="0".
 Puntero_indice_ENTIDADES defw 0 						; Se desplazará por el índice de entidades para `meterlas' en cajas.
@@ -528,7 +528,7 @@ START
 
 ;	call Guarda_movimiento_masticado	;! Provisional
 
-;	call Guarda_foto_registros
+;	call Genera_datos_de_impresion
 ;	call Guarda_datos_de_borrado_Amadeus
 
 ;	ld de,Amadeus_db
@@ -1356,7 +1356,7 @@ Guarda_foto_entidad_a_pintar
 
 ;	call Draw
 ;	call Guarda_movimiento_masticado	;! Provisional
-	call Guarda_foto_registros
+	call Genera_datos_de_impresion
 	ret
 
 ; ENTIDADES!
@@ -1369,7 +1369,7 @@ Guarda_foto_entidad_a_pintar
 ; {Almacen_de_movimientos_masticados_Entidad_1} lleno. Se trata de una "ENTIDAD_FANTASMA".
 
 4
-;	call Prepara_registros_con_mov_masticados	; (Tb Guarda_foto_registros).
+;	call Prepara_registros_con_mov_masticados	; (Tb Genera_datos_de_impresion).
 	ret
 
 ; Hemos completado el último movimiento del patrón de movimientos ???, se ha aplicado REINICIO ???
@@ -1408,7 +1408,7 @@ Guarda_foto_entidad_a_pintar
 
 3 	call Draw 											
 	call Guarda_movimiento_masticado
-	call Guarda_foto_registros							; Hemos modificado (Scanlines_album_SP), +6.
+	call Genera_datos_de_impresion							; Hemos modificado (Scanlines_album_SP), +6.
 
 ; Este ha sido el último "movimiento_masticado" que hemos guardado ???
 ; Si es así, hemos de reinicializar el (Puntero_de_mov_masticados) y el (Contador_de_mov_masticados) de la entidad.
@@ -1951,7 +1951,7 @@ Actualiza_relojes
 	include "calcula_tercio.asm"
 	include "Cls.asm"
 	include "Genera_coordenadas.asm"
-	include "Guarda_foto_registros.asm"
+	include "Genera_datos_de_impresion.asm"
 
 	SAVESNA "Pruebas.sna", START
 

@@ -40,20 +40,31 @@ Genera_datos_de_impresion
 
     ld hl,0
 
-    jr $
-
     push ix
     dec sp
     adc hl,sp
     push de
+
+; Recuperamos SP.
+
     ld sp,(Stack)
 
     push hl
+    pop af
+    ex af,af'                                      ; AF´ almacena la casilla donde vamos a almacenar el nº de scanlines que vamos a generar a continuación. 
+    
+; Tenemos el encabezado listo.
+; Preparamos registros para generar los scanlines.
+
+    push ix
+    pop hl                                         ; 1er scanline en HL.
+
+
+    ld de,(Scanlines_album_SP)
 
 ;   Llegados a este punto: seguimos teniendo el Puntero_de_impresión en IX y Puntero_objeto en DE.
 
-
-
+    
 
 
 

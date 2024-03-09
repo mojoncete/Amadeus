@@ -209,10 +209,10 @@ Store_Restore_cajas
 Guarda_foto_de_mov_masticado 
 
 	call Cargamos_registros_con_mov_masticado
-	call Guarda_foto_registros
-;																; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
+	call Genera_datos_de_impresion
+;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
 ;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
-;																; La rutina [Guarda_foto_registros] activa las interrupciones antes del RET.
+;																; La rutina [Genera_datos_de_impresion] activa las interrupciones antes del RET.
 ; Actualizamos (Contador_de_mov_masticados) tras la foto.	
 
 	call Decrementa_Contador_de_mov_masticados
@@ -290,7 +290,7 @@ Reinicia_entidad_maliciosa
 	ld (Scanlines_album_SP),hl
 
 	call Cargamos_registros_con_mov_masticado
-	call Guarda_foto_registros
+	call Genera_datos_de_impresion
 
 	ld hl,(Contador_de_mov_masticados)
 	dec hl
