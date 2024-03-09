@@ -35,7 +35,7 @@ Draw
 
 3 call calcula_CColumnass							; Define el valor de la variable (Columnas). Nº de columnas que se van a pintar de la entidad.
 	call Calcula_puntero_de_impresion				; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
-	call Define_rutina_de_impresion
+;	call Define_rutina_de_impresion
 
 	ld a,(Ctrl_0)									; Antes de salir de la rutina REStauramos el bit5 de Ctrl_0 para que nos vuelva_
 	res 5,a											; _a ser de utilidad.
@@ -728,9 +728,9 @@ PreviousScan ld a,h
 ;	Rutina principal de pintado de entidades.
 ;	Extrae la foto del frame, (entidades).
 
-Extrae_Album_de_fotos 
+Extrae_Album_de_lineas 
 
-	ld hl,Album_de_fotos+1									
+	ld hl,Album_de_lineas+1									
 	ld a,(hl)
 	and a
 	ret z 																	; Salimos si el álbum está vacío.
@@ -743,8 +743,8 @@ Extrae_Album_de_fotos
 
 ; -----------------------------------
 
-	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
-	ld sp,Album_de_fotos
+	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_lineas
+	ld sp,Album_de_lineas
 
 2 pop iy																	; (Puntero_objeto) en IY.
 	pop hl																	; Puntero de impresión de pantalla en HL.
@@ -788,7 +788,7 @@ Imprime db 0,0,0
 
 Extrae_foto_disparos
 
-	ld hl,Album_de_fotos_disparos+1
+	ld hl,Album_de_lineas_disparos+1
     ld a,(hl)
     and a
     ret z		
@@ -796,8 +796,8 @@ Extrae_foto_disparos
 	ld a,(Numero_de_disparotes)
 	and a
 	ret z
-	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
-	ld sp,Album_de_fotos_disparos
+	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_lineas
+	ld sp,Album_de_lineas_disparos
 
 2 pop iy																	; (Puntero_objeto) en IY.
 	pop hl																	; Puntero de impresión de pantalla en HL.
@@ -835,9 +835,9 @@ Imprime2 db 0,0,0
 ;	4/9/23
 ;
 ;	Rutina principal de pintado de Amadeus.
-;	Extrae fotos de Album_de_fotos_Amadeus.
+;	Extrae fotos de Album_de_lineas_Amadeus.
 
-Extrae_foto_Amadeus	ld hl,Album_de_fotos_Amadeus
+Extrae_foto_Amadeus	ld hl,Album_de_lineas_Amadeus
 	ld a,(hl)
 	and a
 	ret z 																	; Salimos si no hay datos en el álbum. VACÍO.
@@ -848,8 +848,8 @@ Extrae_foto_Amadeus	ld hl,Album_de_fotos_Amadeus
 
 ; -----------------------------------
 
-	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
-	ld sp,Album_de_fotos_Amadeus
+	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Album_de_lineas
+	ld sp,Album_de_lineas_Amadeus
 
 2 pop iy																	; (Puntero_objeto) en IY.
 	pop hl																	; Puntero de impresión de pantalla en HL.
@@ -947,7 +947,7 @@ Retorno	exx
 	jp Borra_3x2
 
 
-Borra_2x2 ld (Stack),sp														; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
+Borra_2x2 ld (Stack),sp														; Guardo el puntero de pila y lo sitúo al principio del Album_de_lineas
 	ld sp,(Puntero_de_scanlines_masticados_a_borrar)
 
 	pop hl
@@ -1054,7 +1054,7 @@ Borra_2x2 ld (Stack),sp														; Guardo el puntero de pila y lo sitúo al 
 
 	ret
 
-Borra_3x2  ld (Stack),sp														; Guardo el puntero de pila y lo sitúo al principio del Album_de_fotos
+Borra_3x2  ld (Stack),sp														; Guardo el puntero de pila y lo sitúo al principio del Album_de_lineas
 	ld sp,(Puntero_de_scanlines_masticados_a_borrar)
 
 	xor a

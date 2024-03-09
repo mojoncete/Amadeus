@@ -1,12 +1,14 @@
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;   19/1/24
+;   8/3/24
 ;
 ;	Carga el nº de entidades del nivel en (Numero_de_entidades). 
 ;	Fija los perfiles de velocidad según el Nivel de dificultad.
 ;	Sitúa el puntero (Datos_de_nivel) en la dirección de memoria donde se encuentra el .db que define el (Tipo)_
 ;	_ de la 1ª entidad del Nivel.
-;	
+;
+;	Sitúa (Puntero_indice_mov) en la coreografía correcta.
+
 ;	MODIFICA: HL,DE y A. 
 ;	ACTUALIZA: (Puntero_indice_NIVELES), (Numero_de_entidades) y (Datos_de_nivel).
 
@@ -18,10 +20,10 @@ Inicializa_Nivel
 	ld (Numero_de_entidades),a					 ; Fijamos el nº de entidades que tiene el nivel.
 	inc hl
 	call Fija_velocidades					     ; Perfiles_de_velocidad según Nivel.
-	ld (Datos_de_nivel),hl						 ; (Datos_de_nivel) ahora apunta a la dirección de mem. donde se encuentra el .db que indica__ 
-	call Inicializa_Puntero_indice_mov			 ; Inicializa (Puntero_indice_mov) según el (Tipo) de Entidad. (Coreografía).
-;												 ; _ el (Tipo) de la 1ª entidad del Nivel.
-	call Inicializa_Puntero_de_almacen_de_mov_masticados
+	ld (Datos_de_nivel),hl						 ; (Datos_de_nivel) ahora apunta a la dirección de mem. donde se encuentra el .db que indica el (Tipo) de la 1ª entidad del Nivel.
+	call Inicializa_Puntero_indice_mov			 ; Inicializa (Puntero_indice_mov) según el (Tipo) de Entidad. Nos situamos en la coreografía correcta.
+												 
+	call Inicializa_Puntero_de_almacen_de_mov_masticados	; Selecciona el almacén adecuado de mov_masticados según el (Tipo) de entidad. 
 	ret 										 
 
 ; ----------------------
@@ -278,14 +280,14 @@ Reinicia_entidad_maliciosa
 
 	ld (Puntero_de_almacen_de_mov_masticados),hl
 
-;	Recolocamos el puntero (Stack_snapshot) del álbum de fotos para colocamos justo después del borrado.
+;	Recolocamos el puntero (Album_de_lineas_SP) del álbum de fotos para colocamos justo después del borrado.
 ;	Queremos pintar la entidad en su posición de inicio.
 
-	ld hl,(Stack_snapshot)
+	ld hl,(Album_de_lineas_SP)
 	ld bc,6
 	and a
 	sbc hl,bc
-	ld (Stack_snapshot),hl
+	ld (Album_de_lineas_SP),hl
 
 	call Cargamos_registros_con_mov_masticado
 	call Guarda_foto_registros

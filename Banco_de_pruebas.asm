@@ -47,7 +47,7 @@ FRAME ld (Stack_3),sp
 ;	exx
 
 	call Pinta_Sprites
-;	call Extrae_Album_de_fotos 	
+;	call Extrae_Album_de_lineas 	
 
 ;	ld a,6	
 ;	out ($fe),a												
@@ -136,21 +136,29 @@ Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_de
 
 Almacen_de_scanlines_masticados_a_borrar equ $e800
 Almacen_de_scanlines_masticados equ $e900
-Almacen_de_movimientos_masticados_Entidad_1 equ $eb00	; $eb00 - $ff09 ..... $1409 / 5129 bytes. Guardaremos los movimientos masticados que ha hido generando la entidad guía.
+Almacen_de_movimientos_masticados_Entidad_1 equ $eb00	; $eb00 - $f85c ..... $0d5c / 3420 bytes. Guardaremos los movimientos masticados que ha hido generando la entidad guía.
 Almacen_de_movimientos_masticados_Amadeus equ $e700		
 ;
-Album_de_fotos equ $8000	;	(8000h - 8055h).		; En (Album_de_fotos) vamos a ir almacenando los valores_
-;                                   				    ; _de los registros y las llamadas a las rutinas de impresión.   
-;                               				        ; De momento situamos este almacén en $7000. La capacidad del album será de 7 entidades.  
-Album_de_fotos_disparos equ $8056 ;  (8056h - 80abh).	; En (Album_de_fotos_disparos) vamos a ir almacenando los valores_
+Album_de_lineas equ $8000	;	(8000h - 8118h), 		; Inicialmente 280 bytes. 
+
+;                                                       ;	35 bytes por entidad. 
+;														;	1. 2 Bytes ..... .defw  Puntero_objeto, (mem. address donde se encuentran los .db que forman los distintos sprites).
+;                                                       ;	2. 1 Byte ..... .db  Indica el nº de scanlines que vamos a imprimir del sprite. Generalmente 16 scanlines.
+;														;		El nº de scanlines será menor cuando estemos `desapareciendo´ por la parte baja de la pantalla.					 	
+; 														;	3. 32 Bytes, (como máximo). Screen mem. address de cada uno de los scanlines que forman el sprite.
+
+
+Album_de_lineas_disparos equ $8119 ;  (8119h - 816eh).	; En (Album_de_lineas_disparos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´. 
 ;														; 55 Bytes.
 
-Album_de_fotos_Amadeus equ $80ac	 ;  (80ach - 810eh) ; 12 bytes.
+Album_de_lineas_Amadeus equ $816f	 ;  (816fh - 8192h) ; 12 bytes.
 
-;Almacen_de_parametros_DRAW equ $80b9 ; ($80b9 - $80fb) ; 66 bytes.
+Almacen_de_parametros_DRAW equ $8193 ; ($8193 - $81d5h) ; 66 bytes.
 
-; 54h es el espacio necesario en (Album_de_fotos) para 7 entidades/disparos en pantalla.
+	ds 45
+
+; 54h es el espacio necesario en (Album_de_lineas) para 7 entidades/disparos en pantalla.
 
 ; ******************************************************************************************************************************************************************************************
 ; Variables. 
@@ -297,7 +305,7 @@ Contador_general_de_mov_masticados_Entidad_4 defw 0
 
 Puntero_de_scanlines_masticados defw Almacen_de_scanlines_masticados
 Puntero_de_scanlines_masticados_a_borrar defw Almacen_de_scanlines_masticados_a_borrar
-Puntero_de_scanlines_en_album defw Album_de_fotos+2
+Puntero_de_scanlines_en_album defw Album_de_lineas+2
 
 Semaforo_de_rutinas_de_impresion_utilizadas ds 8	;! Para acelerar la rutina de borrado de sprites, hemos de poder desplazarnos por este almacén con 1 byte.!!
 
@@ -336,7 +344,7 @@ Ctrl_1 db 0 											; Byte de control de propósito general.
 ;
 ;														BIT 0, La rutina de generación de disparos, [Genera_disparo], pone este bit a "1" para indicar a la_
 ;															_ rutina [Guarda_foto_registros] que los datos a guardar pertenecen a un disparo y no a una entidad,_
-;															_ por lo tanto hemos de almacenarlos en `Album_de_fotos_disparos´ en lugar de `Album_de_fotos´.
+;															_ por lo tanto hemos de almacenarlos en `Album_de_lineas_disparos´ en lugar de `Album_de_lineas´.
 ;														BIT 1, Este bit indica que el disparo sale de la pantalla, ($4000-$57ff).
 ;														BIT 2, Este bit a "1" indica que un disparo de Amadeus ha alcanzado a una entidad. Como no sabemos cual,_
 ;															_ hemos de comparar las coordenadas de (Coordenadas_disparo_certero) con las de cada entidad.
@@ -362,7 +370,7 @@ Numero_parcial_de_entidades db 7						; Nº de cajas que contiene un bloque de e
 Entidades_en_curso db 0									; ..... ..... .....
 Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Guarda_foto_registros]_
-;														; _ para actualizar el puntero (Stack_snapshot) o reiniciarlo cuando_
+;														; _ para actualizar el puntero (Album_de_lineas_SP) o reiniciarlo cuando_
 ;														; _ (Numero_de_malotes)="0".
 Puntero_indice_ENTIDADES defw 0 						; Se desplazará por el índice de entidades para `meterlas' en cajas.
 Datos_de_entidad defw 0									; Contiene los bytes de información de la entidad hacia la que apunta el 
@@ -380,16 +388,17 @@ Stack defw 0 											; La rutinas de pintado, utilizan esta_
 Stack_2 defw 0											; 2º variable destinada a almacenar el puntero de pila, SP.
 ;														; La utiliza la rutina [Extrae_foto_registros].
 Stack_3 defw 0											; Almacena el SP antes de ejecutar FRAME.
-Stack_snapshot defw Album_de_fotos
 
-Stack_snapshot_disparos defw Album_de_fotos_disparos
+Album_de_lineas_SP defw Album_de_lineas
 
-;End_Snapshot defw Album_de_fotos										
-;														; Inicialmente está situado el la posición $7000, Album_de_fotos.
-End_Snapshot_disparos defw Album_de_fotos_disparos							; Puntero que indica la posición de memoria donde vamos a guardar_
+Album_de_lineas_disparos_SP defw Album_de_lineas_disparos
+
+End_Snapshot defw Album_de_lineas										
+;														; Inicialmente está situado el la posición $7000, Album_de_lineas.
+End_Snapshot_disparos defw Album_de_lineas_disparos							; Puntero que indica la posición de memoria donde vamos a guardar_
 ;														; _el snapshot de los registros del siguiente disparo.
-;														; Inicialmente está situado en la posición $7060, Album_de_fotos_disparos.
-End_Snapshot_Amadeus defw Album_de_fotos_Amadeus
+;														; Inicialmente está situado en la posición $7060, Album_de_lineas_disparos.
+End_Snapshot_Amadeus defw Album_de_lineas_Amadeus
 
 Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una única entidad.
 ;
@@ -492,7 +501,6 @@ START
 ;														 ; Inicializa (Datos_de_nivel) con el `tipo´ de la 1ª entidad del nivel. 
 	
 ;	Provisional, (para desarrollo).
-
 	;-
 ;	ld hl,Numero_parcial_de_entidades
 ;	ld b,(hl)
@@ -575,8 +583,8 @@ Main
 	call Genera_scanlines_masticados_a_borrar
 	call Limpia_Almacen_de_scanlines_masticados
 
-	call Limpia_y_reinicia_Stack_Snapshot 				; Lo 1º que hacemos después de pintar es limpiar el álbum de fotos e inicializar 
-; 													 	; _(Stack_snapshot).
+	call Limpia_y_reinicia_Album_de_lineas 				; Lo 1º que hacemos después de pintar es limpiar el álbum de fotos e inicializar 
+; 													 	; _(Album_de_lineas_SP).
 
 	ld a,(Clock_Entidades_en_curso)	
 	ld b,a
@@ -669,7 +677,7 @@ Main
 
 11 ld a,(Entidades_en_curso)
 	and a
-	jr z,16F											; Si no hay entidades en curso saltamos a [Avanza_puntero_de_album_de_fotos_de_entidades].
+	jr z,16F											; Si no hay entidades en curso saltamos a [Avanza_puntero_de_Album_de_lineas_de_entidades].
 	ld b,a												; No hay entidades que gestionar.
 
 ; ( Código que ejecutamos con cada entidad: ).
@@ -1021,7 +1029,7 @@ Mov_obj
 ; ---------
 
 ;1 call Prepara_var_pintado	 			                		; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´en su {Variables_de_pintado}.      
-;	call Repone_datos_de_borrado 								; ! BORRAMOS !!!. Guardamos la foto de las {Variables_de_borrado} en Album_de_fotos.
+;	call Repone_datos_de_borrado 								; ! BORRAMOS !!!. Guardamos la foto de las {Variables_de_borrado} en Album_de_lineas.
 ;	call Limpia_Variables_de_borrado
 
 3 ret													
@@ -1120,7 +1128,7 @@ Limpia_Almacen_de_scanlines_masticados
 	ld hl,Almacen_de_scanlines_masticados
 	ld (Puntero_de_scanlines_masticados),hl
 
-	ld hl,Album_de_fotos+2
+	ld hl,Album_de_lineas+2
 	ld (Puntero_de_scanlines_en_album),hl
 
 	ret
@@ -1182,8 +1190,8 @@ Genera_scanlines_masticados_a_borrar
 
 Genera_scanlines_masticados	
 
-	and a
-	ret z 												; Salimos si no hay malotes que pintar.
+;	and a
+;	ret z 												; Salimos si no hay malotes que pintar.
 
 	ld hl,(Puntero_de_scanlines_en_album) 				; Dirección donde se encuentra el 1er puntero de impresión en el álbum de fotos.
 	ld de,(Puntero_de_scanlines_masticados) 			; Inicialmente se encuentra al comienzo del Almacén de scanlines masticados.
@@ -1278,9 +1286,9 @@ Guarda_movimiento_masticado
 	ld (Stack),sp
 	ld sp,(Puntero_de_almacen_de_mov_masticados)			; Guardamos el movimiento masticado en el almacén.
 
-	push hl
-    push ix
-    push iy
+;	push hl
+    push ix 												; Pushea el Puntero_de_impresión, (1er scanline).
+    push iy 												; Pushea Puntero_objeto.
  
     ld sp,(Stack)
 
@@ -1301,7 +1309,7 @@ Guarda_movimiento_masticado
 Actualiza_Puntero_de_almacen_de_mov_masticados 
 
 	ld hl,(Puntero_de_almacen_de_mov_masticados)
-	ld bc,6
+	ld bc,4
 	and a
 	adc hl,bc
 	ld (Puntero_de_almacen_de_mov_masticados),hl
@@ -1322,9 +1330,9 @@ Actualiza_Puntero_de_almacen_de_mov_masticados
 Cargamos_registros_con_mov_masticado ld (Stack),sp
 	ld sp,(Puntero_de_almacen_de_mov_masticados)
 
-	pop iy
-	pop ix
-	pop hl
+	pop de 															; IY contiene Puntero_objeto
+	pop ix 															; IX contiene Puntero_de_impresion
+;	pop hl
 
 	ld (Puntero_de_almacen_de_mov_masticados),sp 					; Actualiza (Puntero_de_almacen_de_mov_masticados).
 
@@ -1401,7 +1409,7 @@ Guarda_foto_entidad_a_pintar
 
 3 	call Draw 											
 	call Guarda_movimiento_masticado
-	call Guarda_foto_registros							; Hemos modificado (Stack_snapshot), +6.
+	call Guarda_foto_registros							; Hemos modificado (Album_de_lineas_SP), +6.
 
 ; Este ha sido el último "movimiento_masticado" que hemos guardado ???
 ; Si es así, hemos de reinicializar el (Puntero_de_mov_masticados) y el (Contador_de_mov_masticados) de la entidad.
@@ -1448,23 +1456,23 @@ Inicia_Puntero_Disparo_Amadeus ld hl,Indice_de_disparos_Amadeus
 ; 21/9/23 
 ;
 
-; Album_de_fotos_Amadeus equ $72a0 ; (72a0h - 72ach).
+; Album_de_lineas_Amadeus equ $72a0 ; (72a0h - 72ach).
 
 Limpia_album_Amadeus 
 
-	ld hl,Album_de_fotos_Amadeus
+	ld hl,Album_de_lineas_Amadeus
 	ld a,(hl)
 	and a
 	ret z
 
-	ld hl,Album_de_fotos_Amadeus
-	ld de,Album_de_fotos_Amadeus+1
+	ld hl,Album_de_lineas_Amadeus
+	ld de,Album_de_lineas_Amadeus+1
 	ld bc,11
 	xor a
 	ld (hl),a
 	ldir
 
-	ld hl,Album_de_fotos_Amadeus
+	ld hl,Album_de_lineas_Amadeus
 	ld (End_Snapshot_Amadeus),hl
 
 	ret
@@ -1484,13 +1492,13 @@ Limpia_Variables_de_borrado ld hl,Variables_de_borrado
 ;	MODIFICA: AF,HL,BC,DE
 ;	
 ; 	(Numero_de_malotes) lo utiliza la rutina [Extrae_foto_entidades] para borrar/pintar entidades en pantalla.
-; 	Se calcula dividiendo entre 6 el nº de bytes que contiene el Album_de_fotos.
+; 	Se calcula dividiendo entre 6 el nº de bytes que contiene el Album_de_lineas.
 
 Calcula_numero_de_malotes 
 
-	ld hl,Album_de_fotos
+	ld hl,Album_de_lineas
 	ex de,hl
-	ld hl,(Stack_snapshot)
+	ld hl,(Album_de_lineas_SP)
 
 	ld b,0
 	ld a,l
@@ -1514,11 +1522,11 @@ Calcula_numero_de_malotes
 ;
 
 ; (Numero_de_malotes_Amadeus) lo utiliza la rutina [Extrae_foto_Amadeus] para borrar/pintar la nave en pantalla.
-; Se calcula dividiendo entre 6 el nº de bytes que contiene el Album_de_fotos.
+; Se calcula dividiendo entre 6 el nº de bytes que contiene el Album_de_lineas.
 
 Calcula_malotes_Amadeus 
 
-	ld hl,Album_de_fotos_Amadeus
+	ld hl,Album_de_lineas_Amadeus
 	ex de,hl
 	ld hl,(End_Snapshot_Amadeus)
 
@@ -1549,7 +1557,7 @@ Calcula_malotes_Amadeus
 
 Calcula_numero_de_disparotes 
 
-	ld hl,Album_de_fotos_disparos
+	ld hl,Album_de_lineas_disparos
 	ex de,hl
 	ld hl,(End_Snapshot_disparos)
 
@@ -1867,7 +1875,7 @@ Guarda_datos_de_borrado_Amadeus	ld hl,(End_Snapshot_Amadeus)
 Repone_datos_de_borrado_Amadeus
 
 	ld hl,Variables_de_borrado
-	ld de,Album_de_fotos_Amadeus
+	ld de,Album_de_lineas_Amadeus
 	ld bc,6
 	ldir
 
@@ -1882,20 +1890,20 @@ Repone_datos_de_borrado_Amadeus
 ;
 
 ;	Si se ha producido movimiento de la entidad en curso, esta rutina vuelca las `Variables_de_borrado´ en el_
-;	_ Album_de_fotos correspondiente.
+;	_ Album_de_lineas correspondiente.
 
 ;	El proceso de "escritura en los álbumes de fotos" no puede verse interrumpido por la rutina FRAME, (di/ei)_
 ;	_ durante el proceso de escritura.
 
 Repone_datos_de_borrado
 
-	ld de,(Stack_snapshot)
+	ld de,(Album_de_lineas_SP)
 	ld hl,Variables_de_borrado
 	ld bc,6
 	ldir
 
 	ex de,hl
-	ld (Stack_snapshot),hl
+	ld (Album_de_lineas_SP),hl
 
 	ret
 
