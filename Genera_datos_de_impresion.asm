@@ -51,51 +51,235 @@ Genera_datos_de_impresion
 
     push hl
     pop af
-    ex af,af'                                      ; AF´ almacena la casilla donde vamos a almacenar el nº de scanlines que vamos a generar a continuación. 
+    ex af,af'                                       ; AF´ almacena la casilla donde vamos a almacenar el nº de scanlines que vamos a generar a continuación. 
     
 ; Tenemos el encabezado listo.
 ; Preparamos registros para generar los scanlines.
 
     push ix
-    pop hl                                         ; 1er scanline en HL.
-
+    pop hl                                          ; 1er scanline en HL.
 
     ld de,(Scanlines_album_SP)
 
-;   Llegados a este punto: seguimos teniendo el Puntero_de_impresión en IX y Puntero_objeto en DE.
+; Voy a utilizar 2 rutinas para generar las líneas. Una será rápida y otra lenta. La lenta sólo se empleará cuando el sprite esté desapareciendo o apareciendo_
+; _por la parte baja de la pantalla, en este caso no se podrán imprimir las 16 líneas pues entramos en attr. mem. 
 
+    ld a,h
+    cp $50
+    jr c,Genera_scanlines_rapidos                   ; No hemos llegado a la parte baja de la pantalla. 
+
+    jr nz,2F
+
+    ld a,l
+    cp $e0
+    jr c,Genera_scanlines_rapidos                   ; El 1er scanline está en una dirección $50xx. Si estamos en la FILA $C0-$DF, podemos imprimir todos los scanlines del sprite.
+
+2 ld a,l
+    cp $c0
+    jp nc,Genera_scanlines_lentos                   ; En las 2 últimas líneas el Sprite sólo se imprime completo cuando el primer scanline está en una dirección $50xx.
+
+Genera_scanlines_rapidos ; -------------------------------------------------------------------------------------------------------------------------------------
+
+    call NextScan
+    ex de,hl
+
+    ld (hl),e
+    inc l
+    ld (hl),d
+    inc l
+
+    ex de,hl
     
+    call NextScan
+    ex de,hl
 
+    ld (hl),e
+    inc l
+    ld (hl),d
+    inc l
 
+    ex de,hl
 
+    call NextScan
+    ex de,hl
 
+    ld (hl),e
+    inc l
+    ld (hl),d
+    inc l
 
-
-
-
-; Disparo o entidad ?
-
-    ld a,(Ctrl_1)
-    bit 0,a
-    jr z,5F
+    ex de,hl
     
-;    ld (Scanlines_album_disparos_SP),hl
-    jr 6F
+    call NextScan
+    ex de,hl
 
-; Entidad o Amadeus ?
+    ld (hl),e
+    inc l
+    ld (hl),d
+    inc l
 
-5 ld a,(Ctrl_0)
-    bit 6,a
-    jr z,8F
+    ex de,hl
 
-;    ld (End_Snapshot_Amadeus),hl    
-;    ld sp,(Stack)
+    call NextScan
+    ex de,hl
+
+    ld (hl),e
+    inc l
+    ld (hl),d
+    inc l
+
+    ex de,hl
+    
+    call NextScan
+    ex de,hl
+
+    ld (hl),e
+    inc l
+    ld (hl),d
+    inc l
+
+    ex de,hl
+
+    call NextScan
+    ex de,hl
+
+    ld (hl),e
+    inc l
+    ld (hl),d
+    inc l
+
+    ex de,hl
+    
+    call NextScan
+    ex de,hl
+
+    ld (hl),e
+    inc l
+    ld (hl),d
+    inc l
+
+    ex de,hl
+
+    call NextScan
+    ex de,hl
+
+    ld (hl),e
+    inc l
+    ld (hl),d
+    inc l
+
+    ex de,hl
+    
+    call NextScan
+    ex de,hl
+
+    ld (hl),e
+    inc l
+    ld (hl),d
+    inc l
+
+    ex de,hl
+
+    call NextScan
+    ex de,hl
+
+    ld (hl),e
+    inc l
+    ld (hl),d
+    inc l
+
+    ex de,hl
+    
+    call NextScan
+    ex de,hl
+
+    ld (hl),e
+    inc l
+    ld (hl),d
+    inc l
+
+    ex de,hl
+
+    call NextScan
+    ex de,hl
+
+    ld (hl),e
+    inc l
+    ld (hl),d
+    inc l
+
+    ex de,hl
+    
+    call NextScan
+    ex de,hl
+
+    ld (hl),e
+    inc l
+    ld (hl),d
+    inc l
+
+    ex de,hl
+
+    call NextScan
+    ex de,hl
+
+    ld (hl),e
+    inc l
+    ld (hl),d
+    inc l
+
+; Todos los scanlines generados. actualizamos el puntero (Scanlines_album_SP).
+
+    ld (Scanlines_album_SP),hl
+
+; Completamos la casilla pendiente, (define el nº total de scanlines). 
+
+    ex af,af
+
+    push af
+    pop hl
+
+    ld (hl),16
+
     ret
 
-8 ld (Scanlines_album_SP),hl
-6 ld sp,(Stack)
+Genera_scanlines_lentos ; -------------------------------------------------------------------------------------------------------------------------------------
 
-    ret
+; En 1er lugar calculamos el nº de scanlines que podemos imprimir.
+
+    ld a,$58
+    sub h
+    ld b,a
+
+    ld a,$df
+    cp l 
+    jr c,1F 
+
+    ld a,8
+    add b
+    ld b,a
+
+; Tenemos en el registro B el nº de scanlines que podemos imprimir del sprite. Imprimimos.
+
+1 jr $
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ; -----------------------------------------------------------------------------
 ;

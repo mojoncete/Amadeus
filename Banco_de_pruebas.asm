@@ -557,7 +557,6 @@ START
 ; Entidades y Amadeus iniciados. Esperamos a [FRAME].
 
 6 call Calcula_numero_de_malotes
-	call Genera_scanlines_masticados
 
 	jr $
 
@@ -823,8 +822,6 @@ Main
 
 16 
 	call Calcula_numero_de_malotes 						; Si el nº de malotes es "0" no generamos scanlines masticados. No ha habido movimiento.
-	call Genera_scanlines_masticados	
-;	call Prepara_Borra_sprites
 
 	ld hl,Ctrl_3
 	set 0,(hl)											; Frame completo. 
@@ -1070,7 +1067,7 @@ Construye_movimientos_masticados_entidad
 ;															; _ el (Contador_de_mov_masticados).    
 	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
-	call Recompone_posicion_inicio
+;	call Recompone_posicion_inicio
 
 1 call Draw
 	call Guarda_movimiento_masticado
@@ -1098,181 +1095,6 @@ Construye_movimientos_masticados_entidad
 	ld (hl),c
 	inc hl
 	ld (hl),b
-
-	ret
-
-; -----------------------------------------------------------------------------------
-;
-;	28/02/24
-;
-
-;Limpia_Almacen_de_scanlines_masticados 
-
-;	ld hl,(Puntero_de_scanlines_masticados)
-;	ld bc,Almacen_de_scanlines_masticados
-;	and a
-;	sbc hl,bc
-;	ret z 												; Salimos. No hay scanlines masticados que copiar.
-
-;	push hl
-;	pop bc
-
-;	ld hl,Almacen_de_scanlines_masticados
-;	ld de,Almacen_de_scanlines_masticados+1
-
-;	xor a
-;	ld (hl),a
-
-;	ldir
-
-;	ld hl,Almacen_de_scanlines_masticados
-;	ld (Puntero_de_scanlines_masticados),hl
-
-;	ld hl,Scanlines_album+2
-;	ld (Puntero_de_scanlines_en_album),hl
-
-;	ret
-
-
-;Limpia_Almacen_de_scanlines_masticados_a_borrar
-
-;	ld hl,(Puntero_de_scanlines_masticados_a_borrar)
-;	ld bc,Almacen_de_scanlines_masticados_a_borrar
-;	and a
-;	sbc hl,bc
-;	ret z 												; Salimos. No hay scanlines masticados que copiar.
-
-;	push hl
-;	pop bc
-
-;	ld hl,Almacen_de_scanlines_masticados_a_borrar
-;	ld de,Almacen_de_scanlines_masticados_a_borrar+1
-
-;	xor a
-;	ld (hl),a
-
-;	ldir
-
-;	ld hl,Almacen_de_scanlines_masticados_a_borrar
-;	ld (Puntero_de_scanlines_masticados_a_borrar),hl
-
-;	ret
-
-; -----------------------------------------------------------------------------------
-;
-;	28/02/24
-;
-
-;Genera_scanlines_masticados_a_borrar	
-
-;	ld hl,(Puntero_de_scanlines_masticados)
-;	ld bc,Almacen_de_scanlines_masticados
-;	and a
-;	sbc hl,bc
-;	ret z 												; Salimos. No hay scanlines masticados que copiar.
-
-;	push hl
-;	pop bc
-
-;	ld hl,Almacen_de_scanlines_masticados
-;	ld de,Almacen_de_scanlines_masticados_a_borrar
-;	ldir
-
-;	ld (Puntero_de_scanlines_masticados_a_borrar),de	; Situamos el puntero al principio del almacén.
-
-;	ret
-
-; -----------------------------------------------------------------------------------
-;
-;	6/03/24
-;
-;	INPUTS: A Y B contienen (Numero_de_malotes).
-
-Genera_scanlines_masticados	
-
-;	and a
-;	ret z 												; Salimos si no hay malotes que pintar.
-
-;	ld hl,(Puntero_de_scanlines_en_album) 				; Dirección donde se encuentra el 1er puntero de impresión en el álbum de fotos.
-;	ld de,(Puntero_de_scanlines_masticados) 			; Inicialmente se encuentra al comienzo del Almacén de scanlines masticados.
-
-1 push bc 												; Guardamos el nº de malotes.
-
-	ld a,(hl)
-	ld (de),a 											
-
-	inc l
-	inc e 												; Inc. punteros.
-
-	ld a,(hl)
-	ld (de),a 											; 1er scanline, (Puntero_de_impresion) en el Almacén de scanlines masticados.
-
-	call Construimos_scanlines 
-
-; Actualizamos (Puntero_de_scanlines_en_album). Nos situamos en el Puntero_de_impresion de la siguiente entidad.
-
-;	ld bc,5
-;	and a
-;	adc hl,bc
-;	ld (Puntero_de_scanlines_en_album),hl
-
-	pop bc
-
-	djnz 1B
-
-	ret
-	
-; --------------------------------------------------------
-;
-;	A partir del 1er scanline, (Puntero_de_impresion), generamos los 15 scanlines restantes.
-;	La producción de scanlines se detiene cuando entramos en memoria de attr. de pantalla. Esto viene representado con $0000 en el Almacén de scanlines masticados.
-
-Construimos_scanlines push hl
-	push bc
-
-	ld b,15
-	dec de
-
-	ld a,(de)
-	ld l,a
-	inc de
-	ld a,(de)
-	ld h,a 												; Puntero_de_impresión en HL.
-
-	inc de
-
-1 call NextScan
-
-; Entramos en memoria de attr.???
-
-; Si es así, decrementamos H. (Repetimos el último scancline).
-
-	ld a,h
-	cp $58
-	jr nz,2F
-
-	ld hl,0 											; Scanline NO IMPRIMIBLE, "0".
-
-2 ld a,l
-	ld (de),a
-	inc e
-	ld a,h
-	ld (de),a
-
-	inc e
-
-	inc h
-	dec h
-	jr z,3F  											; No generamos más escanlines si hemos entrado en memoria de attr.
-
-	djnz 1B 											; 15 scanlines generados.
-
-3 
-
-;	ld (Puntero_de_scanlines_masticados),de 				; Actualizamos puntero.
-
-	pop bc
-	pop hl
 
 	ret
 
