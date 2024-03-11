@@ -1,25 +1,10 @@
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
-;	12/12/23
+;	11/03/24
 ;
-;	Instrucciones donde interviene el Stack Pointer, (SP).
-
-;	ADC HL,SP	LD (addr),SP
-;	ADD HL,SP	LD SP,(addr)
-;	ADD IX,SP	LD SP,nn
-; 	ADD IY,SP	LD SP,HL
-;				LD SP,IX
-;	DEC SP		LD SP,IY
-
-;	EX (SP),HL
-;	EX (SP),IX
-;	EX (SP),IY
-
-;	INC SP
-
     org $80bf
 
-;   (Scanlines_album_SP) se sitúa inicialmente al comienzo del Scanlines_album.
+;   (Scanlines_album_SP) se sitúa inicialmente al comienzo de Scanlines_album.
 ;   DE contiene Puntero_objeto.
 ;   IX contiene el Puntero de impresión.
 
@@ -247,7 +232,7 @@ Genera_scanlines_lentos ; ------------------------------------------------------
 
 ; En 1er lugar calculamos el nº de scanlines que podemos imprimir.
 
-    ld a,$58
+    ld a,$57
     sub h
     ld b,a
 
@@ -259,27 +244,31 @@ Genera_scanlines_lentos ; ------------------------------------------------------
     add b
     ld b,a
 
-; Tenemos en el registro B el nº de scanlines que podemos imprimir del sprite. Imprimimos.
+; Tenemos en el registro B el nº de scanlines que podemos imprimir del sprite. 
+; Generamos scanlines de objeto que desaparece por la parte baja de la pantalla.
 
-1 jr $
+1 ld c,b
+    inc c
 
+3 call NextScan
+    ex de,hl
 
+    ld (hl),e
+    inc l
+    ld (hl),d
+    inc l
 
+    ex de,hl
 
+    djnz 3B
 
+    ex af,af
+    push af
+    pop hl    
 
+    ld (hl),c
 
-
-
-
-
-
-
-
-
-
-
-
+    ret
 
 ; -----------------------------------------------------------------------------
 ;
@@ -307,3 +296,9 @@ Limpia_y_reinicia_Scanlines_album
     ld (Scanlines_album_SP),hl
 
     ret
+
+; -----------------------------------------------------------------------------
+;
+;   11/03/24
+
+Pinta_Sprites jr $

@@ -885,65 +885,8 @@ Imprime db 0,0,0
 
 ;	ret
 
-; -----------------------------------------------------------------------------------
-;
-;	04/03/24
-;
-;	Borra los sprites impresos en pantalla.
-;	
-
-;Limpia_semaforo 
-
-;	xor a
-;	ld b,8
-;	ld hl,Semaforo_de_rutinas_de_impresion_utilizadas
-;1 ld (hl),a
-;	inc l
-;	djnz 1B
-;	ret
-
-; -----------------------------------------------------------------------------------
-;
-;	06/03/24
-;
-;	
-;	
-
-Pinta_Sprites jr $ 
 
 
 
-
-
-; -----------------------------------------------------------------------------------
-;
-;	01/03/24
-;
-;	Borra los sprites impresos en pantalla.
-;	
-
-;Borra_sprites 
-
-;	ld hl,Almacen_de_scanlines_masticados_a_borrar									
-;	ld a,(hl)
-;	and a
-;	ret z 																	; Salimos si no hay scanlines en el álbum.
-
-;	No hay datos, (entidades para pintar en este frame).
-
-;	ld a,(Numero_de_malotes)												; No se ha producido movimiento.
-;	and a																	; NO BORRAMOS !!!
-;	ret z
-
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-;Retorno	exx
-;	ld a,(hl)
-;	inc l
-;	exx
-;	dec a
-
-;	jr z,Borra_2x2
-;	jp Borra_3x2
 
 

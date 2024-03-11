@@ -31,21 +31,15 @@ FRAME ld (Stack_3),sp
 	push ix
 	push iy
 
-; Pintamos entidades/Amadeus y gestionamos álbumes de fotos de entidades.
-
 	ld a,2	
 	out ($fe),a												
 
 	ld a,(Ctrl_3)
 	bit 0,a
-	jr z,1F
+	jr z,1F 												; No pintamos si el FRAME no se ha completado.
 
 ;	call Borra_sprites
 	
-;	exx
-;	ld hl,Semaforo_de_rutinas_de_impresion_utilizadas
-;	exx
-
 	call Pinta_Sprites
 ;	call Extrae_Scanlines_album 	
 
@@ -518,7 +512,7 @@ START
 
 ;	ld a,(Ctrl_1)
 ;	bit 3,a
-;	jr nz,5F											; Loop
+;	jr nz,5F											 ; Loop
 
 ; 	INICIA AMADEUS !!!!!
 
@@ -556,12 +550,19 @@ START
 
 ; Entidades y Amadeus iniciados. Esperamos a [FRAME].
 
-6 call Calcula_numero_de_malotes
+6 
 
-	jr $
+;	call Calcula_numero_de_malotes
+
+; Damos por concluida la construcción del FRAME. 
+; Inicializamos (Scanlines_album_SP).
+
+	ld hl,Scanlines_album
+	ld (Scanlines_album_SP),hl
 
 	ld hl,Ctrl_3
-	set 0,(hl)											; Frame completo. 
+	set 0,(hl) 											 ; Indica Frame completo. 
+
 	ei
 	halt 
 
