@@ -142,6 +142,7 @@ Scanlines_album equ $8000	;	(8000h - 8118h), 		; Inicialmente 280 bytes.
 ;														;		El nº de scanlines será menor cuando estemos `desapareciendo´ por la parte baja de la pantalla.					 	
 ; 														;	3. 32 Bytes, (como máximo). Screen mem. address de cada uno de los scanlines que forman el sprite.
 
+Scanlines_album_2 equ $8119    ;    (8119h - 8231h)
 
 ;Scanlines_album_disparos equ $8119 ;  (8119h - 816eh).	; En (Scanlines_album_disparos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´. 
@@ -383,7 +384,8 @@ Stack_2 defw 0											; 2º variable destinada a almacenar el puntero de pila
 ;														; La utiliza la rutina [Extrae_foto_registros].
 Stack_3 defw 0											; Almacena el SP antes de ejecutar FRAME.
 
-Scanlines_album_SP defw Scanlines_album
+Sc_album_SP defw 0
+Scanlines_album_SP defw 0
 
 ;Scanlines_album_disparos_SP defw Scanlines_album_disparos
 
@@ -502,10 +504,11 @@ START
 ;	dec b
 ;	jr z,3F	;-									   		 ; Si no hay entidades, cargamos AMADEUS.
 
+	call Inicia_selector_de_albumes_de_lineas
+
 4 call Inicia_Entidades						 
 
 	call Inicia_punteros_de_cajas						 ; Situa (Puntero_store_caja) en el 1er .db de la 1ª caja del índice de entidades.
-
 ;														 ; Situa (Puntero_restore_caja) en el 1er .db de la 2ª caja del índice de cajas de entidades.
 ; Si Amadeus ya está iniciado, saltamos a [Inicia_punteros_de_cajas] y [Restore_entidad].
 ; (Esto se dá cuando se inicia una nueva oleada).
@@ -555,9 +558,10 @@ START
 ;	call Calcula_numero_de_malotes
 
 ; Damos por concluida la construcción del FRAME. 
-; Inicializamos (Scanlines_album_SP).
+; Inicializamos (Scanlines_album_SP). Se sitúa al comienzo del álbum que acabamos de completar.
 
-	ld hl,Scanlines_album
+	ld hl,(Sc_album_SP)
+	call Extrae_address
 	ld (Scanlines_album_SP),hl
 
 	ld hl,Ctrl_3
@@ -585,6 +589,10 @@ Main
 
 ;	call Limpia_y_reinicia_Scanlines_album 				; Lo 1º que hacemos después de pintar es limpiar el álbum de fotos e inicializar 
 ; 													 	; _(Scanlines_album_SP).
+
+	di
+	jr $
+	ei
 
 	ld a,(Clock_Entidades_en_curso)	
 	ld b,a
@@ -1239,7 +1247,22 @@ Guarda_foto_entidad_a_pintar
 ;	call Convierte_guia_en_fantasma
 	ret	
 
-; *************************************************************************************************************************************************************
+; ---------------------------------------------------------------------------------------------------------------------
+;
+;	13/03/24
+;
+;	Sitúa el puntero (Sc_album_SP) en el 1er álbum del índice.
+;	Sitúa (Scanlines_album_SP) al comienzo del 1er álbum del índice.
+
+Inicia_selector_de_albumes_de_lineas
+
+	ld hl,Indice_de_albumes_de_lineas
+	ld (Sc_album_SP),hl
+	call Extrae_address
+	ld (Scanlines_album_SP),hl
+	ret
+
+; ---------------------------------------------------------------------------------------------------------------------
 ;
 ; 8/1/23
 ;

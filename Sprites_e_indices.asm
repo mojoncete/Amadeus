@@ -101,10 +101,22 @@ Indice_Badsat_der defw Badsat_derecha
 	defw Badsat_der_fd
 	defw Badsat_der_fe
 
-Badsat_derecha DEFB	$10,$00,$28,$40,$54,$40,$AA,$40
-	DEFB	$55,$40,$2A,$40,$17,$FE,$06,$C0
-	DEFB	$07,$50,$1F,$E8,$17,$D4,$02,$2A
-	DEFB	$06,$55,$00,$2A,$00,$14,$00,$08 ; Sprite principal a derecha, (sin desplazar).
+Badsat_derecha DEFB	$10,$00,$00
+	DEFB    $28,$40,$00
+	DEFB	$54,$40,$00
+	DEFB	$AA,$40,$00
+	DEFB	$55,$40,$00
+	DEFB	$2A,$40,$00
+	DEFB	$17,$FE,$00
+	DEFB	$06,$C0,$00
+	DEFB	$07,$50,$00
+	DEFB	$1F,$E8,$00
+	DEFB	$17,$D4,$00
+	DEFB	$02,$2A,$00
+	DEFB	$06,$55,$00
+	DEFB	$00,$2A,$00
+	DEFB	$00,$14,$00
+	DEFB	$00,$08,$00 ; Sprite principal a derecha, (sin desplazar).
 
 Badsat_der_f8 DEFB $08,$00,$00,$14,$20,$00,$2A,$20
 	DEFB	$00,$55,$20,$00,$2A,$A0,$00,$15

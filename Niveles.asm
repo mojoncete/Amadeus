@@ -12,12 +12,18 @@ Indice_de_niveles
 	defw 0
 	defw 0
 
-Nivel_1 db 2									; Nº de entidades.
+Nivel_1 db 1									; Nº de entidades.
 	db 1,1,1,1	                                ; Velocidades. Vel_left, Vel_right, Vel_up, Vel_downa. (1, 2, 4 u 8 px). 
-	db 1,1										; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.		
+	db 1										; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.		
 
 Nivel_2 db 12									; Nº de entidades.
 	db 1,1,1,2									; Velocidades. Vel_left, Vel_right, Vel_up, Vel_downa. (1, 2, 4 u 8 px). 
 	db 2,1,1,1,1,2								; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.			
 	db 2,1,1,1,1,2
 
+; 13/03/24
+
+Indice_de_albumes_de_lineas
+
+	defw Scanlines_album
+	defw Scanlines_album_2
