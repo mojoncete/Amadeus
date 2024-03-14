@@ -389,7 +389,7 @@ Scanlines_album_SP defw 0
 
 ;Scanlines_album_disparos_SP defw Scanlines_album_disparos
 
-End_Snapshot defw Scanlines_album										
+;End_Snapshot defw Scanlines_album										
 ;														; Inicialmente está situado el la posición $7000, Scanlines_album.
 ;End_Snapshot_disparos defw Scanlines_album_disparos							; Puntero que indica la posición de memoria donde vamos a guardar_
 ;														; _el snapshot de los registros del siguiente disparo.

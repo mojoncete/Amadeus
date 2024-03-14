@@ -234,7 +234,12 @@ Genera_scanlines_lentos ; ------------------------------------------------------
 
     ld a,$57
     sub h
-    ld b,a
+    jr nz,4F
+
+    ld c,1
+    jr 5F
+
+4 ld b,a
 
     ld a,$df
     cp l 
@@ -262,7 +267,7 @@ Genera_scanlines_lentos ; ------------------------------------------------------
 
     djnz 3B
 
-    ex af,af
+5 ex af,af
     push af
     pop hl    
 
@@ -606,8 +611,29 @@ Pinta_rapido    ;   1520 t/states.
     ld (hl),a
     inc de
 
-    ld (Scanlines_album_SP),sp
+2 ld (Scanlines_album_SP),sp
     ld sp,(Stack)
     jp Pinta_Sprites
 
-Pinta_lento jr $
+Pinta_lento 
+
+1 pop hl
+
+    ld a,(de)
+    xor (hl)
+    ld (hl),a
+    inc l
+    inc e
+    ld a,(de)
+    xor (hl)
+    ld (hl),a
+    inc l
+    inc e
+    ld a,(de)
+    xor (hl)
+    ld (hl),a
+    inc de
+
+    djnz 1B
+
+    jr 2B
