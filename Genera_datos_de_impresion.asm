@@ -2,8 +2,6 @@
 ;
 ;	11/03/24
 ;
-    org $80bf
-
 ;   (Scanlines_album_SP) se sitúa inicialmente al comienzo de Scanlines_album.
 ;   DE contiene Puntero_objeto.
 ;   IX contiene el Puntero de impresión.
@@ -266,6 +264,8 @@ Genera_scanlines_lentos ; ------------------------------------------------------
     ex de,hl
 
     djnz 3B
+
+    ld (Scanlines_album_SP),de
 
 5 ex af,af
     push af

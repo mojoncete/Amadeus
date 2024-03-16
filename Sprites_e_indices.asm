@@ -4,7 +4,7 @@
 ;
 ;	Sprites e índices.
 
-	org $8131
+	org $8232
 
 ; Disparo.
 

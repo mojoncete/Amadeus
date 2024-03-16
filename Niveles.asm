@@ -21,9 +21,3 @@ Nivel_2 db 12									; Nº de entidades.
 	db 2,1,1,1,1,2								; Tipo de entidad que vamos a introducir en las 7 cajas de DRAW.			
 	db 2,1,1,1,1,2
 
-; 13/03/24
-
-Indice_de_albumes_de_lineas
-
-	defw Scanlines_album
-	defw Scanlines_album_2

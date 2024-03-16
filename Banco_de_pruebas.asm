@@ -38,10 +38,16 @@ FRAME ld (Stack_3),sp
 	bit 0,a
 	jr z,1F 												; No pintamos si el FRAME no se ha completado.
 
-;	call Borra_sprites
-	
+; Borramos:
+
 	call Pinta_Sprites
-;	call Extrae_Scanlines_album 	
+
+; Pintamos:
+
+	ld hl,(Album_de_pintado)
+	ld (Scanlines_album_SP),hl
+
+	call Pinta_Sprites
 
 ;	ld a,6	
 ;	out ($fe),a												
@@ -384,17 +390,11 @@ Stack_2 defw 0											; 2º variable destinada a almacenar el puntero de pila
 ;														; La utiliza la rutina [Extrae_foto_registros].
 Stack_3 defw 0											; Almacena el SP antes de ejecutar FRAME.
 
-Sc_album_SP defw 0
+Album_de_pintado defw 0
+Album_de_borrado defw 0
+Techo defw 0
+
 Scanlines_album_SP defw 0
-
-;Scanlines_album_disparos_SP defw Scanlines_album_disparos
-
-;End_Snapshot defw Scanlines_album										
-;														; Inicialmente está situado el la posición $7000, Scanlines_album.
-;End_Snapshot_disparos defw Scanlines_album_disparos							; Puntero que indica la posición de memoria donde vamos a guardar_
-;														; _el snapshot de los registros del siguiente disparo.
-;														; Inicialmente está situado en la posición $7060, Scanlines_album_disparos.
-;End_Snapshot_Amadeus defw Scanlines_album_Amadeus
 
 Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una única entidad.
 ;
@@ -504,7 +504,7 @@ START
 ;	dec b
 ;	jr z,3F	;-									   		 ; Si no hay entidades, cargamos AMADEUS.
 
-	call Inicia_selector_de_albumes_de_lineas
+	call Inicia_albumes_de_lineas
 
 4 call Inicia_Entidades						 
 
@@ -560,8 +560,10 @@ START
 ; Damos por concluida la construcción del FRAME. 
 ; Inicializamos (Scanlines_album_SP). Se sitúa al comienzo del álbum que acabamos de completar.
 
-	ld hl,(Sc_album_SP)
-	call Extrae_address
+	ld hl,(Scanlines_album_SP)
+	ld (Techo),hl
+
+	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
 
 	ld hl,Ctrl_3
@@ -1251,15 +1253,15 @@ Guarda_foto_entidad_a_pintar
 ;
 ;	13/03/24
 ;
-;	Sitúa el puntero (Sc_album_SP) en el 1er álbum del índice.
-;	Sitúa (Scanlines_album_SP) al comienzo del 1er álbum del índice.
 
-Inicia_selector_de_albumes_de_lineas
+Inicia_albumes_de_lineas
 
-	ld hl,Indice_de_albumes_de_lineas
-	ld (Sc_album_SP),hl
-	call Extrae_address
+	ld hl,Scanlines_album
+	ld (Album_de_pintado),hl
 	ld (Scanlines_album_SP),hl
+
+	ld hl,Scanlines_album_2
+	ld (Album_de_borrado),hl
 	ret
 
 ; ---------------------------------------------------------------------------------------------------------------------
