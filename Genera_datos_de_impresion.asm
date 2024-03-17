@@ -305,10 +305,9 @@ Limpia_y_reinicia_Scanlines_album
 ; -----------------------------------------------------------------------------
 ;
 ;   11/03/24
+;
 
 Pinta_Sprites 
-
-;   Preparamos registros ...
 
     ld hl,(Scanlines_album_SP)
     call Extrae_address

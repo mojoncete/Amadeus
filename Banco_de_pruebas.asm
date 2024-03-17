@@ -392,7 +392,8 @@ Stack_3 defw 0											; Almacena el SP antes de ejecutar FRAME.
 
 Album_de_pintado defw 0
 Album_de_borrado defw 0
-Techo defw 0
+Techo_de_pintado defw 0
+Techo_de_borrado defw 0
 
 Scanlines_album_SP defw 0
 
@@ -561,7 +562,7 @@ START
 ; Inicializamos (Scanlines_album_SP). Se sitúa al comienzo del álbum que acabamos de completar.
 
 	ld hl,(Scanlines_album_SP)
-	ld (Techo),hl
+	ld (Techo_de_pintado),hl
 
 	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
@@ -592,9 +593,7 @@ Main
 ;	call Limpia_y_reinicia_Scanlines_album 				; Lo 1º que hacemos después de pintar es limpiar el álbum de fotos e inicializar 
 ; 													 	; _(Scanlines_album_SP).
 
-	di
-	jr $
-	ei
+	call Change
 
 	ld a,(Clock_Entidades_en_curso)	
 	ld b,a
@@ -695,6 +694,10 @@ Main
 ;	--------------------------------------- GESTIÓN DE ENTIDADES. !!!!!!!!!!
 
 15 push bc 												; Nº de entidades en curso.
+
+	di
+	jr $
+	ei
 
 	call Restore_entidad								; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
 
@@ -832,10 +835,19 @@ Main
 
 
 16 
-	call Calcula_numero_de_malotes 						; Si el nº de malotes es "0" no generamos scanlines masticados. No ha habido movimiento.
+
+	di
+	jr $
+	ei
+
+	ld hl,(Scanlines_album_SP)
+	ld (Techo_de_pintado),hl
+
+	ld hl,(Album_de_borrado)
+	ld (Scanlines_album_SP),hl
 
 	ld hl,Ctrl_3
-	set 0,(hl)											; Frame completo. 
+	set 0,(hl) 											 ; Indica Frame completo. 
 
 	xor a
 	out ($fe),a
@@ -1063,6 +1075,36 @@ Mov_obj
 ;	call Limpia_Variables_de_borrado
 
 ;	ret													
+
+; --------------------------------------------------------------------------------------------------------------
+;
+;	17/3/24
+
+Change ld hl,(Album_de_pintado)
+	ld de,(Album_de_borrado)
+	ex de,hl
+	ld (Album_de_pintado),hl
+	ld (Scanlines_album_SP),hl
+	ld (Album_de_borrado),de
+
+	ld hl,(Techo_de_pintado)
+	ld de,(Techo_de_borrado)
+
+	ld a,l
+	sub e
+	ld b,a
+	dec l
+
+1 xor a
+	ld (hl),a
+	dec l
+	djnz 1B
+
+	inc l
+
+	ld (Techo_de_borrado),hl
+
+	ret
 
 ; -----------------------------------------------------------------------------------
 ;
