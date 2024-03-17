@@ -37,6 +37,8 @@ FRAME ld (Stack_3),sp
 	ld a,(Ctrl_3)
 	bit 0,a
 	jr z,1F 												; No pintamos si el FRAME no se ha completado.
+	bit 2,a
+	jr z,1F                                                 ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
 
 ; Borramos:
 
@@ -86,6 +88,7 @@ FRAME ld (Stack_3),sp
 
 	ld hl,Ctrl_3
 	res 0,(hl)											; Reinicia el flag de FRAME completo.
+	res 2,(hl)											; Reinicia el flag DETECTA MOVIMIENTO.
 
 	pop iy
 	pop ix
@@ -142,13 +145,16 @@ Almacen_de_movimientos_masticados_Entidad_1 equ $eb00	; $eb00 - $f85c ..... $0d5
 ;
 Scanlines_album equ $8000	;	(8000h - 8118h), 		; Inicialmente 280 bytes. 
 
+;	($8119 - $81e8) = Índice y datos de Amadeus. "$d0", 208 bytes.
+
+
 ;                                                       ;	35 bytes por entidad. 
 ;														;	1. 2 Bytes ..... .defw  Puntero_objeto, (mem. address donde se encuentran los .db que forman los distintos sprites).
 ;                                                       ;	2. 1 Byte ..... .db  Indica el nº de scanlines que vamos a imprimir del sprite. Generalmente 16 scanlines.
 ;														;		El nº de scanlines será menor cuando estemos `desapareciendo´ por la parte baja de la pantalla.					 	
 ; 														;	3. 32 Bytes, (como máximo). Screen mem. address de cada uno de los scanlines que forman el sprite.
 
-Scanlines_album_2 equ $8119    ;    (8119h - 8231h)
+Scanlines_album_2 equ $8200    ;    (8200h - 8318h)
 
 ;Scanlines_album_disparos equ $8119 ;  (8119h - 816eh).	; En (Scanlines_album_disparos) vamos a ir almacenando los valores_
 ;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´. 
@@ -402,6 +408,8 @@ Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una únic
 ;															BIT 0, "1" Indica que el FRAME está completo, (hemos podido hacer la foto de todas las entidades).
 ;															BIT 1, "1" Indica que hemos completado todo el patrón de movimientos de este tipo de entidad.
 ;																_ El almacén de movimientos masticados de este tipo de entidad quedará completo. ([Inicia_entidad]).
+;															BIT 2, "1" Indica que se produce movimiento en alguna entidad, (modificamos el último FRAME impreso en pantalla).
+;																Habilita el borrado/pintado de sprites.
 
 Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una única entidad. Lo utiliza la rutina [Inicia_entidad].
 ;
@@ -569,6 +577,7 @@ START
 
 	ld hl,Ctrl_3
 	set 0,(hl) 											 ; Indica Frame completo. 
+	set 2,(hl)
 
 	ei
 	halt 
@@ -592,8 +601,6 @@ Main
 
 ;	call Limpia_y_reinicia_Scanlines_album 				; Lo 1º que hacemos después de pintar es limpiar el álbum de fotos e inicializar 
 ; 													 	; _(Scanlines_album_SP).
-
-	call Change
 
 	ld a,(Clock_Entidades_en_curso)	
 	ld b,a
@@ -692,6 +699,8 @@ Main
 ; ( Código que ejecutamos con cada entidad: ).
 
 ;	--------------------------------------- GESTIÓN DE ENTIDADES. !!!!!!!!!!
+;
+;	Se produce MOVIMIENTO.
 
 15 push bc 												; Nº de entidades en curso.
 
@@ -699,13 +708,11 @@ Main
 	jr $
 	ei
 
-	call Restore_entidad								; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
+	ld hl,Ctrl_3
+	set 2,(hl)
+	call Change
 
-	ld a,(Ctrl_3)
-	bit 2,a
-	di
-	jr nz,$
-	ei
+	call Restore_entidad								; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
 
 ; Existe "Entidad_guía" ???.
 ; Si la Entidad_guía ha sido fulminada hemos de reemplazarla.
@@ -835,10 +842,6 @@ Main
 
 
 16 
-
-	di
-	jr $
-	ei
 
 	ld hl,(Scanlines_album_SP)
 	ld (Techo_de_pintado),hl
