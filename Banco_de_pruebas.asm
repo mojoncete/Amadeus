@@ -398,9 +398,10 @@ Stack_3 defw 0											; Almacena el SP antes de ejecutar FRAME.
 
 Album_de_pintado defw 0
 Album_de_borrado defw 0
-Techo_de_pintado defw 0
-Techo_de_borrado defw 0
+;Techo_Scanlines_album defw 0
+;Techo_Scanlines_album_2 defw 0
 
+;Techo defw 0
 Scanlines_album_SP defw 0
 
 Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una única entidad.
@@ -569,8 +570,9 @@ START
 ; Damos por concluida la construcción del FRAME. 
 ; Inicializamos (Scanlines_album_SP). Se sitúa al comienzo del álbum que acabamos de completar.
 
-	ld hl,(Scanlines_album_SP)
-	ld (Techo_de_pintado),hl
+;	ld hl,(Scanlines_album_SP)
+;	ld (Techo),hl
+;	ld (Techo_Scanlines_album),hl
 
 	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
@@ -620,11 +622,6 @@ Main
 
 	inc a
 	ld (Entidades_en_curso),a
-
-	cp 2
-	di
-	jr z,$
-	ei
 
 ; - Define el tiempo que ha de transcurrir para que aparezca la siguiente entidad. ----------------------------
 
@@ -703,10 +700,6 @@ Main
 ;	Se produce MOVIMIENTO.
 
 15 push bc 												; Nº de entidades en curso.
-
-	di
-	jr $
-	ei
 
 	ld hl,Ctrl_3
 	set 2,(hl)
@@ -840,13 +833,12 @@ Main
 ;	ld hl,Ctrl_1
 ;	res 2,(hl)
 
+;	di
+;	jr $
+;	ei
 
-16 
 
-	ld hl,(Scanlines_album_SP)
-	ld (Techo_de_pintado),hl
-
-	ld hl,(Album_de_borrado)
+16 ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
 
 	ld hl,Ctrl_3
@@ -1083,29 +1075,39 @@ Mov_obj
 ;
 ;	17/3/24
 
-Change ld hl,(Album_de_pintado)
+Change 
+
+	ld hl,(Album_de_pintado)
 	ld de,(Album_de_borrado)
 	ex de,hl
 	ld (Album_de_pintado),hl
 	ld (Scanlines_album_SP),hl
+
+;	push hl
+
 	ld (Album_de_borrado),de
 
-	ld hl,(Techo_de_pintado)
-	ld de,(Techo_de_borrado)
+;	ld hl,(Techo)
+;	ld de,(Techo_Scanlines_album_2)
 
-	ld a,l
-	sub e
-	ld b,a
-	dec l
+;	ld a,e
+;	sub l
+;	call nc,Borra_diferencia
+	
+;	ld e,l
+;	ld (Techo_Scanlines_album_2),de
 
-1 xor a
-	ld (hl),a
-	dec l
-	djnz 1B
+;	pop hl
 
-	inc l
+;	ld (Techo),hl
 
-	ld (Techo_de_borrado),hl
+	ret
+
+; ------------------------------------
+
+Borra_diferencia 
+
+	jr $
 
 	ret
 
@@ -1123,7 +1125,7 @@ Construye_movimientos_masticados_entidad
 ;															; _ el (Contador_de_mov_masticados).    
 	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
-;	call Recompone_posicion_inicio
+	call Recompone_posicion_inicio
 
 1 call Draw
 	call Guarda_movimiento_masticado
@@ -1304,10 +1306,16 @@ Inicia_albumes_de_lineas
 	ld hl,Scanlines_album
 	ld (Album_de_pintado),hl
 	ld (Scanlines_album_SP),hl
+;	ld (Techo_Scanlines_album),hl
+;	ld (Techo),hl
 
 	ld hl,Scanlines_album_2
 	ld (Album_de_borrado),hl
+;	ld (Techo_Scanlines_album_2),hl
+
 	ret
+
+
 
 ; ---------------------------------------------------------------------------------------------------------------------
 ;
@@ -1407,67 +1415,6 @@ Calcula_numero_de_malotes
 
 1 ld (Numero_de_malotes),a					
 	ret
-
-; -------------------------------------------------------------------------------------------------------------
-;
-; 8/9/23 
-;
-
-; (Numero_de_malotes_Amadeus) lo utiliza la rutina [Extrae_foto_Amadeus] para borrar/pintar la nave en pantalla.
-; Se calcula dividiendo entre 6 el nº de bytes que contiene el Scanlines_album.
-
-;Calcula_malotes_Amadeus 
-
-;	ld hl,Scanlines_album_Amadeus
-;	ex de,hl
-;	ld hl,(End_Snapshot_Amadeus)
-
-;	ld a,h
-;	and a
-;	jr z,1F										; (End_Snapshot_Amadeus) = "$0000" significa que el álbum está vacío.
-
-;	ld b,0
-;	ld a,l
-;	sub e
-;	jr z,1F
-
-; Nº de malotes no es "0".
-
-;2 sub 6
-;	inc b
-;	and a
-;	jr nz,2B
-;	ld a,b
-
-;1 ld (Numero_de_malotes),a					
-;	ret
-
-; -------------------------------------------------------------------------------------------------------------
-;
-; 28/2/23 
-;
-
-;;Calcula_numero_de_disparotes 
-
-;	ld hl,Scanlines_album_disparos
-;	ex de,hl
-;	ld hl,(End_Snapshot_disparos)
-
-;	ld b,0
-;	ld a,l
-;	sub e
-;	jr z,1F
-
-; Nº de malotes no es "0".
-
-;2 sub 6
-;	inc b
-;	and a
-;	jr nz,2B
-;	ld a,b
-
-;1 ld (Numero_de_disparotes),a
-;	ret
 
 ; *************************************************************************************************************************************************************
 ;
