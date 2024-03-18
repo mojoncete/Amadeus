@@ -398,10 +398,11 @@ Stack_3 defw 0											; Almacena el SP antes de ejecutar FRAME.
 
 Album_de_pintado defw 0
 Album_de_borrado defw 0
+
 ;Techo_Scanlines_album defw 0
 ;Techo_Scanlines_album_2 defw 0
 
-;Techo defw 0
+Techo defw 0
 Scanlines_album_SP defw 0
 
 Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una única entidad.
@@ -570,8 +571,8 @@ START
 ; Damos por concluida la construcción del FRAME. 
 ; Inicializamos (Scanlines_album_SP). Se sitúa al comienzo del álbum que acabamos de completar.
 
-;	ld hl,(Scanlines_album_SP)
-;	ld (Techo),hl
+	ld hl,(Scanlines_album_SP)
+	ld (Techo),hl
 ;	ld (Techo_Scanlines_album),hl
 
 	ld hl,(Album_de_borrado)
@@ -833,12 +834,11 @@ Main
 ;	ld hl,Ctrl_1
 ;	res 2,(hl)
 
-;	di
-;	jr $
-;	ei
+	call Borra_diferencia
 
-
-16 ld hl,(Album_de_borrado)
+16 ld hl,(Scanlines_album_SP)
+	ld (Techo),hl
+	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
 
 	ld hl,Ctrl_3
@@ -1087,27 +1087,33 @@ Change
 
 	ld (Album_de_borrado),de
 
-;	ld hl,(Techo)
-;	ld de,(Techo_Scanlines_album_2)
-
-;	ld a,e
-;	sub l
-;	call nc,Borra_diferencia
-	
-;	ld e,l
-;	ld (Techo_Scanlines_album_2),de
-
-;	pop hl
-
-;	ld (Techo),hl
-
 	ret
 
 ; ------------------------------------
+;
+; 18/03/24
 
 Borra_diferencia 
 
+	ld hl,(Scanlines_album_SP)
+	ld de,(Techo)
+	ld a,e
+	sub l
+	ret z
+	ret c
+
+; Borramos_diferencia.
+
+	ld b,a
+	xor a
+
+1 inc l
+	ld (hl),a
+	djnz 1B
+
+	di
 	jr $
+	ei
 
 	ret
 
@@ -1307,7 +1313,7 @@ Inicia_albumes_de_lineas
 	ld (Album_de_pintado),hl
 	ld (Scanlines_album_SP),hl
 ;	ld (Techo_Scanlines_album),hl
-;	ld (Techo),hl
+	ld (Techo),hl
 
 	ld hl,Scanlines_album_2
 	ld (Album_de_borrado),hl
