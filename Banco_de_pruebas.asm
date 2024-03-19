@@ -40,9 +40,18 @@ FRAME ld (Stack_3),sp
 	bit 2,a
 	jr z,1F                                                 ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
 
+;! Debugg!!!!!!!
+
+	ld a,(Contador_de_frames_2)
+	cp $03
+	jr nz,2F
+	ld a,(Contador_de_frames)
+	cp $58
+	jr z,$
+
 ; Borramos:
 
-	call Pinta_Sprites
+2 call Pinta_Sprites
 
 ; Pintamos:
 
@@ -605,7 +614,7 @@ Main
 ;	call Limpia_y_reinicia_Scanlines_album 				; Lo 1º que hacemos después de pintar es limpiar el álbum de fotos e inicializar 
 ; 													 	; _(Scanlines_album_SP).
 
-	ld a,(Clock_Entidades_en_curso)	
+45 ld a,(Clock_Entidades_en_curso)	
 	ld b,a
 	ld a,(Contador_de_frames)
 	cp b
@@ -700,11 +709,11 @@ Main
 ;
 ;	Se produce MOVIMIENTO.
 
-15 push bc 												; Nº de entidades en curso.
-
 	ld hl,Ctrl_3
 	set 2,(hl)
 	call Change
+
+15 push bc 												; Nº de entidades en curso.
 
 	call Restore_entidad								; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
 
@@ -834,10 +843,12 @@ Main
 ;	ld hl,Ctrl_1
 ;	res 2,(hl)
 
-	call Borra_diferencia
+;	call Borra_diferencia
 
-16 ld hl,(Scanlines_album_SP)
+16 
+	ld hl,(Scanlines_album_SP)
 	ld (Techo),hl
+
 	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
 
@@ -1102,13 +1113,17 @@ Borra_diferencia
 	ret z
 	ret c
 
+; Nuevo techo, (más bajo que el anterior). 
+
+	ld (Techo),hl
+
 ; Borramos_diferencia.
 
 	ld b,a
 	xor a
 
-1 inc l
-	ld (hl),a
+1 ld (hl),a
+	inc l
 	djnz 1B
 
 	di
