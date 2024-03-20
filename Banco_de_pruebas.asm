@@ -407,12 +407,12 @@ Stack_3 defw 0											; Almacena el SP antes de ejecutar FRAME.
 
 Album_de_pintado defw 0
 Album_de_borrado defw 0
+Techo_Scanlines_album db 0
+Techo_Scanlines_album_2 db 0
 
-;Techo_Scanlines_album defw 0
-;Techo_Scanlines_album_2 defw 0
+Switch db 0
+Techo db 0
 
-Techo_de_pintado db 0
-Techo_de_borrado db 0
 Scanlines_album_SP defw 0
 
 Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una única entidad.
@@ -585,7 +585,7 @@ START
 
 	ld hl,(Scanlines_album_SP)
 	ld a,l
-	ld (Techo_de_pintado),a
+	ld (Techo_Scanlines_album),a
 
 	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
@@ -848,13 +848,19 @@ Main
 
 	call Borra_diferencia
 
-16 
+	ld a,(Ctrl_3)
+	bit 3,a
+	jr nz,16F
 
-	ld hl,(Album_de_borrado)
+	ld a,l
+	ld (de),a											; Nuevo techo, mayor que el anterior.
+
+16 ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
 
 	ld hl,Ctrl_3
-	set 0,(hl) 											 ; Indica Frame completo. 
+	set 0,(hl) 											; Indica Frame completo. 
+	res 3,(hl)
 
 	xor a
 	out ($fe),a
@@ -1101,6 +1107,9 @@ Change
 ;	jr z,$
 ;	ei
 
+	ld a,(Switch)
+	xor 1
+	ld (Switch),a
 
 	ld hl,(Album_de_pintado)
 	ld de,(Album_de_borrado)
@@ -1110,16 +1119,6 @@ Change
 
 	ld (Album_de_borrado),de
 
-	ld a,(Techo_de_pintado)
-	ld d,a
-	ld a,(Techo_de_borrado)
-	ld e,a
-
-	ld a,e
-	ld (Techo_de_pintado),a
-	ld a,d
-	ld (Techo_de_borrado),a
-
 	ret
 
 ; ------------------------------------
@@ -1128,25 +1127,36 @@ Change
 
 Borra_diferencia 
 
-	di
-	jr $
-	ei
-
 	ld hl,(Scanlines_album_SP)
-	ld a,(Techo_de_pintado)
 
-	sub l
+	ld a,(Switch)
+	and a
+	jr z,2F
+
+	ld a,(Techo_Scanlines_album_2)
+	ld de,Techo_Scanlines_album_2
+	jr 3F
+
+2 ld a,(Techo_Scanlines_album)
+	ld de,Techo_Scanlines_album
+
+3 sub l
 
 	ret z
 	ret c
 
 ; Nuevo techo, (más bajo que el anterior). 
 
-	ld (Techo_de_borrado),hl
+;	di
+;	jr $
+;	ei
 
-; Borramos_diferencia.
+; Fijamos nuevo techo y borramos bytes sobrantes.
 
 	ld b,a
+
+	ld a,l
+	ld (de),a
 	xor a
 
 1 ld (hl),a
