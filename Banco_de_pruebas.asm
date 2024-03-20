@@ -42,16 +42,16 @@ FRAME ld (Stack_3),sp
 
 ;! Debugg!!!!!!!
 
-	ld a,(Contador_de_frames_2)
-	cp $03
-	jr nz,2F
-	ld a,(Contador_de_frames)
-	cp $58
-	jr z,$
+;	ld a,(Contador_de_frames_2)
+;	cp $03
+;	jr nz,2F
+;	ld a,(Contador_de_frames)
+;	cp $58
+;	jr z,$
 
 ; Borramos:
 
-2 call Pinta_Sprites
+	call Pinta_Sprites
 
 ; Pintamos:
 
@@ -411,7 +411,8 @@ Album_de_borrado defw 0
 ;Techo_Scanlines_album defw 0
 ;Techo_Scanlines_album_2 defw 0
 
-Techo defw 0
+Techo_de_pintado db 0
+Techo_de_borrado db 0
 Scanlines_album_SP defw 0
 
 Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una única entidad.
@@ -421,6 +422,8 @@ Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una únic
 ;																_ El almacén de movimientos masticados de este tipo de entidad quedará completo. ([Inicia_entidad]).
 ;															BIT 2, "1" Indica que se produce movimiento en alguna entidad, (modificamos el último FRAME impreso en pantalla).
 ;																Habilita el borrado/pintado de sprites.
+;															BIT 3, "1" Este bit lo coloca a "1" la rutina [Borra_diferencia] para indicar que hemos actualizado el (Techo_de_pintado)_
+;																_ a la baja. 
 
 Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una única entidad. Lo utiliza la rutina [Inicia_entidad].
 ;
@@ -581,8 +584,8 @@ START
 ; Inicializamos (Scanlines_album_SP). Se sitúa al comienzo del álbum que acabamos de completar.
 
 	ld hl,(Scanlines_album_SP)
-	ld (Techo),hl
-;	ld (Techo_Scanlines_album),hl
+	ld a,l
+	ld (Techo_de_pintado),a
 
 	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
@@ -614,7 +617,7 @@ Main
 ;	call Limpia_y_reinicia_Scanlines_album 				; Lo 1º que hacemos después de pintar es limpiar el álbum de fotos e inicializar 
 ; 													 	; _(Scanlines_album_SP).
 
-45 ld a,(Clock_Entidades_en_curso)	
+	ld a,(Clock_Entidades_en_curso)	
 	ld b,a
 	ld a,(Contador_de_frames)
 	cp b
@@ -843,11 +846,9 @@ Main
 ;	ld hl,Ctrl_1
 ;	res 2,(hl)
 
-;	call Borra_diferencia
+	call Borra_diferencia
 
 16 
-	ld hl,(Scanlines_album_SP)
-	ld (Techo),hl
 
 	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
@@ -1088,15 +1089,36 @@ Mov_obj
 
 Change 
 
+
+;! Debugg!!!!!!!
+
+;	ld a,(Contador_de_frames_2)
+;	cp $03
+;	jr nz,1F
+;	ld a,(Contador_de_frames)
+;	cp $59
+;	di
+;	jr z,$
+;	ei
+
+
 	ld hl,(Album_de_pintado)
 	ld de,(Album_de_borrado)
 	ex de,hl
 	ld (Album_de_pintado),hl
 	ld (Scanlines_album_SP),hl
 
-;	push hl
-
 	ld (Album_de_borrado),de
+
+	ld a,(Techo_de_pintado)
+	ld d,a
+	ld a,(Techo_de_borrado)
+	ld e,a
+
+	ld a,e
+	ld (Techo_de_pintado),a
+	ld a,d
+	ld (Techo_de_borrado),a
 
 	ret
 
@@ -1106,16 +1128,21 @@ Change
 
 Borra_diferencia 
 
+	di
+	jr $
+	ei
+
 	ld hl,(Scanlines_album_SP)
-	ld de,(Techo)
-	ld a,e
+	ld a,(Techo_de_pintado)
+
 	sub l
+
 	ret z
 	ret c
 
 ; Nuevo techo, (más bajo que el anterior). 
 
-	ld (Techo),hl
+	ld (Techo_de_borrado),hl
 
 ; Borramos_diferencia.
 
@@ -1126,9 +1153,10 @@ Borra_diferencia
 	inc l
 	djnz 1B
 
-	di
-	jr $
-	ei
+; Indicamos que tenemos nuevo techo más bajo con el FLAG:
+
+	ld hl,Ctrl_3
+	set 3,(hl)
 
 	ret
 
@@ -1327,12 +1355,9 @@ Inicia_albumes_de_lineas
 	ld hl,Scanlines_album
 	ld (Album_de_pintado),hl
 	ld (Scanlines_album_SP),hl
-;	ld (Techo_Scanlines_album),hl
-	ld (Techo),hl
 
 	ld hl,Scanlines_album_2
 	ld (Album_de_borrado),hl
-;	ld (Techo_Scanlines_album_2),hl
 
 	ret
 
