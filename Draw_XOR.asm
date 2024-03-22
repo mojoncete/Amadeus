@@ -35,7 +35,6 @@ Draw
 
 3 call calcula_CColumnass							; Define el valor de la variable (Columnas). Nº de columnas que se van a pintar de la entidad.
 	call Calcula_puntero_de_impresion				; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
-;	call Define_rutina_de_impresion
 
 	ld a,(Ctrl_0)									; Antes de salir de la rutina REStauramos el bit5 de Ctrl_0 para que nos vuelva_
 	res 5,a											; _a ser de utilidad.
@@ -578,62 +577,6 @@ Operandos ld hl,(Posicion_actual)
 
 ; --------------------------------------------------------------------------------------------------------------------
 ;
-;	3/1/23
-;
-;	La Rutina entrega en HL la dirección de memoria donde se encuentra la rutina de impresión que debemos ejecutar.
-;
-;	Destruye: A,B,HL y DE.
-
-Define_rutina_de_impresion 
-
-	ld a,(Columns)	
-	ld b,a
-	ld a,(Columnas)
-	cp b
-	jr nz,2f
-
-;	La entidad se imprime entera.
-
-	ld hl, Indice_entidades_completas
-	and 1
-	jr z,1F
-
-	inc hl
-	inc hl
-
-1 call Extrae_address
-	ret		;	ret	
-
-;	La entidad no se imprime entera en pantalla.
-
-2 ld a,(Cuad_objeto) 
-	and 1
-	jr z,3F
-
-; 	La entidad no se imprime entera en pantalla, nos encontramos en el extremo izquierdo de la misma.
-
-	ld hl, Indice_entidades_incompletas_izquierda
-4 ld a,(Columns)
-	and 1
-	jr z,1B					; Sólo imprimimos 1 (Columnas) de un objeto de 2 Columns.
-
-	inc hl
-	inc hl
-
-	ld a,(Columnas)
-	and 1
-	jr nz,1B				; Sólo imprimimos 1 (Columnas) de un objeto de 3 Columns.		
-
-	inc hl
-	inc hl
-
-	jr 1B					; Sólo imprimimos 2 (Columnas) de un objeto de 3 Columns.
-
-3 ld hl, Indice_entidades_incompletas_derecha
-	jr 4B
-
-; --------------------------------------------------------------------------------------------------------------------
-;
 ;	Prepara_draw
 ;
 ;	Es una rutina de carga.
@@ -721,169 +664,11 @@ PreviousScan ld a,h
     ld h,a
     ret
 
-; -----------------------------------------------------------------------------------
-;
-;	31/7/23
-;
-;	Rutina principal de pintado de entidades.
-;	Extrae la foto del frame, (entidades).
 
-Extrae_Scanlines_album 
-
-	ld hl,Scanlines_album+1									
-	ld a,(hl)
-	and a
-	ret z 																	; Salimos si el álbum está vacío.
-
-;	No hay datos, (entidades para pintar en este frame).
-
-	ld a,(Numero_de_malotes)												; No hay MALOTES. No se ha producido movimiento.
-	and a																	
-	ret z
-
-; -----------------------------------
-
-	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Scanlines_album
-	ld sp,Scanlines_album
-
-2 pop iy																	; (Puntero_objeto) en IY.
-	pop hl																	; Puntero de impresión de pantalla en HL.
-	pop de																	; Dirección de la rutina de impresión en DE. 
-
-	ld (Stack_2),sp
-	ld sp,(Stack)
-
-; Fabrica la llamada a la correspondiente rutina de impresión.
-
-	ld a,$cd
-	ld (Imprime),a
-	ex de,hl
-	ld (Imprime+1),hl
-	ex de,hl
-
-; Ejecuta la llamada:	CALL $xx,xx
-
-Imprime db 0,0,0						
-
-	ld (Stack),sp
-
-	ld a,(Numero_de_malotes)
-	dec a
-	jr z,1F
- 	ld (Numero_de_malotes),a	 
-
-	ld sp,(Stack_2)
-	jr 2B
-
-1 xor a
-	ld (Stack_2),a
-
-	ret
 	
-; -----------------------------------------------------------------------------------
-;
-;	28/2/23
-;
-;	Pinta los disparos generados.
 
-;Extrae_foto_disparos
 
-;	ld hl,Scanlines_album_disparos+1
-;    ld a,(hl)
-;    and a
-;    ret z		
 
-;	ld a,(Numero_de_disparotes)
-;	and a
-;	ret z
-;	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Scanlines_album
-;	ld sp,Scanlines_album_disparos
-
-;2 pop iy																	; (Puntero_objeto) en IY.
-;	pop hl																	; Puntero de impresión de pantalla en HL.
-;	pop de																	; Dirección de la rutina de impresión en DE. 
-
-;	ld (Stack_2),sp
-;	ld sp,(Stack)
-
-; Fabrica la llamada a la correspondiente rutina de impresión.
-
-;	ld a,$cd
-;	ld (Imprime2),a
-;	ex de,hl
-;	ld (Imprime2+1),hl
-;	ex de,hl
-
-; Ejecuta la llamada:	CALL $xx,xx
-
-;Imprime2 db 0,0,0						
-
-;	ld a,(Numero_de_disparotes)
-;	dec a
-;	jr z,1F
-; 	ld (Numero_de_disparotes),a	 
-
-;	ld sp,(Stack_2)
-;	jr 2B
-
-;1 xor a
-;	ld (Stack_2),a
-;	ret
-
-; -----------------------------------------------------------------------------------
-;
-;	4/9/23
-;
-;	Rutina principal de pintado de Amadeus.
-;	Extrae fotos de Scanlines_album_Amadeus.
-
-;Extrae_foto_Amadeus	ld hl,Scanlines_album_Amadeus
-;	ld a,(hl)
-;	and a
-;	ret z 																	; Salimos si no hay datos en el álbum. VACÍO.
-
-;	ld a,(Numero_de_malotes)												; No hay MALOTES. No se ha producido movimiento.
-;	and a																	; No ha aparecido ninguna `nueva entidad'.
-;	ret z
-
-; -----------------------------------
-
-;	ld (Stack),sp															; Guardo el puntero de pila y lo sitúo al principio del Scanlines_album
-;	ld sp,Scanlines_album_Amadeus
-
-;2 pop iy																	; (Puntero_objeto) en IY.
-;	pop hl																	; Puntero de impresión de pantalla en HL.
-;	pop de																	; Dirección de la rutina de impresión en DE. 
-
-;	ld (Stack_2),sp
-;	ld sp,(Stack)
-
-; Fabrica la llamada a la correspondiente rutina de impresión.
-
-;	ld a,$cd
-;	ld (Imprime_Amadeus),a
-;	ex de,hl
-;	ld (Imprime_Amadeus+1),hl
-;	ex de,hl
-
-; Ejecuta la llamada:	CALL $xx,xx
-
-;Imprime_Amadeus db 0,0,0						
-
-;	ld (Stack),sp
-
-;	ld a,(Numero_de_malotes)
-;	dec a
-;	jr z,1F
-; 	ld (Numero_de_malotes),a	 
-
-;	ld sp,(Stack_2)
-;	jr 2B
-
-;1 xor a
-;	ld (Stack_2),a
-
-;	ret
 
 
 

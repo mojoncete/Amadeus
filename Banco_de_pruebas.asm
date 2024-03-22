@@ -40,15 +40,6 @@ FRAME ld (Stack_3),sp
 	bit 2,a
 	jr z,1F                                                 ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
 
-;! Debugg!!!!!!!
-
-;	ld a,(Contador_de_frames_2)
-;	cp $03
-;	jr nz,2F
-;	ld a,(Contador_de_frames)
-;	cp $58
-;	jr z,$
-
 ; Borramos:
 
 	call Pinta_Sprites
@@ -59,18 +50,6 @@ FRAME ld (Stack_3),sp
 	ld (Scanlines_album_SP),hl
 
 	call Pinta_Sprites
-
-;	ld a,6	
-;	out ($fe),a												
-;	call Pinta_Amadeus										; Borde amarillo.
-
-; En 1er lugar guardamos los 67 bytes de la entidad alojada en DRAW para restaurarlos antes de salir de la_
-; _ rutina de interrupción. (Para gestionar Amadeus hemos de introducir sus datos en DRAW).
-
-;	ld a,7	
-;	out ($fe),a												; Borde blanco.
-;	call Guarda_parametros_DRAW
-;	call Restore_Amadeus
 
 ; Posible colisión Entidad-Amadeus ???
 
@@ -140,41 +119,25 @@ FRAME ld (Stack_3),sp
 ; Constantes.
 ;
  
-Sprite_vacio equ $eae0
+Sprite_vacio equ $eae0									; ($eae0 - $eb10) 48 Bytes de "0".
 
 Centro_arriba equ $0160 								; Emplearemos estas constantes en la rutina de `recolocación´ del objeto:_
 Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto en las dos primeras constantes_
 Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
 
-;Almacen_de_scanlines_masticados_a_borrar equ $e800
-;Almacen_de_scanlines_masticados equ $e900
-Almacen_de_movimientos_masticados_Entidad_1 equ $eb00	; $eb00 - $f85c ..... $0d5c / 3420 bytes. Guardaremos los movimientos masticados que ha hido generando la entidad guía.
-;Almacen_de_movimientos_masticados_Amadeus equ $e700		
-;
-Scanlines_album equ $8000	;	(8000h - 8118h), 		; Inicialmente 280 bytes. 
+Almacen_de_movimientos_masticados_Entidad_1 equ $eb20	; $eb00 - $f87b ..... 3419 bytes. Guardaremos los movimientos masticados que ha hido generando la entidad guía.
 
-;	($8119 - $81e8) = Índice y datos de Amadeus. "$d0", 208 bytes.
+Scanlines_album equ $8000	;	($8000 - $8118) 		; Inicialmente 280 bytes. 
 
+;                                                       ; 35 bytes por entidad. 
+;														; 1. 2 Bytes ..... .defw  Puntero_objeto, (mem. address donde se encuentran los .db que forman los distintos sprites).
+;                                                       ; 2. 1 Byte ..... .db  Indica el nº de scanlines que vamos a imprimir del sprite. Generalmente 16 scanlines.
+;														; El nº de scanlines será menor cuando estemos `desapareciendo´ por la parte baja de la pantalla.					 	
+; 														; 3. 32 Bytes, (como máximo). Screen mem. address de cada uno de los scanlines que forman el sprite.
 
-;                                                       ;	35 bytes por entidad. 
-;														;	1. 2 Bytes ..... .defw  Puntero_objeto, (mem. address donde se encuentran los .db que forman los distintos sprites).
-;                                                       ;	2. 1 Byte ..... .db  Indica el nº de scanlines que vamos a imprimir del sprite. Generalmente 16 scanlines.
-;														;		El nº de scanlines será menor cuando estemos `desapareciendo´ por la parte baja de la pantalla.					 	
-; 														;	3. 32 Bytes, (como máximo). Screen mem. address de cada uno de los scanlines que forman el sprite.
+Scanlines_album_2 equ $9000    ;    ($9000 - $9118)
 
-Scanlines_album_2 equ $8200    ;    (8200h - 8318h)
-
-;Scanlines_album_disparos equ $8119 ;  (8119h - 816eh).	; En (Scanlines_album_disparos) vamos a ir almacenando los valores_
-;                                   				    ; _de los registros y llamadas a las distintas rutinas de impresión para poder pintar `disparos´. 
-;														; 55 Bytes.
-
-;Scanlines_album_Amadeus equ $816f	 ;  (816fh - 8192h) ; 12 bytes.
-
-;Almacen_de_parametros_DRAW equ $8193 ; ($8193 - $81d5h) ; 66 bytes.
-
-
-; 54h es el espacio necesario en (Scanlines_album) para 7 entidades/disparos en pantalla.
 
 ; ******************************************************************************************************************************************************************************************
 ; Variables. 
@@ -318,12 +281,6 @@ Contador_general_de_mov_masticados_Entidad_3 defw 0
 Contador_general_de_mov_masticados_Entidad_4 defw 0
 
 ; Movimiento. ------------------------------------------------------------------------------------------------------
-
-;Puntero_de_scanlines_masticados defw Almacen_de_scanlines_masticados
-;Puntero_de_scanlines_masticados_a_borrar defw Almacen_de_scanlines_masticados_a_borrar
-;Puntero_de_scanlines_en_album defw Scanlines_album+2
-
-;Semaforo_de_rutinas_de_impresion_utilizadas ds 8	;! Para acelerar la rutina de borrado de sprites, hemos de poder desplazarnos por este almacén con 1 byte.!!
 
 Puntero_indice_mov defw 0							    ; Puntero índice del patrón de movimiento de la entidad. "0" No hay movimiento.
 Puntero_mov defw 0										; Guarda la posición de memoria en la que nos encontramos dentro de la cadena de movimiento.
@@ -1838,16 +1795,17 @@ Actualiza_relojes
 ; ---------------------------------------------------------------
 
 	include "Rutinas_de_inicio_y_niveles.asm"
-	include "Draw_XOR.asm"
-	include "Rutinas_de_impresion_sprites.asm" 
-	include "Direcciones.asm"
-	include "Movimiento.asm"
-;	include "Disparo.asm"
-	include "Relojes_y_temporizaciones.asm"
 	include "calcula_tercio.asm"
 	include "Cls.asm"
 	include "Genera_coordenadas.asm"
+	include "Relojes_y_temporizaciones.asm"
 	include "Genera_datos_de_impresion.asm"
+	include "Pinta_Sprites.asm"
+	include "Draw_XOR.asm"
+	include "Direcciones.asm"
+	include "Movimiento.asm"
+;	include "Disparo.asm"
+
 
 	SAVESNA "Pruebas.sna", START
 

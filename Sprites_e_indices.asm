@@ -4,7 +4,7 @@
 ;
 ;	Sprites e índices.
 
-	org $8319
+	org $8119
 
 ; Disparo.
 
@@ -67,9 +67,9 @@ Badsat_izq_f9 DEFB $00,$02,$00,$00,$85,$00,$00,$8A
 	DEFB	$00,$00,$0A,$00,$00,$04,$00,$00 ; $F9 (6º DESPLZ a izquierda).
 
 
-;! 23 bytes libres aquí !!!!! 
+;! 39 bytes libres aquí !!!!! 
 
-	org $8400
+	org $8200
 
 Badsat_izq_fa DEFB $00,$01,$00,$00,$42,$80,$00,$45
 	DEFB	$40,$00,$4A,$A0,$00,$55,$40,$00
@@ -163,7 +163,7 @@ Badsat_der_fb DEFB $01,$00,$00,$02,$84,$00,$05,$44
 
 ;! 16 bytes libres aquí !!!!! 
 
-	org $8600
+	org $8400
 
 Badsat_der_fc DEFB $00,$80,$00,$01,$42,$00,$02,$A2
 	DEFB	$00,$05,$52,$00,$02,$AA,$00,$01
@@ -190,7 +190,7 @@ Badsat_der_fe DEFB $00,$20,$00,$00,$50,$80,$00,$A8
 
 ; Amadeus. 2x2.
 
-	org $8119
+;	org $8119
 
 Indice_Amadeus_der defw Amadeus
 	defw 0	
@@ -238,7 +238,7 @@ Amadeus_Fd DEFB	$00,$06,$00,$00,$8F,$10,$00,$99
 
 ; ----------------------------------------------------------------------------------------
 
-	org $8690
+;	org $8690
 
 Indice_Explosion_2x3 defw Explosion_2x3_1
 	defw Explosion_2x3_2
