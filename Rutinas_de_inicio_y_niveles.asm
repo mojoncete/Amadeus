@@ -115,6 +115,7 @@ Inicia_Entidades
 
 	call Activa_FLAG_mov_masticados_completos					; Activa el FLAG que indica que este (Tipo) de entidad tiene todos sus_
 ;																; _ Mov_masticados ya generados.
+
 4 call Guarda_foto_de_mov_masticado
 
 ; Antes de guardar los parámetros de esta entidad en su correspondiente caja hay que actualizar coordenadas.
@@ -208,26 +209,17 @@ Store_Restore_cajas
 
 Guarda_foto_de_mov_masticado 
 
-;	ld a,(Contador_de_frames_2)
-;	cp 3
-;	jr nz,25F
-
-;	ld a,(Contador_de_frames)
-;	cp $53		;6a Pantalla en blanco, se ha escrito mal el álbum de borrado.
-
-;	di
-;	jr z,$
-;	ei
-
 	call Cargamos_registros_con_mov_masticado
 
 	call Genera_datos_de_impresion
+
 ;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
 ;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
 ;																; La rutina [Genera_datos_de_impresion] activa las interrupciones antes del RET.
 ; Actualizamos (Contador_de_mov_masticados) tras la foto.	
 
 	call Decrementa_Contador_de_mov_masticados
+
 	ret
 
 ; ---------------------------------------------------------------------
@@ -246,16 +238,10 @@ Limpiamos_bandeja_DRAW ld hl,Bandeja_DRAW
 
 ; ---------------------------------------------------------------------
 ;
-;	22/01/24
+;	24/03/24
 
 Decrementa_Contador_de_mov_masticados ld hl,(Contador_de_mov_masticados)
 	dec hl
-
-	inc h
-	dec h
-
-	call m,Reinicia_entidad_maliciosa
-
 	ld (Contador_de_mov_masticados),hl
 	ret
 
@@ -283,25 +269,9 @@ Reinicia_entidad_maliciosa
 
 	ld (Puntero_de_almacen_de_mov_masticados),hl
 
-;	Recolocamos el puntero (Scanlines_album_SP) del álbum de fotos para colocamos justo después del borrado.
-;	Queremos pintar la entidad en su posición de inicio.
-
-	ld hl,(Scanlines_album_SP)
-	ld bc,6
-	and a
-	sbc hl,bc
-	ld (Scanlines_album_SP),hl
-
 	call Cargamos_registros_con_mov_masticado
-	call Genera_datos_de_impresion
-
-	ld hl,(Contador_de_mov_masticados)
-	dec hl
 
 	ret
-
-
-
 
 ; ---------------------------------------------------------------------
 ;

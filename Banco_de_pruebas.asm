@@ -1217,7 +1217,7 @@ Actualiza_Puntero_de_almacen_de_mov_masticados
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	09/03/24
+;	24/03/24
 ;
 ;	Cargamos los registros DE e IX y actualizamos (Puntero_de_almacen_de_mov_masticados). 
 ;	
@@ -1232,8 +1232,12 @@ Cargamos_registros_con_mov_masticado ld (Stack),sp
 	pop ix 															; IX contiene Puntero_de_impresion
 
 	ld (Puntero_de_almacen_de_mov_masticados),sp 					; Actualiza (Puntero_de_almacen_de_mov_masticados).
-
 	ld sp,(Stack)
+
+	ld a,e
+	add d
+
+	call z,Reinicia_entidad_maliciosa
 
 	ret
 
