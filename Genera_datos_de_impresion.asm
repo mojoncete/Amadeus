@@ -67,9 +67,9 @@ Genera_scanlines_rapidos ; -----------------------------------------------------
     ex de,hl
 
     ld (hl),e
-    inc l
+    inc hl
     ld (hl),d
-    inc l
+    inc hl
 
     ex de,hl
     
@@ -77,9 +77,9 @@ Genera_scanlines_rapidos ; -----------------------------------------------------
     ex de,hl
 
     ld (hl),e
-    inc l
+    inc hl
     ld (hl),d
-    inc l
+    inc hl
 
     ex de,hl
 
@@ -87,9 +87,9 @@ Genera_scanlines_rapidos ; -----------------------------------------------------
     ex de,hl
 
     ld (hl),e
-    inc l
+    inc hl
     ld (hl),d
-    inc l
+    inc hl
 
     ex de,hl
     
@@ -97,9 +97,9 @@ Genera_scanlines_rapidos ; -----------------------------------------------------
     ex de,hl
 
     ld (hl),e
-    inc l
+    inc hl
     ld (hl),d
-    inc l
+    inc hl
 
     ex de,hl
 
@@ -107,9 +107,9 @@ Genera_scanlines_rapidos ; -----------------------------------------------------
     ex de,hl
 
     ld (hl),e
-    inc l
+    inc hl
     ld (hl),d
-    inc l
+    inc hl
 
     ex de,hl
     
@@ -117,9 +117,9 @@ Genera_scanlines_rapidos ; -----------------------------------------------------
     ex de,hl
 
     ld (hl),e
-    inc l
+    inc hl
     ld (hl),d
-    inc l
+    inc hl
 
     ex de,hl
 
@@ -127,9 +127,9 @@ Genera_scanlines_rapidos ; -----------------------------------------------------
     ex de,hl
 
     ld (hl),e
-    inc l
+    inc hl
     ld (hl),d
-    inc l
+    inc hl
 
     ex de,hl
     
@@ -137,9 +137,9 @@ Genera_scanlines_rapidos ; -----------------------------------------------------
     ex de,hl
 
     ld (hl),e
-    inc l
+    inc hl
     ld (hl),d
-    inc l
+    inc hl
 
     ex de,hl
 
@@ -147,9 +147,9 @@ Genera_scanlines_rapidos ; -----------------------------------------------------
     ex de,hl
 
     ld (hl),e
-    inc l
+    inc hl
     ld (hl),d
-    inc l
+    inc hl
 
     ex de,hl
     
@@ -157,9 +157,9 @@ Genera_scanlines_rapidos ; -----------------------------------------------------
     ex de,hl
 
     ld (hl),e
-    inc l
+    inc hl
     ld (hl),d
-    inc l
+    inc hl
 
     ex de,hl
 
@@ -167,9 +167,9 @@ Genera_scanlines_rapidos ; -----------------------------------------------------
     ex de,hl
 
     ld (hl),e
-    inc l
+    inc hl
     ld (hl),d
-    inc l
+    inc hl
 
     ex de,hl
     
@@ -177,9 +177,9 @@ Genera_scanlines_rapidos ; -----------------------------------------------------
     ex de,hl
 
     ld (hl),e
-    inc l
+    inc hl
     ld (hl),d
-    inc l
+    inc hl
 
     ex de,hl
 
@@ -187,9 +187,9 @@ Genera_scanlines_rapidos ; -----------------------------------------------------
     ex de,hl
 
     ld (hl),e
-    inc l
+    inc hl
     ld (hl),d
-    inc l
+    inc hl
 
     ex de,hl
     
@@ -197,9 +197,9 @@ Genera_scanlines_rapidos ; -----------------------------------------------------
     ex de,hl
 
     ld (hl),e
-    inc l
+    inc hl
     ld (hl),d
-    inc l
+    inc hl
 
     ex de,hl
 
@@ -207,9 +207,9 @@ Genera_scanlines_rapidos ; -----------------------------------------------------
     ex de,hl
 
     ld (hl),e
-    inc l
+    inc hl
     ld (hl),d
-    inc l
+    inc hl
 
 ; Todos los scanlines generados. actualizamos el puntero (Scanlines_album_SP).
 
@@ -257,9 +257,9 @@ Genera_scanlines_lentos ; ------------------------------------------------------
     ex de,hl
 
     ld (hl),e
-    inc l
+    inc hl
     ld (hl),d
-    inc l
+    inc hl
 
     ex de,hl
 

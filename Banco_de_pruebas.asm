@@ -364,11 +364,11 @@ Stack_3 defw 0											; Almacena el SP antes de ejecutar FRAME.
 
 Album_de_pintado defw 0
 Album_de_borrado defw 0
-Techo_Scanlines_album db 0
-Techo_Scanlines_album_2 db 0
+Techo_Scanlines_album defw 0
+Techo_Scanlines_album_2 defw 0
 
 Switch db 0
-Techo db 0
+Techo defw 0
 
 Scanlines_album_SP defw 0
 
@@ -541,8 +541,7 @@ START
 ; Inicializamos (Scanlines_album_SP). Se sitúa al comienzo del álbum que acabamos de completar.
 
 	ld hl,(Scanlines_album_SP)
-	ld a,l
-	ld (Techo_Scanlines_album),a
+	ld (Techo_Scanlines_album),hl
 
 	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
@@ -809,8 +808,10 @@ Main
 	bit 3,a
 	jr nz,16F
 
-	ld a,l
-	ld (de),a											; Nuevo techo, mayor que el anterior.
+	ex de,hl
+	ld (hl),c
+	inc l
+	ld (hl),b											; Nuevo techo, mayor que el anterior.
 
 16 ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
@@ -1052,18 +1053,6 @@ Mov_obj
 
 Change 
 
-
-;! Debugg!!!!!!!
-
-;	ld a,(Contador_de_frames_2)
-;	cp $03
-;	jr nz,1F
-;	ld a,(Contador_de_frames)
-;	cp $59
-;	di
-;	jr z,$
-;	ei
-
 	ld a,(Switch)
 	xor 1
 	ld (Switch),a
@@ -1084,37 +1073,49 @@ Change
 
 Borra_diferencia 
 
-	ld hl,(Scanlines_album_SP)
+	ld bc,(Scanlines_album_SP)
+
+;	ld a,b
+;	and 3
+;	ld b,a 											; Sólo necesitamos 3 bytes.
 
 	ld a,(Switch)
 	and a
 	jr z,2F
 
-	ld a,(Techo_Scanlines_album_2)
+	ld hl,(Techo_Scanlines_album_2)
 	ld de,Techo_Scanlines_album_2
 	jr 3F
 
-2 ld a,(Techo_Scanlines_album)
+2 ld hl,(Techo_Scanlines_album)
 	ld de,Techo_Scanlines_album
 
-3 sub l
+; Diferencia. 
+
+3 
+
+;	ld a,h
+;	and 3
+;	ld h,a
+
+	sbc hl,bc
 
 	ret z
 	ret c
 
 ; Nuevo techo, (más bajo que el anterior). 
-
-;	di
-;	jr $
-;	ei
-
 ; Fijamos nuevo techo y borramos bytes sobrantes.
 
-	ld b,a
+	ex de,hl
 
-	ld a,l
-	ld (de),a
+	ld (hl),c
+	inc l
+	ld (hl),b
+
 	xor a
+	ld b,e
+
+	ld hl,(Scanlines_album_SP)
 
 1 ld (hl),a
 	inc l
@@ -1166,6 +1167,7 @@ Construye_movimientos_masticados_entidad
 ; Guardamos (Contador_de_mov_masticados) en el (Contador_general_de_mov_masticados) de esta entidad.
 
 	ld bc,(Contador_de_mov_masticados)
+
 	ld (hl),c
 	inc hl
 	ld (hl),b

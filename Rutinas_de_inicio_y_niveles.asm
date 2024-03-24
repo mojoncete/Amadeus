@@ -208,7 +208,19 @@ Store_Restore_cajas
 
 Guarda_foto_de_mov_masticado 
 
+;	ld a,(Contador_de_frames_2)
+;	cp 3
+;	jr nz,25F
+
+;	ld a,(Contador_de_frames)
+;	cp $53		;6a Pantalla en blanco, se ha escrito mal el álbum de borrado.
+
+;	di
+;	jr z,$
+;	ei
+
 	call Cargamos_registros_con_mov_masticado
+
 	call Genera_datos_de_impresion
 ;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
 ;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
@@ -244,16 +256,7 @@ Decrementa_Contador_de_mov_masticados ld hl,(Contador_de_mov_masticados)
 
 	call m,Reinicia_entidad_maliciosa
 
-;	jr nz,1F
-
-;	inc l
-;	dec l
-
-;	di
-;	jr z,$
-;	ei
-
-1 ld (Contador_de_mov_masticados),hl
+	ld (Contador_de_mov_masticados),hl
 	ret
 
 ; ---------------------------------------------------------------------
