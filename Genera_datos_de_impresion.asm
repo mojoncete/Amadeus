@@ -232,12 +232,7 @@ Genera_scanlines_lentos ; ------------------------------------------------------
 
     ld a,$57
     sub h
-    jr nz,4F
-
-    ld c,1
-    jr 5F
-
-4 ld b,a
+    ld b,a
 
     ld a,$df
     cp l 
@@ -253,6 +248,12 @@ Genera_scanlines_lentos ; ------------------------------------------------------
 1 ld c,b
     inc c
 
+    inc b
+    dec b
+    jr nz,3F
+
+    jr 6F
+
 3 call NextScan
     ex de,hl
 
@@ -262,10 +263,9 @@ Genera_scanlines_lentos ; ------------------------------------------------------
     inc hl
 
     ex de,hl
-
     djnz 3B
 
-    ld (Scanlines_album_SP),de
+6 ld (Scanlines_album_SP),de
 
 5 ex af,af
     push af

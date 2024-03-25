@@ -666,7 +666,7 @@ Main
 
 ;	--------------------------------------- GESTIÓN DE ENTIDADES. !!!!!!!!!!
 ;
-;	Se produce MOVIMIENTO.
+;	Se produce MOVIMIENTO. Intercambio de Álbumes, (borrado-pintado).
 
 	ld hl,Ctrl_3
 	set 2,(hl)
@@ -771,7 +771,7 @@ Main
 ;	ld hl,Ctrl_1
 ;	res 2,(hl)
 
-7 call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
+;7 call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
 
 ;	ld a,(Ctrl_0)
 ;	bit 4,a
@@ -923,7 +923,7 @@ Main
 ;
 ;	15/12/23
 
-Mov_obj 
+;Mov_obj 
 
 ;	ld a,(Ctrl_2)
 ;	bit 1,a
@@ -1023,7 +1023,7 @@ Mov_obj
 ;	call Repone_datos_de_borrado 								; ! BORRAMOS !!!. Guardamos la foto de las {Variables_de_borrado} en Scanlines_album.
 ;	call Limpia_Variables_de_borrado
 
-3 ret													
+;3 ret													
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -1235,7 +1235,7 @@ Cargamos_registros_con_mov_masticado ld (Stack),sp
 	ld sp,(Stack)
 
 	ld a,e
-	add d
+	add d															; Comprueba si ya no hay datos en el almacén.
 
 	call z,Reinicia_entidad_maliciosa
 

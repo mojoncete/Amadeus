@@ -210,7 +210,6 @@ Store_Restore_cajas
 Guarda_foto_de_mov_masticado 
 
 	call Cargamos_registros_con_mov_masticado
-
 	call Genera_datos_de_impresion
 
 ;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
