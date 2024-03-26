@@ -191,7 +191,7 @@ Cuad_objeto db 0										; Almacena el cuadrante de pantalla donde se encuentra
 Impacto db 0											; Si después del movimiento de la entidad, (Impacto) se coloca a "1",_
 ;														; _ existen muchas posibilidades de que esta entidad haya colisionado con Amadeus. 
 ; 														; Hay que comprobar la posible colisión después de mover Amadeus. En este caso, (Impacto2)="3".
-Variables_de_borrado ds 6 							
+; Variables_de_borrado ds 6 							
 
 Puntero_de_impresion defw 0								; Contiene el puntero de impresión, (calculado por DRAW). Esta dirección la utilizará la rutina_
 ;														; _ [Guarda_coordenadas_X] y [Compara_coordenadas_X] para detectar la colisión ENTIDAD-AMADEUS.
@@ -362,15 +362,21 @@ Stack_2 defw 0											; 2º variable destinada a almacenar el puntero de pila
 ;														; La utiliza la rutina [Extrae_foto_registros].
 Stack_3 defw 0											; Almacena el SP antes de ejecutar FRAME.
 
+
+; Impresión. ----------------------------------------------------------------------------------------------------
+
 Album_de_pintado defw 0
 Album_de_borrado defw 0
 Techo_Scanlines_album defw 0
 Techo_Scanlines_album_2 defw 0
-
 Switch db 0
 Techo defw 0
-
 Scanlines_album_SP defw 0
+Coordenadas_y_de_entidades ds 7
+Coordenadas_y_de_entidades_SP defw Coordenadas_y_de_entidades
+Masa_SP defw Masa
+;Masa_2_SP defw Masa+2
+
 
 Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una única entidad.
 ;
@@ -675,6 +681,8 @@ Main
 15 push bc 												; Nº de entidades en curso.
 
 	call Restore_entidad								; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
+	call Recauda_informacion_de_entidad_en_curso		; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
+
 
 ; Existe "Entidad_guía" ???.
 ; Si la Entidad_guía ha sido fulminada hemos de reemplazarla.
@@ -802,6 +810,8 @@ Main
 ;	ld hl,Ctrl_1
 ;	res 2,(hl)
 
+	call Inicializa_punteros_Masa_y_coordenadas
+
 	call Borra_diferencia
 
 	ld a,(Ctrl_3)
@@ -812,6 +822,11 @@ Main
 	ld (hl),c
 	inc l
 	ld (hl),b											; Nuevo techo, mayor que el anterior.
+
+; Aquí situaremos la rutina que ordena el índice Masa.
+
+
+
 
 16 ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
@@ -1046,6 +1061,39 @@ Main
 ;	call Limpia_Variables_de_borrado
 
 ;	ret													
+
+; --------------------------------------------------------------------------------------------------------------
+;
+;	26/3/24
+
+Recauda_informacion_de_entidad_en_curso
+
+; Almacena la Coordenada Y de la entidad en curso.
+
+	ld a,(Coordenada_y)
+	ld hl,(Coordenadas_y_de_entidades_SP)
+	ld (hl),a
+	inc l
+	ld (Coordenadas_y_de_entidades_SP),hl
+
+; Almacena la dirección de memoria, (dentro del album de scanlines), de la entidad en curso.
+
+	ld de,(Scanlines_album_SP)
+	ld hl,(Masa_SP)
+	ld (hl),e
+	inc l
+	ld (hl),d
+	inc l
+	ld (Masa_SP),hl
+	ret
+
+; ----- ----- ----- ----- -----
+
+Inicializa_punteros_Masa_y_coordenadas ld hl,Coordenadas_y_de_entidades
+	ld (Coordenadas_y_de_entidades_SP),hl
+	ld hl,Masa
+	ld (Masa_SP),hl
+	ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -1404,37 +1452,6 @@ Inicia_punteros_de_cajas
 ;	ldir
 ;	ret
 
-; -------------------------------------------------------------------------------------------------------------
-;
-; 	21/02/24 
-;
-;	MODIFICA: AF,HL,BC,DE
-;	
-; 	(Numero_de_malotes) lo utiliza la rutina [Extrae_foto_entidades] para borrar/pintar entidades en pantalla.
-; 	Se calcula dividiendo entre 6 el nº de bytes que contiene el Scanlines_album.
-
-Calcula_numero_de_malotes 
-
-	ld hl,Scanlines_album
-	ex de,hl
-	ld hl,(Scanlines_album_SP)
-
-	ld b,0
-	ld a,l
-	sub e
-	jr z,1F
-
-; Nº de malotes no es "0".
-
-2 sub 6
-	inc b
-	and a
-	jr nz,2B
-	ld a,b
-
-1 ld (Numero_de_malotes),a					
-	ret
-
 ; *************************************************************************************************************************************************************
 ;
 ; 20/10/22
@@ -1527,10 +1544,6 @@ Restore_entidad
 	inc hl
 
 	inc de
-
-	ld bc,6
-	ldir
-
 	ld bc,7
 	ldir 											; Transferimos (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados),_
 ; 													; _ (Contador_de_mov_masticados) y (Ctrl_0).	

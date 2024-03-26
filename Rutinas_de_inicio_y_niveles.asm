@@ -223,16 +223,14 @@ Guarda_foto_de_mov_masticado
 
 ; ---------------------------------------------------------------------
 ;
-;	25/01/24
+;	26/03/24
 
 Limpiamos_bandeja_DRAW ld hl,Bandeja_DRAW
-	ld b,42
+	ld b,36
 	xor a
-
 1 ld (hl),a
 	inc hl 
 	djnz 1B
-
 	ret
 
 ; ---------------------------------------------------------------------
@@ -484,7 +482,9 @@ Definicion_de_entidad_a_bandeja_DRAW
 ; 
 ;	MODIFICA: HL,DE y BC
 
-Parametros_de_bandeja_DRAW_a_caja ld hl,Bandeja_DRAW
+Parametros_de_bandeja_DRAW_a_caja 
+
+	ld hl,Bandeja_DRAW
 	ld de,(Puntero_store_caja) 								
 	ld a,(hl)
 	ld (de),a
@@ -503,11 +503,8 @@ Parametros_de_bandeja_DRAW_a_caja ld hl,Bandeja_DRAW
 	ld a,(hl)			 									; HL, situado ahora correctamente: (Impacto).
 	ld (de),a
 	inc de 													; (Impacto), volcado a la caja.
-;															; DE situado ahora en (Variables_de_borrado).
-	inc hl
-	ld bc,6
-	ldir 													; Hemos volcado las (Variables_de_borrado).
-; 															; DE situado ahora en (Puntero_de_impresión).
+
+	ld hl,Puntero_de_impresion								; DE situado ahora en (Puntero_de_impresión).
 	ld bc,7
 	ldir													; Hemos volcado (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados), _
 ; 															; _ (Contador_de_mov_masticados) y (Ctrl_0).	
@@ -578,3 +575,4 @@ Inicializa_Numero_parcial_de_entidades
 1 ld (Numero_parcial_de_entidades),a
 	ld b,a
 2 ret
+
