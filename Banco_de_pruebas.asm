@@ -372,11 +372,8 @@ Techo_Scanlines_album_2 defw 0
 Switch db 0
 Techo defw 0
 Scanlines_album_SP defw 0
-Coordenadas_y_de_entidades ds 7
-Coordenadas_y_de_entidades_SP defw Coordenadas_y_de_entidades
-Masa_SP defw Masa
-;Masa_2_SP defw Masa+2
-
+India_SP defw Tabla_para_ordenar_entidades_antes_de_pintar 
+India_2_SP defw Tabla_para_ordenar_entidades_antes_de_pintar+3
 
 Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una única entidad.
 ;
@@ -792,6 +789,11 @@ Main
 
 	call Guarda_foto_de_mov_masticado					; PINTAMOS !!!!!!!!!!!!!!!!!!
 
+;	Generamos las coordenadas de la entidad que hemos iniciado o desplazado.
+
+	ld hl,(Puntero_de_impresion)
+	call Genera_coordenadas
+
 ;	ld hl,Ctrl_0
 ;    res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
 
@@ -800,7 +802,11 @@ Main
 	pop bc
 	
 	djnz 15B
-	
+
+; Hemos terminado de gestionar TODAS las ENTIDADES.
+
+	call Inicializa_India_y_limpia_tabla				; Inicializa el puntero (India_SP) y sanea la (Tabla_para_ordenar_entidades_antes_de_pintar).
+
 	call Inicia_punteros_de_cajas 						; Hemos terminado de mover todas las entidades. Nos situamos al principio del índice de entidades.
 
 ;! Activando estas líneas podemos habilitar 2 explosiones en el mismo FRAME.
@@ -810,7 +816,6 @@ Main
 ;	ld hl,Ctrl_1
 ;	res 2,(hl)
 
-	call Inicializa_punteros_Masa_y_coordenadas
 
 	call Borra_diferencia
 
@@ -1070,29 +1075,50 @@ Recauda_informacion_de_entidad_en_curso
 
 ; Almacena la Coordenada Y de la entidad en curso.
 
+; El 1er .db de la tabla almacena (Columna_Y) de la entidad en curso.
+
 	ld a,(Coordenada_y)
-	ld hl,(Coordenadas_y_de_entidades_SP)
+	ld hl,(India_SP)
 	ld (hl),a
 	inc l
-	ld (Coordenadas_y_de_entidades_SP),hl
 
 ; Almacena la dirección de memoria, (dentro del album de scanlines), de la entidad en curso.
 
 	ld de,(Scanlines_album_SP)
-	ld hl,(Masa_SP)
+
 	ld (hl),e
 	inc l
 	ld (hl),d
 	inc l
-	ld (Masa_SP),hl
+
+	ld (India_SP),hl
+
 	ret
 
-; ----- ----- ----- ----- -----
+; --------------------------------------------------------------------------------------------------------------
+;
+;	27/03/24
+;
 
-Inicializa_punteros_Masa_y_coordenadas ld hl,Coordenadas_y_de_entidades
-	ld (Coordenadas_y_de_entidades_SP),hl
-	ld hl,Masa
-	ld (Masa_SP),hl
+Inicializa_India_y_limpia_tabla 
+
+	ld hl,(India_SP)
+	ld bc,Tabla_para_ordenar_entidades_antes_de_pintar+21
+
+	ld a,c
+	sub l
+	jr z,2F
+	ld b,a												; Nº de bytes a limpiar de la tabla. Si la Tabla está completa, omitimos limpiar_
+;														; _ y pasamos a inicializar (India_SP).
+	xor a
+
+1 ld (hl),a
+	inc l
+	djnz 1B												; Limpia Tabla.
+
+2 ld hl,Tabla_para_ordenar_entidades_antes_de_pintar	; Inicializa (India_SP).
+	ld (India_SP),hl
+
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------

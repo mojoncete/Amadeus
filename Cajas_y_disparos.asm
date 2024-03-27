@@ -1,16 +1,23 @@
-
+; ---------------------------------------------------------------------
 ; Cajas de entidades, Amadeus y disparos. Índices de disparos y cajas. 
 ; Índice de Patrón de movimiento para tipo de entidad.
+; ---------------------------------------------------------------------
 
-; 26/03/24
+; 27/03/24
+;
+;	En esta tabla iremos almacenando:
+;
+;	(Columna_Y),(mem.address de los scanlines masticados en el Scanlines_album) de cada entidad en curso.
 
-Masa defw 0
-	defw 0
-	defw 0
-	defw 0
-	defw 0
-	defw 0
-	defw 0
+Tabla_para_ordenar_entidades_antes_de_pintar ds 21
+
+;	db 0, defw 0
+;	db 0, defw 0
+;	db 0, defw 0
+;	db 0, defw 0
+;	db 0, defw 0
+;	db 0, defw 0
+;	db 0, defw 0
 
 Indice_de_mov_segun_tipo_de_entidad defw Indice_mov_Baile_de_BadSat
 ;	defw ...
