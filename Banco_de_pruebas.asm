@@ -830,9 +830,6 @@ Main
 
 ; Aquí situaremos la rutina que ordena el índice Masa.
 
-
-
-
 16 ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
 
@@ -1149,10 +1146,6 @@ Borra_diferencia
 
 	ld bc,(Scanlines_album_SP)
 
-;	ld a,b
-;	and 3
-;	ld b,a 											; Sólo necesitamos 3 bytes.
-
 	ld a,(Switch)
 	and a
 	jr z,2F
@@ -1166,13 +1159,7 @@ Borra_diferencia
 
 ; Diferencia. 
 
-3 
-
-;	ld a,h
-;	and 3
-;	ld h,a
-
-	sbc hl,bc
+3 sbc hl,bc
 
 	ret z
 	ret c
