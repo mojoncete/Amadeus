@@ -9,7 +9,7 @@
 ;
 ;	(Columna_Y),(mem.address de los scanlines masticados en el Scanlines_album) de cada entidad en curso.
 
-Tabla_para_ordenar_entidades_antes_de_pintar ds 21
+Tabla_de_pintado ds 21
 
 ;	db 0, defw 0
 ;	db 0, defw 0

@@ -372,8 +372,8 @@ Techo_Scanlines_album_2 defw 0
 Switch db 0
 Techo defw 0
 Scanlines_album_SP defw 0
-India_SP defw Tabla_para_ordenar_entidades_antes_de_pintar 
-India_2_SP defw Tabla_para_ordenar_entidades_antes_de_pintar+3
+India_SP defw Tabla_de_pintado 
+India_2_SP defw Tabla_de_pintado+3
 
 Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una única entidad.
 ;
@@ -384,6 +384,9 @@ Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una únic
 ;																Habilita el borrado/pintado de sprites.
 ;															BIT 3, "1" Este bit lo coloca a "1" la rutina [Borra_diferencia] para indicar que hemos actualizado el (Techo_de_pintado)_
 ;																_ a la baja. 
+; 															BIT 4, "1" Indica que hemos terminado de ordenar la Tabla_de_pintado. Podremos salir así de la rutina [Ordena_tabla_de_impresion].
+
+
 
 Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una única entidad. Lo utiliza la rutina [Inicia_entidad].
 ;
@@ -678,6 +681,7 @@ Main
 15 push bc 												; Nº de entidades en curso.
 
 	call Restore_entidad								; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
+
 	call Recauda_informacion_de_entidad_en_curso		; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
 
 
@@ -805,8 +809,8 @@ Main
 
 ; Hemos terminado de gestionar TODAS las ENTIDADES.
 
-	call Inicializa_India_y_limpia_tabla				; Inicializa el puntero (India_SP) y sanea la (Tabla_para_ordenar_entidades_antes_de_pintar).
-
+	call Inicializa_India_y_limpia_Tabla_de_impresion 	; Inicializa el puntero (India_SP) y sanea la (Tabla_para_ordenar_entidades_antes_de_pintar).
+	call Ordena_tabla_de_impresion
 	call Inicia_punteros_de_cajas 						; Hemos terminado de mover todas las entidades. Nos situamos al principio del índice de entidades.
 
 ;! Activando estas líneas podemos habilitar 2 explosiones en el mismo FRAME.
@@ -835,7 +839,9 @@ Main
 
 	ld hl,Ctrl_3
 	set 0,(hl) 											; Indica Frame completo. 
+
 	res 3,(hl)
+	res 4,(hl)
 
 	xor a
 	out ($fe),a
@@ -1058,65 +1064,11 @@ Main
 
 ; ---------
 
-;    call Prepara_var_pintado			                ; HEMOS DESPLAZADO AMADEUS.!!!. Almaceno las `VARIABLES DE PINTADO´.         
+;   call Prepara_var_pintado			                ; HEMOS DESPLAZADO AMADEUS.!!!. Almaceno las `VARIABLES DE PINTADO´.         
 ;	call Repone_datos_de_borrado_Amadeus
 ;	call Limpia_Variables_de_borrado
 
 ;	ret													
-
-; --------------------------------------------------------------------------------------------------------------
-;
-;	26/3/24
-
-Recauda_informacion_de_entidad_en_curso
-
-; Almacena la Coordenada Y de la entidad en curso.
-
-; El 1er .db de la tabla almacena (Columna_Y) de la entidad en curso.
-
-	ld a,(Coordenada_y)
-	ld hl,(India_SP)
-	ld (hl),a
-	inc l
-
-; Almacena la dirección de memoria, (dentro del album de scanlines), de la entidad en curso.
-
-	ld de,(Scanlines_album_SP)
-
-	ld (hl),e
-	inc l
-	ld (hl),d
-	inc l
-
-	ld (India_SP),hl
-
-	ret
-
-; --------------------------------------------------------------------------------------------------------------
-;
-;	27/03/24
-;
-
-Inicializa_India_y_limpia_tabla 
-
-	ld hl,(India_SP)
-	ld bc,Tabla_para_ordenar_entidades_antes_de_pintar+21
-
-	ld a,c
-	sub l
-	jr z,2F
-	ld b,a												; Nº de bytes a limpiar de la tabla. Si la Tabla está completa, omitimos limpiar_
-;														; _ y pasamos a inicializar (India_SP).
-	xor a
-
-1 ld (hl),a
-	inc l
-	djnz 1B												; Limpia Tabla.
-
-2 ld hl,Tabla_para_ordenar_entidades_antes_de_pintar	; Inicializa (India_SP).
-	ld (India_SP),hl
-
-	ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -1187,6 +1139,159 @@ Borra_diferencia
 	ld hl,Ctrl_3
 	set 3,(hl)
 
+	ret
+
+; --------------------------------------------------------------------------------------------------------------
+;
+;	26/3/24
+
+Recauda_informacion_de_entidad_en_curso
+
+; Almacena la Coordenada Y de la entidad en curso.
+
+; El 1er .db de la tabla almacena (Columna_Y) de la entidad en curso.
+
+	ld a,(Coordenada_y)
+	ld hl,(India_SP)
+	ld (hl),a
+	inc l
+
+; Almacena la dirección de memoria, (dentro del album de scanlines), de la entidad en curso.
+
+	ld de,(Scanlines_album_SP)
+
+	ld (hl),e
+	inc l
+	ld (hl),d
+	inc l
+
+	ld (India_SP),hl
+
+	ret
+
+; --------------------------------------------------------------------------------------------------------------
+;
+;	27/03/24
+;
+
+Inicializa_India_y_limpia_Tabla_de_impresion 
+
+	ld hl,(India_SP)
+	ld bc,Tabla_de_pintado+21
+
+	ld a,c
+	sub l
+	jr z,2F
+	ld b,a												; Nº de bytes a limpiar de la tabla. Si la Tabla está completa, omitimos limpiar_
+;														; _ y pasamos a inicializar (India_SP).
+	xor a
+
+1 ld (hl),a
+	inc l
+	djnz 1B												; Limpia Tabla.
+
+2 ld hl,Tabla_de_pintado								; Inicializa (India_SP).
+	ld (India_SP),hl
+
+	ret
+
+; --------------------------------------------------------------------------------------------------------------
+;
+;	31/3/24
+
+Ordena_tabla_de_impresion
+
+; Inicializamos punteros (India_SP) e (India_2_SP).
+; Inicializamos contador de comparaciones, [C].
+; Cargamos los registros A y B para efectuar comparación.
+
+
+;	ld hl,Tabla_de_pintado
+	ld a,(hl)
+
+
+	di
+	jr $
+	ei
+
+
+;	ld (India_SP),hl
+	ld hl,Tabla_de_pintado+3
+	ld b,(hl)
+	ld (India_2_SP),hl
+	ld c,1
+
+	exx
+	ld c,1										; Copia de respaldo en C´.
+	exx	
+
+1 cp b  				 						; Compara filas, (entidad X & entidad X).
+	call c, Avanza_India_2_SP
+	jr 1B
+
+	ret
+
+; ----- ----- ----- ----- -----
+
+Avanza_India_2_SP
+
+	inc l
+	inc l
+	inc l
+
+	ld (India_2_SP),hl 							; Siguiente entidad en la Tabla.
+
+	ld b,(hl)
+
+	inc c
+
+	ex af,af
+
+	ld a,c
+	cp 7
+	jr z,Avanza_punteros_indios
+	ex af,af
+	ret
+
+; ----- ----- ----- ----- -----
+
+Avanza_punteros_indios 
+
+	ld hl,(India_SP)
+	inc l
+	inc l
+	inc l
+	ld (India_SP),hl
+	ld d,(hl)
+
+	inc l
+	inc l
+	inc l
+	ld (India_2_SP),hl
+	ld b,(hl)
+
+	exx
+	inc c
+	ld a,c
+
+	cp 7
+
+	di
+	jr z,$	;	Prepara salida.
+	ei
+
+	exx
+
+	ld c,a	
+	ld a,d
+
+	ret
+
+Prepara_salida 
+
+	ld hl,Tabla_de_pintado
+	ld (India_SP),hl
+;	inc iyh
 	ret
 
 ; -----------------------------------------------------------------------------------
@@ -1826,16 +1931,21 @@ Actualiza_relojes
 
 ; ---------------------------------------------------------------
 
+	org $aa54
+
 	include "Rutinas_de_inicio_y_niveles.asm"
 	include "calcula_tercio.asm"
 	include "Cls.asm"
 	include "Genera_coordenadas.asm"
 	include "Relojes_y_temporizaciones.asm"
 	include "Genera_datos_de_impresion.asm"
+
 	include "Pinta_Sprites.asm"
 	include "Draw_XOR.asm"
 	include "Direcciones.asm"
 	include "Movimiento.asm"
+
+
 ;	include "Disparo.asm"
 
 
