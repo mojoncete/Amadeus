@@ -1206,27 +1206,27 @@ Ordena_tabla_de_impresion
 ; Cargamos los registros A y B para efectuar comparación.
 
 
-;	ld hl,Tabla_de_pintado
-	ld a,(hl)
+	ld a,(Entidades_en_curso)
+	cp 4 	;	4
+	ret c 										; Tiene que haber 4 (Entidades_en_curso) en pantalla para poder ejecutar esta rutina.
 
+	dec a
+	ld c,a 										; (Entidades_en_curso)-1 en C. Puede haber menos de 7 ebtidades.
+	ld d,c 										; Copia de respaldo.
 
-	di
-	jr $
-	ei
+	ld a,(hl)									; Nº de Fila de la 1ª entidad, (1er byte de la tabla).
 
-
-;	ld (India_SP),hl
 	ld hl,Tabla_de_pintado+3
 	ld b,(hl)
 	ld (India_2_SP),hl
-	ld c,1
-
-	exx
-	ld c,1										; Copia de respaldo en C´.
-	exx	
 
 1 cp b  				 						; Compara filas, (entidad X & entidad X).
 	call c, Avanza_India_2_SP
+
+	inc d
+	dec d
+	ret z 										; Todas las (Entidades_en_curso) ordenadas.
+
 	jr 1B
 
 	ret
@@ -1243,26 +1243,26 @@ Avanza_India_2_SP
 
 	ld b,(hl)
 
-	inc c
-
-	ex af,af
-
-	ld a,c
-	cp 7
+	dec c
 	jr z,Avanza_punteros_indios
-	ex af,af
 	ret
 
 ; ----- ----- ----- ----- -----
 
 Avanza_punteros_indios 
 
+	dec d
+
+	jr z,Prepara_salida 
+
+	ld c,d
+
 	ld hl,(India_SP)
 	inc l
 	inc l
 	inc l
 	ld (India_SP),hl
-	ld d,(hl)
+	ld a,(hl)
 
 	inc l
 	inc l
@@ -1270,28 +1270,12 @@ Avanza_punteros_indios
 	ld (India_2_SP),hl
 	ld b,(hl)
 
-	exx
-	inc c
-	ld a,c
-
-	cp 7
-
-	di
-	jr z,$	;	Prepara salida.
-	ei
-
-	exx
-
-	ld c,a	
-	ld a,d
-
 	ret
 
 Prepara_salida 
 
 	ld hl,Tabla_de_pintado
 	ld (India_SP),hl
-;	inc iyh
 	ret
 
 ; -----------------------------------------------------------------------------------
