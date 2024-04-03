@@ -1222,6 +1222,9 @@ Ordena_tabla_de_impresion
 
 1 cp b  				 						; Compara filas, (entidad X & entidad X).
 	call c, Avanza_India_2_SP
+	call z, Avanza_India_2_SP
+
+
 
 	inc d
 	dec d
