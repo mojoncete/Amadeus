@@ -9,7 +9,7 @@
 ;
 ;	(Columna_Y),(mem.address de los scanlines masticados en el Scanlines_album) de cada entidad en curso.
 
-Tabla_de_pintado ds 21
+Tabla_de_pintado ds 24
 
 ;	db 0, defw 0
 ;	db 0, defw 0

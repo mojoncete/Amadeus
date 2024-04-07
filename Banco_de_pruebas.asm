@@ -1205,6 +1205,7 @@ Ordena_tabla_de_impresion
 ; Inicializamos contador de comparaciones, [C].
 ; Cargamos los registros A y B para efectuar comparación.
 
+	ld ixl,0
 
 	ld a,(Entidades_en_curso)
 	cp 4 	;	4
@@ -1223,6 +1224,10 @@ Ordena_tabla_de_impresion
 1 cp b  				 						; Compara filas, (entidad X & entidad X).
 	call c, Avanza_India_2_SP
 	call z, Avanza_India_2_SP
+
+	dec ixl
+	jr z,2F
+
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -1259,10 +1264,11 @@ Trueque
  
 	call Avanza_India_2_SP
 
-	inc d
+2 inc d
 	dec d
 	ret z 										; Todas las (Entidades_en_curso) ordenadas.
 
+;	ld ixl,0
 	jr 1B
 
 	ret
@@ -1270,6 +1276,8 @@ Trueque
 ; ----- ----- ----- ----- -----
 
 Avanza_India_2_SP
+
+	inc ixl
 
 	inc l
 	inc l
