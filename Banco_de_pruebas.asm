@@ -1224,7 +1224,40 @@ Ordena_tabla_de_impresion
 	call c, Avanza_India_2_SP
 	call z, Avanza_India_2_SP
 
+; --------------------------------------------------------------------------------------------------------------
+;
+;	7/4/24
 
+Trueque 
+
+; INPUTS:   B contiene el nº de fila de (India_2_SP).
+;  			A contiene en nº de fila de (India_SP).
+;			HL contiene (India_2_SP). 
+
+	push de 									; Preservo DE pues D contiene una copia de respaldo.
+	push hl										; Preservo (India_2_SP).
+
+	ld de,(India_SP)
+	ex de,hl
+	ld (hl),b
+	ld (de),a									; (Flia) de (India_SP) ---- NTERCAMBIADA ---- (Flia) de (India_2_SP).
+
+	call Intercambia_1_byte
+	call Intercambia_1_byte
+
+
+; Volvemos a iniciar A. Vuelve a contener `el nuevo contenido, (Fila), de (India_SP).
+; Recuperamos (India_2_SP) en HL.
+
+	ld hl,(India_SP)
+	ld a,(hl)
+
+	pop hl
+	pop de
+
+; --------------------------------------------------------------------------------------------------------------
+ 
+	call Avanza_India_2_SP
 
 	inc d
 	dec d
@@ -1279,6 +1312,16 @@ Prepara_salida
 
 	ld hl,Tabla_de_pintado
 	ld (India_SP),hl
+	ret
+
+
+Intercambia_1_byte inc l
+	inc e
+	ld b,(hl)
+	ld a,(de)
+	ex de,hl
+	ld (hl),b
+	ld (de),a									; Byte de menor peso de las dos direcciones de memoria, ----- INTERCAMBIADAS -----.
 	ret
 
 ; -----------------------------------------------------------------------------------
