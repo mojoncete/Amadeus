@@ -1201,6 +1201,10 @@ Inicializa_India_y_limpia_Tabla_de_impresion
 
 Ordena_tabla_de_impresion
 
+; 5794 T/states.
+; 6278 T/states.
+; 5310 T/states.
+
 ; Inicializamos punteros (India_SP) e (India_2_SP).
 ; Inicializamos contador de comparaciones, [C].
 ; Cargamos los registros A y B para efectuar comparación.
