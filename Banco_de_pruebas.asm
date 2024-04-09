@@ -40,16 +40,38 @@ FRAME ld (Stack_3),sp
 	bit 2,a
 	jr z,1F                                                 ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
 
-; Borramos:
+
+	jr $
+
+Borrando
+
+	ld hl,(Scanlines_album_SP)
+	call Extrae_address
+
+	inc h
+	dec h
+	jr z,Pintando
 
 	call Pinta_Sprites
+	jr Borrando
+	
 
-; Pintamos:
+Pintando
 
-	ld hl,(Album_de_pintado)
-	ld (Scanlines_album_SP),hl
+	ld hl,(India_SP)
+	inc l
+	call Extrae_address
 
+	inc h
+	dec h
+	ret z
+
+	inc e
+	inc e
+
+	ld (India_SP),de
 	call Pinta_Sprites
+	jr Pintando
 
 ; Posible colisión Entidad-Amadeus ???
 

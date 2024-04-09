@@ -122,6 +122,11 @@ Inicia_Entidades
 
 	ld hl,(Puntero_de_impresion)
 	call Genera_coordenadas
+
+	jr $
+
+	call Recauda_informacion_de_entidad_en_curso				; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
+
 	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
 	call Limpiamos_bandeja_DRAW
 	call Incrementa_punteros_de_cajas
@@ -203,6 +208,7 @@ Store_Restore_cajas
 ;	29/01/24
 
 Guarda_foto_de_mov_masticado 
+
 
 	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
 	call Genera_datos_de_impresion

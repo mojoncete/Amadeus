@@ -7,12 +7,12 @@
 
 Pinta_Sprites 
 
-    ld hl,(Scanlines_album_SP)
-    call Extrae_address
+;    ld hl,(Scanlines_album_SP)
+;    call Extrae_address
 
-    inc h
-    dec h
-    ret z                               ; Salimos si hemos terminado de pintar o el album de líneas está vacío.
+;    inc h
+;    dec h
+;    ret z                               ; Salimos si hemos terminado de pintar o el album de líneas está vacío.
 
     ld (Stack),sp
  
@@ -308,9 +308,8 @@ Pinta_rapido    ;   1520 t/states.
     ld (hl),a
     inc de
 
-2 ld (Scanlines_album_SP),sp
     ld sp,(Stack)
-    jp Pinta_Sprites
+    ret
 
 Pinta_lento 
 
@@ -333,4 +332,5 @@ Pinta_lento
 
     djnz 1B
 
-    jr 2B
+    ld sp,(Stack)
+    ret
