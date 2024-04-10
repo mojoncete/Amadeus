@@ -12,7 +12,7 @@ Pinta_Sprites
 
 ;    inc h
 ;    dec h
-;    ret z                               ; Salimos si hemos terminado de pintar o el album de líneas está vacío.
+;    ret z                              ; Salimos si hemos terminado de pintar o el album de líneas está vacío.
 
     ld (Stack),sp
  
@@ -308,6 +308,7 @@ Pinta_rapido    ;   1520 t/states.
     ld (hl),a
     inc de
 
+    ld (Scanlines_album_SP),sp
     ld sp,(Stack)
     ret
 
@@ -332,5 +333,6 @@ Pinta_lento
 
     djnz 1B
 
+    ld (Scanlines_album_SP),sp
     ld sp,(Stack)
     ret

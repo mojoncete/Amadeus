@@ -116,16 +116,25 @@ Inicia_Entidades
 	call Activa_FLAG_mov_masticados_completos					; Activa el FLAG que indica que este (Tipo) de entidad tiene todos sus_
 ;																; _ Mov_masticados ya generados.
 
-4 call Guarda_foto_de_mov_masticado
+4 call Cargamos_registros_con_mov_masticado						; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
+
+	push ix
+	pop hl 														; (Puntero_de_impresion) en HL.
+
+	push de
+	call Genera_coordenadas
+	call Recauda_informacion_de_entidad_en_curso				; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
+	pop de
+
+	call Genera_datos_de_impresion
+;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
+;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
+;																; La rutina [Genera_datos_de_impresion] activa las interrupciones antes del RET.
+; Actualizamos (Contador_de_mov_masticados) tras la foto.	
+
+	call Decrementa_Contador_de_mov_masticados
 
 ; Antes de guardar los parámetros de esta entidad en su correspondiente caja hay que actualizar coordenadas.
-
-	ld hl,(Puntero_de_impresion)
-	call Genera_coordenadas
-
-	jr $
-
-	call Recauda_informacion_de_entidad_en_curso				; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
 
 	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
 	call Limpiamos_bandeja_DRAW
@@ -200,26 +209,6 @@ Store_Restore_cajas
 ;	ei
 
 2 call Incrementa_punteros_de_cajas
-	ret
-
-
-; ---------------------------------------------------------------------
-;
-;	29/01/24
-
-Guarda_foto_de_mov_masticado 
-
-
-	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
-	call Genera_datos_de_impresion
-
-;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
-;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
-;																; La rutina [Genera_datos_de_impresion] activa las interrupciones antes del RET.
-; Actualizamos (Contador_de_mov_masticados) tras la foto.	
-
-	call Decrementa_Contador_de_mov_masticados
-
 	ret
 
 ; ---------------------------------------------------------------------

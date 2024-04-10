@@ -40,9 +40,6 @@ FRAME ld (Stack_3),sp
 	bit 2,a
 	jr z,1F                                                 ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
 
-
-	jr $
-
 Borrando
 
 	ld hl,(Scanlines_album_SP)
@@ -53,6 +50,7 @@ Borrando
 	jr z,Pintando
 
 	call Pinta_Sprites
+
 	jr Borrando
 	
 
@@ -64,13 +62,18 @@ Pintando
 
 	inc h
 	dec h
-	ret z
+	jr z,1F
 
 	inc e
 	inc e
 
 	ld (India_SP),de
+
+	call Extrae_address
+
+
 	call Pinta_Sprites
+
 	jr Pintando
 
 ; Posible colisión Entidad-Amadeus ???
@@ -559,20 +562,17 @@ START
 ;	res 3,(hl)
 ;	jr Main
 
-; Entidades y Amadeus iniciados. Esperamos a [FRAME].
-
-6 
-
-;	call Calcula_numero_de_malotes
-
 ; Damos por concluida la construcción del FRAME. 
-; Inicializamos (Scanlines_album_SP). Se sitúa al comienzo del álbum que acabamos de completar.
+; 
 
-	ld hl,(Scanlines_album_SP)
+6 ld hl,(Scanlines_album_SP)
 	ld (Techo_Scanlines_album),hl
 
 	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
+
+	ld hl,Tabla_de_pintado
+	ld (India_SP),hl
 
 	ld hl,Ctrl_3
 	set 0,(hl) 											 ; Indica Frame completo. 
@@ -696,6 +696,10 @@ Main
 ;
 ;	Se produce MOVIMIENTO. Intercambio de Álbumes, (borrado-pintado).
 
+	ld hl,Tabla_de_pintado
+	ld (India_SP),hl
+
+
 	ld hl,Ctrl_3
 	set 2,(hl)
 	call Change
@@ -813,7 +817,18 @@ Main
 ;	call Detecta_disparo_entidad
 ; ]]]
 
-	call Guarda_foto_de_mov_masticado					; PINTAMOS !!!!!!!!!!!!!!!!!!
+; -------------------------------------------
+
+ 	call Cargamos_registros_con_mov_masticado						; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
+	call Genera_datos_de_impresion
+;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
+;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
+;																; La rutina [Genera_datos_de_impresion] activa las interrupciones antes del RET.
+; Actualizamos (Contador_de_mov_masticados) tras la foto.	
+
+	call Decrementa_Contador_de_mov_masticados
+
+; -------------------------------------------
 
 ;	Generamos las coordenadas de la entidad que hemos iniciado o desplazado.
 
@@ -1199,7 +1214,7 @@ Recauda_informacion_de_entidad_en_curso
 Inicializa_India_y_limpia_Tabla_de_impresion 
 
 	ld hl,(India_SP)
-	ld bc,Tabla_de_pintado+21
+	ld bc,Tabla_de_pintado+23							; Bytes de (Tabla_de_pintado)-1.
 
 	ld a,c
 	sub l
@@ -1995,7 +2010,7 @@ Actualiza_relojes
 
 ; ---------------------------------------------------------------
 
-	org $aa54
+	org $aa7f
 
 	include "Rutinas_de_inicio_y_niveles.asm"
 	include "calcula_tercio.asm"
