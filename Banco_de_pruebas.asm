@@ -40,6 +40,20 @@ FRAME ld (Stack_3),sp
 	bit 2,a
 	jr z,1F                                                 ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
 
+
+;! Debugggggggggggg
+
+	; $5e ok
+	; $5f mal
+
+;	ld a,(Contador_de_frames)
+;	cp $5e 	; 	$5a
+;	jr nz,Borrando
+;	ld a,(Contador_de_frames_2)
+;	cp $05
+;	jr z,$
+
+
 Borrando
 
 	ld hl,(Scanlines_album_SP)
@@ -696,9 +710,16 @@ Main
 ;
 ;	Se produce MOVIMIENTO. Intercambio de Álbumes, (borrado-pintado).
 
-	ld hl,Tabla_de_pintado
-	ld (India_SP),hl
 
+	ld a,(Contador_de_frames)
+	cp $5f 	; 	$5f
+	jr nz,chuli
+	ld a,(Contador_de_frames_2)
+	cp $05
+	jr z,$
+
+chuli ld hl,Tabla_de_pintado
+	ld (India_SP),hl
 
 	ld hl,Ctrl_3
 	set 2,(hl)
@@ -1214,7 +1235,7 @@ Recauda_informacion_de_entidad_en_curso
 Inicializa_India_y_limpia_Tabla_de_impresion 
 
 	ld hl,(India_SP)
-	ld bc,Tabla_de_pintado+23							; Bytes de (Tabla_de_pintado)-1.
+	ld bc,Tabla_de_pintado+24							; Bytes de (Tabla_de_pintado)-1.
 
 	ld a,c
 	sub l
