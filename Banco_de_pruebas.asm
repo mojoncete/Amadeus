@@ -40,20 +40,6 @@ FRAME ld (Stack_3),sp
 	bit 2,a
 	jr z,1F                                                 ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
 
-
-;! Debugggggggggggg
-
-	; $5e ok
-	; $5f mal
-
-;	ld a,(Contador_de_frames)
-;	cp $5e 	; 	$5a
-;	jr nz,Borrando
-;	ld a,(Contador_de_frames_2)
-;	cp $05
-;	jr z,$
-
-
 Borrando
 
 	ld hl,(Scanlines_album_SP)
@@ -710,15 +696,7 @@ Main
 ;
 ;	Se produce MOVIMIENTO. Intercambio de Álbumes, (borrado-pintado).
 
-
-	ld a,(Contador_de_frames)
-	cp $5f 	; 	$5f
-	jr nz,chuli
-	ld a,(Contador_de_frames_2)
-	cp $05
-	jr z,$
-
-chuli ld hl,Tabla_de_pintado
+	ld hl,Tabla_de_pintado
 	ld (India_SP),hl
 
 	ld hl,Ctrl_3
@@ -1267,7 +1245,7 @@ Ordena_tabla_de_impresion
 ; Inicializamos contador de comparaciones, [C].
 ; Cargamos los registros A y B para efectuar comparación.
 
-	ld ixl,0
+	ld iyl,0
 
 	ld a,(Entidades_en_curso)
 	cp 4 	;	4
@@ -1287,7 +1265,7 @@ Ordena_tabla_de_impresion
 	call c, Avanza_India_2_SP
 	call z, Avanza_India_2_SP
 
-	dec ixl
+	dec iyl
 	jr z,2F
 
 
@@ -1329,8 +1307,6 @@ Trueque
 2 inc d
 	dec d
 	ret z 										; Todas las (Entidades_en_curso) ordenadas.
-
-;	ld ixl,0
 	jr 1B
 
 	ret
@@ -1339,18 +1315,18 @@ Trueque
 
 Avanza_India_2_SP
 
-	inc ixl
-
-	inc l
-	inc l
-	inc l
-
-	ld (India_2_SP),hl 							; Siguiente entidad en la Tabla.
-
-	ld b,(hl)
-
 	dec c
 	jr z,Avanza_punteros_indios
+
+	inc iyl
+
+	inc l
+	inc l
+	inc l
+
+	ld b,(hl)
+	ld (India_2_SP),hl 							; Siguiente entidad en la Tabla.
+
 	ret
 
 ; ----- ----- ----- ----- -----
@@ -1358,7 +1334,6 @@ Avanza_India_2_SP
 Avanza_punteros_indios 
 
 	dec d
-
 	jr z,Prepara_salida 
 
 	ld c,d
@@ -1367,14 +1342,16 @@ Avanza_punteros_indios
 	inc l
 	inc l
 	inc l
-	ld (India_SP),hl
 	ld a,(hl)
+	ld (India_SP),hl
 
 	inc l
 	inc l
 	inc l
-	ld (India_2_SP),hl
 	ld b,(hl)
+	ld (India_2_SP),hl
+
+	inc iyl
 
 	ret
 
