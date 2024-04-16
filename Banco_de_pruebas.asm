@@ -2,7 +2,7 @@
 
 	DEVICE ZXSPECTRUM48
 
-	org $8120
+	org $8119
 
 	include "Sprites_e_indices.asm"
 	include "Cajas_y_disparos.asm"
@@ -765,7 +765,9 @@ Main
 
 ;	ld a,(Ctrl_1) 										; Existe Loop?
 ;	bit 3,a												; Si este bit es "1". Hay recarga de nueva oleada.
-	jp z,Main
+;	jp z,Main
+
+	jp Main
 
 ; RECARGA DE NUEVA OLEADA.
 
