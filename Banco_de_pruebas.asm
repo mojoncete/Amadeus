@@ -2,132 +2,7 @@
 
 	DEVICE ZXSPECTRUM48
 
-	org $a9ff 	
-	
-;	Vector de interrupciones.
-
- 	defw $aa01											; $9000. Rutina de interrupciones.
-
-	org $aa01		
-
-; Guardamos SP.
-
-FRAME ld (Stack_3),sp
-
-;! debuggg
-
-	ex af,af'	
-	push af	;af'
-	exx
-	push hl	;hl'
-	push de	;de'
-	push bc	;bc'
-	exx
-	push hl	;hl
-	push de	;de
-	push bc	;bc
-	ex af,af'
-	push af	;af
-	push ix
-	push iy
-
-	ld a,2	
-	out ($fe),a												
-
-	ld a,(Ctrl_3)
-	bit 0,a
-	jr z,1F 												; No pintamos si el FRAME no se ha completado.
-	bit 2,a
-	jr z,1F                                                 ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
-
-Borrando
-
-	ld hl,(Scanlines_album_SP)
-	call Extrae_address
-
-	inc h
-	dec h
-	jr z,Pintando
-
-	call Pinta_Sprites
-
-	jr Borrando
-	
-
-Pintando
-
-	ld hl,(India_SP)
-	inc l
-	call Extrae_address
-
-	inc h
-	dec h
-	jr z,1F
-
-	inc e
-	inc e
-
-	ld (India_SP),de
-
-	call Extrae_address
-
-
-	call Pinta_Sprites
-
-	jr Pintando
-
-; Posible colisión Entidad-Amadeus ???
-
-;	ld a,(Impacto2)	
-;	bit 2,a
-;	jr z,1F
-
-;	call Detecta_colision_nave_entidad 
-
-;1 ld a,4	
-;	out ($fe),a												
-;	call Gestiona_Amadeus
-
-;	ld a,7	
-;	out ($fe),a											; Borde blanco.
-;	ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
-;	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
-
-; Restauramos los parámetros de la entidad que había alojada en DRAW "antes de gestionar AMADEUS".
-
-;	call Recupera_parametros_DRAW
-
-1 call Actualiza_relojes
-
-	ld hl,Ctrl_3
-	res 0,(hl)											; Reinicia el flag de FRAME completo.
-	res 2,(hl)											; Reinicia el flag DETECTA MOVIMIENTO.
-
-	pop iy
-	pop ix
-	pop af
-	pop bc
-	pop de
-	pop hl
-	exx
-	pop bc
-	pop de
-	pop hl
-	ex af,af'
-	pop af
-	ex af,af'
-	exx
-
-	ld sp,(Stack_3)
-
-	ei
-
-	ld a,1												; Borde azul.
-	out ($fe),a
-
-	ret									 
-
-; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
+	org $8120
 
 	include "Sprites_e_indices.asm"
 	include "Cajas_y_disparos.asm"
@@ -140,10 +15,11 @@ Pintando
 ;
 ; 09/03/24
 
-;
 ; Constantes.
-;
- 
+
+Frames equ $5c78
+Frames_3 equ $5c7a										; Reloj en tiempo real del sistema. VARIABLES DEL SISTEMA, (ROM).
+
 Sprite_vacio equ $eae0									; ($eae0 - $eb10) 48 Bytes de "0".
 
 Centro_arriba equ $0160 								; Emplearemos estas constantes en la rutina de `recolocación´ del objeto:_
@@ -385,9 +261,6 @@ Stack defw 0 											; La rutinas de pintado, utilizan esta_
 ; 														; _de pila, SP.
 Stack_2 defw 0											; 2º variable destinada a almacenar el puntero de pila, SP.
 ;														; La utiliza la rutina [Extrae_foto_registros].
-Stack_3 defw 0											; Almacena el SP antes de ejecutar FRAME.
-
-
 ; Impresión. ----------------------------------------------------------------------------------------------------
 
 Album_de_pintado defw 0
@@ -445,7 +318,7 @@ Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una únic
 ;														; _produzca colisión.
 ;;Coordenadas_disparo_certero ds 2						; Almacenamos aquí las coordenadas del disparo que ha alcanzado a Amadeus.
 ;											            ; (Coordenadas_disparo_certero)=Y ..... (Coordenadas_disparo_certero +1)=X.
-;;Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posibles columnas_
+;;Coordenadas_X_Amadeus ds 3							; 3 Bytes reservados para almacenar las 3 posibles columnas_
 ;														; _ que puede ocupar el sprite de Amadeus. (Colisión).
 Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 posibles columnas_
 ;														; _ que puede ocupar el sprite de una entidad. (Colisión).
@@ -454,9 +327,6 @@ Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 pos
 ;---------------------------------------------------------------------------------------------------------------
 
 ; Relojes y temporizaciones.
-
-Contador_de_frames db 0	 								
-Contador_de_frames_2 db 0	 
 
 ;Clock_explosion db 4
 Clock_Entidades_en_curso db 20
@@ -486,10 +356,6 @@ Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos
 
 START 
 
-	ld sp,0												; Situamos el inicio de Stack.
-	ld a,$a9 											; Habilitamos el modo 2 de interrupciones y fijamos el salto a $a9ff
-	ld i,a 												; Byte alto de la dirección donde se encuentra nuestro vector de interrupciones en el registro I. ($a9). El byte bajo será siempre $ff.
-	IM 2 											    ; Habilitamos el modo 2 de INTERRUPCIONES.
 	DI 													 										 
 
 ;	ld a,%00000111
@@ -585,7 +451,19 @@ START
 
 Main 
 ;
-;	11/12/23
+;	16/04/24
+
+; Regresamos de (RST38).
+; Lo primero que hacemos es BORRAR/PINTAR la pantalla.
+
+	ld a,2	
+	out ($fe),a												
+
+	call Imprime_pantalla
+
+	ld a,1												; Borde azul.
+	out ($fe),a
+
 
 ; Aparece nueva entidad ???
 
@@ -603,7 +481,7 @@ Main
 
 	ld a,(Clock_Entidades_en_curso)	
 	ld b,a
-	ld a,(Contador_de_frames)
+	ld a,(Frames)
 	cp b
 	jr nz,13F
 
@@ -1849,12 +1727,12 @@ Pulsa_ENTER ld a,$bf 									; Esperamos la pulsación de la tecla "ENTER".
 
 ;	!!!!!!!! DESTRUYE BC !!!!!!!!!!!
 
-DELAY LD BC,$0900							;$0320 ..... Delay mínimo
-wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: si el Sprite ocupa la 1ª y 2ª_				
-	LD A,B 										
-	AND A
-	JR NZ,wait
-	RET
+;DELAY LD BC,$0900							;$0320 ..... Delay mínimo
+;wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: si el Sprite ocupa la 1ª y 2ª_				
+;	LD A,B 										
+;	AND A
+;	JR NZ,wait
+;	RET
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
@@ -1989,39 +1867,35 @@ wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: 
 ;
 ;	Incrementa los relojes cada vez que se ejecuta un FRAME completo, (se ha completado la foto de todas las entidades).
 
-Actualiza_relojes 
+;Actualiza_relojes 
 
-	ld a,(Ctrl_3)
-	bit 0,a
-	ret z 						;	Salimos si no hemos pintado unidades.
+;	ld a,(Ctrl_3)
+;	bit 0,a
+;	ret z 						;	Salimos si no hemos pintado unidades.
 
-	ld hl,Contador_de_frames	;	20 ms. (Contador_de_frames)=$ff ..... 5.1 segunados aprox.
-	inc (hl)
+;	ld hl,Contador_de_frames	;	20 ms. (Contador_de_frames)=$ff ..... 5.1 segunados aprox.
+;	inc (hl)
 	
-	inc (hl)
-	dec (hl)
-	ret nz
+;	inc (hl)
+;	dec (hl)
+;	ret nz
 
-	ld hl,Contador_de_frames_2	;	5.1 segundos. (Contador_de_frames_2)=$ff ..... 1300.5 segundos, 21.675 minutos.  
-	inc (hl)
-	ret
+;	ld hl,Contador_de_frames_2	;	5.1 segundos. (Contador_de_frames_2)=$ff ..... 1300.5 segundos, 21.675 minutos.  
+;	inc (hl)
+;	ret
 
 ; ---------------------------------------------------------------
 
-	org $aa7f
-
+	include "Pinta_Sprites.asm"
+	include "Draw_XOR.asm"
+	include "Direcciones.asm"
+	include "Movimiento.asm"
 	include "Rutinas_de_inicio_y_niveles.asm"
 	include "calcula_tercio.asm"
 	include "Cls.asm"
 	include "Genera_coordenadas.asm"
 	include "Relojes_y_temporizaciones.asm"
 	include "Genera_datos_de_impresion.asm"
-
-	include "Pinta_Sprites.asm"
-	include "Draw_XOR.asm"
-	include "Direcciones.asm"
-	include "Movimiento.asm"
-
 
 ;	include "Disparo.asm"
 

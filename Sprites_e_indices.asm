@@ -4,8 +4,6 @@
 ;
 ;	Sprites e índices.
 
-	org $8120
-
 ; Disparo.
 
 Indice_disparo defw Disparo_0

@@ -1,5 +1,43 @@
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
+;   16/0424
+;
+
+Imprime_pantalla ld a,(Ctrl_3)
+    bit 0,a
+    jr z,1F                                                 ; No pintamos si el FRAME no se ha completado.
+    bit 2,a
+    jr z,1F                                                 ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
+
+Borrando ld hl,(Scanlines_album_SP)
+    call Extrae_address
+    inc h
+    dec h
+    jr z,Pintando
+    call Pinta_Sprites
+    jr Borrando
+    
+Pintando ld hl,(India_SP)
+    inc l
+    call Extrae_address
+    inc h
+    dec h
+    jr z,1F
+    inc e
+    inc e
+    ld (India_SP),de
+    call Extrae_address
+    call Pinta_Sprites
+    jr Pintando
+
+1 ld hl,Ctrl_3
+    res 0,(hl)                                          ; Reinicia el flag de FRAME completo.
+    res 2,(hl)  
+
+    ret
+
+; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;
 ;	11/03/24
 ;
 ;   (Scanlines_album_SP) se sitúa inicialmente al comienzo de Scanlines_album.
