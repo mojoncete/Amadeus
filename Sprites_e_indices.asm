@@ -4,7 +4,7 @@
 ;
 ;	Sprites e índices.
 
-	org $8131
+	org $8120
 
 ; Disparo.
 
@@ -35,10 +35,22 @@ Indice_Badsat_izq defw Badsat_izquierda
 	defw Badsat_izq_f9
 	defw Badsat_izq_f8
 
-Badsat_izquierda DEFB $00,$08,$02,$14,$02,$2A,$02,$55
-	DEFB	$02,$AA,$02,$54,$7F,$E8,$03,$60
-	DEFB	$0A,$E0,$17,$F8,$2B,$E8,$54,$40
-	DEFB	$AA,$60,$54,$00,$28,$00,$10,$00 ; Sprite principal a izquierda, (sin desplazar).
+Badsat_izquierda DEFB $00,$08,$00
+	DEFB 	$02,$14,$00
+	DEFB 	$02,$2A,$00
+	DEFB 	$02,$55,$00
+	DEFB	$02,$AA,$00
+	DEFB 	$02,$54,$00
+	DEFB 	$7F,$E8,$00
+	DEFB 	$03,$60,$00
+	DEFB	$0A,$E0,$00
+	DEFB 	$17,$F8,$00
+	DEFB 	$2B,$E8,$00
+	DEFB 	$54,$40,$00
+	DEFB	$AA,$60,$00
+	DEFB 	$54,$00,$00
+	DEFB 	$28,$00,$00
+	DEFB 	$10,$00,$00	 ; Sprite principal a izquierda, (sin desplazar).
 
 Badsat_izq_f8 DEFB $00,$04,$00,$01,$0A,$00,$01,$15
 	DEFB	$00,$01,$2A,$80,$01,$55,$00,$01
@@ -53,6 +65,11 @@ Badsat_izq_f9 DEFB $00,$02,$00,$00,$85,$00,$00,$8A
 	DEFB	$02,$B8,$00,$05,$FE,$00,$0A,$FA
 	DEFB	$00,$15,$10,$00,$2A,$98,$00,$15
 	DEFB	$00,$00,$0A,$00,$00,$04,$00,$00 ; $F9 (6º DESPLZ a izquierda).
+
+
+;! 39 bytes libres aquí !!!!! 
+
+	org $8200
 
 Badsat_izq_fa DEFB $00,$01,$00,$00,$42,$80,$00,$45
 	DEFB	$40,$00,$4A,$A0,$00,$55,$40,$00
@@ -99,10 +116,22 @@ Indice_Badsat_der defw Badsat_derecha
 	defw Badsat_der_fd
 	defw Badsat_der_fe
 
-Badsat_derecha DEFB	$10,$00,$28,$40,$54,$40,$AA,$40
-	DEFB	$55,$40,$2A,$40,$17,$FE,$06,$C0
-	DEFB	$07,$50,$1F,$E8,$17,$D4,$02,$2A
-	DEFB	$06,$55,$00,$2A,$00,$14,$00,$08 ; Sprite principal a derecha, (sin desplazar).
+Badsat_derecha DEFB	$10,$00,$00
+	DEFB    $28,$40,$00
+	DEFB	$54,$40,$00
+	DEFB	$AA,$40,$00
+	DEFB	$55,$40,$00
+	DEFB	$2A,$40,$00
+	DEFB	$17,$FE,$00
+	DEFB	$06,$C0,$00
+	DEFB	$07,$50,$00
+	DEFB	$1F,$E8,$00
+	DEFB	$17,$D4,$00
+	DEFB	$02,$2A,$00
+	DEFB	$06,$55,$00
+	DEFB	$00,$2A,$00
+	DEFB	$00,$14,$00
+	DEFB	$00,$08,$00 ; Sprite principal a derecha, (sin desplazar).
 
 Badsat_der_f8 DEFB $08,$00,$00,$14,$20,$00,$2A,$20
 	DEFB	$00,$55,$20,$00,$2A,$A0,$00,$15
@@ -132,6 +161,10 @@ Badsat_der_fb DEFB $01,$00,$00,$02,$84,$00,$05,$44
 	DEFB	$40,$00,$22,$A0,$00,$65,$50,$00
 	DEFB	$02,$A0,$00,$01,$40,$00,$00,$80 ; $Fb (4º DESPLZ a derecha).
 
+;! 16 bytes libres aquí !!!!! 
+
+	org $8400
+
 Badsat_der_fc DEFB $00,$80,$00,$01,$42,$00,$02,$A2
 	DEFB	$00,$05,$52,$00,$02,$AA,$00,$01
 	DEFB	$52,$00,$00,$BF,$F0,$00,$36,$00
@@ -156,6 +189,8 @@ Badsat_der_fe DEFB $00,$20,$00,$00,$50,$80,$00,$A8
 ; ----------------------------------------------------------------------------------------
 
 ; Amadeus. 2x2.
+
+;	org $8119
 
 Indice_Amadeus_der defw Amadeus
 	defw 0	
@@ -202,6 +237,8 @@ Amadeus_Fd DEFB	$00,$06,$00,$00,$8F,$10,$00,$99
 	DEFB	$EF,$7C,$02,$2F,$44,$01,$C6,$38 ; $Fd (6º DESPLZ a derecha).
 
 ; ----------------------------------------------------------------------------------------
+
+;	org $8690
 
 Indice_Explosion_2x3 defw Explosion_2x3_1
 	defw Explosion_2x3_2

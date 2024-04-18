@@ -1,12 +1,14 @@
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;   19/1/24
+;   8/3/24
 ;
 ;	Carga el nº de entidades del nivel en (Numero_de_entidades). 
 ;	Fija los perfiles de velocidad según el Nivel de dificultad.
 ;	Sitúa el puntero (Datos_de_nivel) en la dirección de memoria donde se encuentra el .db que define el (Tipo)_
 ;	_ de la 1ª entidad del Nivel.
-;	
+;
+;	Sitúa (Puntero_indice_mov) en la coreografía correcta.
+
 ;	MODIFICA: HL,DE y A. 
 ;	ACTUALIZA: (Puntero_indice_NIVELES), (Numero_de_entidades) y (Datos_de_nivel).
 
@@ -18,10 +20,10 @@ Inicializa_Nivel
 	ld (Numero_de_entidades),a					 ; Fijamos el nº de entidades que tiene el nivel.
 	inc hl
 	call Fija_velocidades					     ; Perfiles_de_velocidad según Nivel.
-	ld (Datos_de_nivel),hl						 ; (Datos_de_nivel) ahora apunta a la dirección de mem. donde se encuentra el .db que indica__ 
-	call Inicializa_Puntero_indice_mov			 ; Inicializa (Puntero_indice_mov) según el (Tipo) de Entidad. (Coreografía).
-;												 ; _ el (Tipo) de la 1ª entidad del Nivel.
-	call Inicializa_Puntero_de_almacen_de_mov_masticados
+	ld (Datos_de_nivel),hl						 ; (Datos_de_nivel) ahora apunta a la dirección de mem. donde se encuentra el .db que indica el (Tipo) de la 1ª entidad del Nivel.
+	call Inicializa_Puntero_indice_mov			 ; Inicializa (Puntero_indice_mov) según el (Tipo) de Entidad. Nos situamos en la coreografía correcta.
+												 
+	call Inicializa_Puntero_de_almacen_de_mov_masticados	; Selecciona el almacén adecuado de mov_masticados según el (Tipo) de entidad. 
 	ret 										 
 
 ; ----------------------
@@ -113,12 +115,27 @@ Inicia_Entidades
 
 	call Activa_FLAG_mov_masticados_completos					; Activa el FLAG que indica que este (Tipo) de entidad tiene todos sus_
 ;																; _ Mov_masticados ya generados.
-4 call Guarda_foto_de_mov_masticado
+
+4 call Cargamos_registros_con_mov_masticado						; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
+
+	push ix
+	pop hl 														; (Puntero_de_impresion) en HL.
+
+	push de
+	call Genera_coordenadas
+	call Recauda_informacion_de_entidad_en_curso				; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
+	pop de
+
+	call Genera_datos_de_impresion
+;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
+;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
+;																; La rutina [Genera_datos_de_impresion] activa las interrupciones antes del RET.
+; Actualizamos (Contador_de_mov_masticados) tras la foto.	
+
+	call Decrementa_Contador_de_mov_masticados
 
 ; Antes de guardar los parámetros de esta entidad en su correspondiente caja hay que actualizar coordenadas.
 
-	ld hl,(Puntero_de_impresion)
-	call Genera_coordenadas
 	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
 	call Limpiamos_bandeja_DRAW
 	call Incrementa_punteros_de_cajas
@@ -158,15 +175,10 @@ Definicion_segun_tipo
 
 ; ---------------------------------------------------------------------
 ;
-;	30/01/24
+;	27/03/24
 
 
 Store_Restore_cajas	
-
-;	Generamos las coordenadas de la entidad que hemos iniciado o desplazado.
-
-	ld hl,(Puntero_de_impresion)
-	call Genera_coordenadas
 
 	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
 	call Limpiamos_bandeja_DRAW
@@ -199,57 +211,25 @@ Store_Restore_cajas
 2 call Incrementa_punteros_de_cajas
 	ret
 
-
 ; ---------------------------------------------------------------------
 ;
-;	29/01/24
-
-Guarda_foto_de_mov_masticado call Cargamos_registros_con_mov_masticado
-	call Guarda_foto_registros
-;																; La rutina [Guarda_foto_registros] habilita las interrupciones antes del RET. 
-;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
-;																; La rutina [Guarda_foto_registros] activa las interrupciones antes del RET.
-; Actualizamos (Contador_de_mov_masticados) tras la foto.	
-
-	call Decrementa_Contador_de_mov_masticados
-	ret
-
-; ---------------------------------------------------------------------
-;
-;	25/01/24
+;	26/03/24
 
 Limpiamos_bandeja_DRAW ld hl,Bandeja_DRAW
-	ld b,42
+	ld b,36
 	xor a
-
 1 ld (hl),a
 	inc hl 
 	djnz 1B
-
 	ret
 
 ; ---------------------------------------------------------------------
 ;
-;	22/01/24
+;	24/03/24
 
 Decrementa_Contador_de_mov_masticados ld hl,(Contador_de_mov_masticados)
 	dec hl
-
-	inc h
-	dec h
-
-	call m,Reinicia_entidad_maliciosa
-
-;	jr nz,1F
-
-;	inc l
-;	dec l
-
-;	di
-;	jr z,$
-;	ei
-
-1 ld (Contador_de_mov_masticados),hl
+	ld (Contador_de_mov_masticados),hl
 	ret
 
 ; ---------------------------------------------------------------------
@@ -276,25 +256,9 @@ Reinicia_entidad_maliciosa
 
 	ld (Puntero_de_almacen_de_mov_masticados),hl
 
-;	Recolocamos el puntero (Stack_snapshot) del álbum de fotos para colocamos justo después del borrado.
-;	Queremos pintar la entidad en su posición de inicio.
-
-	ld hl,(Stack_snapshot)
-	ld bc,6
-	and a
-	sbc hl,bc
-	ld (Stack_snapshot),hl
-
 	call Cargamos_registros_con_mov_masticado
-	call Guarda_foto_registros
-
-	ld hl,(Contador_de_mov_masticados)
-	dec hl
 
 	ret
-
-
-
 
 ; ---------------------------------------------------------------------
 ;
@@ -508,7 +472,9 @@ Definicion_de_entidad_a_bandeja_DRAW
 ; 
 ;	MODIFICA: HL,DE y BC
 
-Parametros_de_bandeja_DRAW_a_caja ld hl,Bandeja_DRAW
+Parametros_de_bandeja_DRAW_a_caja 
+
+	ld hl,Bandeja_DRAW
 	ld de,(Puntero_store_caja) 								
 	ld a,(hl)
 	ld (de),a
@@ -527,11 +493,8 @@ Parametros_de_bandeja_DRAW_a_caja ld hl,Bandeja_DRAW
 	ld a,(hl)			 									; HL, situado ahora correctamente: (Impacto).
 	ld (de),a
 	inc de 													; (Impacto), volcado a la caja.
-;															; DE situado ahora en (Variables_de_borrado).
-	inc hl
-	ld bc,6
-	ldir 													; Hemos volcado las (Variables_de_borrado).
-; 															; DE situado ahora en (Puntero_de_impresión).
+
+	ld hl,Puntero_de_impresion								; DE situado ahora en (Puntero_de_impresión).
 	ld bc,7
 	ldir													; Hemos volcado (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados), _
 ; 															; _ (Contador_de_mov_masticados) y (Ctrl_0).	
@@ -602,3 +565,4 @@ Inicializa_Numero_parcial_de_entidades
 1 ld (Numero_parcial_de_entidades),a
 	ld b,a
 2 ret
+

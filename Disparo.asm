@@ -412,7 +412,7 @@ Almacena_disparo
 
     ld sp,(Stack)
 
-; Guardamos en Album_de_fotos_disparos los proyectiles generados.
+; Guardamos en Album_de_lineas_disparos los proyectiles generados.
 
 	ld hl,Ctrl_1
 	set 0,(hl) 
@@ -727,14 +727,14 @@ Bucle_3 push bc                                    ; guardamos el contador de sc
 ;
 ;   DESTRUYE: HL,BC,DE y A.
 
-Limpia_album_disparos ld hl,Album_de_fotos_disparos
+Limpia_album_disparos ld hl,Album_de_lineas_disparos
     ld a,(hl)
     and a
     ret z                                               ; Salimos de la rutina si no hay ningún disparo en pantalla.
 
     ld b,h
     ld c,l
-    ld hl,(Stack_snapshot_disparos)
+    ld hl,(Album_de_lineas_disparos_SP)
     push hl
     and a
     sbc hl,bc                                           
@@ -747,8 +747,8 @@ Limpia_album_disparos ld hl,Album_de_fotos_disparos
     dec de
     lddr                                                ; Limpiamos.
 
-    ld hl,Album_de_fotos_disparos
-    ld (Stack_snapshot_disparos),hl
+    ld hl,Album_de_lineas_disparos
+    ld (Album_de_lineas_disparos_SP),hl
 
     ret
 
