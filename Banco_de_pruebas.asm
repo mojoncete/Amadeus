@@ -498,6 +498,8 @@ START
 
 ; INICIALIZACIÓN.
 
+	call Derivando_RND 									 ; Rutina de generación de nº aleatorios.
+
 ;	Inicializa 1er Nivel.
 
 	ld hl,Indice_de_niveles
@@ -2010,6 +2012,7 @@ Actualiza_relojes
 
 	org $aa7f
 
+	include "RND_Derivando.asm"
 	include "Rutinas_de_inicio_y_niveles.asm"
 	include "calcula_tercio.asm"
 	include "Cls.asm"
