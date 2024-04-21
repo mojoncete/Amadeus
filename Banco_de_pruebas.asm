@@ -459,7 +459,10 @@ Contador_de_frames db 0
 Contador_de_frames_2 db 0	 
 
 ;Clock_explosion db 4
-Clock_Entidades_en_curso db 20
+
+RND_SP defw Numeros_aleatorios							; Puntero que se irá desplazando por el SET de nº aleatorios.
+Clock_Entidades_en_curso db 0
+
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
 ;Disparo_Amadeus db 1									; A "1", se puede generar disparo.
@@ -498,7 +501,11 @@ START
 
 ; INICIALIZACIÓN.
 
+	ld b,7   											 ; Generamos 7 nº aleatorios.
 	call Derivando_RND 									 ; Rutina de generación de nº aleatorios.
+	ld hl,(RND_SP)
+	ld a,(hl)
+	ld (Clock_Entidades_en_curso),a
 
 ;	Inicializa 1er Nivel.
 
@@ -603,8 +610,7 @@ Main
 ;	call Limpia_y_reinicia_Scanlines_album 				; Lo 1º que hacemos después de pintar es limpiar el álbum de fotos e inicializar 
 ; 													 	; _(Scanlines_album_SP).
 
-	ld a,(Clock_Entidades_en_curso)	
-	ld b,a
+	ld b,(Clock_Entidades_en_curso)
 	ld a,(Contador_de_frames)
 	cp b
 	jr nz,13F
@@ -627,7 +633,7 @@ Main
 	ld a,(Clock_Entidades_en_curso)
 ;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
 ;! _ IMPREDECIBLE !!!!
-	add 100
+	add 10
 	ld (Clock_Entidades_en_curso),a
 
 ; -------------------------------------------------------------------------------------------------------------
