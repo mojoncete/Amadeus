@@ -10,11 +10,7 @@
 
 	org $aa01		
 
-; Guardamos SP.
-
-FRAME ld (Stack_3),sp
-
-;! debuggg
+FRAME 
 
 	ex af,af'	
 	push af	;af'
@@ -71,7 +67,6 @@ Pintando
 
 	call Extrae_address
 
-
 	call Pinta_Sprites
 
 	jr Pintando
@@ -97,13 +92,19 @@ Pintando
 
 ;	call Recupera_parametros_DRAW
 
-1 call Actualiza_relojes
+1 ld a,(Ctrl_3)
+	bit 0,a
+	jr z,2F 											; No actualizamos FRAMES si el último cuadro no se completó.
 
-	ld hl,Ctrl_3
+	call ROM_keyboard									; Actualiza FRAMES y ejecuta las rutinas de teclado de la ROM.
+
+2 ld hl,Ctrl_3
 	res 0,(hl)											; Reinicia el flag de FRAME completo.
 	res 2,(hl)											; Reinicia el flag DETECTA MOVIMIENTO.
 
-	pop iy
+;	call Recupera_todos_los_registros
+
+    pop iy
 	pop ix
 	pop af
 	pop bc
@@ -117,8 +118,6 @@ Pintando
 	pop af
 	ex af,af'
 	exx
-
-	ld sp,(Stack_3)
 
 	ei
 
@@ -144,6 +143,9 @@ Pintando
 ; Constantes.
 ;
  
+ROM_keyboard equ $0038 									; Rutina de ROM. Actualiza FRAMES y escanea el teclado.
+FRAMES equ $5c78										; Variable de 16 bits. Almacena el nº de cuadros, (frames) que llevamos construidos. Reloj en tiempo real.
+
 Sprite_vacio equ $eae0									; ($eae0 - $eb10) 48 Bytes de "0".
 
 Centro_arriba equ $0160 								; Emplearemos estas constantes en la rutina de `recolocación´ del objeto:_
@@ -385,8 +387,6 @@ Stack defw 0 											; La rutinas de pintado, utilizan esta_
 ; 														; _de pila, SP.
 Stack_2 defw 0											; 2º variable destinada a almacenar el puntero de pila, SP.
 ;														; La utiliza la rutina [Extrae_foto_registros].
-Stack_3 defw 0											; Almacena el SP antes de ejecutar FRAME.
-
 
 ; Impresión. ----------------------------------------------------------------------------------------------------
 
@@ -455,12 +455,10 @@ Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 pos
 
 ; Relojes y temporizaciones.
 
-Contador_de_frames db 0	 								
-Contador_de_frames_2 db 0	 
-
 ;Clock_explosion db 4
 
 RND_SP defw Numeros_aleatorios							; Puntero que se irá desplazando por el SET de nº aleatorios.
+
 Clock_Entidades_en_curso db 0
 
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
@@ -503,9 +501,9 @@ START
 
 	ld b,7   											 ; Generamos 7 nº aleatorios.
 	call Derivando_RND 									 ; Rutina de generación de nº aleatorios.
-	ld hl,(RND_SP)
-	ld a,(hl)
+	call Extrae_numero_aleatorio_y_avanza
 	ld (Clock_Entidades_en_curso),a
+
 
 ;	Inicializa 1er Nivel.
 
@@ -610,8 +608,10 @@ Main
 ;	call Limpia_y_reinicia_Scanlines_album 				; Lo 1º que hacemos después de pintar es limpiar el álbum de fotos e inicializar 
 ; 													 	; _(Scanlines_album_SP).
 
-	ld b,(Clock_Entidades_en_curso)
-	ld a,(Contador_de_frames)
+	ld a,(Clock_Entidades_en_curso)
+	ld b,a
+
+	ld a,(FRAMES)
 	cp b
 	jr nz,13F
 
@@ -630,11 +630,14 @@ Main
 
 ; - Define el tiempo que ha de transcurrir para que aparezca la siguiente entidad. ----------------------------
 
-	ld a,(Clock_Entidades_en_curso)
+	call Extrae_numero_aleatorio_y_avanza
+	ld (Clock_Entidades_en_curso),a
+
+;	ld a,(Clock_Entidades_en_curso)
 ;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
 ;! _ IMPREDECIBLE !!!!
-	add 10
-	ld (Clock_Entidades_en_curso),a
+;	add 110
+;	ld (Clock_Entidades_en_curso),a
 
 ; -------------------------------------------------------------------------------------------------------------
 
@@ -1132,6 +1135,16 @@ Change
 
 	ld (Album_de_borrado),de
 
+	ret
+
+; ------------------------------------
+;
+; 31/04/24
+
+Extrae_numero_aleatorio_y_avanza ld hl,(RND_SP)
+	ld a,(hl)
+	inc hl
+	ld (RND_SP),hl
 	ret
 
 ; ------------------------------------
@@ -1990,29 +2003,6 @@ wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: 
 ;	call Limpia_album_Amadeus
 
 ;	ret
-
-; -----------------------------------------------------------------------------------
-;
-;	10/12/23
-;
-;	Incrementa los relojes cada vez que se ejecuta un FRAME completo, (se ha completado la foto de todas las entidades).
-
-Actualiza_relojes 
-
-	ld a,(Ctrl_3)
-	bit 0,a
-	ret z 						;	Salimos si no hemos pintado unidades.
-
-	ld hl,Contador_de_frames	;	20 ms. (Contador_de_frames)=$ff ..... 5.1 segunados aprox.
-	inc (hl)
-	
-	inc (hl)
-	dec (hl)
-	ret nz
-
-	ld hl,Contador_de_frames_2	;	5.1 segundos. (Contador_de_frames_2)=$ff ..... 1300.5 segundos, 21.675 minutos.  
-	inc (hl)
-	ret
 
 ; ---------------------------------------------------------------
 
