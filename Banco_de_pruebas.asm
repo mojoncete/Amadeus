@@ -501,6 +501,7 @@ START
 
 	ld b,7   											 ; Generamos 7 nº aleatorios.
 	call Derivando_RND 									 ; Rutina de generación de nº aleatorios.
+
 	call Extrae_numero_aleatorio_y_avanza
 	ld (Clock_next_entity),a
 
@@ -1193,9 +1194,9 @@ Extrae_numero_aleatorio_y_avanza
 
 Define_Clock_next_entity 
 
-	cp $32
+	cp $34
 	jr c,1F  						; nº demasiado bajo, < 1 seg.
-	cp $c8
+	cp $c3
 	jr nc,2F  						; nº demasiado alto, > 4 seg.
 
 3 ld b,a
@@ -1205,9 +1206,9 @@ Define_Clock_next_entity
 	ld (Clock_next_entity),a  		; Actualizamos variable.
 	ret
 
-1 ld a,$32
+1 ld a,$34
 	jr 3B
-2 ld a,$c8
+2 ld a,$c3
 	jr 3B
 
 ; ------------------------------------

@@ -10,9 +10,9 @@
 Derivando_RND 
 
     ld hl,Numeros_aleatorios
-    ld a,r      			            ; La semilla inicial de nuestro nº aleatorio la proporciona el registro `R´. Cargamos A con R.
-3 push bc    
 
+3 ld a,r      			                ; La semilla inicial de nuestro nº aleatorio la proporciona el registro `R´. Cargamos A con R.
+    push bc    
 ;                                       ; El registro R, es un registro de 8 bits que actúa como contador de refresco de la memoria dinámica. ($00 - $ff).
     ld bc,$0700                         ; C contendrá nuestro nº aleatorio: $0 - $ff. Inicialmente está a "0".
 ;                                       ; B actuará como contador de bits. Requerimos de 1 byte, ($ff).
