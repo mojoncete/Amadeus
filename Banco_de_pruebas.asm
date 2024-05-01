@@ -459,7 +459,7 @@ Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 pos
 
 RND_SP defw Numeros_aleatorios							; Puntero que se irá desplazando por el SET de nº aleatorios.
 
-Clock_Entidades_en_curso db 0
+Clock_next_entity db 0
 
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
@@ -502,8 +502,7 @@ START
 	ld b,7   											 ; Generamos 7 nº aleatorios.
 	call Derivando_RND 									 ; Rutina de generación de nº aleatorios.
 	call Extrae_numero_aleatorio_y_avanza
-	ld (Clock_Entidades_en_curso),a
-
+	ld (Clock_next_entity),a
 
 ;	Inicializa 1er Nivel.
 
@@ -596,8 +595,8 @@ Main
 
 ; Aparece nueva entidad ???
 
-; 														; Inicialmente, (Clock_Entidades_en_curso)="30".
-;														; (Clock_Entidades_en_curso) define cuando aparecen las entidades en pantalla.
+; 														; Inicialmente, (Clock_next_entity)="30".
+;														; (Clock_next_entity) define cuando aparecen las entidades en pantalla.
 ;														; Todas las entidades contenidas en un "bloque", (7 cajas), se inicializan en [START].
 ;														; Si (Numero_de_entidades) > "7", cuando el bloque de 7 cajas esté a "0" se inicializaráa _;		
 ;														; _un 2º bloque.
@@ -608,7 +607,7 @@ Main
 ;	call Limpia_y_reinicia_Scanlines_album 				; Lo 1º que hacemos después de pintar es limpiar el álbum de fotos e inicializar 
 ; 													 	; _(Scanlines_album_SP).
 
-	ld a,(Clock_Entidades_en_curso)
+	ld a,(Clock_next_entity)
 	ld b,a
 
 	ld a,(FRAMES)
@@ -616,7 +615,7 @@ Main
 	jr nz,13F
 
 ; Si aún quedan entidades por aparecer del bloque de entidades, (7 cajas), incrementaremos (Entidades_en_curso) y calcularemos_ 
-; _ (Clock_Entidades_en_curso) para la siguiente entidad.
+; _ (Clock_next_entity) para la siguiente entidad.
 
 21 ld a,(Numero_parcial_de_entidades)
 	ld b,a
@@ -631,13 +630,8 @@ Main
 ; - Define el tiempo que ha de transcurrir para que aparezca la siguiente entidad. ----------------------------
 
 	call Extrae_numero_aleatorio_y_avanza
-	ld (Clock_Entidades_en_curso),a
-
-;	ld a,(Clock_Entidades_en_curso)
-;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
-;! _ IMPREDECIBLE !!!!
-;	add 110
-;	ld (Clock_Entidades_en_curso),a
+	call Define_Clock_next_entity
+	ld (Clock_next_entity),a
 
 ; -------------------------------------------------------------------------------------------------------------
 
@@ -921,7 +915,7 @@ Main
 ;! _ IMPREDECIBLE !!!!
 
 ;	add 10
-;	ld (Clock_Entidades_en_curso),a
+;	ld (Clock_next_entity),a
 
 ;	jp 4B
 
@@ -1139,13 +1133,82 @@ Change
 
 ; ------------------------------------
 ;
-; 31/04/24
+; 1/05/24
 
-Extrae_numero_aleatorio_y_avanza ld hl,(RND_SP)
-	ld a,(hl)
+; Fija en A un nº aleatorio comprendido entre 0-255 y desplaza el puntero (RND_SP) al siguiente nº.
+; Si el puntero está situado en el último nº, lo volvemos a situar al principio.
+
+;	DESTRUYE: HL,DE,A
+;	OUTPUTS: A contiene un Nº aleatorio. Actualizamos (RND_SP).
+
+;	Variables implicadas: (RND_SP).
+
+Extrae_numero_aleatorio_y_avanza 
+
+	ld hl,Tabla_de_pintado
+	ex de,hl
+	ld hl,(RND_SP)
+	ex de,hl
+	and a
+	sbc hl,de
+
+	ld hl,(RND_SP)
+	jr nz,1F
+
+; Sitúa HL al principio de la tabla de nº aleatorios.
+
+	ld hl,Numeros_aleatorios
+	ld (RND_SP),HL
+
+; Coloca el nº aleatorio en A y mueve el puntero al siguiente nº.
+
+1 ld a,(hl)
 	inc hl
 	ld (RND_SP),hl
 	ret
+
+; ------------------------------------
+;
+; 1/05/24
+
+; Hacemos que el nº contenido en el registro A tenga un valor comprendido entre ($32 y $c8).
+; (1 a 4 segundos).
+; Actualizamos (Clock_next_entity) con A.
+
+;	DESTRUYE: A y B.
+;	OUTPUTS: A contiene un Nº aleatorio comprendido entre ($32 y $c8).
+;			 Actualiza (Clock_next_entity) con A.
+
+;	Variables implicadas: (Clock_next_entity).
+
+; Notas:
+
+; 	$32 1 seg.
+; 	$64 2 seg.
+; 	$96 3 seg.
+; 	$c8 4 seg.
+; 	$fa 5 seg.
+
+; $ffff 1310,7 seg, 22 minutos.
+
+Define_Clock_next_entity 
+
+	cp $32
+	jr c,1F  						; nº demasiado bajo, < 1 seg.
+	cp $c8
+	jr nc,2F  						; nº demasiado alto, > 4 seg.
+
+3 ld b,a
+	ld a,(FRAMES)
+	add b
+
+	ld (Clock_next_entity),a  		; Actualizamos variable.
+	ret
+
+1 ld a,$32
+	jr 3B
+2 ld a,$c8
+	jr 3B
 
 ; ------------------------------------
 ;
