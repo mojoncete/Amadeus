@@ -153,7 +153,7 @@ Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto e
 Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
 
-Almacen_de_movimientos_masticados_Entidad_1 equ $eb20	; $eb00 - $f87b ..... 3419 bytes. Guardaremos los movimientos masticados que ha hido generando la entidad guía.
+Almacen_de_movimientos_masticados_Entidad_1 equ $eb20	; $eb20 - $f87b ..... 3419 bytes. Guardaremos los movimientos masticados que ha hido generando la entidad guía.
 
 Scanlines_album equ $8000	;	($8000 - $8118) 		; Inicialmente 280 bytes. 
 
@@ -172,7 +172,7 @@ Scanlines_album_2 equ $9000    ;    ($9000 - $9118)
 ;
 ; 18/01/24
 ;
-; Variables de DRAW. (Motor principal).	42 Bytes.	
+; Variables de DRAW. (Motor principal).	44 Bytes.	
 ;
 
 Bandeja_DRAW ; -----------------------------------------------------------------------------------------------
@@ -284,6 +284,13 @@ Ctrl_2 db 0
 ;															_ el último MOVIMIENTO que hayamos ejecutado.
 ;														BIT 4, ???
 ;														BIT 5, Este bit a "1" indica que esta entidad es una "Entidad_guía".
+
+Contador_de_vueltas db 0
+Velocidad db 0 											; 5 vueltas max. 5 vueltas       1 - 0 (1ª vuelta - velocidad 0)
+;																						 2 - 0 (2ª vuelta - velocidad 0)
+;																						 4 - 1 (3ª vuelta - velocidad 1)
+;																						 8 - 2 (4ª vuelta - velocidad 2)
+;																					   $10 - 4 (5ª vuelta - velocidad 3) 																		
 
 Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
 
@@ -824,7 +831,34 @@ Main
 
 ; -------------------------------------------
 
- 	call Cargamos_registros_con_mov_masticado						; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
+;! Velocidad !!!!!!!!!!!!!!!!!!!
+
+;	di
+;	jr $
+;	ei
+
+;	ld a,(Velocidad)
+;	sla a 
+;	ld (Velocidad),a
+;	and $08
+;	jr z,48F
+	
+; Restaura (Velocidad) a razón del nº de vueltas. 	
+;	ld a,4
+
+;	ld hl,(Puntero_de_almacen_de_mov_masticados)
+;	inc hl
+;	inc hl
+;	inc hl
+;	inc hl
+;	ld (Puntero_de_almacen_de_mov_masticados),hl
+
+;	ld (Velocidad),a
+
+48 call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
+
+
+
 	call Genera_datos_de_impresion
 ;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
 ;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
@@ -1553,7 +1587,9 @@ Actualiza_Puntero_de_almacen_de_mov_masticados
 ;	DE contiene (Puntero_objeto).
  
 
-Cargamos_registros_con_mov_masticado ld (Stack),sp
+Cargamos_registros_con_mov_masticado 
+
+	ld (Stack),sp
 	ld sp,(Puntero_de_almacen_de_mov_masticados)
 
 	pop de 															; DE contiene Puntero_objeto
@@ -1796,7 +1832,7 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 
 ; **************************************************************************************************
 ;
-;	31/01/24
+;	6/5/24
 ;
 ;	Cargamos los datos de la caja de entidades señalada por el puntero (Puntero_store_caja) a la BANDEJA_DRAW.
 
@@ -1828,9 +1864,8 @@ Restore_entidad
 	ldir 											; Transferimos (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados),_
 ; 													; _ (Contador_de_mov_masticados) y (Ctrl_0).	
 	ld de,Ctrl_2
-
-	ld a,(hl)
-	ld (de),a 										; Transferimos (Ctrl_2).
+	ld bc,3
+	ldir											; Transferimos (Ctrl_2),(Contador_de_vueltas) y (Velocidad).
 
 	ret
 

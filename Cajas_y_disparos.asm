@@ -169,7 +169,7 @@ p.imp.amadeus defw 0 									; Puntero_de_impresion.
 ;
 ;	22/01/24
 ;
-; 	Cada caja tiene 13 bytes !!!
+; 	Cada caja tiene 15 bytes !!!
 
 Caja_1 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	db %00000000										; (Attr).
@@ -179,6 +179,8 @@ Caja_1 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	defw 0 												; (Contador_de_mov_masticados).
 	db 0												; (Ctrl_0).
 	db 0												; (Ctrl_2). 
+	db 0 												; (Contador_de_vueltas).
+	db 0												; (Velocidad). 					
 
 ; ---------- ---------- ---------- ---------- ----------	
 
@@ -190,6 +192,8 @@ Caja_2 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	defw 0 												; (Contador_de_mov_masticados).
 	db 0												; (Ctrl_0).
 	db 0												; (Ctrl_2). 
+	db 0 												; (Contador_de_vueltas).
+	db 0												; (Velocidad). 					
 
 ; ---------- ---------- ---------- ---------- ----------	
 
@@ -201,6 +205,8 @@ Caja_3 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	defw 0 												; (Contador_de_mov_masticados).
 	db 0												; (Ctrl_0).
 	db 0												; (Ctrl_2). 
+	db 0 												; (Contador_de_vueltas).
+	db 0												; (Velocidad). 					
 
 ; ---------- ---------- ---------- ---------- ----------
 
@@ -212,6 +218,8 @@ Caja_4 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	defw 0 												; (Contador_de_mov_masticados).
 	db 0												; (Ctrl_0).
 	db 0												; (Ctrl_2). 
+	db 0 												; (Contador_de_vueltas).
+	db 0												; (Velocidad). 					
 
 ; ---------- ---------- ---------- ---------- ----------
 
@@ -223,6 +231,8 @@ Caja_5 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	defw 0 												; (Contador_de_mov_masticados).
 	db 0												; (Ctrl_0).
 	db 0												; (Ctrl_2). 
+	db 0 												; (Contador_de_vueltas).
+	db 0												; (Velocidad). 					
 
 ; ---------- ---------- ---------- ---------- ----------
 
@@ -234,6 +244,8 @@ Caja_6 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y)..
 	defw 0 												; (Contador_de_mov_masticados).
 	db 0												; (Ctrl_0).
 	db 0												; (Ctrl_2). 
+	db 0 												; (Contador_de_vueltas).
+	db 0												; (Velocidad). 					
 
 ; ---------- ---------- ---------- ---------- ----------	
 
@@ -245,7 +257,9 @@ Caja_7 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y)..
 	defw 0 												; (Contador_de_mov_masticados).
 	db 0												; (Ctrl_0).
 	db 0												; (Ctrl_2). 
-
+	db 0 												; (Contador_de_vueltas).
+	db 0												; (Velocidad). 					
+	
 ; -------------------------------------------------------------------------------------
 ;
 ;	11/1/24

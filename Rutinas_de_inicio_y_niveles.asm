@@ -216,7 +216,7 @@ Store_Restore_cajas
 ;	26/03/24
 
 Limpiamos_bandeja_DRAW ld hl,Bandeja_DRAW
-	ld b,36
+	ld b,38
 	xor a
 1 ld (hl),a
 	inc hl 
@@ -229,12 +229,16 @@ Limpiamos_bandeja_DRAW ld hl,Bandeja_DRAW
 
 Decrementa_Contador_de_mov_masticados ld hl,(Contador_de_mov_masticados)
 	dec hl
+
+; debug 6/5/24
+
+
 	ld (Contador_de_mov_masticados),hl
 	ret
 
 ; ---------------------------------------------------------------------
 ;
-;	10/2/24
+;	6/5/24
 
 Reinicia_entidad_maliciosa 
 
@@ -257,6 +261,15 @@ Reinicia_entidad_maliciosa
 	ld (Puntero_de_almacen_de_mov_masticados),hl
 
 	call Cargamos_registros_con_mov_masticado
+
+; Incrementa el contador de vueltas
+
+;	ld hl,Contador_de_vueltas
+;	ld a,6
+;	sla (hl)
+;	cp (hl)
+;	ret nz
+;	dec (hl)
 
 	ret
 
@@ -459,7 +472,7 @@ Definicion_de_entidad_a_bandeja_DRAW
 
 ; ----------------------------------------------------------------------------------------------------------
 ;
-;	22/01/24
+;	6/5/24
 ;
 ;	Guarda la definición que ha generado los movimientos masticados de este tipo de entidad en su correspondiente caja.
 ;	
@@ -499,10 +512,9 @@ Parametros_de_bandeja_DRAW_a_caja
 	ldir													; Hemos volcado (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados), _
 ; 															; _ (Contador_de_mov_masticados) y (Ctrl_0).	
 ;															; HL apunta ahora a (Columnas).
-	ld hl,Ctrl_2
-	ld a,(hl)
-	ld (de),a 												; Volcamos (Ctrl_2).
-	inc de 										
+	ld hl,Ctrl_2 											
+	ld bc,3
+	ldir													; Hemos volcado (Ctrl_2),(Contador_de_vueltas) y (Velocidad). 
 
 	ret
 
