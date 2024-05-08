@@ -285,7 +285,7 @@ Ctrl_2 db 0
 ;														BIT 4, ???
 ;														BIT 5, Este bit a "1" indica que esta entidad es una "Entidad_guía".
 
-Contador_de_vueltas db 0
+Contador_de_vueltas db %00000001
 Velocidad db 0 											; 5 vueltas max. 5 vueltas       1 - 0 (1ª vuelta - velocidad 0)
 ;																						 2 - 0 (2ª vuelta - velocidad 0)
 ;																						 4 - 1 (3ª vuelta - velocidad 1)
@@ -833,31 +833,33 @@ Main
 
 ;! Velocidad !!!!!!!!!!!!!!!!!!!
 
+;	ld a,(Contador_de_vueltas)
+;	cp 10
 ;	di
-;	jr $
+;	jr z,$
 ;	ei
 
-;	ld a,(Velocidad)
-;	sla a 
-;	ld (Velocidad),a
-;	and $08
-;	jr z,48F
+	ld a,(Velocidad)
+	sla a 
+	ld (Velocidad),a
+	and $10
+	jr z,48F
 	
 ; Restaura (Velocidad) a razón del nº de vueltas. 	
-;	ld a,4
 
-;	ld hl,(Puntero_de_almacen_de_mov_masticados)
-;	inc hl
-;	inc hl
-;	inc hl
-;	inc hl
-;	ld (Puntero_de_almacen_de_mov_masticados),hl
+	ld a,(Contador_de_vueltas)
+	sra a
+	sra a
+	ld (Velocidad),a	
 
-;	ld (Velocidad),a
+	ld hl,(Puntero_de_almacen_de_mov_masticados)
+	inc hl
+	inc hl
+	inc hl
+	inc hl
+	ld (Puntero_de_almacen_de_mov_masticados),hl
 
 48 call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
-
-
 
 	call Genera_datos_de_impresion
 ;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
