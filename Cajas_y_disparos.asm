@@ -179,7 +179,7 @@ Caja_1 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	defw 0 												; (Contador_de_mov_masticados).
 	db 0												; (Ctrl_0).
 	db 0												; (Ctrl_2). 
-	db 0 												; (Contador_de_vueltas).
+	db 1 												; (Contador_de_vueltas).
 	db 0												; (Velocidad). 					
 
 ; ---------- ---------- ---------- ---------- ----------	
@@ -192,7 +192,7 @@ Caja_2 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	defw 0 												; (Contador_de_mov_masticados).
 	db 0												; (Ctrl_0).
 	db 0												; (Ctrl_2). 
-	db 0 												; (Contador_de_vueltas).
+	db 1 												; (Contador_de_vueltas).
 	db 0												; (Velocidad). 					
 
 ; ---------- ---------- ---------- ---------- ----------	
@@ -205,7 +205,7 @@ Caja_3 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	defw 0 												; (Contador_de_mov_masticados).
 	db 0												; (Ctrl_0).
 	db 0												; (Ctrl_2). 
-	db 0 												; (Contador_de_vueltas).
+	db 1 												; (Contador_de_vueltas).
 	db 0												; (Velocidad). 					
 
 ; ---------- ---------- ---------- ---------- ----------
@@ -218,7 +218,7 @@ Caja_4 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	defw 0 												; (Contador_de_mov_masticados).
 	db 0												; (Ctrl_0).
 	db 0												; (Ctrl_2). 
-	db 0 												; (Contador_de_vueltas).
+	db 1 												; (Contador_de_vueltas).
 	db 0												; (Velocidad). 					
 
 ; ---------- ---------- ---------- ---------- ----------
@@ -231,7 +231,7 @@ Caja_5 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	defw 0 												; (Contador_de_mov_masticados).
 	db 0												; (Ctrl_0).
 	db 0												; (Ctrl_2). 
-	db 0 												; (Contador_de_vueltas).
+	db 1 												; (Contador_de_vueltas).
 	db 0												; (Velocidad). 					
 
 ; ---------- ---------- ---------- ---------- ----------
@@ -244,7 +244,7 @@ Caja_6 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y)..
 	defw 0 												; (Contador_de_mov_masticados).
 	db 0												; (Ctrl_0).
 	db 0												; (Ctrl_2). 
-	db 0 												; (Contador_de_vueltas).
+	db 1 												; (Contador_de_vueltas).
 	db 0												; (Velocidad). 					
 
 ; ---------- ---------- ---------- ---------- ----------	
@@ -257,7 +257,7 @@ Caja_7 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y)..
 	defw 0 												; (Contador_de_mov_masticados).
 	db 0												; (Ctrl_0).
 	db 0												; (Ctrl_2). 
-	db 0 												; (Contador_de_vueltas).
+	db 1 												; (Contador_de_vueltas).
 	db 0												; (Velocidad). 					
 	
 ; -------------------------------------------------------------------------------------

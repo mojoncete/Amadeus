@@ -833,12 +833,6 @@ Main
 
 ;! Velocidad !!!!!!!!!!!!!!!!!!!
 
-;	ld a,(Contador_de_vueltas)
-;	cp 10
-;	di
-;	jr z,$
-;	ei
-
 	ld a,(Velocidad)
 	sla a 
 	ld (Velocidad),a
@@ -897,7 +891,6 @@ Main
 
 ;	ld hl,Ctrl_1
 ;	res 2,(hl)
-
 
 	call Borra_diferencia
 
