@@ -2099,7 +2099,7 @@ wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: 
 
 ;Pinta_Amadeus 
 
-;   	call Calcula_malotes_Amadeus 
+;   call Calcula_malotes_Amadeus 
 ;	call Extrae_foto_Amadeus
 ;	call Limpia_album_Amadeus
 
