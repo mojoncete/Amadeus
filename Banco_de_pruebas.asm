@@ -169,8 +169,9 @@ Scanlines_album_2 equ $9000    ;    ($9000 - $9118)
 ; ******************************************************************************************************************************************************************************************
 ; Variables. 
 ; ****************************************************************************************************************************************************************************************** 
+
 ;
-; 18/01/24
+; 12/05/24
 ;
 ; Variables de DRAW. (Motor principal).	44 Bytes.	
 ;
@@ -192,7 +193,20 @@ Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos.
 ; 														; El hecho de que este byte sea distinto de "0", indica que se ha modificado el nº de columnas del objeto.
 ; 														; Cuando vamos a imprimir un Sprite en pantalla, la rutina de pintado consultará este byte para situar (Puntero_objeto). [Mov_left]. 
-Attr db 0												; Atributos de la entidad:
+Contador_de_vueltas db 0								; Contador de vueltas de entidades. Inicialmente su valor es "1". El bit se desplaza una posición a la izquierda cada vez que la entidad_
+;														; _desaparece por la parte baja de la pantalla. Esta variable se utiliza para incrementar el perfil de velocidad de las entidades.
+
+; Incrementa el contador de vueltas, (el contador cuenta 4 vueltas máximo).
+; El perfil de velocidad de la entidad será: (Contador_de_vueltas)/8.
+; Ejemplos.
+
+;	1ª vuelta: (Contador_de_vueltas)="$02" --- (Velocidad)="0".
+;	2ª vuelta: 	""	""	""	""	""  ="$04" ---   ""	 ""	  ="1".
+;	3ª vuelta: 	""	""	""	""	""  ="$08" ---   ""	 ""	  ="2".
+;	4ª vuelta: 	""	""	""	""	""  ="$10" ---   ""	 ""	  ="4".
+;	5ª vuelta: 	""	""	""	""	""  ="$20" ---   ""	 ""	  ="8".   
+
+; ---------- ---------- ---------- ---------;      ;--------- ---------- ---------- ---------- 
 
 ;	El formato: FBPPPIII (Flash, Brillo, Papel, Tinta).
 ;
@@ -285,7 +299,6 @@ Ctrl_2 db 0
 ;														BIT 4, ???
 ;														BIT 5, Este bit a "1" indica que esta entidad es una "Entidad_guía".
 
-Contador_de_vueltas db %00000001
 Velocidad db 0 											; 5 vueltas max. 5 vueltas       1 - 0 (1ª vuelta - velocidad 0)
 ;																						 2 - 0 (2ª vuelta - velocidad 0)
 ;																						 4 - 1 (3ª vuelta - velocidad 1)
@@ -831,29 +844,9 @@ Main
 
 ; -------------------------------------------
 
-;! Velocidad !!!!!!!!!!!!!!!!!!!
+	call Ajusta_velocidad_entidad								; Ajusta el perfil de velocidad de la entidad en función de (Contader_de_vueltas).
 
-	ld a,(Velocidad)
-	sla a 
-	ld (Velocidad),a
-	and $10
-	jr z,48F
-	
-; Restaura (Velocidad) a razón del nº de vueltas. 	
-
-	ld a,(Contador_de_vueltas)
-	sra a
-	sra a
-	ld (Velocidad),a	
-
-	ld hl,(Puntero_de_almacen_de_mov_masticados)
-	inc hl
-	inc hl
-	inc hl
-	inc hl
-	ld (Puntero_de_almacen_de_mov_masticados),hl
-
-48 call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
+	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
 
 	call Genera_datos_de_impresion
 ;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
@@ -1143,6 +1136,32 @@ Main
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
+;	12/05/24
+
+Ajusta_velocidad_entidad ld a,(Velocidad)
+	sla a 
+	ld (Velocidad),a
+	and $10
+	ret z
+	
+; Restaura (Velocidad) a razón del nº de vueltas. 	
+
+	ld a,(Contador_de_vueltas)
+	sra a
+	sra a
+	ld (Velocidad),a	
+
+	ld hl,(Puntero_de_almacen_de_mov_masticados)
+	inc hl
+	inc hl
+	inc hl
+	inc hl
+	ld (Puntero_de_almacen_de_mov_masticados),hl
+
+	ret
+
+; --------------------------------------------------------------------------------------------------------------
+;
 ;	17/3/24
 
 Change 
@@ -1223,9 +1242,9 @@ Extrae_numero_aleatorio_y_avanza
 
 Define_Clock_next_entity 
 
-	cp $34
+	cp $50
 	jr c,1F  						; nº demasiado bajo, < 1 seg.
-	cp $c3
+	cp $ff
 	jr nc,2F  						; nº demasiado alto, > 4 seg.
 
 3 ld b,a
@@ -1235,9 +1254,9 @@ Define_Clock_next_entity
 	ld (Clock_next_entity),a  		; Actualizamos variable.
 	ret
 
-1 ld a,$34
+1 ld a,$50
 	jr 3B
-2 ld a,$c3
+2 ld a,$ff
 	jr 3B
 
 ; ------------------------------------
@@ -1827,7 +1846,7 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 
 ; **************************************************************************************************
 ;
-;	6/5/24
+;	12/5/24
 ;
 ;	Cargamos los datos de la caja de entidades señalada por el puntero (Puntero_store_caja) a la BANDEJA_DRAW.
 
@@ -1845,22 +1864,16 @@ Restore_entidad
 
 	inc de
 	ld a,(hl)
-	ld (de),a 										; Transferimos (Attr).
+	ld (de),a 										; Transferimos (Contador_de_vueltas).
 	inc hl
 
 	ld de,Impacto
-
-	ld a,(hl)
-	ld (de),a 										; Transferimos (Impacto).					
-	inc hl
-
-	inc de
-	ld bc,7
-	ldir 											; Transferimos (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados),_
+	ld bc,8
+	ldir 											; Transferimos (Impacto), (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados),_
 ; 													; _ (Contador_de_mov_masticados) y (Ctrl_0).	
 	ld de,Ctrl_2
-	ld bc,3
-	ldir											; Transferimos (Ctrl_2),(Contador_de_vueltas) y (Velocidad).
+	ld bc,2
+	ldir											; Transferimos (Ctrl_2) y (Velocidad).
 
 	ret
 

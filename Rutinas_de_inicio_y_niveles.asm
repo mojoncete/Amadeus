@@ -213,10 +213,10 @@ Store_Restore_cajas
 
 ; ---------------------------------------------------------------------
 ;
-;	26/03/24
+;	12/05/24
 
 Limpiamos_bandeja_DRAW ld hl,Bandeja_DRAW
-	ld b,38
+	ld b,37
 	xor a
 1 ld (hl),a
 	inc hl 
@@ -457,7 +457,7 @@ Situa_en_datos_de_definicion and a
 
 ; ----------------------------------------------------------------------------------------------------------
 ;
-;	31/1/24
+;	12/05/24
 ;
 ;	Introduce una definición de entidad en la bandeja DRAW para generar los "movimientos masticados" de este tipo_
 ;	_ de entidad.
@@ -474,9 +474,9 @@ Definicion_de_entidad_a_bandeja_DRAW
 	ld bc,3
 	ldir 										; Hemos volcado (Tipo), (Filas) y (Columns).
 ;												; HL, (origen), apunta ahora al .db (attr.), hay que situar DE.
-	ld de,Attr									; DE en (Attr).
+	ld de,Contador_de_vueltas					; DE en (Attr).
 	ld bc,5
-	ldir										; Hemos volcado (Attr), (Indice_Sprite_der) y (Indice_Sprite_izq).
+	ldir										; Hemos volcado (Contador_de_vueltas), (Indice_Sprite_der) y (Indice_Sprite_izq).
 ;												; HL, (origen), apunta ahora al .db (Posicion_inicio), hay que situar DE.
 	ld de,Posicion_inicio 
 	ld bc,3
@@ -494,7 +494,7 @@ Definicion_de_entidad_a_bandeja_DRAW
 
 ; ----------------------------------------------------------------------------------------------------------
 ;
-;	6/5/24
+;	12/5/24
 ;
 ;	Guarda la definición que ha generado los movimientos masticados de este tipo de entidad en su correspondiente caja.
 ;	
@@ -502,8 +502,8 @@ Definicion_de_entidad_a_bandeja_DRAW
 ;
 ;	Disponen de un (Puntero_de_impresión), (Coordenadas X e Y), ...
 ;
-;	OUTPUT: HL apunta al .db (Ctrl_2) de la bandeja DRAW.
-;			DE apunta al 1er .db de la siguiente caja de entidades.
+;	OUTPUT: HL apunta al .db (Frames_explosion) de la bandeja DRAW.
+;			DE apunta al 1er .db (Tipo) de la siguiente caja de entidades.
 ; 
 ;	MODIFICA: HL,DE y BC
 
@@ -518,25 +518,20 @@ Parametros_de_bandeja_DRAW_a_caja
 	ld hl,Coordenada_X										; HL situado en (Coordenada_X) de la bandeja DRAW.
 	ld bc,2
 	ldir 													; Hemos volcado (Coordenada_X) y (Coordenada_y).
-;															; DE apunta ahora a (Attr) de la caja de entidades. Hemos de recolocar HL.
+;															; DE apunta ahora a (Contador_de_vueltas) de la caja de entidades. Hemos de recolocar HL.
 	inc hl
-	ld a,(hl)			 									; HL, situado ahora correctamente: (attr).
+	ld a,(hl)			 									; HL, situado ahora correctamente: (Contador_de_vueltas).
 	ld (de),a
 	inc de 													; DE apunta a (Impacto), situamos HL.
 
 	ld hl,Impacto
-	ld a,(hl)			 									; HL, situado ahora correctamente: (Impacto).
-	ld (de),a
-	inc de 													; (Impacto), volcado a la caja.
-
-	ld hl,Puntero_de_impresion								; DE situado ahora en (Puntero_de_impresión).
-	ld bc,7
-	ldir													; Hemos volcado (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados), _
+	ld bc,8
+	ldir													; Hemos volcado (Impacto), (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados), _
 ; 															; _ (Contador_de_mov_masticados) y (Ctrl_0).	
 ;															; HL apunta ahora a (Columnas).
 	ld hl,Ctrl_2 											
-	ld bc,3
-	ldir													; Hemos volcado (Ctrl_2),(Contador_de_vueltas) y (Velocidad). 
+	ld bc,2
+	ldir													; Hemos volcado (Ctrl_2) y (Velocidad). 
 
 	ret
 
