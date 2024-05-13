@@ -479,8 +479,7 @@ Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 pos
 
 RND_SP defw Numeros_aleatorios							; Puntero que se irá desplazando por el SET de nº aleatorios.
 
-Clock_next_entity db 0
-
+Clock_next_entity defw 0								; Transcurrido este tiempo aparece una nueva entidad.
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
 ;Disparo_Amadeus db 1									; A "1", se puede generar disparo.
@@ -523,7 +522,10 @@ START
 	call Derivando_RND 									 ; Rutina de generación de nº aleatorios.
 
 	call Extrae_numero_aleatorio_y_avanza
-	ld (Clock_next_entity),a
+
+	ld l,a
+	ld h,0
+	ld (Clock_next_entity),hl 							 ; El 1er nº aleatorio define cuando aparece la 1ª entidad en pantalla. 
 
 ;	Inicializa 1er Nivel.
 
@@ -612,27 +614,19 @@ START
 
 Main 
 ;
-;	11/12/23
+; 13/05/24
 
 ; Aparece nueva entidad ???
 
-; 														; Inicialmente, (Clock_next_entity)="30".
-;														; (Clock_next_entity) define cuando aparecen las entidades en pantalla.
+; 														; (Clock_next_entity) define cuando aparecen las entidades en pantalla.
 ;														; Todas las entidades contenidas en un "bloque", (7 cajas), se inicializan en [START].
-;														; Si (Numero_de_entidades) > "7", cuando el bloque de 7 cajas esté a "0" se inicializaráa _;		
+;														; Si (Numero_de_entidades) > "7", cuando el bloque de 7 cajas esté a "0" se inicializará _;		
 ;														; _un 2º bloque.
 
-;	call Genera_scanlines_masticados_a_borrar
-;	call Limpia_Almacen_de_scanlines_masticados
-
-;	call Limpia_y_reinicia_Scanlines_album 				; Lo 1º que hacemos después de pintar es limpiar el álbum de fotos e inicializar 
-; 													 	; _(Scanlines_album_SP).
-
-	ld a,(Clock_next_entity)
-	ld b,a
-
-	ld a,(FRAMES)
-	cp b
+	ld hl,(Clock_next_entity)
+	ld bc,(FRAMES)
+	and a
+	sbc hl,bc
 	jr nz,13F
 
 ; Si aún quedan entidades por aparecer del bloque de entidades, (7 cajas), incrementaremos (Entidades_en_curso) y calcularemos_ 
@@ -650,9 +644,8 @@ Main
 
 ; - Define el tiempo que ha de transcurrir para que aparezca la siguiente entidad. ----------------------------
 
-	call Extrae_numero_aleatorio_y_avanza
+	call Extrae_numero_aleatorio_y_avanza 				; A contiene un nº aleatorio (0-255). De 0 a 5 segundos, aproximadamente.
 	call Define_Clock_next_entity
-	ld (Clock_next_entity),a
 
 ; -------------------------------------------------------------------------------------------------------------
 
@@ -1240,23 +1233,29 @@ Extrae_numero_aleatorio_y_avanza
 
 ; $ffff 1310,7 seg, 22 minutos.
 
+;	$0100  5 seg. aproximadamente.
+;	$0200 10 seg. aproximadamente.
+;	$0300 15 seg. aproximadamente.
+;	$0400 20 seg. aproximadamente.
+;	$0500 25 seg. aproximadamente.
+;	$0600 30 seg. aproximadamente.
+
 Define_Clock_next_entity 
 
-	cp $50
+	cp $34
 	jr c,1F  						; nº demasiado bajo, < 1 seg.
-	cp $ff
-	jr nc,2F  						; nº demasiado alto, > 4 seg.
 
-3 ld b,a
-	ld a,(FRAMES)
-	add b
+; En función de los minutos que llevemos de juego las entidades irán apareciendo más lentamente.
 
-	ld (Clock_next_entity),a  		; Actualizamos variable.
+3 ld c,a
+	ld b,2							; BC contendrá un valor entre 10-15 segundos.
+	ld hl,(FRAMES)
+	and a
+	adc hl,bc
+	ld (Clock_next_entity),hl  		; Actualizamos variable.
 	ret
 
-1 ld a,$50
-	jr 3B
-2 ld a,$ff
+1 ld a,$34
 	jr 3B
 
 ; ------------------------------------
