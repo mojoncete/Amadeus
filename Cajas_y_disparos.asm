@@ -252,17 +252,17 @@ Caja_7 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y)..
 	db 0												; (Ctrl_0).
 	db 0												; (Ctrl_2). 
 	db 0												; (Velocidad). 					
-	
+
 ; -------------------------------------------------------------------------------------
 ;
 ;	11/1/24
 ;
 ;	TIPOS de "Entidades maliciosas" que quieren conquistar la Tierra.	
 ;
-	;	Notas de funcionamiento: (Cuad_objeto) siempre será "1" independientemente de su (Posicion_inicio).
-	;		De no ser así, la rutina [Recompone_posicion_inicio] generará problemas a la hora de hacer que_
-	;		_ la entidad aparezca `al píxel', por la parte derecha de la pantalla. Esto se debe a como están_
-	;		_ construidas las rutinas [Mov_right] y [Mov_left].
+;	Notas de funcionamiento: (Cuad_objeto) siempre será "1" independientemente de su (Posicion_inicio).
+;		De no ser así, la rutina [Recompone_posicion_inicio] generará problemas a la hora de hacer que_
+;		_ la entidad aparezca `al píxel', por la parte derecha de la pantalla. Esto se debe a como están_
+;		_ construidas las rutinas [Mov_right] y [Mov_left].
 
 Indice_de_definiciones_de_entidades
 
@@ -288,3 +288,20 @@ Entidad_2 db 1,2,2		                     			; (Tipo) / (Filas) / (Columns).
 	defw $5040                                      	; (Posicion_inicio).
 	db 1												; (Cuad_objeto).
 	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
+
+; -------------------------------------------------------------------------------------
+;
+;	14/05/24
+;
+;	Definición de Amadeus.
+;
+;	Amadeus no utiliza los parámetros: (Tipo) y (Contador_de_vueltas). Los colocamos a "0".
+;	Inicialmente situamos a Amadeus en el extremo izquierdo de la pantalla.
+
+Definicion_Amadeus db 0,2,2		                     	; (Tipo) / (Filas) / (Columns).
+	db 0												; (Contador_de_vueltas).
+	defw Indice_Amadeus_der								; (Indice_Sprite_der).
+	defw Indice_Amadeus_izq								; (Indice_Sprite_izq).
+	defw $50c1	                                     	; (Posicion_inicio).
+	db 3												; (Cuad_objeto).
+	defw Almacen_de_movimientos_masticados_Amadeus		; (Puntero_de_almacen_de_mov_masticados).

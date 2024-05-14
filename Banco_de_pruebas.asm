@@ -154,6 +154,7 @@ Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y 
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
 
 Almacen_de_movimientos_masticados_Entidad_1 equ $eb20	; $eb20 - $f87b ..... 3419 bytes. Guardaremos los movimientos masticados que ha hido generando la entidad guía.
+Almacen_de_movimientos_masticados_Amadeus equ $e000		; Movimientos masticados de Amadeus.
 
 Scanlines_album equ $8000	;	($8000 - $8118) 		; Inicialmente 280 bytes. 
 
@@ -520,7 +521,6 @@ START
 
 	ld b,7   											 ; Generamos 7 nº aleatorios.
 	call Derivando_RND 									 ; Rutina de generación de nº aleatorios.
-
 	call Extrae_numero_aleatorio_y_avanza
 
 	ld l,a
@@ -535,8 +535,7 @@ START
 ;														 ; Situa (Puntero_indice_NIVELES) el el primer defw., (nivel) del índice de niveles.
 ;														 ; Inicializa (Numero_de_entidades) con el nº total de malotes del nivel.
 ;														 ; Inicializa (Datos_de_nivel) con el `tipo´ de la 1ª entidad del nivel. 
-	
-;	Provisional, (para desarrollo).
+	;	Provisional, (para desarrollo).
 	;-
 ;	ld hl,Numero_parcial_de_entidades
 ;	ld b,(hl)
@@ -547,6 +546,74 @@ START
 	call Inicia_albumes_de_lineas
 
 4 call Inicia_Entidades						 
+
+;! 14/05/24 !!!!! Inicia Amadeus !!!!! ---------------------------------------------------------------------------------------------------------------------
+
+;	Nos situamos en el 1er .db, (Tipo), de la definición de Amadeus.
+
+	ld hl,Definicion_Amadeus
+	call Definicion_de_entidad_a_bandeja_DRAW			; Vuelca los datos de la definición de Amadeus en DRAW.
+
+
+Construye_movimientos_masticados_Amadeus
+
+	ld hl,(Puntero_de_almacen_de_mov_masticados)			; Guardamos en la pila la dirección inicial del puntero, (para reiniciarlo más tarde).
+	push hl
+	call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
+;															; _ el (Contador_de_mov_masticados).    
+	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
+;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
+;	call Recompone_posicion_inicio
+
+1 call Draw
+	call Guarda_movimiento_masticado
+
+;	call Movimiento
+
+;	ld a,(Ctrl_3)											; El bit1 de (Ctrl_3) a "1" indica que hemos completado todo el patrón de movimiento_
+;	bit 1,a 												; _ que corresponde a esta entidad.
+;	jr z,1B
+
+;	Hemos completado el almacén de movimientos masticados de la entidad.
+;	Reinicializamos (Puntero_de_almacen_de_mov_masticados).
+
+	pop hl 													; Recuperamos la dirección inicial de (Puntero_de_almacen_de_mov_masticados).
+	ld (Puntero_de_almacen_de_mov_masticados),hl
+
+; Guardamos el nº total de movimientos masticados de esta entidad en su (Contador_general_de_mov_masticados). 
+
+;	call Situa_en_contador_general_de_mov_masticados
+
+; HL apunta al 1er byte del (Contador_general_de_mov_masticados) de esta entidad.
+; Guardamos (Contador_de_mov_masticados) en el (Contador_general_de_mov_masticados) de esta entidad.
+
+;	ld bc,(Contador_de_mov_masticados)
+
+;	ld (hl),c
+;	inc hl
+;	ld (hl),b
+
+;	ret
+
+	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
+	call Genera_datos_de_impresion
+;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
+;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
+;																; La rutina [Genera_datos_de_impresion] activa las interrupciones antes del RET.
+; Actualizamos (Contador_de_mov_masticados) tras la foto.	
+
+
+
+;	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
+
+	call Limpiamos_bandeja_DRAW
+	call Inicia_punteros_de_cajas
+
+;! ---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
 
 	call Inicia_punteros_de_cajas						 ; Situa (Puntero_store_caja) en el 1er .db de la 1ª caja del índice de entidades.
 ;														 ; Situa (Puntero_restore_caja) en el 1er .db de la 2ª caja del índice de cajas de entidades.
@@ -838,9 +905,7 @@ Main
 ; -------------------------------------------
 
 	call Ajusta_velocidad_entidad								; Ajusta el perfil de velocidad de la entidad en función de (Contader_de_vueltas).
-
 	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
-
 	call Genera_datos_de_impresion
 ;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
 ;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
@@ -1248,7 +1313,7 @@ Define_Clock_next_entity
 ; En función de los minutos que llevemos de juego las entidades irán apareciendo más lentamente.
 
 3 ld c,a
-	ld b,2							; BC contendrá un valor entre 10-15 segundos.
+	ld b,0							; BC contendrá un valor entre 5-10 segundos.
 	ld hl,(FRAMES)
 	and a
 	adc hl,bc
@@ -1500,7 +1565,7 @@ Intercambia_1_byte inc l
 	ld a,(de)
 	ex de,hl
 	ld (hl),b
-	ld (de),a									; Byte de menor peso de las dos direcciones de memoria, ----- INTERCAMBIADAS -----.
+	ld (de),a												; Byte de menor peso de las dos direcciones de memoria, ----- INTERCAMBIADAS -----.
 	ret
 
 ; -----------------------------------------------------------------------------------

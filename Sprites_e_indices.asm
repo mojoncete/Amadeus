@@ -210,10 +210,22 @@ Indice_Amadeus_izq defw Amadeus
 	defw Amadeus_F9							; [$FD] right - [$FE] left 
 	defw 0	 								; (Fín de índice).
 
-Amadeus DEFB $01,$80,$23,$C4,$26,$64,$24,$24
-	DEFB	$2C,$34,$6D,$B6,$6F,$F6,$67,$E6
-	DEFB	$E7,$E7,$F3,$CF,$F7,$EF,$FF,$FF
-	DEFB	$FB,$DF,$FB,$DF,$8B,$D1,$71,$8E ; Sprite principal, (sin desplazar).
+Amadeus DEFB $01,$80,0
+	DEFB	$23,$C4,0
+	DEFB	$26,$64,0
+	DEFB	$24,$24,0
+	DEFB	$2C,$34,0
+	DEFB	$6D,$B6,0
+	DEFB	$6F,$F6,0
+	DEFB	$67,$E6,0
+	DEFB	$E7,$E7,0
+	DEFB	$F3,$CF,0
+	DEFB	$F7,$EF,0
+	DEFB	$FF,$FF,0
+	DEFB	$FB,$DF,0
+	DEFB	$FB,$DF,0
+	DEFB	$8B,$D1,0
+	DEFB	$71,$8E,0 						; Sprite principal, (sin desplazar).
 
 Amadeus_F9 DEFB	$00,$60,$00,$08,$F1,$00,$09,$99
 	DEFB	$00,$09,$09,$00,$0B,$0D,$00,$1B
