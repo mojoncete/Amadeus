@@ -49,7 +49,6 @@ Borrando
 
 	jr Borrando
 	
-
 Pintando
 
 	ld hl,(India_SP)
@@ -596,7 +595,17 @@ Construye_movimientos_masticados_Amadeus
 ;	ret
 
 	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
+
+	push ix
+	pop hl 														; (Puntero_de_impresion) en HL.
+
+	push de
+	call Genera_coordenadas
+	call Recauda_informacion_de_entidad_en_curso				; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
+	pop de
+
 	call Genera_datos_de_impresion
+
 ;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
 ;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
 ;																; La rutina [Genera_datos_de_impresion] activa las interrupciones antes del RET.
@@ -607,13 +616,8 @@ Construye_movimientos_masticados_Amadeus
 ;	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
 
 	call Limpiamos_bandeja_DRAW
-	call Inicia_punteros_de_cajas
 
 ;! ---------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-
 
 	call Inicia_punteros_de_cajas						 ; Situa (Puntero_store_caja) en el 1er .db de la 1ª caja del índice de entidades.
 ;														 ; Situa (Puntero_restore_caja) en el 1er .db de la 2ª caja del índice de cajas de entidades.
@@ -623,17 +627,6 @@ Construye_movimientos_masticados_Amadeus
 ;	ld a,(Ctrl_1)
 ;	bit 3,a
 ;	jr nz,5F											 ; Loop
-
-; 	INICIA AMADEUS !!!!!
-
-;3 call Restore_Amadeus
-;	call Inicia_Puntero_objeto
-;	call Draw
-
-;	call Guarda_movimiento_masticado	;! Provisional
-
-;	call Genera_datos_de_impresion
-;	call Guarda_datos_de_borrado_Amadeus
 
 ;	ld de,Amadeus_db
 ;	call Store_Amadeus
@@ -792,9 +785,7 @@ Main
 15 push bc 												; Nº de entidades en curso.
 
 	call Restore_entidad								; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
-
 	call Recauda_informacion_de_entidad_en_curso		; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
-
 
 ; Existe "Entidad_guía" ???.
 ; Si la Entidad_guía ha sido fulminada hemos de reemplazarla.
