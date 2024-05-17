@@ -1355,7 +1355,7 @@ Borra_diferencia
 	ld hl,(Scanlines_album_SP)
 
 1 ld (hl),a
-	inc l
+	inc hl
 	djnz 1B
 
 ; Indicamos que tenemos nuevo techo más bajo con el FLAG:
