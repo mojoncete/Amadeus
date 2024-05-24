@@ -153,7 +153,7 @@ Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y 
 Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
 
 Almacen_de_movimientos_masticados_Entidad_1 equ $eb20	; $eb20 - $f87b ..... 3419 bytes. Guardaremos los movimientos masticados que ha hido generando la entidad guía.
-Almacen_de_movimientos_masticados_Amadeus equ $e000		; Movimientos masticados de Amadeus.
+Almacen_de_movimientos_masticados_Amadeus equ $e000		; ($e000 - $e1e3), 483 bytes. Movimientos masticados de Amadeus.
 
 Scanlines_album equ $8000	;	($8000 - $8118) 		; Inicialmente 280 bytes. 
 
@@ -562,12 +562,20 @@ Construye_movimientos_masticados_Amadeus
 ;															; _ el (Contador_de_mov_masticados).    
 	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
-;	call Recompone_posicion_inicio
 
-1 call Draw
+; Generamos movimientos masticados de Amadeus.
+
+	ld b,121
+
+1 push bc
+	call Draw
 	call Guarda_movimiento_masticado
 
-;	call Movimiento
+	call Mov_right
+	call Mov_right
+
+	pop bc
+	djnz 1B
 
 ;	ld a,(Ctrl_3)											; El bit1 de (Ctrl_3) a "1" indica que hemos completado todo el patrón de movimiento_
 ;	bit 1,a 												; _ que corresponde a esta entidad.
@@ -576,8 +584,8 @@ Construye_movimientos_masticados_Amadeus
 ;	Hemos completado el almacén de movimientos masticados de la entidad.
 ;	Reinicializamos (Puntero_de_almacen_de_mov_masticados).
 
-	pop hl 													; Recuperamos la dirección inicial de (Puntero_de_almacen_de_mov_masticados).
-	ld (Puntero_de_almacen_de_mov_masticados),hl
+;	pop hl 													; Recuperamos la dirección inicial de (Puntero_de_almacen_de_mov_masticados).
+;	ld (Puntero_de_almacen_de_mov_masticados),hl
 
 ; Guardamos el nº total de movimientos masticados de esta entidad en su (Contador_general_de_mov_masticados). 
 
@@ -594,17 +602,25 @@ Construye_movimientos_masticados_Amadeus
 
 ;	ret
 
-	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
+;	jr $
 
-	push ix
-	pop hl 														; (Puntero_de_impresion) en HL.
+;	ld hl,(Puntero_de_almacen_de_mov_masticados)
+;	ld bc,8
+;	and a
+;	sbc hl,bc
+;	ld (Puntero_de_almacen_de_mov_masticados),hl
 
-	push de
-	call Genera_coordenadas
-	call Recauda_informacion_de_entidad_en_curso				; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
-	pop de
+;	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
 
-	call Genera_datos_de_impresion
+;	push ix
+;	pop hl 														; (Puntero_de_impresion) en HL.
+
+;	push de
+;	call Genera_coordenadas
+;	call Recauda_informacion_de_entidad_en_curso				; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
+;	pop de
+
+;	call Genera_datos_de_impresion
 
 ;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
 ;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
