@@ -158,6 +158,63 @@ Inicia_Entidades
 
 	ret
 
+; -------------------------------------------------------------------------------------------------------------------
+;
+;	27/5/24
+;
+;	Inicia,genera mov. masticados y sitúa en el centro de la pantalla a Amadeus.
+;
+
+; 	Cargamos la definición de Amadeus en DRAW.
+;	Nos situamos en el 1er .db, (Tipo), de la definición de Amadeus.
+
+Inicia_Amadeus ld hl,Definicion_Amadeus
+	call Definicion_de_entidad_a_bandeja_DRAW				; Vuelca los datos de la definición de Amadeus en DRAW.
+
+	
+Construye_movimientos_masticados_Amadeus
+
+	ld hl,(Puntero_de_almacen_de_mov_masticados)			; Guardamos en la pila la dirección inicial del puntero, (para reiniciarlo más tarde).
+	call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
+;															; _ el (Contador_de_mov_masticados).    
+	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
+;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
+
+; Generamos movimientos masticados de Amadeus.
+
+	ld b,121												; $0079, 121d.
+
+1 push bc
+	call Draw
+	call Guarda_movimiento_masticado
+
+	call Mov_right
+	call Mov_right											; Amadeus se mueve x2 pixel.
+
+	pop bc
+	djnz 1B
+
+; Todos los movimientos masticados de Amadeus se han creado. 
+
+;	(Contador_de_mov_masticados) de Amadeus ="$0079", 121d movimientos en total. Amadeus se encuentra ahora en el extremo derecho de la pantalla.
+;	Ahora hay que modificar la posición del (Puntero_de_almacen_de_mov_masticados), (está 4 posiciones de memoria adelantado para seguir creando desplazamientos).
+
+	ld hl,(Puntero_de_almacen_de_mov_masticados)
+	ld bc,8
+	and a
+	sbc hl,bc
+	ld (Puntero_de_almacen_de_mov_masticados),hl
+
+; 	Situamos a Amadeus en el centro de la pantalla y pintamos.
+
+	ld b,60
+2 call Amadeus_a_izquierda
+	djnz 2B
+
+	call Pinta_Amadeus
+
+	ret
+
 ; ---------------------------------------------------------------------
 ;
 ;	10/02/24

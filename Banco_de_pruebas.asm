@@ -540,98 +540,21 @@ START
 ;	ld b,(hl)
 ;	inc b
 ;	dec b
-;	jr z,3F	;-									   		 ; Si no hay entidades, cargamos AMADEUS.
+;	jr z,3F	;-									   		 				; Si no hay entidades, cargamos AMADEUS.
 
 	call Inicia_albumes_de_lineas
 
 4 call Inicia_Entidades						 
+	call Inicia_Amadeus
 
-;! 14/05/24 !!!!! Inicia Amadeus !!!!! ---------------------------------------------------------------------------------------------------------------------
-
-;	Nos situamos en el 1er .db, (Tipo), de la definición de Amadeus.
-
-	ld hl,Definicion_Amadeus
-	call Definicion_de_entidad_a_bandeja_DRAW			; Vuelca los datos de la definición de Amadeus en DRAW.
-
-
-Construye_movimientos_masticados_Amadeus
-
-	ld hl,(Puntero_de_almacen_de_mov_masticados)			; Guardamos en la pila la dirección inicial del puntero, (para reiniciarlo más tarde).
-	push hl
-	call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
-;															; _ el (Contador_de_mov_masticados).    
-	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
-;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
-
-; Generamos movimientos masticados de Amadeus.
-
-	ld b,121
-
-1 push bc
-	call Draw
-	call Guarda_movimiento_masticado
-
-	call Mov_right
-	call Mov_right
-
-	pop bc
-	djnz 1B
-
-;	ld a,(Ctrl_3)											; El bit1 de (Ctrl_3) a "1" indica que hemos completado todo el patrón de movimiento_
-;	bit 1,a 												; _ que corresponde a esta entidad.
-;	jr z,1B
-
-;	Hemos completado el almacén de movimientos masticados de la entidad.
-;	Reinicializamos (Puntero_de_almacen_de_mov_masticados).
-
-;	pop hl 													; Recuperamos la dirección inicial de (Puntero_de_almacen_de_mov_masticados).
-;	ld (Puntero_de_almacen_de_mov_masticados),hl
-
-; Guardamos el nº total de movimientos masticados de esta entidad en su (Contador_general_de_mov_masticados). 
-
-;	call Situa_en_contador_general_de_mov_masticados
-
-; HL apunta al 1er byte del (Contador_general_de_mov_masticados) de esta entidad.
-; Guardamos (Contador_de_mov_masticados) en el (Contador_general_de_mov_masticados) de esta entidad.
-
-;	ld bc,(Contador_de_mov_masticados)
-
-;	ld (hl),c
-;	inc hl
-;	ld (hl),b
-
-;	ret
-
-;	jr $
-
-;	ld hl,(Puntero_de_almacen_de_mov_masticados)
-;	ld bc,8
-;	and a
-;	sbc hl,bc
-;	ld (Puntero_de_almacen_de_mov_masticados),hl
-
-;	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
-
-;	push ix
-;	pop hl 														; (Puntero_de_impresion) en HL.
-
-;	push de
-;	call Genera_coordenadas
-;	call Recauda_informacion_de_entidad_en_curso				; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
-;	pop de
-
-;	call Genera_datos_de_impresion
-
-;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
-;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
-;																; La rutina [Genera_datos_de_impresion] activa las interrupciones antes del RET.
-; Actualizamos (Contador_de_mov_masticados) tras la foto.	
-
-
+;																		; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
+;																		; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
+;																		; La rutina [Genera_datos_de_impresion] activa las interrupciones antes del RET.
 
 ;	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
 
 	call Limpiamos_bandeja_DRAW
+
 
 ;! ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1692,6 +1615,25 @@ Cargamos_registros_con_mov_masticado
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
+;	27/5/24
+;
+;	Cargamos los registros DE e IX, (Puntero_de_almacen_de_mov_masticados) de Amadeus. 
+;	
+;	IX contiene el puntero de impresión.
+;	DE contiene (Puntero_objeto).
+ 
+
+Cargamos_registros_con_mov_masticado_Amadeus
+
+	ld (Stack),sp
+	ld sp,(Puntero_de_almacen_de_mov_masticados)
+	pop de 															; DE contiene Puntero_objeto
+	pop ix 															; IX contiene Puntero_de_impresion
+	ld sp,(Stack)
+	ret
+
+; --------------------------------------------------------------------------------------------------------------
+;
 ;	28/12/23
 ;
 ;	(Guardo la foto de la entidad ejecutando DRAW, pues ha habido movimiento del Sprite y una posible_
@@ -1767,6 +1709,21 @@ Guarda_foto_entidad_a_pintar
 ;	call Convierte_guia_en_fantasma
 	ret	
 
+; ---------------------------------------------------------------------------------------------------------------------
+;
+;	27/05/24
+;
+
+Pinta_Amadeus call Cargamos_registros_con_mov_masticado_Amadeus			; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
+	push ix
+	pop hl 																; (Puntero_de_impresion) en HL.
+	push de
+	call Genera_coordenadas
+	call Recauda_informacion_de_entidad_en_curso						; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
+	pop de
+	call Genera_datos_de_impresion
+	ret
+	
 ; ---------------------------------------------------------------------------------------------------------------------
 ;
 ;	13/03/24
