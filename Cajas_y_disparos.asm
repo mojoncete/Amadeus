@@ -133,37 +133,30 @@ Indice_de_cajas_de_entidades
 	defw 0
 	defw 0
 
+; -------------------------
+
+; Relleno para que no se corrompa el movimiento. ?????
+
+	db 0
+
 ; ---------- ---------- ---------- ---------- ----------
+;
+;	28/05/24
+;
+; 	Cada caja tiene 14 bytes !!!
+;
+;	En principio Amadeus mo utiliza los parámetros: (Contador_de_vueltas) y (Velocidad). Estarán a "0" aunque no descarto utilizarlos más adelante_
+;	_para otra función.
 
-Amadeus_db db 0,2,2										; (Tipo) / (Filas) / (Columns).
-	defw 0		 										; (Posicion_actual).
-	defw 0	 											; (Puntero_objeto).
-	db 0,0												; (Coordenada_X) / (Coordenada_Y).
-
-ctrl_desplz_amadeus	db 0								; (CTRL_DESPLZ).
-	db %00000101										; (Attr).
-	defw Indice_Amadeus_der								; (Indice_Sprite_der).		
-	defw Indice_Amadeus_izq								; (Indice_Sprite_izq).
-	defw 0		 										; (Puntero_DESPLZ_der).
-	defw 0												; (Puntero_DESPLZ_izq).
-	defw $50c1											; (Posicion_inicio).		$50c1 - $50de
-	db 4 												; (Cuad_objeto).
-	db 0												; Impacto. "1" existe impacto en la entidad.
-	ds 6												; Variables_de_borrado 
-
-p.imp.amadeus defw 0 									; Puntero_de_impresion.
-
-;	defw Almacen_de_movimientos_masticados_Amadeus+6  	; Puntero_de_almacen_de_mov_masticados
-	defw 0
-	defw 0 												; Contador_de_mov_masticados
-	db $40												; (Ctrl_0).
-	defw 0,0,0	 										; (Puntero_indice_mov) / (Puntero_mov) / (Puntero_bucle).
-	db 0,0,0											; (Incrementa_puntero) / (Incrementa_puntero_backup) / (Repetimos_desplazamiento).
-	db 0,0												; (Repetimos_desplazamiento_backup) / (Repetimos_movimiento).
-	db 0												; (Cola_de_desplazamiento).
-	db 0 												; (Columnas).									
-	defw 0												; (Limite_horizontal).
-	db 0,0,0											; (Limite_vertical), (Ctrl_2), (Frames_explosion).
+Amadeus_BOX db 0,0,0									; (Tipo) / (Coordenada_X) / (Coordenada_Y).
+	db 0												; (Contador_de_vueltas).
+	db 0												; (Impacto).
+	defw 0												; (Puntero_de_impresion).
+	defw 0												; (Puntero_de_almacen_de_mov_masticados).
+	defw 0 												; (Contador_de_mov_masticados).
+	db 0												; (Ctrl_0).
+	db 0												; (Ctrl_2). 
+	db 0												; (Velocidad). 					
 
 ; ---------- ---------- ---------- ---------- ----------
 ;
@@ -291,12 +284,12 @@ Entidad_2 db 1,2,2		                     			; (Tipo) / (Filas) / (Columns).
 
 ; -------------------------------------------------------------------------------------
 ;
-;	14/05/24
+;	28/05/24
 ;
 ;	Definición de Amadeus.
 ;
-;	Amadeus no utiliza los parámetros: (Tipo) y (Contador_de_vueltas). Los colocamos a "0".
-;	Inicialmente situamos a Amadeus en el extremo izquierdo de la pantalla.
+;	Amadeus no utiliza el parámetro: (Contador_de_vueltas). Lo colocamos a "0".
+;	Inicialmente situamos a Amadeus en el centro de la pantalla.
 
 Definicion_Amadeus db 0,2,2		                     	; (Tipo) / (Filas) / (Columns).
 	db 0												; (Contador_de_vueltas).

@@ -541,17 +541,6 @@ Calcula_puntero_de_impresion ld a,(Cuad_objeto)
 	push hl
 	pop iy
 
-; Hemos calculado el puntero_de_impresion de Amadeus ????.	
-
-	ld a,(Ctrl_0)
-	bit 6,a
-	ret z
-
-; Almacenaremos el puntero de impresión de Amadeus para usarlo en la rutina de colisión `disparo de_
-; _ entidad / Amadeus´.
-
-	ld (p.imp.amadeus),ix
-
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------------

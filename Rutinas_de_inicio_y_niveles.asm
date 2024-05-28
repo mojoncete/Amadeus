@@ -136,7 +136,9 @@ Inicia_Entidades
 
 ; Antes de guardar los parámetros de esta entidad en su correspondiente caja hay que actualizar coordenadas.
 
+	ld de,(Puntero_store_caja) 								
 	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
+
 	call Limpiamos_bandeja_DRAW
 	call Incrementa_punteros_de_cajas
 
@@ -237,7 +239,9 @@ Definicion_segun_tipo
 
 Store_Restore_cajas	
 
+	ld de,(Puntero_store_caja) 								
 	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
+
 	call Limpiamos_bandeja_DRAW
 
 ; 	Entidad_sospechosa. 20/4/23
@@ -559,6 +563,11 @@ Definicion_de_entidad_a_bandeja_DRAW
 ;
 ;	Disponen de un (Puntero_de_impresión), (Coordenadas X e Y), ...
 ;
+;	INPUT:  DE debe contener la dirección del 1er byte de almacenamiento de la caja correspondiente:  
+;				
+;			- (Puntero_store_caja).
+;			_ Amadeus_BOX.
+
 ;	OUTPUT: HL apunta al .db (Frames_explosion) de la bandeja DRAW.
 ;			DE apunta al 1er .db (Tipo) de la siguiente caja de entidades.
 ; 
@@ -567,7 +576,6 @@ Definicion_de_entidad_a_bandeja_DRAW
 Parametros_de_bandeja_DRAW_a_caja 
 
 	ld hl,Bandeja_DRAW
-	ld de,(Puntero_store_caja) 								
 	ld a,(hl)
 	ld (de),a
 	inc de 													; (Tipo).

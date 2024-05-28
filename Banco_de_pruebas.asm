@@ -540,21 +540,22 @@ START
 ;	ld b,(hl)
 ;	inc b
 ;	dec b
-;	jr z,3F	;-									   		 				; Si no hay entidades, cargamos AMADEUS.
+;	jr z,3F	;-									   		 ; Si no hay entidades, cargamos AMADEUS.
 
-	call Inicia_albumes_de_lineas
+	call Inicia_albumes_de_lineas						 ; (Album_de_pintado) contiene $8000
+;														 ; (Album_de_borrado) contiene $9000
 
 4 call Inicia_Entidades						 
 	call Inicia_Amadeus
 
-;																		; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
-;																		; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
-;																		; La rutina [Genera_datos_de_impresion] activa las interrupciones antes del RET.
+;														 ; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
+;														 ; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
+;														 ; La rutina [Genera_datos_de_impresion] activa las interrupciones antes del RET.
 
-;	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
+	ld de,Amadeus_BOX
+	call Parametros_de_bandeja_DRAW_a_caja	 			 ; Volcamos Amadeus en (Amadeus_BOX).
 
 	call Limpiamos_bandeja_DRAW
-
 
 ;! ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -607,6 +608,7 @@ START
 	set 2,(hl)
 
 	ei
+
 	halt 
 
 ; ------------------------------------
@@ -1711,17 +1713,20 @@ Guarda_foto_entidad_a_pintar
 
 ; ---------------------------------------------------------------------------------------------------------------------
 ;
-;	27/05/24
+;	28/05/24
 ;
 
-Pinta_Amadeus call Cargamos_registros_con_mov_masticado_Amadeus			; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
+Pinta_Amadeus call Cargamos_registros_con_mov_masticado_Amadeus			
 	push ix
 	pop hl 																; (Puntero_de_impresion) en HL.
+
 	push de
 	call Genera_coordenadas
 	call Recauda_informacion_de_entidad_en_curso						; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
 	pop de
+
 	call Genera_datos_de_impresion
+
 	ret
 	
 ; ---------------------------------------------------------------------------------------------------------------------
