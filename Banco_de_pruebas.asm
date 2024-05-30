@@ -156,14 +156,15 @@ Almacen_de_movimientos_masticados_Entidad_1 equ $eb20	; $eb20 - $f87b ..... 3419
 Almacen_de_movimientos_masticados_Amadeus equ $e000		; ($e000 - $e1e3), 483 bytes. Movimientos masticados de Amadeus.
 
 Scanlines_album equ $8000	;	($8000 - $8118) 		; Inicialmente 280 bytes. 
+Scanlines_album_2 equ $9000    ;    ($9000 - $9118)
+Amadeus_scanlines_album equ $8120	;	($8120 - $8142)
+Amadeus_scanlines_album_2 equ $8143	;	($8143 - $8166)
 
 ;                                                       ; 35 bytes por entidad. 
 ;														; 1. 2 Bytes ..... .defw  Puntero_objeto, (mem. address donde se encuentran los .db que forman los distintos sprites).
 ;                                                       ; 2. 1 Byte ..... .db  Indica el nº de scanlines que vamos a imprimir del sprite. Generalmente 16 scanlines.
 ;														; El nº de scanlines será menor cuando estemos `desapareciendo´ por la parte baja de la pantalla.					 	
 ; 														; 3. 32 Bytes, (como máximo). Screen mem. address de cada uno de los scanlines que forman el sprite.
-
-Scanlines_album_2 equ $9000    ;    ($9000 - $9118)
 
 
 ; ******************************************************************************************************************************************************************************************
@@ -412,6 +413,8 @@ Stack_2 defw 0											; 2º variable destinada a almacenar el puntero de pila
 
 Album_de_pintado defw 0
 Album_de_borrado defw 0
+Album_de_pintado_Amadeus defw 0
+Album_de_borrado_Amadeus defw 0
 Techo_Scanlines_album defw 0
 Techo_Scanlines_album_2 defw 0
 Switch db 0
@@ -726,6 +729,8 @@ Main
 15 push bc 												; Nº de entidades en curso.
 
 	call Restore_entidad								; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
+
+	ld de,(Scanlines_album_SP)
 	call Recauda_informacion_de_entidad_en_curso		; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
 
 ; Existe "Entidad_guía" ???.
@@ -863,6 +868,29 @@ Main
 	djnz 15B
 
 ; Hemos terminado de gestionar TODAS las ENTIDADES.
+;! GESTIONA AMADEUS !!!!!!!!!!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	call Inicializa_India_y_limpia_Tabla_de_impresion 	; Inicializa el puntero (India_SP) y sanea la (Tabla_para_ordenar_entidades_antes_de_pintar).
 	call Ordena_tabla_de_impresion
@@ -1323,7 +1351,7 @@ Recauda_informacion_de_entidad_en_curso
 
 ; Almacena la dirección de memoria, (dentro del album de scanlines), de la entidad en curso.
 
-	ld de,(Scanlines_album_SP)
+;	ld de,(Scanlines_album_SP)
 
 	ld (hl),e
 	inc l
@@ -1713,19 +1741,33 @@ Guarda_foto_entidad_a_pintar
 
 ; ---------------------------------------------------------------------------------------------------------------------
 ;
-;	28/05/24
+;	30/05/24
 ;
 
-Pinta_Amadeus call Cargamos_registros_con_mov_masticado_Amadeus			
+Genera_datos_de_impresion_Amadeus 
+
+	call Cargamos_registros_con_mov_masticado_Amadeus			
+
 	push ix
 	pop hl 																; (Puntero_de_impresion) en HL.
 
 	push de
 	call Genera_coordenadas
+
+	ld de,(Album_de_pintado_Amadeus)
 	call Recauda_informacion_de_entidad_en_curso						; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
 	pop de
 
+	ld hl,(Scanlines_album_SP)
+	push hl
+
+	ld hl,(Album_de_pintado_Amadeus)
+	ld (Scanlines_album_SP),hl
+
 	call Genera_datos_de_impresion
+
+	pop hl
+	ld (Scanlines_album_SP),hl	
 
 	ret
 	
@@ -1736,12 +1778,21 @@ Pinta_Amadeus call Cargamos_registros_con_mov_masticado_Amadeus
 
 Inicia_albumes_de_lineas
 
+;	Entidades.
+
 	ld hl,Scanlines_album
 	ld (Album_de_pintado),hl
 	ld (Scanlines_album_SP),hl
 
 	ld hl,Scanlines_album_2
 	ld (Album_de_borrado),hl
+
+;	Amadeus.
+
+	ld hl,Amadeus_scanlines_album
+	ld (Album_de_pintado_Amadeus),hl
+	ld hl,Amadeus_scanlines_album_2
+	ld (Album_de_borrado_Amadeus),hl
 
 	ret
 

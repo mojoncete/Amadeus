@@ -123,6 +123,8 @@ Inicia_Entidades
 
 	push de
 	call Genera_coordenadas
+
+	ld de,(Scanlines_album_SP)
 	call Recauda_informacion_de_entidad_en_curso				; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
 	pop de
 
@@ -213,7 +215,7 @@ Construye_movimientos_masticados_Amadeus
 2 call Amadeus_a_izquierda
 	djnz 2B
 
-	call Pinta_Amadeus
+	call Genera_datos_de_impresion_Amadeus
 
 	ret
 
