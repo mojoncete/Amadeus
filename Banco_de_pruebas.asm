@@ -870,9 +870,7 @@ Main
 ; Hemos terminado de gestionar TODAS las ENTIDADES.
 ;! GESTIONA AMADEUS !!!!!!!!!!
 
-
-
-
+;	Existe movimiento ?????
 
 
 
@@ -2098,7 +2096,7 @@ wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: 
 ;2 ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
 ;	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
 ;	and $01													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $01 resulta "0"  llama a la rutina "Mov_izq".
-;    call z,Mov_left											;			"			"			"			"			"			"			"			"
+;    call z,Amadeus_a_izquierda							
 
 ;	ld a,$f7
 ;	in a,($fe)
@@ -2108,7 +2106,7 @@ wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: 
 ;	ld a,$f7
 ;	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
 ;	and $02													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $02 resulta "0"  llama a la rutina "Mov_der".
-;	call z,Mov_right										;			"			"			"			"			"			"			"			"
+;	call z,Amadeus_a_derecha
 ;	ret	
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2129,70 +2127,6 @@ wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: 
 ;	ret nz
 
 ;	call Genera_disparo
-;	ret
-
-; ----------------------------------------------------------------------
-;
-;	8/9/23
-
-;Guarda_datos_de_borrado_Amadeus	ld hl,(End_Snapshot_Amadeus)
-; 	dec hl
-;	ld a,(hl)
-;	and a
-;	ret z										; Salimos si es álbum está vacío.
-
-;	ld de,Variables_de_borrado+5
-;	ld bc,6
-;	lddr
-;	ret
-
-; ----------------------------------------------------------------------
-;
-;	9/9/23
-
-;Repone_datos_de_borrado_Amadeus
-
-;	ld hl,Variables_de_borrado
-;	ld de,Scanlines_album_Amadeus
-;	ld bc,6
-;	ldir
-
-;	ex de,hl
-;	ld (End_Snapshot_Amadeus),hl
-
-;	ret
-
-; ----------------------------------------------------------------------
-;
-;	27/10/23
-;
-
-;	Si se ha producido movimiento de la entidad en curso, esta rutina vuelca las `Variables_de_borrado´ en el_
-;	_ Scanlines_album correspondiente.
-
-;	El proceso de "escritura en los álbumes de fotos" no puede verse interrumpido por la rutina FRAME, (di/ei)_
-;	_ durante el proceso de escritura.
-
-;Repone_datos_de_borrado
-
-;	ld de,(Scanlines_album_SP)
-;	ld hl,Variables_de_borrado
-;	ld bc,6
-;	ldir
-
-;	ex de,hl
-;	ld (Scanlines_album_SP),hl
-
-;	ret
-
-; --------------------------------------------------------------------------------------
-
-;Pinta_Amadeus 
-
-;   call Calcula_malotes_Amadeus 
-;	call Extrae_foto_Amadeus
-;	call Limpia_album_Amadeus
-
 ;	ret
 
 ; ---------------------------------------------------------------

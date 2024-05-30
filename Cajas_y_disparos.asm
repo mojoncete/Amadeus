@@ -3,15 +3,17 @@
 ; Índice de Patrón de movimiento para tipo de entidad.
 ; ---------------------------------------------------------------------
 
-; 27/03/24
+; 30/05/24
 ;
 ;	En esta tabla iremos almacenando:
 ;
-;	(Columna_Y),(mem.address de los scanlines masticados en el Scanlines_album) de cada entidad en curso.
+;	(Columna_Y),(Dirección de memoria donde se encuentran almacenados los scanlines masticados de cada entidad, (Scanlines_album)).
+;	
+;	Los 6 últimos bytes contienen el borrado/pintado de Amadeus, (Amadeus_scanlines_album).
 
 Numeros_aleatorios ds 7
 
-Tabla_de_pintado ds 24
+Tabla_de_pintado ds 27
 
 ;	db 0, defw 0
 ;	db 0, defw 0

@@ -770,7 +770,9 @@ Limpia_contenido_hl	ld (hl),a
 
 ;	Actualiza movimiento.
 
-Amadeus_a_izquierda ld hl,(Puntero_de_almacen_de_mov_masticados)	;	Actualiza variable de 16 bits.
+Amadeus_a_izquierda 
+
+	ld hl,(Puntero_de_almacen_de_mov_masticados)					;	Actualiza variable de 16 bits.
 	dec hl
 	dec hl
 	dec hl
@@ -789,7 +791,9 @@ Amadeus_a_izquierda ld hl,(Puntero_de_almacen_de_mov_masticados)	;	Actualiza var
 ;	27/5/24
 ;
 
-Amadeus_a_derecha ld hl,Puntero_de_almacen_de_mov_masticados
+Amadeus_a_derecha 
+
+	ld hl,Puntero_de_almacen_de_mov_masticados
 	inc (hl)
 	inc (hl)
 	inc (hl)
