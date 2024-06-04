@@ -2,131 +2,6 @@
 
 	DEVICE ZXSPECTRUM48
 
-	org $a9ff 	
-	
-;	Vector de interrupciones.
-
- 	defw $aa01											; $9000. Rutina de interrupciones.
-
-	org $aa01		
-
-FRAME 
-
-	ex af,af'	
-	push af	;af'
-	exx
-	push hl	;hl'
-	push de	;de'
-	push bc	;bc'
-	exx
-	push hl	;hl
-	push de	;de
-	push bc	;bc
-	ex af,af'
-	push af	;af
-	push ix
-	push iy
-
-	ld a,2	
-	out ($fe),a												
-
-	ld a,(Ctrl_3)
-	bit 0,a
-	jr z,1F 												; No pintamos si el FRAME no se ha completado.
-	bit 2,a
-	jr z,1F                                                 ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
-
-Borrando
-
-	ld hl,(Scanlines_album_SP)
-	call Extrae_address
-
-	inc h
-	dec h
-	jr z,Pintando
-
-	call Pinta_Sprites
-
-	jr Borrando
-	
-Pintando
-
-	ld hl,(India_SP)
-	inc l
-	call Extrae_address
-
-	inc h
-	dec h
-	jr z,1F
-
-	inc e
-	inc e
-
-	ld (India_SP),de
-
-	call Extrae_address
-
-	call Pinta_Sprites
-
-	jr Pintando
-
-; Posible colisión Entidad-Amadeus ???
-
-;	ld a,(Impacto2)	
-;	bit 2,a
-;	jr z,1F
-
-;	call Detecta_colision_nave_entidad 
-
-;1 ld a,4	
-;	out ($fe),a												
-;	call Gestiona_Amadeus
-
-;	ld a,7	
-;	out ($fe),a											; Borde blanco.
-;	ld de,Amadeus_db 									; Antes de llamar a [Store_Amadeus], debemos cargar en DE_
-;	call Store_Amadeus 									; _la dirección de memoria de la base de datos donde vamos a volcar.
-
-; Restauramos los parámetros de la entidad que había alojada en DRAW "antes de gestionar AMADEUS".
-
-;	call Recupera_parametros_DRAW
-
-1 ld a,(Ctrl_3)
-	bit 0,a
-	jr z,2F 											; No actualizamos FRAMES si el último cuadro no se completó.
-
-	call ROM_keyboard									; Actualiza FRAMES y ejecuta las rutinas de teclado de la ROM.
-
-2 ld hl,Ctrl_3
-	res 0,(hl)											; Reinicia el flag de FRAME completo.
-	res 2,(hl)											; Reinicia el flag DETECTA MOVIMIENTO.
-
-;	call Recupera_todos_los_registros
-
-    pop iy
-	pop ix
-	pop af
-	pop bc
-	pop de
-	pop hl
-	exx
-	pop bc
-	pop de
-	pop hl
-	ex af,af'
-	pop af
-	ex af,af'
-	exx
-
-	ei
-
-	ld a,1												; Borde azul.
-	out ($fe),a
-
-	ret									 
-
-; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
-
 	include "Sprites_e_indices.asm"
 	include "Cajas_y_disparos.asm"
 	include "Patrones_de_mov.asm"
@@ -510,13 +385,13 @@ Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos
 START 
 
 	ld sp,0												; Situamos el inicio de Stack.
-	ld a,$a9 											; Habilitamos el modo 2 de interrupciones y fijamos el salto a $a9ff
-	ld i,a 												; Byte alto de la dirección donde se encuentra nuestro vector de interrupciones en el registro I. ($a9). El byte bajo será siempre $ff.
-	IM 2 											    ; Habilitamos el modo 2 de INTERRUPCIONES.
+;	ld a,$a9 											; Habilitamos el modo 2 de interrupciones y fijamos el salto a $a9ff
+;	ld i,a 												; Byte alto de la dirección donde se encuentra nuestro vector de interrupciones en el registro I. ($a9). El byte bajo será siempre $ff.
+;	IM 2 											    ; Habilitamos el modo 2 de INTERRUPCIONES.
 	DI 													 										 
 
-;	ld a,%00000111
-;	call Cls
+	ld a,%00000111
+	call Cls
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
 ; INICIALIZACIÓN.
@@ -626,6 +501,8 @@ Main
 ;														; Todas las entidades contenidas en un "bloque", (7 cajas), se inicializan en [START].
 ;														; Si (Numero_de_entidades) > "7", cuando el bloque de 7 cajas esté a "0" se inicializará _;		
 ;														; _un 2º bloque.
+
+	call Actualiza_pantalla								; Lo 1º que hacemos es actualizar la pantalla. BORRA/PINTA.
 
 	ld hl,(Clock_next_entity)
 	ld bc,(FRAMES)
@@ -2066,6 +1943,80 @@ wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: 
 	JR NZ,wait
 	RET
 
+; ---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------
+;
+;	4/6/24
+;
+;	Es la 1ª rutina que se ejcuta tras la rutina de interrupciones.
+; 	
+;	ACTUALIZA LA PANTALLA siempre que se haya producido algún movimiento, (entidades, Amadeus).
+;
+
+Actualiza_pantalla 
+
+	ld a,2	
+	out ($fe),a												
+
+	ld a,(Ctrl_3)
+	bit 0,a
+	jr z,1F 												; No pintamos si el FRAME no se ha completado.
+	bit 2,a
+	jr z,1F                                                 ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
+
+Borrando
+
+	ld hl,(Scanlines_album_SP)
+	call Extrae_address
+
+	inc h
+	dec h
+	jr z,Pintando
+
+	call Pinta_Sprites
+
+	jr Borrando
+	
+Pintando
+
+	ld hl,(India_SP)
+	inc l
+	call Extrae_address
+
+	inc h
+	dec h
+	jr z,1F
+
+	inc e
+	inc e
+
+	ld (India_SP),de
+
+	call Extrae_address
+
+	call Pinta_Sprites
+
+	jr Pintando
+
+; Posible colisión Entidad-Amadeus ???
+
+;	ld a,(Impacto2)	
+;	bit 2,a
+;	jr z,1F
+
+;	call Detecta_colision_nave_entidad 
+
+;1 ld a,(Ctrl_3)
+;	bit 0,a
+;	jr z,2F 											; No actualizamos FRAMES si el último cuadro no se completó.
+
+1 ld hl,Ctrl_3
+	res 0,(hl)											; Reinicia el flag de FRAME completo.
+	res 2,(hl)											; Reinicia el flag DETECTA MOVIMIENTO.
+
+	ld a,1												; Borde azul.
+	out ($fe),a
+
+	ret									 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
 ;	5/3/23
