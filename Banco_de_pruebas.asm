@@ -17,7 +17,7 @@
 ; Constantes.
 ;
  
-ROM_keyboard equ $0038 									; Rutina de ROM. Actualiza FRAMES y escanea el teclado.
+;ROM_keyboard equ $0038 								; Rutina de ROM. Actualiza FRAMES y escanea el teclado.
 FRAMES equ $5c78										; Variable de 16 bits. Almacena el nº de cuadros, (frames) que llevamos construidos. Reloj en tiempo real.
 
 Sprite_vacio equ $eae0									; ($eae0 - $eb10) 48 Bytes de "0".
@@ -482,10 +482,12 @@ START
 	ld (India_SP),hl
 
 	ld hl,Ctrl_3
-	set 0,(hl) 											 ; Indica Frame completo. 
+	set 0,(hl) 											; Indica Frame completo. 
 	set 2,(hl)
 
-	ei
+	push iy
+	ld iy,$5c3a 										; La IM1 utiliza el registro IY para modificar variables de teclado.
+	ei 													; Ha de apuntar a $5c3a.
 
 	halt 
 
@@ -501,6 +503,7 @@ Main
 ;														; Todas las entidades contenidas en un "bloque", (7 cajas), se inicializan en [START].
 ;														; Si (Numero_de_entidades) > "7", cuando el bloque de 7 cajas esté a "0" se inicializará _;		
 ;														; _un 2º bloque.
+	pop iy
 
 	call Actualiza_pantalla								; Lo 1º que hacemos es actualizar la pantalla. BORRA/PINTA.
 
@@ -802,7 +805,10 @@ Main
 
 	xor a
 	out ($fe),a
-	halt 
+
+	push iy
+	ld iy,$5c3a 										; La IM1 utiliza el registro IY para modificar variables de teclado.
+	halt												; Ha de apuntar a $5c3a.
 
 ; ----------------------------------------
 
