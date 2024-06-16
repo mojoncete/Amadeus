@@ -17,8 +17,14 @@
 ; Constantes.
 ;
  
-;ROM_keyboard equ $0038 								; Rutina de ROM. Actualiza FRAMES y escanea el teclado.
-FRAMES equ $5c78										; Variable de 16 bits. Almacena el nº de cuadros, (frames) que llevamos construidos. Reloj en tiempo real.
+;Variables ROM. FRAMES y KEYBOARD. Rutina Interrupción mascarable $0038.
+
+FRAMES equ $5c78										; Variable de 24 bits. Almacena el nº de cuadros, (frames) que llevamos construidos. Reloj en tiempo real.
+LAST_K equ $5c08										; Última tecla pulsada.
+FLAGS equ $5c3b											; Bit 5 indica "Pulsación aceptada".
+REPDEL equ $5c09										; Temporización. Repetición de tecla, (tecla pulsada).
+
+; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Sprite_vacio equ $eae0									; ($eae0 - $eb10) 48 Bytes de "0".
 
@@ -390,6 +396,16 @@ START
 ;	IM 2 											    ; Habilitamos el modo 2 de INTERRUPCIONES.
 	DI 													 										 
 
+; Desactivamos las variables REPDEL y REPPER de la rutina del teclado de la ROM. Vamos a utilizar esta rutina para controlar a Amadeus y necesitamos precisión sin delays.
+
+	ld a,1
+	ld hl,REPDEL
+	ld (hl),a
+	inc hl
+	ld (hl),a
+
+; Limpiamos pantalla.
+
 	ld a,%00000111
 	call Cls
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
@@ -748,9 +764,14 @@ Main
 	djnz 15B
 
 ; Hemos terminado de gestionar TODAS las ENTIDADES.
+
 ;! GESTIONA AMADEUS !!!!!!!!!!
 
-;	Existe movimiento ?????
+; Existe movimiento???, Disparamos???, Pausamos el juego??? 
+
+	ld hl,FLAGS
+	bit 5,(hl)
+	call nz,Mov_Amadeus
 
 
 
@@ -766,13 +787,9 @@ Main
 
 
 
-
-
-
-
-	call Inicializa_India_y_limpia_Tabla_de_impresion 	; Inicializa el puntero (India_SP) y sanea la (Tabla_para_ordenar_entidades_antes_de_pintar).
+	call Inicializa_India_y_limpia_Tabla_de_impresion 						; Inicializa el puntero (India_SP) y sanea la (Tabla_para_ordenar_entidades_antes_de_pintar).
 	call Ordena_tabla_de_impresion
-	call Inicia_punteros_de_cajas 						; Hemos terminado de mover todas las entidades. Nos situamos al principio del índice de entidades.
+	call Inicia_punteros_de_cajas 											; Hemos terminado de mover todas las entidades. Nos situamos al principio del índice de entidades.
 
 ;! Activando estas líneas podemos habilitar 2 explosiones en el mismo FRAME.
 ; Hemos gestionado todas las unidades.
@@ -1013,25 +1030,36 @@ Main
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	29/1/23
+;	16/6/24
 
-;Mov_Amadeus 
+Mov_Amadeus 
 
-;	call Movimiento_Amadeus 							; MOVEMOS AMADEUS.
+;	Generamos disparo ???
 
-;	call Mov_right
+	ld a,(LAST_K)
+	cp $35
+	jr z,$
 
-;	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
-;	bit 4,a
-;	ret z
+; 	Si no se produce disparo, se produce movimiento.
 
-; ---------
+;	Movemos a izquierda ???
 
-;   call Prepara_var_pintado			                ; HEMOS DESPLAZADO AMADEUS.!!!. Almaceno las `VARIABLES DE PINTADO´.         
-;	call Repone_datos_de_borrado_Amadeus
-;	call Limpia_Variables_de_borrado
+	ld a,(LAST_K)
+	cp $31
+	call z,Amadeus_a_izquierda	
 
-;	ret													
+;	Movemos a derecha ???
+
+	ld a,(LAST_K)
+	cp $32
+	call z,Amadeus_a_derecha	
+
+;	Inicializamos (LAST_K)
+
+	xor a
+	ld (LAST_K),a
+
+	ret													
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
