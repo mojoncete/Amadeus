@@ -769,31 +769,22 @@ Limpia_contenido_hl	ld (hl),a
 ;
 ;	Sitúa nuestra nave en el centro de la pantalla. Se han generado todos lon movimientos masticados de nuestra nave.
 
-Amadeus_al_centro 
+Amadeus_a_izquierda
 
-	ld hl,(Puntero_de_almacen_de_mov_masticados)					;	Actualiza variable de 16 bits.
+	ld hl,(Pamm_Amadeus)					;	Actualiza variable de 16 bits.
 	dec hl
 	dec hl
 	dec hl
 	dec hl		
-	ld (Puntero_de_almacen_de_mov_masticados),hl					;	Actualiza variable de 8 bits.
+	ld (Pamm_Amadeus),hl					;	Actualiza variable de 8 bits.
 
 ;	Actualiza contador de movimientos.
 
-	ld hl,Contador_de_mov_masticados
+	ld hl,Comm_Amadeus
 	dec (hl)
 
 	ret
 
-; ----------------------------------------------------------------------------------------------------------------
-;
-;	27/5/24
-;
-
-Amadeus_a_izquierda jr $
-
-	ret
-	
 ; ----------------------------------------------------------------------------------------------------------------
 ;
 ;	27/5/24

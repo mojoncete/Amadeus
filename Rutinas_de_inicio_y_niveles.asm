@@ -209,13 +209,6 @@ Construye_movimientos_masticados_Amadeus
 	sbc hl,bc
 	ld (Puntero_de_almacen_de_mov_masticados),hl
 
-; 	Situamos a Amadeus en el centro de la pantalla y pintamos.
-
-	ld b,60
-2 call Amadeus_al_centro
-	djnz 2B
-	call Genera_datos_de_impresion_Amadeus
-
 	ret
 
 ; ---------------------------------------------------------------------

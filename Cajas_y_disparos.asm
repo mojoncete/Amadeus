@@ -155,7 +155,7 @@ Amadeus_BOX db 0,0,0									; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	db 0												; (Impacto).
 	defw 0												; (Puntero_de_impresion).
 Pamm_Amadeus defw 0										; (Puntero_de_almacen_de_mov_masticados).
-	defw 0 												; (Contador_de_mov_masticados).
+Comm_Amadeus defw 0 									; (Contador_de_mov_masticados).
 	db 0												; (Ctrl_0).
 	db 0												; (Ctrl_2). 
 	db 0												; (Velocidad). 					

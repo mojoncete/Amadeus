@@ -448,8 +448,15 @@ START
 
 	ld de,Amadeus_BOX
 	call Parametros_de_bandeja_DRAW_a_caja	 			 ; Volcamos Amadeus en (Amadeus_BOX).
-
 	call Limpiamos_bandeja_DRAW
+
+; 	Situamos a Amadeus en el centro de la pantalla y pintamos.
+
+	ld b,60
+2 call Amadeus_a_izquierda
+	djnz 2B
+
+	call Genera_datos_de_impresion_Amadeus
 
 ;! ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1554,7 +1561,7 @@ Cargamos_registros_con_mov_masticado
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	27/5/24
+;	17/06/24
 ;
 ;	Cargamos los registros DE e IX, (Puntero_de_almacen_de_mov_masticados) de Amadeus. 
 ;	
@@ -1565,7 +1572,7 @@ Cargamos_registros_con_mov_masticado
 Cargamos_registros_con_mov_masticado_Amadeus
 
 	ld (Stack),sp
-	ld sp,(Puntero_de_almacen_de_mov_masticados)
+	ld sp,(Pamm_Amadeus)
 	pop de 															; DE contiene Puntero_objeto
 	pop ix 															; IX contiene Puntero_de_impresion
 	ld sp,(Stack)
