@@ -765,10 +765,16 @@ Limpia_contenido_hl	ld (hl),a
 	
 ; ----------------------------------------------------------------------------------------------------------------
 ;
-;	17/6/24
+;	18/6/24
 ;
 
 Amadeus_a_izquierda
+
+;	Actualiza contador de movimientos.
+
+	ld hl,Comm_Amadeus
+	dec (hl)
+	jr z,1F 								; 	Estamos en el extremo izquierdo de la pantalla.
 
 	ld hl,(Pamm_Amadeus)					;	Actualiza variable de 16 bits.
 	dec hl
@@ -777,19 +783,23 @@ Amadeus_a_izquierda
 	dec hl		
 	ld (Pamm_Amadeus),hl					;	Actualiza variable de 8 bits.
 
+	ret
+
+1 inc (hl)                                  ; 	Salimos. Damos orden de no imprimir la nave. No habrá movimiento.
+	ld hl,Ctrl_3
+	res 5,(hl)
+	ret
+
+
+Amadeus_a_derecha
+
 ;	Actualiza contador de movimientos.
 
 	ld hl,Comm_Amadeus
-	dec (hl)
-
-	ret
-
-; ----------------------------------------------------------------------------------------------------------------
-;
-;	17/6/24
-;
-
-Amadeus_a_derecha
+	inc (hl)
+	ld a,$7a
+	cp (hl)
+	jr z,1F									; 	Estamos en el extremo derecho de la pantalla.
 
 	ld hl,(Pamm_Amadeus)					;	Actualiza variable de 16 bits.
 	inc hl
@@ -798,9 +808,9 @@ Amadeus_a_derecha
 	inc hl		
 	ld (Pamm_Amadeus),hl					;	Actualiza variable de 8 bits.
 
-;	Actualiza contador de movimientos.
+	ret
 
-	ld hl,Comm_Amadeus
-	inc (hl)
-
+1 dec (hl)									; 	Salimos. Damos orden de no imprimir la nave. No habrá movimiento.
+	ld hl,Ctrl_3
+	res 5,(hl)
 	ret

@@ -532,10 +532,6 @@ Main
 
 	call Actualiza_pantalla								; Lo 1º que hacemos es actualizar la pantalla. BORRA/PINTA.
 
-;	di
-;	jr $
-;	ei
-
 	ld hl,(Clock_next_entity)
 	ld bc,(FRAMES)
 	and a
@@ -807,7 +803,6 @@ Main
 	bit 5,(hl)
 	call nz,Mov_Amadeus
 
-
 	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
 
@@ -1063,7 +1058,7 @@ Mov_Amadeus
 	xor a
 	ld (LAST_K),a
 
-	ret													
+	ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -2031,7 +2026,7 @@ Borrando_Amadeus
 
 	ld hl,Ctrl_3
 	bit 5,(hl)
-	jr z,1F
+	jr z,1F												; No pintamos. No hay movimiento.
 
 	ld hl,(Album_de_borrado_Amadeus)
 	call Extrae_address
