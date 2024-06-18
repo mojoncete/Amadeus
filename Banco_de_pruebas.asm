@@ -811,6 +811,9 @@ Main
 	res 3,(hl)
 	res 4,(hl)
 
+	ld hl,FLAGS
+	res 5,(hl)
+
 	xor a
 	out ($fe),a
 
