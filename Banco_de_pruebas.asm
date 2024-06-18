@@ -314,7 +314,7 @@ Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una únic
 ;															BIT 3, "1" Este bit lo coloca a "1" la rutina [Borra_diferencia] para indicar que hemos actualizado el (Techo_de_pintado)_
 ;																_ a la baja. 
 ; 															BIT 4, "1" Indica que hemos terminado de ordenar la Tabla_de_pintado. Podremos salir así de la rutina [Ordena_tabla_de_impresion].
-
+;															BIT 5, "1" Indica que existe movimiento de Amadeus.
 
 
 Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una única entidad. Lo utiliza la rutina [Inicia_entidad].
@@ -407,7 +407,7 @@ START
 ; Limpiamos pantalla.
 
 	ld a,%00000111
-	call Cls
+;	call Cls
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
 ; INICIALIZACIÓN.
@@ -455,6 +455,7 @@ START
 	ld b,60
 2 call Amadeus_a_izquierda
 	djnz 2B
+
 
 	call Genera_datos_de_impresion_Amadeus
 
@@ -507,6 +508,7 @@ START
 	ld hl,Ctrl_3
 	set 0,(hl) 											; Indica Frame completo. 
 	set 2,(hl)
+	set 5,(hl)											; Imprimimos Amadeus.
 
 	push iy
 	ld iy,$5c3a 										; La IM1 utiliza el registro IY para modificar variables de teclado.
@@ -530,11 +532,15 @@ Main
 
 	call Actualiza_pantalla								; Lo 1º que hacemos es actualizar la pantalla. BORRA/PINTA.
 
+;	di
+;	jr $
+;	ei
+
 	ld hl,(Clock_next_entity)
 	ld bc,(FRAMES)
 	and a
 	sbc hl,bc
-	jr nz,13F
+	jr nz,11F
 
 ; Si aún quedan entidades por aparecer del bloque de entidades, (7 cajas), incrementaremos (Entidades_en_curso) y calcularemos_ 
 ; _ (Clock_next_entity) para la siguiente entidad.
@@ -543,8 +549,8 @@ Main
 	ld b,a
 	ld a,(Entidades_en_curso)
 	cp b
-	jr z,13F
-	jr nc,13F
+	jr z,11F
+	jr nc,11F
 
 	inc a
 	ld (Entidades_en_curso),a
@@ -591,10 +597,10 @@ Main
 
 ; ---------------------------------------------------------------------------------------
 
-10 ld a,(Numero_parcial_de_entidades)
-    ld b,a
-	and a
-	jr nz,11F
+;10 ld a,(Numero_parcial_de_entidades)
+;    ld b,a
+;	and a
+;	jr nz,11F
 
 ;	ld hl,Ctrl_1;
 ;	bit 4,(hl)
@@ -770,30 +776,6 @@ Main
 	
 	djnz 15B
 
-; Hemos terminado de gestionar TODAS las ENTIDADES.
-
-;! GESTIONA AMADEUS !!!!!!!!!!
-
-; Existe movimiento???, Disparamos???, Pausamos el juego??? 
-
-	ld hl,FLAGS
-	bit 5,(hl)
-	call nz,Mov_Amadeus
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	call Inicializa_India_y_limpia_Tabla_de_impresion 						; Inicializa el puntero (India_SP) y sanea la (Tabla_para_ordenar_entidades_antes_de_pintar).
 	call Ordena_tabla_de_impresion
 	call Inicia_punteros_de_cajas 											; Hemos terminado de mover todas las entidades. Nos situamos al principio del índice de entidades.
@@ -814,16 +796,23 @@ Main
 	ex de,hl
 	ld (hl),c
 	inc l
-	ld (hl),b											; Nuevo techo, mayor que el anterior.
+	ld (hl),b																; Nuevo techo, mayor que el anterior.
 
-; Aquí situaremos la rutina que ordena el índice Masa.
 
-16 ld hl,(Album_de_borrado)
+;! GESTIONA AMADEUS !!!!!!!!!!
+
+; Existe movimiento???, Disparamos???, Pausamos el juego??? 
+
+16 ld hl,FLAGS
+	bit 5,(hl)
+	call nz,Mov_Amadeus
+
+
+	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
 
 	ld hl,Ctrl_3
 	set 0,(hl) 											; Indica Frame completo. 
-
 	res 3,(hl)
 	res 4,(hl)
 
@@ -1048,6 +1037,12 @@ Mov_Amadeus
 	jr z,$
 
 ; 	Si no se produce disparo, se produce movimiento.
+;	Cambio de cromos.	
+
+	ld hl,Ctrl_3
+	set 5,(hl)
+
+	call Change_Amadeus
 
 ;	Movemos a izquierda ???
 
@@ -1062,6 +1057,8 @@ Mov_Amadeus
 	call z,Amadeus_a_derecha	
 
 ;	Inicializamos (LAST_K)
+
+	call Genera_datos_de_impresion_Amadeus
 
 	xor a
 	ld (LAST_K),a
@@ -1096,22 +1093,28 @@ Ajusta_velocidad_entidad ld a,(Velocidad)
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	17/3/24
+;	18/06/24
 
 Change 
 
 	ld a,(Switch)
 	xor 1
 	ld (Switch),a
-
 	ld hl,(Album_de_pintado)
 	ld de,(Album_de_borrado)
 	ex de,hl
 	ld (Album_de_pintado),hl
 	ld (Scanlines_album_SP),hl
-
 	ld (Album_de_borrado),de
+	ret
 
+Change_Amadeus
+
+	ld hl,(Album_de_pintado_Amadeus)
+	ld de,(Album_de_borrado_Amadeus)
+	ex de,hl
+	ld (Album_de_pintado_Amadeus),hl
+	ld (Album_de_borrado_Amadeus),de
 	ret
 
 ; ------------------------------------
@@ -1657,22 +1660,17 @@ Guarda_foto_entidad_a_pintar
 
 ; ---------------------------------------------------------------------------------------------------------------------
 ;
-;	30/05/24
+;	18/6/24
 ;
+;	Genera la coordenada X de Amadeus y los datos de impresión en la nave en su (Album_de_pintado_Amadeus).
 
 Genera_datos_de_impresion_Amadeus 
 
 	call Cargamos_registros_con_mov_masticado_Amadeus			
-
-	push ix
-	pop hl 																; (Puntero_de_impresion) en HL.
-
-	push de
-	call Genera_coordenadas
-
-	ld de,(Album_de_pintado_Amadeus)
-	call Recauda_informacion_de_entidad_en_curso						; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
-	pop de
+														
+	ld a,ixl
+	and $1f
+	ld (CX_Amadeus),a 													; Coordenada X del Amadeus, (0-$1f). Columnas.
 
 	ld hl,(Scanlines_album_SP)
 	push hl
@@ -2000,43 +1998,56 @@ Actualiza_pantalla
 
 	ld a,(Ctrl_3)
 	bit 0,a
-	jr z,1F 												; No pintamos si el FRAME no se ha completado.
+	jr z,Borrando_Amadeus												; No pintamos si el FRAME no se ha completado.
 	bit 2,a
-	jr z,1F                                                 ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
+	jr z,Borrando_Amadeus                                               ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
 
-Borrando
+Borrando_entidades
 
 	ld hl,(Scanlines_album_SP)
 	call Extrae_address
-
 	inc h
 	dec h
-	jr z,Pintando
-
+	jr z,Pintando_entidades
 	call Pinta_Sprites
-
-	jr Borrando
+	jr Borrando_entidades
 	
-Pintando
+Pintando_entidades
 
 	ld hl,(India_SP)
 	inc l
 	call Extrae_address
+	inc h
+	dec h
+	jr z,Borrando_Amadeus
+	inc e
+	inc e
+	ld (India_SP),de
+	call Extrae_address
+	call Pinta_Sprites
+	jr Pintando_entidades
 
+Borrando_Amadeus
+
+	ld hl,Ctrl_3
+	bit 5,(hl)
+	jr z,1F
+
+	ld hl,(Album_de_borrado_Amadeus)
+	call Extrae_address
+	inc h
+	dec h
+	jr z,Pintando_Amadeus
+	call Pinta_Sprites
+
+Pintando_Amadeus
+
+	ld hl,(Album_de_pintado_Amadeus)
+	call Extrae_address
 	inc h
 	dec h
 	jr z,1F
-
-	inc e
-	inc e
-
-	ld (India_SP),de
-
-	call Extrae_address
-
 	call Pinta_Sprites
-
-	jr Pintando
 
 ; Posible colisión Entidad-Amadeus ???
 
@@ -2053,6 +2064,7 @@ Pintando
 1 ld hl,Ctrl_3
 	res 0,(hl)											; Reinicia el flag de FRAME completo.
 	res 2,(hl)											; Reinicia el flag DETECTA MOVIMIENTO.
+	res 5,(hl)
 
 	ld a,1												; Borde azul.
 	out ($fe),a

@@ -9,6 +9,7 @@
 Genera_datos_de_impresion 
 
     ld (Stack),sp                                 ; Guardo SP en (Stack).
+
     ld sp,Puntero_de_impresion+2                  ; Almacenamos el (Puntero_de_impresion) actual de la entidad.
     push ix                                       ; Utilizaremos este dato para generar las coordenadas_X que ocupa la entidad y compararlas_
 

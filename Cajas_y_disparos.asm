@@ -147,10 +147,10 @@ Indice_de_cajas_de_entidades
 ;
 ; 	Cada caja tiene 14 bytes !!!
 ;
-;	En principio Amadeus mo utiliza los parámetros: (Contador_de_vueltas) y (Velocidad). Estarán a "0" aunque no descarto utilizarlos más adelante_
-;	_para otra función.
+;	En principio Amadeus mo utiliza los parámetros: (Contador_de_vueltas) y (Velocidad). Estarán a "0" aunque no descarto utilizarlos más adelante para otra función.
 
-Amadeus_BOX db 0,0,0									; (Tipo) / (Coordenada_X) / (Coordenada_Y).
+Amadeus_BOX db 0										; (Tipo).
+CX_Amadeus db 0,$16                                     ; (Coordenada_X), (Coordenada_Y).
 	db 0												; (Contador_de_vueltas).
 	db 0												; (Impacto).
 	defw 0												; (Puntero_de_impresion).
