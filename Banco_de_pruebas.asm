@@ -238,7 +238,10 @@ Cola_de_desplazamiento db 0								; Este byte indica:
 ;														;	"$ff" ..... Bucle infinito de repetición. 
 ;														;				Nunca vamos a saltar a la siguiente cadena de movimiento del índice,_	
 ;														;				,_ (si es que la hay). Volvemos a inicializar (Puntero_mov) con (Puntero_indice_mov).	
-; Contador_general_de_mov_masticados_Entidad_1 defw 0		; Contador general de "movimientos masticados" de la Entidad_1.
+
+Mov_FLAGS db 0											;	Bit 0 ..... "1", Existe movimiento a derecha.
+;														;	Bit 1 ..... "1",  ""         ""    a izquierda.
+;														;	Bit 2 ..... "1",  ""    disparo.    
 
 Ctrl_1 db 0 											; Byte de control de propósito general.
 
@@ -366,7 +369,7 @@ RND_SP defw Numeros_aleatorios							; Puntero que se irá desplazando por el SE
 Clock_next_entity defw 0								; Transcurrido este tiempo aparece una nueva entidad.
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
-;Disparo_Amadeus db 1									; A "1", se puede generar disparo.
+Disparo_Amadeus db 1									; A "1", se puede generar disparo.
 ;CLOCK_repone_disparo_Amadeus_BACKUP db 30				; Restaura (CLOCK_repone_disparo_Amadeus). 
 ;CLOCK_repone_disparo_Amadeus db 30 						; Reloj, decreciente.
 
@@ -391,9 +394,6 @@ Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos
 START 
 
 	ld sp,0												; Situamos el inicio de Stack.
-;	ld a,$a9 											; Habilitamos el modo 2 de interrupciones y fijamos el salto a $a9ff
-;	ld i,a 												; Byte alto de la dirección donde se encuentra nuestro vector de interrupciones en el registro I. ($a9). El byte bajo será siempre $ff.
-;	IM 2 											    ; Habilitamos el modo 2 de INTERRUPCIONES.
 	DI 													 										 
 
 ; Desactivamos las variables REPDEL y REPPER de la rutina del teclado de la ROM. Vamos a utilizar esta rutina para controlar a Amadeus y necesitamos precisión sin delays.
@@ -530,6 +530,7 @@ Main
 ;														; _un 2º bloque.
 	pop iy
 
+	call Teclado
 	call Actualiza_pantalla								; Lo 1º que hacemos es actualizar la pantalla. BORRA/PINTA.
 
 	ld hl,(Clock_next_entity)
@@ -799,8 +800,8 @@ Main
 
 ; Existe movimiento???, Disparamos???, Pausamos el juego??? 
 
-16 ld hl,FLAGS
-	bit 5,(hl)
+16 ld a,(Mov_FLAGS)
+	and a
 	call nz,Mov_Amadeus
 
 	ld hl,(Album_de_borrado)
@@ -810,9 +811,6 @@ Main
 	set 0,(hl) 											; Indica Frame completo. 
 	res 3,(hl)
 	res 4,(hl)
-
-	ld hl,FLAGS
-	res 5,(hl)
 
 	xor a
 	out ($fe),a
@@ -1030,9 +1028,9 @@ Mov_Amadeus
 
 ;	Generamos disparo ???
 
-	ld a,(LAST_K)
-	cp $35
-	jr z,$
+	ld hl,Mov_FLAGS
+	bit 2,(hl)
+	jr nz,$
 
 ; 	Si no se produce disparo, se produce movimiento.
 ;	Cambio de cromos.	
@@ -1044,21 +1042,22 @@ Mov_Amadeus
 
 ;	Movemos a izquierda ???
 
-	ld a,(LAST_K)
-	cp $31
-	call z,Amadeus_a_izquierda	
+	ld hl,Mov_FLAGS
+	bit 1,(hl)
+	call nz,Amadeus_a_izquierda	
 
 ;	Movemos a derecha ???
 
-	ld a,(LAST_K)
-	cp $32
-	call z,Amadeus_a_derecha	
-
-;	Inicializamos (LAST_K)
+	ld hl,Mov_FLAGS
+	bit 0,(hl)
+	call nz,Amadeus_a_derecha	
 
 	call Genera_datos_de_impresion_Amadeus
 
+;	Inicializamos (Mov_FLAGS).
+
 	xor a
+	ld (Mov_FLAGS),a
 	ld (LAST_K),a
 
 	ret
@@ -2068,22 +2067,49 @@ Pintando_Amadeus
 	out ($fe),a
 
 	ret									 
+
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
-;	5/3/23
+;	19/6/24
 ;
-;	En 1er lugar detectamos disparo (5), seguido de los movimientos a izq. / derecha.
+	
+Teclado
 
-;Movimiento_Amadeus 
+;	Tenemos una lectura correcta del teclado??, sólo una tecla pulsada??.
+;	Si es así, codificamos el movimiento en (Mov_FLAGS).
 
-; Disparo.
+;	Bit 0 ..... "1", Existe movimiento a derecha.
+;	Bit 1 ..... "1",  ""         ""    a izquierda.
+;	Bit 2 ..... "1",  ""    disparo.    
 
-;	ld a,(Disparo_Amadeus)
-;	and a
-;	jr nz,1F
-;	jr 2F
+	ld a,(LAST_K)
+	and a
+	jr z,Examina_disparo
 
-;1 ld a,$f7													; "5" para disparar.
+	ld hl,Mov_FLAGS
+	cp $35
+	jr nz,1F
+
+	set 2,(hl)													; Indica disparo.
+	ret
+
+1 cp $32
+	jr nz,2F
+
+	set 0,(hl)													; Indica derecha.
+	ret
+
+2 cp $31
+	ret nz
+
+	set 1,(hl)													; Indica izquierda.
+	ret	
+
+Examina_disparo ld a,(Disparo_Amadeus)
+;	dec a
+;	jr nz,2F
+
+;	ld a,$f7													; "5" para disparar.
 ;	in a,($fe)
 ;	and $10
 
@@ -2095,6 +2121,7 @@ Pintando_Amadeus
 ;	ld a,(Disparo_Amadeus)
 ;	xor 1
 ;	ld (Disparo_Amadeus),a
+
 ;2 ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
 ;	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
 ;	and $01													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $01 resulta "0"  llama a la rutina "Mov_izq".
@@ -2109,7 +2136,7 @@ Pintando_Amadeus
 ;	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
 ;	and $02													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $02 resulta "0"  llama a la rutina "Mov_der".
 ;	call z,Amadeus_a_derecha
-;	ret	
+	ret	
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
