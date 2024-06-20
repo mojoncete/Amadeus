@@ -783,11 +783,12 @@ Amadeus_a_izquierda
 	dec hl		
 	ld (Pamm_Amadeus),hl					;	Actualiza variable de 8 bits.
 
+	ld hl,Ctrl_3
+	set 5,(hl)
+
 	ret
 
 1 inc (hl)                                  ; 	Salimos. Damos orden de no imprimir la nave. No habrá movimiento.
-	ld hl,Ctrl_3
-	res 5,(hl)
 	ret
 
 
@@ -808,9 +809,9 @@ Amadeus_a_derecha
 	inc hl		
 	ld (Pamm_Amadeus),hl					;	Actualiza variable de 8 bits.
 
+	ld hl,Ctrl_3
+	set 5,(hl)
 	ret
 
-1 dec (hl)									; 	Salimos. Damos orden de no imprimir la nave. No habrá movimiento.
-	ld hl,Ctrl_3
-	res 5,(hl)
+1 dec (hl)									; 	Salimos. No hay movimiento. No pintamos la nave.
 	ret

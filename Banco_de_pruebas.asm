@@ -2,6 +2,46 @@
 
 	DEVICE ZXSPECTRUM48
 
+;	IM_2 *************************************************************************************************************************************************************************
+;
+;	20/6/24
+
+	org $a9ff
+
+	defw $aa01
+
+;	Incrementa FRAMES. (ROM).
+
+	push af
+	push hl
+
+	ld hl,(FRAMES)
+	inc hl
+	ld (FRAMES),hl
+
+	ld a,h
+	or l
+	jr nz,1F
+
+	ld hl,FRAMES_3
+	inc (hl)
+
+1 push de
+	push bc
+
+	call Actualiza_pantalla
+
+	pop bc
+	pop de
+	pop hl
+	pop af
+
+	ei
+
+	ret
+
+; --------------------------------------------------------------------------------
+
 	include "Sprites_e_indices.asm"
 	include "Cajas_y_disparos.asm"
 	include "Patrones_de_mov.asm"
@@ -20,9 +60,7 @@
 ;Variables ROM. FRAMES y KEYBOARD. Rutina Interrupción mascarable $0038.
 
 FRAMES equ $5c78										; Variable de 24 bits. Almacena el nº de cuadros, (frames) que llevamos construidos. Reloj en tiempo real.
-LAST_K equ $5c08										; Última tecla pulsada.
-FLAGS equ $5c3b											; Bit 5 indica "Pulsación aceptada".
-REPDEL equ $5c09										; Temporización. Repetición de tecla, (tecla pulsada).
+FRAMES_3 equ $5c7a
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -239,10 +277,6 @@ Cola_de_desplazamiento db 0								; Este byte indica:
 ;														;				Nunca vamos a saltar a la siguiente cadena de movimiento del índice,_	
 ;														;				,_ (si es que la hay). Volvemos a inicializar (Puntero_mov) con (Puntero_indice_mov).	
 
-Mov_FLAGS db 0											;	Bit 0 ..... "1", Existe movimiento a derecha.
-;														;	Bit 1 ..... "1",  ""         ""    a izquierda.
-;														;	Bit 2 ..... "1",  ""    disparo.    
-
 Ctrl_1 db 0 											; Byte de control de propósito general.
 
 ;														DESCRIPCIÓN:
@@ -385,8 +419,7 @@ Nivel db 0												; Nivel actual del juego.
 Puntero_indice_NIVELES defw 0
 Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos bytes_
 ; 														; _ que definen el NIVEL.
-; Y todo comienza aquí .....
-;
+
 ; 	INICIO  *************************************************************************************************************************************************************************
 ;
 ;	5/1/24
@@ -394,15 +427,10 @@ Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos
 START 
 
 	ld sp,0												; Situamos el inicio de Stack.
-	DI 													 										 
-
-; Desactivamos las variables REPDEL y REPPER de la rutina del teclado de la ROM. Vamos a utilizar esta rutina para controlar a Amadeus y necesitamos precisión sin delays.
-
-	ld a,1
-	ld hl,REPDEL
-	ld (hl),a
-	inc hl
-	ld (hl),a
+	ld a,$a9 											; Habilitamos el modo 2 de interrupciones y fijamos el salto a $a9ff
+	ld i,a 												; Byte alto de la dirección donde se encuentra nuestro vector de interrupciones en el registro I. ($a9). El byte bajo será siempre $ff.
+	IM 2 											    ; Habilitamos el modo 2 de INTERRUPCIONES.
+	DI 					
 
 ; Limpiamos pantalla.
 
@@ -510,8 +538,6 @@ START
 	set 2,(hl)
 	set 5,(hl)											; Imprimimos Amadeus.
 
-	push iy
-	ld iy,$5c3a 										; La IM1 utiliza el registro IY para modificar variables de teclado.
 	ei 													; Ha de apuntar a $5c3a.
 
 	halt 
@@ -528,10 +554,10 @@ Main
 ;														; Todas las entidades contenidas en un "bloque", (7 cajas), se inicializan en [START].
 ;														; Si (Numero_de_entidades) > "7", cuando el bloque de 7 cajas esté a "0" se inicializará _;		
 ;														; _un 2º bloque.
-	pop iy
+;	pop iy
 
-	call Teclado
-	call Actualiza_pantalla								; Lo 1º que hacemos es actualizar la pantalla. BORRA/PINTA.
+;	call Teclado
+;	call Actualiza_pantalla								; Lo 1º que hacemos es actualizar la pantalla. BORRA/PINTA.
 
 	ld hl,(Clock_next_entity)
 	ld bc,(FRAMES)
@@ -765,7 +791,7 @@ Main
 	call Genera_coordenadas
 
 ;	ld hl,Ctrl_0
-;    res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
+;   res 4,(hl)																; Inicializamos el FLAG de movimiento de la entidad.
 
 17 call Store_Restore_cajas
 
@@ -800,9 +826,18 @@ Main
 
 ; Existe movimiento???, Disparamos???, Pausamos el juego??? 
 
-16 ld a,(Mov_FLAGS)
-	and a
-	call nz,Mov_Amadeus
+16 call Teclado
+
+	ld hl,Ctrl_3
+	bit 5,(hl)
+	jr z,End_frame
+
+; Existe movimiento de Amadeus, Cambiamos álmub vorrado-pintado y generamos los datos de impresión.
+
+	call Change_Amadeus
+	call Genera_datos_de_impresion_Amadeus
+
+End_frame 
 
 	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
@@ -815,9 +850,7 @@ Main
 	xor a
 	out ($fe),a
 
-	push iy
-	ld iy,$5c3a 										; La IM1 utiliza el registro IY para modificar variables de teclado.
-	halt												; Ha de apuntar a $5c3a.
+	halt												
 
 ; ----------------------------------------
 
@@ -1019,48 +1052,6 @@ Main
 ;	call Limpia_Variables_de_borrado
 
 ;3 ret													
-
-; --------------------------------------------------------------------------------------------------------------
-;
-;	16/6/24
-
-Mov_Amadeus 
-
-;	Generamos disparo ???
-
-	ld hl,Mov_FLAGS
-	bit 2,(hl)
-	jr nz,$
-
-; 	Si no se produce disparo, se produce movimiento.
-;	Cambio de cromos.	
-
-	ld hl,Ctrl_3
-	set 5,(hl)
-
-	call Change_Amadeus
-
-;	Movemos a izquierda ???
-
-	ld hl,Mov_FLAGS
-	bit 1,(hl)
-	call nz,Amadeus_a_izquierda	
-
-;	Movemos a derecha ???
-
-	ld hl,Mov_FLAGS
-	bit 0,(hl)
-	call nz,Amadeus_a_derecha	
-
-	call Genera_datos_de_impresion_Amadeus
-
-;	Inicializamos (Mov_FLAGS).
-
-	xor a
-	ld (Mov_FLAGS),a
-	ld (LAST_K),a
-
-	ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -1502,7 +1493,6 @@ Guarda_movimiento_masticado
 	ld (Stack),sp
 	ld sp,(Puntero_de_almacen_de_mov_masticados)			; Guardamos el movimiento masticado en el almacén.
 
-;	push hl
     push ix 												; Pushea el Puntero_de_impresión, (1er scanline).
     push iy 												; Pushea Puntero_objeto.
  
@@ -1743,40 +1733,6 @@ Inicia_punteros_de_cajas
 ;	ld (Puntero_DESPLZ_DISPARO_AMADEUS),hl
 ;	ret
 
-; -------------------------------------------------------------------------------------------------------------
-;
-; 21/9/23 
-;
-
-; Scanlines_album_Amadeus equ $72a0 ; (72a0h - 72ach).
-
-;;Limpia_album_Amadeus 
-;
-;;	ld hl,Scanlines_album_Amadeus
-;;	ld a,(hl)
-;;	and a
-;;	ret z
-
-;;	ld hl,Scanlines_album_Amadeus;
-;;	ld de,Scanlines_album_Amadeus+1
-;;	ld bc,11
-;;	xor a
-;;	ld (hl),a
-;;	ldir
-
-;;	ld hl,Scanlines_album_Amadeus
-;;	ld (End_Snapshot_Amadeus),hl
-
-;;	ret
-
-;Limpia_Variables_de_borrado ld hl,Variables_de_borrado 
-;	ld de,Variables_de_borrado+1
-;	ld bc,5
-;	xor a
-;	ld (hl),a
-;	ldir
-;	ret
-
 ; *************************************************************************************************************************************************************
 ;
 ; 20/10/22
@@ -1889,44 +1845,6 @@ Incrementa_punteros_de_cajas
     call Extrae_address
     ld (Puntero_restore_caja),hl
     ret
-
-; **************************************************************************************************
-;
-;	21/12/23
-;
-;	Restore_Amadeus
-;
-;	Cargamos en DRAW los parámetros de Amadeus.
-;	
-
-;Restore_Amadeus	push hl 
-;	push de
-; 	push bc
-;	ld hl,Amadeus_db									; Cargamos en DRAW los parámetros de Amadeus.
-;	ld de,Bandeja_DRAW
-;	ld bc,42
-;	ldir
-;	pop bc
-;	pop de
-;	pop hl
-;	ret
-
-; *************************************************************************************************************************************************************
-;
-;	21/12/23
-;
-;	Store_Amadeus
-;
-;	Almacena los datos de la entidad alojada en DRAW, (incl. Amadeus), en su respectiva base de datos.
-;	
-;	INPUT: DE contiene la dirección del 1er byte de la base de datos donde vamos a guardar los datos de la entidad.
-;
-;	DESTRUYE: HL y BC y DE.
-
-;Store_Amadeus ld hl,Bandeja_DRAW											; Cargamos en DRAW los parámetros de Amadeus.
-;	ld bc,42
-;	ldir
-;	ret
 
 ; -----------------------------------------------------------
 ;
@@ -2075,67 +1993,45 @@ Pintando_Amadeus
 	
 Teclado
 
-;	Tenemos una lectura correcta del teclado??, sólo una tecla pulsada??.
-;	Si es así, codificamos el movimiento en (Mov_FLAGS).
+; Examina_disparo 
 
-;	Bit 0 ..... "1", Existe movimiento a derecha.
-;	Bit 1 ..... "1",  ""         ""    a izquierda.
-;	Bit 2 ..... "1",  ""    disparo.    
-
-	ld a,(LAST_K)
-	and a
-	jr z,Examina_disparo
-
-	ld hl,Mov_FLAGS
-	cp $35
+	ld a,(Disparo_Amadeus)
+	dec a
 	jr nz,1F
 
-	set 2,(hl)													; Indica disparo.
-	ret
-
-1 cp $32
-	jr nz,2F
-
-	set 0,(hl)													; Indica derecha.
-	ret
-
-2 cp $31
-	ret nz
-
-	set 1,(hl)													; Indica izquierda.
-	ret	
-
-Examina_disparo ld a,(Disparo_Amadeus)
-;	dec a
-;	jr nz,2F
-
-;	ld a,$f7													; "5" para disparar.
-;	in a,($fe)
-;	and $10
+	ld a,$f7													; "5" para disparar.
+	in a,($fe)
+	and $10
 
 ;	push af
 ;	call z,Genera_disparo
 ;	pop af
-;	jr nz,2F
 
-;	ld a,(Disparo_Amadeus)
-;	xor 1
-;	ld (Disparo_Amadeus),a
+	jr nz,1F
 
-;2 ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
-;	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
-;	and $01													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $01 resulta "0"  llama a la rutina "Mov_izq".
-;    call z,Amadeus_a_izquierda							
+	ld a,(Disparo_Amadeus)
+	xor 1
+	ld (Disparo_Amadeus),a
 
-;	ld a,$f7
-;	in a,($fe)
-;	and $01
-;	ret z
+	di
+	jr $
+	ei
 
-;	ld a,$f7
-;	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
-;	and $02													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $02 resulta "0"  llama a la rutina "Mov_der".
-;	call z,Amadeus_a_derecha
+1 ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
+	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
+	and $01													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $01 resulta "0"  llama a la rutina "Mov_izq".
+    call z,Amadeus_a_izquierda							
+
+	ld a,$f7
+	in a,($fe)
+	and $01
+	ret z
+
+	ld a,$f7
+	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
+	and $02													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $02 resulta "0"  llama a la rutina "Mov_der".
+	call z,Amadeus_a_derecha
+
 	ret	
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2174,8 +2070,6 @@ Examina_disparo ld a,(Disparo_Amadeus)
 	include "Draw_XOR.asm"
 	include "Direcciones.asm"
 	include "Movimiento.asm"
-
-
 ;	include "Disparo.asm"
 
 
