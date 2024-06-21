@@ -15,6 +15,12 @@
 	push af
 	push hl
 
+; -------------------
+	ld hl,Ctrl_3	;	STOP si no hemos terminado de construir el FRAME.
+	bit 0,(hl)
+	jr z,$
+; -------------------
+
 	ld hl,(FRAMES)
 	inc hl
 	ld (FRAMES),hl
