@@ -236,7 +236,7 @@ Store_Restore_cajas
 	ld de,(Puntero_store_caja) 								
 	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
 
-	call Limpiamos_bandeja_DRAW
+;	call Limpiamos_bandeja_DRAW
 
 ; 	Entidad_sospechosa. 20/4/23
 
@@ -268,14 +268,45 @@ Store_Restore_cajas
 
 ; ---------------------------------------------------------------------
 ;
-;	12/05/24
+;	23/6/24
+;
+;	Limpiamos lo más rápido posible la Bandeja DRAW.
+;
+;	MODIFY: HL
 
-Limpiamos_bandeja_DRAW ld hl,Bandeja_DRAW
-	ld b,37
+Limpiamos_bandeja_DRAW 
+
+	ld (Stack),sp
+	ld sp,Vel_left 
+	
 	xor a
-1 ld (hl),a
-	inc hl 
-	djnz 1B
+	ld h,a
+	ld l,a
+
+	push hl
+	push hl
+	push hl
+	push hl
+	push hl
+	push hl
+	push hl
+	push hl
+	push hl
+	push hl
+	push hl
+	push hl
+	push hl
+	push hl
+	push hl
+	push hl
+	push hl
+	push hl
+
+	inc sp
+
+	push hl
+	ld sp,(Stack)
+
 	ret
 
 ; ---------------------------------------------------------------------
