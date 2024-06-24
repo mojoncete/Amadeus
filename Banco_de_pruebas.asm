@@ -107,18 +107,9 @@ Bandeja_DRAW ; -----------------------------------------------------------------
 Tipo db 0												; Clase de la entidad. Cada `tipo´ de Entidad tiene unas características únicas que lo distinguen de otros tipos: 
 ;															- Patrón de movimiento.
 ;															- Aspecto
-Filas db 0												; Filas. [DRAW]
-Columns db 0 	  										; Nº de columnas. [DRAW]
-Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
-Puntero_objeto defw 0									; Donde están los datos para pintar el Sprite.
 Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
 Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 
-; ---------- ---------- ---------- ---------;      ;--------- ---------- ---------- ---------- 
-
-CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos.
-; 														; El hecho de que este byte sea distinto de "0", indica que se ha modificado el nº de columnas del objeto.
-; 														; Cuando vamos a imprimir un Sprite en pantalla, la rutina de pintado consultará este byte para situar (Puntero_objeto). [Mov_left]. 
 Contador_de_vueltas db 0								; Contador de vueltas de entidades. Inicialmente su valor es "1". El bit se desplaza una posición a la izquierda cada vez que la entidad_
 ;														; _desaparece por la parte baja de la pantalla. Esta variable se utiliza para incrementar el perfil de velocidad de las entidades.
 
@@ -132,33 +123,9 @@ Contador_de_vueltas db 0								; Contador de vueltas de entidades. Inicialmente
 ;	4ª vuelta: 	""	""	""	""	""  ="$10" ---   ""	 ""	  ="4".
 ;	5ª vuelta: 	""	""	""	""	""  ="$20" ---   ""	 ""	  ="8".   
 
-; ---------- ---------- ---------- ---------;      ;--------- ---------- ---------- ---------- 
-
-;	El formato: FBPPPIII (Flash, Brillo, Papel, Tinta).
-;
-;	COLORES: 0 ..... NEGRO
-;    		 1 ..... AZUL
-; 			 2 ..... ROJO
-;			 3 ..... MAGENTA
-; 			 4 ..... VERDE
-; 			 5 ..... CIAN
-;			 6 ..... AMARILLO
-; 			 7 ..... BLANCO
-
-Indice_Sprite_der defw 0
-Indice_Sprite_izq defw 0
-Puntero_DESPLZ_der defw 0
-Puntero_DESPLZ_izq defw 0
-
-Posicion_inicio defw 0									; Dirección de pantalla donde aparece el objeto. [DRAW].
-Cuad_objeto db 0										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
-
-; Variables de objeto. (Características).
-
 Impacto db 0											; Si después del movimiento de la entidad, (Impacto) se coloca a "1",_
 ;														; _ existen muchas posibilidades de que esta entidad haya colisionado con Amadeus. 
 ; 														; Hay que comprobar la posible colisión después de mover Amadeus. En este caso, (Impacto2)="3".
-; Variables_de_borrado ds 6 							
 
 Puntero_de_impresion defw 0								; Contiene el puntero de impresión, (calculado por DRAW). Esta dirección la utilizará la rutina_
 ;														; _ [Guarda_coordenadas_X] y [Compara_coordenadas_X] para detectar la colisión ENTIDAD-AMADEUS.
@@ -199,15 +166,6 @@ Ctrl_0 db 0 											; Byte de control. A través de este byte de control. Las
 ; 															   _ Utilizo la información que proporciona este BIT para modificar (CTRL_DESPLZ) si el siguiente movimiento_
 ; 															   _ se va a producir a la izquierda. "1" DERECHA - "0" IZQUIERDA.
 
-; Variables de funcionamiento. [DRAW].
-
-Columnas db 0
-Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado en función del tamaño del Sprite. Si el objeto llega a esta línea se modifica_    
-; 														; _(Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
-Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta columna se modifica (Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
-
-; variables de control general.
-
 Ctrl_2 db 0 											
 ;														BIT 0, Los sprites se inician con un `sprite vacío', (sprite formado por "ceros"), cuando la rutina_
 ;															_ [Genera_datos_de_impresion] guarda su 1ª imagen.
@@ -231,11 +189,55 @@ Velocidad db 0 											; 5 vueltas max. 5 vueltas       1 - 0 (1ª vuelta - v
 ;																						 8 - 2 (4ª vuelta - velocidad 2)
 ;																					   $10 - 4 (5ª vuelta - velocidad 3) 																		
 
+; ----- ----- De aquí para arriba son los datos que se trasfieren a las cajas de entidades. ¡¡¡¡¡
+
+Filas db 0												; Filas. [DRAW]
+Columns db 0 	  										; Nº de columnas. [DRAW]
+Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
+Puntero_objeto defw 0									; Donde están los datos para pintar el Sprite.
+
+; ---------- ---------- ---------- ---------;      ;--------- ---------- ---------- ---------- 
+
+CTRL_DESPLZ db 0										; Este byte nos indica la posición que tiene el Sprite dentro del mapa de desplazamientos.
+; 														; El hecho de que este byte sea distinto de "0", indica que se ha modificado el nº de columnas del objeto.
+; 														; Cuando vamos a imprimir un Sprite en pantalla, la rutina de pintado consultará este byte para situar (Puntero_objeto). [Mov_left]. 
+
+; ---------- ---------- ---------- ---------;      ;--------- ---------- ---------- ---------- 
+
+;	El formato: FBPPPIII (Flash, Brillo, Papel, Tinta).
+;
+;	COLORES: 0 ..... NEGRO
+;    		 1 ..... AZUL
+; 			 2 ..... ROJO
+;			 3 ..... MAGENTA
+; 			 4 ..... VERDE
+; 			 5 ..... CIAN
+;			 6 ..... AMARILLO
+; 			 7 ..... BLANCO
+
+Indice_Sprite_der defw 0
+Indice_Sprite_izq defw 0
+Puntero_DESPLZ_der defw 0
+Puntero_DESPLZ_izq defw 0
+
+Posicion_inicio defw 0									; Dirección de pantalla donde aparece el objeto. [DRAW].
+Cuad_objeto db 0										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+
+; Variables de objeto. (Características).
+
+; Variables_de_borrado ds 6 							
+
+
+; Variables de funcionamiento. [DRAW].
+
+Columnas db 0
+Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado en función del tamaño del Sprite. Si el objeto llega a esta línea se modifica_    
+; 														; _(Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
+Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta columna se modifica (Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
+
+; variables de control general.
+
 Frames_explosion db 0 									; Nº de Frames que tiene la explosión.
-
-; ----- ----- De aquí para arriba son datos que hemos de guardar en los almacenes de entidades.
-
-;					         		---------;      ;---------
 
 ; Variables de funcionamiento, (No incluidas en base de datos de entidades), a partir de aquí!!!!!
 
@@ -1809,30 +1811,42 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 
 Restore_entidad 
 
-	ld hl,(Puntero_store_caja)						
-	ld de,Bandeja_DRAW
-	ld a,(hl)
-	ld (de),a
-	inc hl 											; (Tipo).
+;	ld hl,(Puntero_store_caja)						; 369 t/states.
+;	ld de,Bandeja_DRAW
+;	ld a,(hl)
+;	ld (de),a
+;	inc hl 											; (Tipo).
 
-	ld de,Coordenada_X								; Nos situamos en (Coordenada_X) de la bandeja DRAW. 										
-	ld bc,2
-	ldir 											; Hemos transferido (Coordenada_X) y (Coordenada_Y) a la bandeja.
+;	ld de,Coordenada_X								; Nos situamos en (Coordenada_X) de la bandeja DRAW. 										
+;	ld bc,2
+;	ldir 											; Hemos transferido (Coordenada_X) y (Coordenada_Y) a la bandeja.
 
-	inc de
-	ld a,(hl)
-	ld (de),a 										; Transferimos (Contador_de_vueltas).
-	inc hl
+;	inc de
+;	ld a,(hl)
+;	ld (de),a 										; Transferimos (Contador_de_vueltas).
+;	inc hl
 
-	ld de,Impacto
-	ld bc,8
-	ldir 											; Transferimos (Impacto), (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados),_
+;	ld de,Impacto
+;	ld bc,8
+;	ldir 											; Transferimos (Impacto), (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados),_
 ; 													; _ (Contador_de_mov_masticados) y (Ctrl_0).	
-	ld de,Ctrl_2
-	ld bc,2
-	ldir											; Transferimos (Ctrl_2) y (Velocidad).
+;	ld de,Ctrl_2
+;	ld bc,2
+;	ldir											; Transferimos (Ctrl_2) y (Velocidad).
 
-	ret
+;	ret
+
+; --------------------------------------------------------------------------------------------------------------------------------------------
+
+	di
+	jr $
+	ei
+
+	ld (Stack),sp
+
+	ld sp,(Puntero_store_caja)
+	ld de,Bandeja_DRAW
+	pop hl
 
 ; **************************************************************************************************
 ;
