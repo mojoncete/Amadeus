@@ -35,9 +35,6 @@ Genera_disparo
 ;   _ sólo podran generar disparo cuando (CTRL_DESPLZ) tenga los valores, $00, $f9, $fb y $fd.
 ;   IY contendrá la dirección de Puntero_objeto_disparo. 
 
-    di
-    jr $
-    ei
 
 ; Exclusiones:
 
