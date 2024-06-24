@@ -543,7 +543,7 @@ Situa_en_datos_de_definicion and a
 
 ; ----------------------------------------------------------------------------------------------------------
 ;
-;	12/05/24
+;	24/6/24
 ;
 ;	Introduce una definición de entidad en la bandeja DRAW para generar los "movimientos masticados" de este tipo_
 ;	_ de entidad.
@@ -557,70 +557,42 @@ Situa_en_datos_de_definicion and a
 Definicion_de_entidad_a_bandeja_DRAW 	
 
 	ld de,Bandeja_DRAW	 						; DE apunta al 1er .db de la bandeja_DRAW, (Tipo).
-	ld bc,3
-	ldir 										; Hemos volcado (Tipo), (Filas) y (Columns).
-;												; HL, (origen), apunta ahora al .db (attr.), hay que situar DE.
-	ld de,Contador_de_vueltas					; DE en (Attr).
-	ld bc,5
+	ld a,(hl) 									; Volcamos Tipo.
+	ld (de),a
+	inc hl
+;												
+	ld de,Filas									; Volcamos (Filas) y (Columns).
+	ld bc,2
 	ldir										; Hemos volcado (Contador_de_vueltas), (Indice_Sprite_der) y (Indice_Sprite_izq).
 ;												; HL, (origen), apunta ahora al .db (Posicion_inicio), hay que situar DE.
-	ld de,Posicion_inicio 
-	ld bc,3
-	ldir										; Hemos volcado (Posicion_inicio) y (Cuad_objeto).
-;												; HL, (origen), apunta ahora al .db (Puntero_de_almacen_de_mov_masticados), hay que situar DE.
-	ld de,Puntero_de_almacen_de_mov_masticados
-	ld bc,2
+	ld de,Contador_de_vueltas 
+	ld a,(hl)
+	ld (de),a
+	inc hl										; Hemos volcado (Posicion_inicio) y (Cuad_objeto).
+
+	ld de,Indice_Sprite_der
+	ld bc,4
 	ldir 										; Hemos volcado (Puntero_de_almacen_de_mov_masticados).
 
-	ld de,Frames_explosion
-	ld a,3 										; 3 FRAMES de explosión.!!!!!!!!!!!!!!
-	ld (de),a 									; Vuelco (Frames_explosion).
+	ld de,Posicion_inicio
+	ld bc,3									; 3 FRAMES de explosión.!!!!!!!!!!!!!!
+	ldir 									; Vuelco (Frames_explosion).
+
+	ld de,Puntero_de_almacen_de_mov_masticados
+	ld bc,2
+	ldir
 
 	ret
 
 ; ----------------------------------------------------------------------------------------------------------
 ;
-;	12/5/24
+;	24/6/24
 ;
-;	Guarda la definición que ha generado los movimientos masticados de este tipo de entidad en su correspondiente caja.
-;	
-;	Las cajas contienen entidades iniciadas:
-;
-;	Disponen de un (Puntero_de_impresión), (Coordenadas X e Y), ...
-;
-;	INPUT:  DE debe contener la dirección del 1er byte de almacenamiento de la caja correspondiente:  
-;				
-;			- (Puntero_store_caja).
-;			_ Amadeus_BOX.
-
-;	OUTPUT: HL apunta al .db (Frames_explosion) de la bandeja DRAW.
-;			DE apunta al 1er .db (Tipo) de la siguiente caja de entidades.
-; 
-;	MODIFICA: HL,DE y BC
 
 Parametros_de_bandeja_DRAW_a_caja 
 
 	ld hl,Bandeja_DRAW
-	ld a,(hl)
-	ld (de),a
-	inc de 													; (Tipo).
-
-	ld hl,Coordenada_X										; HL situado en (Coordenada_X) de la bandeja DRAW.
-	ld bc,2
-	ldir 													; Hemos volcado (Coordenada_X) y (Coordenada_y).
-;															; DE apunta ahora a (Contador_de_vueltas) de la caja de entidades. Hemos de recolocar HL.
-	inc hl
-	ld a,(hl)			 									; HL, situado ahora correctamente: (Contador_de_vueltas).
-	ld (de),a
-	inc de 													; DE apunta a (Impacto), situamos HL.
-
-	ld hl,Impacto
-	ld bc,8
-	ldir													; Hemos volcado (Impacto), (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados), _
-; 															; _ (Contador_de_mov_masticados) y (Ctrl_0).	
-;															; HL apunta ahora a (Columnas).
-	ld hl,Ctrl_2 											
-	ld bc,2
+	ld bc,14
 	ldir													; Hemos volcado (Ctrl_2) y (Velocidad). 
 
 	ret

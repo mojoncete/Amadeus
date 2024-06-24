@@ -783,7 +783,21 @@ Main
 
 	call Ajusta_velocidad_entidad								; Ajusta el perfil de velocidad de la entidad en función de (Contader_de_vueltas).
 	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
-	call Genera_datos_de_impresion
+
+; Posible contacto de entidad con Amadeus. 
+
+	ld a,(Coordenada_y)
+	cp $14
+	jr c,27F
+	
+	di
+	jr $
+	ei
+	
+
+
+
+27 call Genera_datos_de_impresion
 ;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
 ;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
 ;																; La rutina [Genera_datos_de_impresion] activa las interrupciones antes del RET.
@@ -1576,83 +1590,6 @@ Cargamos_registros_con_mov_masticado_Amadeus
 	ld sp,(Stack)
 	ret
 
-; --------------------------------------------------------------------------------------------------------------
-;
-;	28/12/23
-;
-;	(Guardo la foto de la entidad ejecutando DRAW, pues ha habido movimiento del Sprite y una posible_
-;   _recolocación. Guarda la IMÁGEN DE LA ENTIDAD A PINTAR. 
-
-Guarda_foto_entidad_a_pintar 
-
-	ld a,(Ctrl_0)
-	bit 6,a
-	jr z,5F
-
-;	Guarda la foto de Amadeus.
-
-;	call Draw
-;	call Guarda_movimiento_masticado	;! Provisional
-	call Genera_datos_de_impresion
-	ret
-
-; ENTIDADES!
-; Está lleno el {Almacen_de_movimientos_masticados_Entidad_1}. ?
-
-5 ld a,(Ctrl_3)
-	bit 3,a
-	jr z,1F
-	
-; {Almacen_de_movimientos_masticados_Entidad_1} lleno. Se trata de una "ENTIDAD_FANTASMA".
-
-4
-;	call Prepara_registros_con_mov_masticados	; (Tb Genera_datos_de_impresion).
-	ret
-
-; Hemos completado el último movimiento del patrón de movimientos ???, se ha aplicado REINICIO ???
-
-1 ld a,(Ctrl_3)
-	bit 2,a
-	jr nz,6F
-
-; Entidad guía o fantasma ???
-
-	ld a,(Ctrl_2)
-	bit 5,a
-	jr nz,3F
-
-; ENTIDAD_FANTASMA, preparo los "movimientos_masticados" y guardo_foto.
-
-	jr 4B
-
-; ENTIDAD_GUÍA:
-; Se acaba de llenar el almacén ???. Si no es así seguimos ejecutando [DRAW] y continuaremos_
-; _guardando "movimientos_masticados". 
-
-2 ld a,(Ctrl_3)
-	bit 2,a
-	jr z,3F
-
-; Hemos completado todos los movimientos masticados. Se trata de una "Entidad_fantasma" recién creada.
-; Vamos a `generar el último "movimiento_masticado". A partir de este momento esta "Entidad_fantasma", (recién creada), pasa a guardar fotos de movimientos masticaditos.
-
-6 res 2,a
-	set 3,a
-	ld (Ctrl_3),a
-
-
-;	Esto sólo lo ejecuta una entidad guía.
-
-3 	call Draw 											
-	call Guarda_movimiento_masticado
-	call Genera_datos_de_impresion							; Hemos modificado (Scanlines_album_SP), +6.
-
-; Este ha sido el último "movimiento_masticado" que hemos guardado ???
-; Si es así, hemos de reinicializar el (Puntero_de_mov_masticados) y el (Contador_de_mov_masticados) de la entidad.
-
-;	call Convierte_guia_en_fantasma
-	ret	
-
 ; ---------------------------------------------------------------------------------------------------------------------
 ;
 ;	18/6/24
@@ -1805,48 +1742,17 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 
 ; **************************************************************************************************
 ;
-;	12/5/24
+;	24/6/24
 ;
 ;	Cargamos los datos de la caja de entidades señalada por el puntero (Puntero_store_caja) a la BANDEJA_DRAW.
 
 Restore_entidad 
 
-;	ld hl,(Puntero_store_caja)						; 369 t/states.
-;	ld de,Bandeja_DRAW
-;	ld a,(hl)
-;	ld (de),a
-;	inc hl 											; (Tipo).
-
-;	ld de,Coordenada_X								; Nos situamos en (Coordenada_X) de la bandeja DRAW. 										
-;	ld bc,2
-;	ldir 											; Hemos transferido (Coordenada_X) y (Coordenada_Y) a la bandeja.
-
-;	inc de
-;	ld a,(hl)
-;	ld (de),a 										; Transferimos (Contador_de_vueltas).
-;	inc hl
-
-;	ld de,Impacto
-;	ld bc,8
-;	ldir 											; Transferimos (Impacto), (Puntero_de_impresion), (Puntero_de_almacen_de_mov_masticados),_
-; 													; _ (Contador_de_mov_masticados) y (Ctrl_0).	
-;	ld de,Ctrl_2
-;	ld bc,2
-;	ldir											; Transferimos (Ctrl_2) y (Velocidad).
-
-;	ret
-
-; --------------------------------------------------------------------------------------------------------------------------------------------
-
-	di
-	jr $
-	ei
-
-	ld (Stack),sp
-
-	ld sp,(Puntero_store_caja)
+	ld hl,(Puntero_store_caja)						; 369 t/states.
 	ld de,Bandeja_DRAW
-	pop hl
+	ld bc,14
+	ldir											; Transferimos (Ctrl_2) y (Velocidad).
+	ret
 
 ; **************************************************************************************************
 ;
