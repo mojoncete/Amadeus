@@ -384,7 +384,7 @@ Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una únic
 ;Numero_de_disparotes db 0	
 ;Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
 ;Puntero_DESPLZ_DISPARO_AMADEUS defw 0
-;Impacto2 db 0											; Este byte indica que se ha producido impacto:
+Impacto2 db 0											; Este byte indica que se ha producido impacto:
 ; 														; (Impacto)="1". El impacto se produce en una entidad.
 ;														; (Impacto)="2". El impacto se produce en Amadeus.
 ;Entidad_sospechosa_de_colision defw 0					; Almacena la dirección de memoria donde se encuentra el .db_
@@ -570,7 +570,7 @@ Main
 	ld bc,(FRAMES)
 	and a
 	sbc hl,bc
-	jr nz,11F
+	jr nz,13F
 
 ; Si aún quedan entidades por aparecer del bloque de entidades, (7 cajas), incrementaremos (Entidades_en_curso) y calcularemos_ 
 ; _ (Clock_next_entity) para la siguiente entidad.
@@ -579,8 +579,8 @@ Main
 	ld b,a
 	ld a,(Entidades_en_curso)
 	cp b
-	jr z,11F
-	jr nc,11F
+	jr z,13F
+	jr nc,13F
 
 	inc a
 	ld (Entidades_en_curso),a
@@ -611,6 +611,13 @@ Main
 ; Bit 0 a "1" Impacto en entidad por disparo. ($01)
 ; Bit 1 a "1" Impacto en Amadeus por disparo. ($02)
 ; Bit 2 a "1" Colisión de Amadeus con entidad, (sin disparo). ($04)
+
+	ld a,(Impacto2)
+	cp 4
+
+	di
+	jr z,$
+	ei
 
 ;	xor a
 ;	ld (Impacto2),a										; Flag (Impacto2) a "0".
@@ -797,13 +804,6 @@ Main
 	ld hl,(Puntero_de_impresion)
 	call Genera_coordenadas
 	call Colision_Entidad_Amadeus
-
-	ld a,(Impacto)
-	and a
-
-	di
-	jr nz,$
-	ei
 
 ;	ld hl,Ctrl_0
 ; 	res 4,(hl)																; Inicializamos el FLAG de movimiento de la entidad.

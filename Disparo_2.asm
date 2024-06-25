@@ -44,9 +44,8 @@ Genera_coordenadas_X
 
     ld a,1                                               ; El .db (Impacto)="1" indica que es altamente probable que esta_
     ld (Impacto),a                                       ; _ entidad colisione con Amadeus, (ha superado, o está en la fila $14) y 
-
-;    ld hl,Impacto2                                      ; _ alguna de las columnas_X que ocupa coinciden con las de Amadeus.
-;    set 2,(hl)
+    ld hl,Impacto2                                      ; _ alguna de las columnas_X que ocupa coinciden con las de Amadeus.
+    set 2,(hl)
 
     ret
 
