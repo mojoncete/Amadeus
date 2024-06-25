@@ -106,7 +106,6 @@ Bandeja_DRAW ; -----------------------------------------------------------------
 
 Tipo db 0												; Clase de la entidad. Cada `tipo´ de Entidad tiene unas características únicas que lo distinguen de otros tipos: 
 ;															- Patrón de movimiento.
-;															- Aspecto
 Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
 Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 
@@ -382,23 +381,23 @@ Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una únic
 
 ; Gestión de Disparos.
 
-Numero_de_disparotes db 0	
-Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
-Puntero_DESPLZ_DISPARO_AMADEUS defw 0
-Impacto2 db 0											; Este byte indica que se ha producido impacto:
+;Numero_de_disparotes db 0	
+;Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
+;Puntero_DESPLZ_DISPARO_AMADEUS defw 0
+;Impacto2 db 0											; Este byte indica que se ha producido impacto:
 ; 														; (Impacto)="1". El impacto se produce en una entidad.
 ;														; (Impacto)="2". El impacto se produce en Amadeus.
-Entidad_sospechosa_de_colision defw 0					; Almacena la dirección de memoria donde se encuentra el .db_
+;Entidad_sospechosa_de_colision defw 0					; Almacena la dirección de memoria donde se encuentra el .db_
 ;														; _(Impacto) de la entidad que ocupa el mismo espacio que Amadeus.
 ;														; Necesitaremos poner a "0" este .db en el caso de que finalmente no se_
 ;														; _produzca colisión.
-Coordenadas_disparo_certero ds 2						; Almacenamos aquí las coordenadas del disparo que ha alcanzado a Amadeus.
+;Coordenadas_disparo_certero ds 2						; Almacenamos aquí las coordenadas del disparo que ha alcanzado a Amadeus.
 ;											            ; (Coordenadas_disparo_certero)=Y ..... (Coordenadas_disparo_certero +1)=X.
-Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posibles columnas_
-;														; _ que puede ocupar el sprite de Amadeus. (Colisión).
 Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 posibles columnas_
 ;														; _ que puede ocupar el sprite de una entidad. (Colisión).
-Velocidad_disparo_entidades db 2	  					; Nº de scanlines, (NextScan) que avanza el disparo de las entidades.
+Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posibles columnas_
+;														; _ que puede ocupar el sprite de Amadeus. (Colisión).
+;Velocidad_disparo_entidades db 2	  					; Nº de scanlines, (NextScan) que avanza el disparo de las entidades.
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -783,16 +782,7 @@ Main
 
 	call Ajusta_velocidad_entidad								; Ajusta el perfil de velocidad de la entidad en función de (Contader_de_vueltas).
 	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
-
-; Posible contacto de entidad con Amadeus. 
-
-	ld a,(Coordenada_y)
-	cp $14
-	jr c,27F
-
-	call Genera_coordenadas_X
-
-27 call Genera_datos_de_impresion
+	call Genera_datos_de_impresion
 ;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
 ;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
 ;																; La rutina [Genera_datos_de_impresion] activa las interrupciones antes del RET.
@@ -806,9 +796,17 @@ Main
 
 	ld hl,(Puntero_de_impresion)
 	call Genera_coordenadas
+	call Colision_Entidad_Amadeus
+
+	ld a,(Impacto)
+	and a
+
+	di
+	jr nz,$
+	ei
 
 ;	ld hl,Ctrl_0
-;   res 4,(hl)																; Inicializamos el FLAG de movimiento de la entidad.
+; 	res 4,(hl)																; Inicializamos el FLAG de movimiento de la entidad.
 
 17 call Store_Restore_cajas
 
