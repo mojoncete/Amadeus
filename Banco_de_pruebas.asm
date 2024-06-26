@@ -387,7 +387,7 @@ Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una únic
 Impacto2 db 0											; Este byte indica que se ha producido impacto:
 ; 														; (Impacto)="1". El impacto se produce en una entidad.
 ;														; (Impacto)="2". El impacto se produce en Amadeus.
-;Entidad_sospechosa_de_colision defw 0					; Almacena la dirección de memoria donde se encuentra el .db_
+Entidad_sospechosa_de_colision defw 0					; Almacena la dirección de memoria donde se encuentra el .db_
 ;														; _(Impacto) de la entidad que ocupa el mismo espacio que Amadeus.
 ;														; Necesitaremos poner a "0" este .db en el caso de que finalmente no se_
 ;														; _produzca colisión.
@@ -554,18 +554,16 @@ Main
 ;
 ; 13/05/24
 
-; Aparece nueva entidad ???
+; En el FRAME que acabamos de pintar puede existir una posible colisión entre alguna entidad y Amadeus. 
+; Si alguna de las coordenadas_X de alguna entidad que esté en zona de Amadeus coincide con alguna de las coordenadas_X de Amadeus, habrá que comprobar si existe colisión.
 
-; 														; (Clock_next_entity) define cuando aparecen las entidades en pantalla.
-;														; Todas las entidades contenidas en un "bloque", (7 cajas), se inicializan en [START].
-;														; Si (Numero_de_entidades) > "7", cuando el bloque de 7 cajas esté a "0" se inicializará _;		
-;														; _un 2º bloque.
-;	pop iy
+	ld a,(Impacto2)	
+	bit 2,a
+	jr z,16F
 
-;	call Teclado
-;	call Actualiza_pantalla								; Lo 1º que hacemos es actualizar la pantalla. BORRA/PINTA.
+	call Detecta_colision_nave_entidad 
 
-	ld hl,(Clock_next_entity)
+16 ld hl,(Clock_next_entity)
 	ld bc,(FRAMES)
 	and a
 	sbc hl,bc
@@ -594,19 +592,6 @@ Main
 ; Habilita disparos.
 
 13 
-
-
-; Posible colisión Entidad-Amadeus ???
-
-;	ld a,(Impacto2)	
-;	bit 2,a
-;	jr z,1F
-
-;	call Detecta_colision_nave_entidad 
-
-
-
-
 
 ;	ld hl,Disparo_Amadeus
 ;	ld de,CLOCK_repone_disparo_Amadeus
@@ -661,7 +646,7 @@ Main
 
 11 ld a,(Entidades_en_curso)
 	and a
-	jr z,16F											; Si no hay entidades en curso saltamos a [Avanza_puntero_de_Scanlines_album_de_entidades].
+	jr z,Gestion_de_Amadeus								; Si no hay entidades en curso saltamos a [Avanza_puntero_de_Scanlines_album_de_entidades].
 	ld b,a												; No hay entidades que gestionar.
 
 ; ( Código que ejecutamos con cada entidad: ).
@@ -840,7 +825,7 @@ Main
 
 	ld a,(Ctrl_3)
 	bit 3,a
-	jr nz,16F
+	jr nz,Gestion_de_Amadeus
 
 	ex de,hl
 	ld (hl),c
@@ -850,15 +835,17 @@ Main
 
 ;! GESTIONA AMADEUS !!!!!!!!!!
 
-; Existe movimiento???, Disparamos???, Pausamos el juego??? 
+Gestion_de_Amadeus
+ 
+; Existe movimiento???, Disparamos???, Pausamos el juego???
 
-16 call Teclado
+	call Teclado
 
 	ld hl,Ctrl_3
 	bit 5,(hl)
 	jr z,End_frame
 
-; Existe movimiento de Amadeus, Cambiamos álmub vorrado-pintado y generamos los datos de impresión.
+; Existe movimiento de Amadeus, Cambiamos álbum borrado-pintado y generamos los datos de impresión.
 
 	call Change_Amadeus
 	call Genera_datos_de_impresion_Amadeus
@@ -1893,18 +1880,6 @@ Pintando_Amadeus
 	dec h
 	jr z,1F
 	call Pinta_Sprites
-
-; Posible colisión Entidad-Amadeus ???
-
-;	ld a,(Impacto2)	
-;	bit 2,a
-;	jr z,1F
-
-;	call Detecta_colision_nave_entidad 
-
-;1 ld a,(Ctrl_3)
-;	bit 0,a
-;	jr z,2F 											; No actualizamos FRAMES si el último cuadro no se completó.
 
 1 ld hl,Ctrl_3
 	res 0,(hl)											; Reinicia el flag de FRAME completo.
