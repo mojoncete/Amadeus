@@ -491,7 +491,6 @@ START
 2 call Amadeus_a_izquierda
 	djnz 2B
 
-
 	call Genera_datos_de_impresion_Amadeus
 
 ;! ---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -596,6 +595,19 @@ Main
 
 13 
 
+
+; Posible colisión Entidad-Amadeus ???
+
+;	ld a,(Impacto2)	
+;	bit 2,a
+;	jr z,1F
+
+;	call Detecta_colision_nave_entidad 
+
+
+
+
+
 ;	ld hl,Disparo_Amadeus
 ;	ld de,CLOCK_repone_disparo_Amadeus
 ;	call Habilita_disparos 								; 30 Frames como mínimo entre cada disparo de Amadeus.
@@ -611,13 +623,6 @@ Main
 ; Bit 0 a "1" Impacto en entidad por disparo. ($01)
 ; Bit 1 a "1" Impacto en Amadeus por disparo. ($02)
 ; Bit 2 a "1" Colisión de Amadeus con entidad, (sin disparo). ($04)
-
-	ld a,(Impacto2)
-	cp 4
-
-	di
-	jr z,$
-	ei
 
 ;	xor a
 ;	ld (Impacto2),a										; Flag (Impacto2) a "0".
@@ -703,11 +708,15 @@ Main
 
 ; Impacto ???
 
-;22 ld a,(Impacto)										 
-;	and a
-;	jr z,8F
+22 ld a,(Impacto)										 
+	and a
+	jr z,8F
 
 ; Hay Impacto en esta entidad.
+
+	di
+	jr $
+	ei
 
 ;	ld hl,Clock_explosion								; _ a gestionar la siguiente entidad, JR 6F.
 ;	dec (hl)
@@ -748,7 +757,9 @@ Main
 ; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
 ; _con las coordenadas de la entidad almacenada en DRAW.
 
-;8 ld a,(Ctrl_1)
+8 
+
+;	ld a,(Ctrl_1)
 ;	bit 2,a
 ;	jr z,7F	
 

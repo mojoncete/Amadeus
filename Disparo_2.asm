@@ -27,8 +27,6 @@ Genera_coordenadas_X
 
 ;    call Limpia_Coordenadas_X
 
-;   Almacenamos coordenadas X.
-
 ;   Almacenamos las coordenadas X de la entidad peligrosa, (en curso).
 
     ld hl,Coordenadas_X_Entidad
@@ -44,8 +42,8 @@ Genera_coordenadas_X
 
     ld a,1                                               ; El .db (Impacto)="1" indica que es altamente probable que esta_
     ld (Impacto),a                                       ; _ entidad colisione con Amadeus, (ha superado, o está en la fila $14) y 
-    ld hl,Impacto2                                      ; _ alguna de las columnas_X que ocupa coinciden con las de Amadeus.
-    set 2,(hl)
+;    ld hl,Impacto2                                       ; _ alguna de las columnas_X que ocupa coinciden con las de Amadeus.
+;    set 2,(hl)
 
     ret
 
