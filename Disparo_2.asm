@@ -109,21 +109,42 @@ Comparando_1 cp b
 
 ; -----------------------------------------------------------------------
 ;
-;   7/12/23
+;   29/06/24
 ;   
 
 Detecta_colision_nave_entidad 
 
-; LLegados a este punto, los datos que contiene DRAW son los de Amadeus.
+; Detección fina filipina de colisión Nave-Entidad.
+
+
+    ld hl,(Pamm_Amadeus)
+    call Extrae_address
+
+    ld de,(p.imp.amadeus)
+    push de
+
+    ld c,16                                        ; Contador de líneas. 16 líneas.
+    ld b,3                                         ; Contador de .db, (bytes). 3 bytes por línea
+
+1 ld a,(de)
+    cpi
+
+    di
+    jr nz,$
+    ei
+
+    inc e
+    djnz 1B                                        ; Hemos compado la línea superior de (Puntero_objeto) de Amadeus con la línea superior del Sprite de nuestra nave en pantalla.
 
     di
     jr $
     ei
 
-    ld iy,(Puntero_objeto)
-    ld hl,(Puntero_de_impresion)
 
-    push hl
+
+    pop de
+    inc d
+
 
 ; ----- ----- -----
     ld e,0                                         ; Indica impacto.

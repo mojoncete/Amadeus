@@ -556,6 +556,7 @@ Main
 
 ; En el FRAME que acabamos de pintar puede existir una posible colisión entre alguna entidad y Amadeus. 
 ; Si alguna de las coordenadas_X de alguna entidad que esté en zona de Amadeus coincide con alguna de las coordenadas_X de Amadeus, habrá que comprobar si existe colisión.
+; Este hecho lo indica el bit2 de (Impacto2).
 
 	ld a,(Impacto2)	
 	bit 2,a
@@ -1575,9 +1576,10 @@ Cargamos_registros_con_mov_masticado
 Cargamos_registros_con_mov_masticado_Amadeus
 
 	ld (Stack),sp
-	ld sp,(Pamm_Amadeus)
+	ld sp,(Pamm_Amadeus)											; (Puntero_de_almacen_de_mov_masticados_Amadeus) en su correspondiente caja.
 	pop de 															; DE contiene Puntero_objeto
 	pop ix 															; IX contiene Puntero_de_impresion
+	ld (p.imp.amadeus),ix											; (Puntero_de_impresion_Amadeus) en su correspondiente caja.									
 	ld sp,(Stack)
 	ret
 
