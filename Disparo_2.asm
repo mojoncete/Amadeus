@@ -42,6 +42,14 @@ Genera_coordenadas_X
 
     ld a,1                                               ; El .db (Impacto)="1" indica que es altamente probable que esta_
     ld (Impacto),a                                       ; _ entidad colisione con Amadeus, (ha superado, o está en la fila $14) y 
+
+    ld hl,(Puntero_store_caja)
+    inc l
+    inc l
+    inc l
+    inc l
+    ld (Entidad_sospechosa_de_colision),hl               ; En caso de que no exista colisión con Amadeus hemos de poner el .db (Impacto) de la (Entidad_sospechosa_de_colision) a "0" más adelante.
+
     ld hl,Impacto2                                       ; _ alguna de las columnas_X que ocupa coinciden con las de Amadeus.
     set 2,(hl)
 
@@ -109,84 +117,51 @@ Comparando_1 cp b
 
 ; -----------------------------------------------------------------------
 ;
-;   29/06/24
+;   02/07/24
 ;   
 
 Detecta_colision_nave_entidad 
 
-; Detección fina filipina de colisión Nave-Entidad.
-
+; Detección byte a byte de colisión ENTIDAD-NAVE.
 
     ld hl,(Pamm_Amadeus)
-    call Extrae_address
+    call Extrae_address                            
+    ld d,h
+    ld e,l                                         ; (Puntero_objeto) en DE.
 
-    ld de,(p.imp.amadeus)
-    push de
+    ld hl,(p.imp.amadeus)                          ; (Puntero_de_impresion) en HL.
+    ld b,17                                        ; Contador de scanlines en B.
+    ld iyl,5                                       ; Contador de impacto. Si su valor es "0" se considera "Colisión". Esto me permitirá ajustar la sensibilidad de la colisión en Amadeus.
 
-    ld c,16                                        ; Contador de líneas. 16 líneas.
-    ld b,3                                         ; Contador de .db, (bytes). 3 bytes por línea
+1 push bc
+    ld b,3
+    push hl
 
-1 ld a,(de)
-    cpi
+3 ld a,(de)
+    cpi                                            ; Comparamos el 1er .db de los tres de ancho que tiene el sprite de Amadeus.
+    jr z,2F
 
-    di
-    jr nz,$
-    ei
+; Impacto.
+    dec iyl
+    jr z,4F
 
-    inc e
-    djnz 1B                                        ; Hemos compado la línea superior de (Puntero_objeto) de Amadeus con la línea superior del Sprite de nuestra nave en pantalla.
+2 inc e
+
+    djnz 3B
+ 
+    pop hl
+    call NextScan
+
+    pop bc
+    djnz 1B                                        
 
     di
     jr $
     ei
 
 
+; Fin de la comparativa.
 
-    pop de
-    inc d
-
-
-; ----- ----- -----
-    ld e,0                                         ; Indica impacto.
-    ld b,10
-2 call Bucle_3                                     ; Comprobamos el 1er scanline.
-    ld a,e
-    cp 5                                           ;! Ajusta sensibilidad del impacto "Amadeus-Entidad".
-    jr c,3F
-
-; LLegados a este punto:
-;
-;   HAY COLISIÓN !!!!!.
-;
-;   .db (Impacto) de Amadeus a "1".
-;   SET el bit3 de (Impacto2).
-;
-;   Nota: El .db (Impacto) de la entidad implicada lo puso a "1" la rutina [Compara_coordenadas_X]. 
-
-    ld hl,Impacto
-    ld (hl),1                                      
-    ld hl,Impacto2                                 ; Cuando se produce Colisión, RES el bit2 de (Impacto2) y_
-    res 2,(hl)                                     ; _ SET el bit3. El bit3 de (Impacto2) indica que hay contacto_
-    set 3,(hl)                                     ; _  entre una entidad y Amadeus.
-
-    jr 1F
-
-; -----
-
-3 pop hl
-    call NextScan
-    push hl
-    ld a,h                                         ; El 1er scanline de la bala se pinta en pantalla.
-    cp $58                                         ; El 2º scanline indica colisión porque entra en zona_
-    jr z,1F                                        ; _ de atributos. Evitamos comprobar colisión en el _
-    jr nc,1F
-;                                                  ; _ 2º scanline si esto es así.    
-    djnz 2B
-
-; Aqui tengo que fabricar una rutina que ponga a "0" el .db (Impacto) de la entidad implicada.
-
-; LLegados a este punto:
-;
 ;   NO HAY COLISIÓN !!!!!.
 ;
 ;   .db (Impacto) de Amadeus a "0".
@@ -200,22 +175,44 @@ Detecta_colision_nave_entidad
     ld hl,(Entidad_sospechosa_de_colision)
     ld (hl),0
 
-1 pop hl                                           ; Puntero de impresión en HL e indicador de Impacto en B.
-    ret                                            
+    ret
 
- ; ---------- ----------
+; LLegados a este punto:
+;
+;   HAY COLISIÓN !!!!!.
+;
+;   .db (Impacto) de Amadeus a "1".
+;   SET el bit3 de (Impacto2).
+;
+;   Nota: El .db (Impacto) de la entidad implicada lo puso a "1" la rutina [Compara_coordenadas_X]. 
 
-Bucle_3 push bc                                    ; guardamos el contador de scanlines en la pila.
-    ld a,(Columns)
-    ld b,a 
-2 ld a,(iy)
-    cp (hl)
-    jr z,1F
+4 di
+    jr $
+    ei
 
-    inc e
+;    ld hl,Impacto
+;    ld (hl),1                                      
+;    ld hl,Impacto2                                 ; Cuando se produce Colisión, RES el bit2 de (Impacto2) y_
+;    res 2,(hl)                                     ; _ SET el bit3. El bit3 de (Impacto2) indica que hay contacto_
+ ;   set 3,(hl)                                     ; _  entre una entidad y Amadeus.
 
-1 inc hl
-    inc iy
-    djnz 2B
-    pop bc
-    ret                                   
+;    jr 1F
+
+; -----
+
+;3 pop hl
+;    call NextScan
+;    push hl
+;    ld a,h                                         ; El 1er scanline de la bala se pinta en pantalla.
+;    cp $58                                         ; El 2º scanline indica colisión porque entra en zona_
+;    jr z,1F                                        ; _ de atributos. Evitamos comprobar colisión en el _
+ ;   jr nc,1F
+;                                                  ; _ 2º scanline si esto es así.    
+;    djnz 2B
+
+; Aqui tengo que fabricar una rutina que ponga a "0" el .db (Impacto) de la entidad implicada.
+
+
+
+
+ 
