@@ -130,23 +130,30 @@ Detecta_colision_nave_entidad
     ld e,l                                         ; (Puntero_objeto) en DE.
 
     ld hl,(p.imp.amadeus)                          ; (Puntero_de_impresion) en HL.
-    ld b,17                                        ; Contador de scanlines en B.
-    ld iyl,5                                       ; Contador de impacto. Si su valor es "0" se considera "Colisión". Esto me permitirá ajustar la sensibilidad de la colisión en Amadeus.
+    ld b,16                                        ; Contador de scanlines en B.
+    ld iyl,4                                       ; Contador de impacto. Si su valor es "0" se considera "Colisión". Esto me permitirá ajustar la sensibilidad de la colisión en Amadeus.
 
 1 push bc
     ld b,3
     push hl
 
+; .db
+
 3 ld a,(de)
-    cpi                                            ; Comparamos el 1er .db de los tres de ancho que tiene el sprite de Amadeus.
+    and a
+    jr nz,4F                                        
+
+    inc l                                       
+    jr 2F                                         ; No aplica CPI, no hay píxels en este .db.
+
+4 cpi                                             ; Comparamos el 1er .db de los tres de ancho que tiene el sprite de Amadeus.
     jr z,2F
 
 ; Impacto.
     dec iyl
-    jr z,4F
+    jr z,5F
 
 2 inc e
-
     djnz 3B
  
     pop hl
@@ -154,11 +161,6 @@ Detecta_colision_nave_entidad
 
     pop bc
     djnz 1B                                        
-
-    di
-    jr $
-    ei
-
 
 ; Fin de la comparativa.
 
@@ -173,12 +175,10 @@ Detecta_colision_nave_entidad
     ld hl,Impacto2                                 
     res 2,(hl)                                     
     ld hl,(Entidad_sospechosa_de_colision)
-    ld (hl),0
+    ld (hl),0                                       ; Coloca a "0" el .db (Impacto) de la (Entidad_sospechosa_de_colision).
 
     ret
 
-; LLegados a este punto:
-;
 ;   HAY COLISIÓN !!!!!.
 ;
 ;   .db (Impacto) de Amadeus a "1".
@@ -186,7 +186,7 @@ Detecta_colision_nave_entidad
 ;
 ;   Nota: El .db (Impacto) de la entidad implicada lo puso a "1" la rutina [Compara_coordenadas_X]. 
 
-4 di
+5 di
     jr $
     ei
 
