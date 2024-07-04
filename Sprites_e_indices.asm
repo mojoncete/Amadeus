@@ -257,12 +257,22 @@ Indice_Explosion_2x3 defw Explosion_2x3_1
 	defw Explosion_2x3_2
 	defw Explosion_2x3_3
 
-Explosion_2x3_1 DEFB $00,$10,$00,$08,$10,$00,$04,$38
-	DEFB	$40,$03,$7D,$80,$02,$E6,$80,$01
-	DEFB	$B7,$00,$01,$7F,$00,$03,$DD,$80
-	DEFB	$0F,$FF,$E0,$03,$3B,$80,$01,$9D
-	DEFB	$00,$01,$F6,$00,$02,$FD,$80,$03
-	DEFB	$00,$40,$04,$00,$00,$08,$00,$00
+Explosion_2x3_1 DEFB $00,$10,$00
+	DEFB 	$08,$10,$00
+	DEFB	$04,$38,$40
+	DEFB	$03,$7D,$80
+	DEFB	$02,$E6,$80
+	DEFB	$01,$B7,$00
+	DEFB	$01,$7F,$00
+	DEFB	$03,$DD,$80
+	DEFB	$0F,$FF,$E0
+	DEFB	$03,$3B,$80
+	DEFB	$01,$9D,$00
+	DEFB	$01,$F6,$00
+	DEFB	$02,$FD,$80
+	DEFB	$03,$00,$40
+	DEFB	$04,$00,$00
+	DEFB	$08,$00,$00
 
 Explosion_2x3_2 DEFB $08,$00,$00,$05,$38,$10,$03,$BC
 	DEFB	$20,$06,$00,$C0,$04,$06,$C0,$00

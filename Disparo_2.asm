@@ -4,7 +4,11 @@ Colision_Entidad_Amadeus
 
 	ld a,(Coordenada_y)
 	cp $14
-	ret c
+	ret c                                                  ; Salimos si la entidad no está en zona de Amadeus.
+
+    ld a,(Impacto)
+    dec a
+    ret z                                                  ; Salimos si la unidad que está en zona de Amadeus ya está impactada. 
 
 ; -------------------------------------------------------------------------------------------------------------
 ;
@@ -117,10 +121,16 @@ Comparando_1 cp b
 
 ; -----------------------------------------------------------------------
 ;
-;   02/07/24
+;   04/7/24
 ;   
 
 Detecta_colision_nave_entidad 
+
+; Salimos de la rutina si no hay advertencia de posible colisión.
+
+	ld hl,Impacto2	
+	bit 2,(hl)
+	ret z
 
 ; Detección byte a byte de colisión ENTIDAD-NAVE.
 
@@ -131,7 +141,7 @@ Detecta_colision_nave_entidad
 
     ld hl,(p.imp.amadeus)                          ; (Puntero_de_impresion) en HL.
     ld b,16                                        ; Contador de scanlines en B.
-    ld iyl,4                                       ; Contador de impacto. Si su valor es "0" se considera "Colisión". Esto me permitirá ajustar la sensibilidad de la colisión en Amadeus.
+    ld iyl,5                                       ; Contador de impacto. Si su valor es "0" se considera "Colisión". Esto me permitirá ajustar la sensibilidad de la colisión en Amadeus.
 
 1 push bc
     ld b,3
@@ -157,12 +167,28 @@ Detecta_colision_nave_entidad
     djnz 3B
  
     pop hl
-    call NextScan
 
-    pop bc
+; Hay salto de línea en el puntero de impresión ???
+
+    ld a,h
+    sub $57
+    jr nz,6F
+
+; Comprobamos la parte baja de Amadeus. Modifico manualmente el salto de línea en HL para no haver llamadas a [NextScan].
+
+    ld hl,(p.imp.amadeus)
+    ld a,$20
+    and a
+    add l
+    ld l,a
+    jr 7F
+
+6 inc h
+
+7 pop bc
     djnz 1B                                        
 
-; Fin de la comparativa.
+;   Fin de la comparativa.
 
 ;   NO HAY COLISIÓN !!!!!.
 ;
@@ -176,7 +202,6 @@ Detecta_colision_nave_entidad
     res 2,(hl)                                     
     ld hl,(Entidad_sospechosa_de_colision)
     ld (hl),0                                       ; Coloca a "0" el .db (Impacto) de la (Entidad_sospechosa_de_colision).
-
     ret
 
 ;   HAY COLISIÓN !!!!!.
@@ -186,17 +211,24 @@ Detecta_colision_nave_entidad
 ;
 ;   Nota: El .db (Impacto) de la entidad implicada lo puso a "1" la rutina [Compara_coordenadas_X]. 
 
-5 di
-    jr $
-    ei
+5 pop hl
+    pop bc
 
-;    ld hl,Impacto
-;    ld (hl),1                                      
-;    ld hl,Impacto2                                 ; Cuando se produce Colisión, RES el bit2 de (Impacto2) y_
-;    res 2,(hl)                                     ; _ SET el bit3. El bit3 de (Impacto2) indica que hay contacto_
- ;   set 3,(hl)                                     ; _  entre una entidad y Amadeus.
+    ld hl,Impacto_Amadeus
+    ld (hl),1                                      
+    ld hl,Impacto2                                 ; Cuando se produce Colisión, RES el bit2 de (Impacto2) y_
+    res 2,(hl)                                     ; _ SET el bit3. El bit3 de (Impacto2) indica que hay contacto_
 
-;    jr 1F
+    ld de,Indice_Explosion_2x3
+    ld hl,(Entidad_sospechosa_de_colision)         ; Situamos el (Puntero_de_almacen_de_mov_masticados) de la entidad impactada en la primera palabra del índice de explosiones.
+    inc l
+    inc l
+    inc l
+    ld (hl),e
+    inc l
+    ld (hl),d
+
+    ret
 
 ; -----
 

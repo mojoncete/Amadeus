@@ -315,10 +315,6 @@ Limpiamos_bandeja_DRAW
 
 Decrementa_Contador_de_mov_masticados ld hl,(Contador_de_mov_masticados)
 	dec hl
-
-; debug 6/5/24
-
-
 	ld (Contador_de_mov_masticados),hl
 	ret
 

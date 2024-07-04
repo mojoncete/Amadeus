@@ -409,7 +409,7 @@ Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posi
 
 ; Relojes y temporizaciones.
 
-;Clock_explosion db 4
+Clock_explosion db 4									; Temporización de las explosiones, (velocidad de la explosión).
 
 RND_SP defw Numeros_aleatorios							; Puntero que se irá desplazando por el SET de nº aleatorios.
 
@@ -564,11 +564,7 @@ Main
 ; Si alguna de las coordenadas_X de alguna entidad que esté en zona de Amadeus coincide con alguna de las coordenadas_X de Amadeus, habrá que comprobar si existe colisión.
 ; Este hecho lo indica el bit2 de (Impacto2).
 
-	ld a,(Impacto2)	
-	bit 2,a
-	jr z,16F
-
-	call Detecta_colision_nave_entidad 
+	call Detecta_colision_nave_entidad 					; La rutina verifica la colisión entre una entidad y Amadeus, (SET 3 Impacto2 - RES 2 Impacto2).
 
 16 ld hl,(Clock_next_entity)
 	ld bc,(FRAMES)
@@ -672,53 +668,28 @@ Main
 15 push bc 												; Nº de entidades en curso.
 
 	call Restore_entidad								; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
-
 	ld de,(Scanlines_album_SP)
-	call Recauda_informacion_de_entidad_en_curso		; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
 
-; Existe "Entidad_guía" ???.
-; Si la Entidad_guía ha sido fulminada hemos de reemplazarla.
+; Datos de la entidad en curso en la bandeja DRAW y puntero (Scanlines_album_SP) en DE.
 
-;	ld a,(Ctrl_3)
-;	bit 1,a
-;	jr nz,22F
+; En 1er lugar, ... existe (Impacto) en esta entidad ???
 
-; Almacén de "Movimientos_masticados" lleno ???
-; Una "Entidad_guía" a dejado de serlo ???, (Reinicio??).
-; En ese caso NO SE ACTIVA UNA NUEVA "ENTIDAD_GUÍA".
+;! ------------------------------------------------------------------------------------------------------------------------ 3/7/24 EXPLOSIÓN DE ENTIDAD.
+; Hay Impacto en esta entidad.
 
-;;	ld a,(Ctrl_3)
-;;	bit 3,a
-;;	jr nz,22F
-
-; Activa "Entidad_guía" siempre que no esté ya completo el almacén de productos_masticados.
-
-;	ld hl,Ctrl_2
-;	set 5,(hl)
-;	ld hl,Ctrl_3
-;	set 1,(hl)
-
-; Impacto ???
-
-22 ld a,(Impacto)										 
+;	ld hl,Clock_explosion								
+;	dec (hl)
+;	jr nz,17F											; Gestionamos la siguiente entidad.
+	
+	ld a,(Impacto)										 
 	and a
 	jr z,8F
-
-; Hay Impacto en esta entidad.
 
 	di
 	jr $
 	ei
 
-;	ld hl,Clock_explosion								; _ a gestionar la siguiente entidad, JR 6F.
-;	dec (hl)
-;	jp nz,17F
-
-;! Velocidad de la animación de la explosión.
-
-;	ld (hl),4 											; Reiniciamos el temporizador de la explosión,_
-;														; _,(velocidad de la explosión).
-; !!!!!!!! Explosiónnnnnnnnn 20/9/23
+;	ld (hl),4 											; Reiniciamos (Clock_explosion), (velocidad de la explosión).
 
 ;	call Repone_datos_de_borrado
 ;	call Limpia_Variables_de_borrado					; Guarda los datos de la entidad `impactada´ para borrarla.
@@ -748,8 +719,6 @@ Main
 
 ; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
 ; _con las coordenadas de la entidad almacenada en DRAW.
-
-8 
 
 ;	ld a,(Ctrl_1)
 ;	bit 2,a
@@ -788,8 +757,39 @@ Main
 ;	call Detecta_disparo_entidad
 ; ]]]
 
+;	dec a
+;	ld (Impacto),a
+
+; Existe "Entidad_guía" ???.
+; Si la Entidad_guía ha sido fulminada hemos de reemplazarla.
+
+;	ld a,(Ctrl_3)
+;	bit 1,a
+;	jr nz,22F
+
+; Almacén de "Movimientos_masticados" lleno ???
+; Una "Entidad_guía" a dejado de serlo ???, (Reinicio??).
+; En ese caso NO SE ACTIVA UNA NUEVA "ENTIDAD_GUÍA".
+
+;;	ld a,(Ctrl_3)
+;;	bit 3,a
+;;	jr nz,22F
+
+; Activa "Entidad_guía" siempre que no esté ya completo el almacén de productos_masticados.
+
+;	ld hl,Ctrl_2
+;	set 5,(hl)
+;	ld hl,Ctrl_3
+;	set 1,(hl)
+
+; Impacto ???
+
+
+
+
 ; -------------------------------------------
 
+8 call Recauda_informacion_de_entidad_en_curso					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
 	call Ajusta_velocidad_entidad								; Ajusta el perfil de velocidad de la entidad en función de (Contader_de_vueltas).
 	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
 	call Genera_datos_de_impresion
@@ -806,7 +806,8 @@ Main
 
 	ld hl,(Puntero_de_impresion)
 	call Genera_coordenadas
-	call Colision_Entidad_Amadeus
+
+	call Colision_Entidad_Amadeus											; Si hay posibilidad de COLISION, set 2,(Impacto2) y (Impacto) de entidad en curso a "1".
 
 ;	ld hl,Ctrl_0
 ; 	res 4,(hl)																; Inicializamos el FLAG de movimiento de la entidad.
@@ -861,6 +862,9 @@ End_frame
 
 	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
+
+;	ld hl,Impacto2
+;	res 3,(hl)
 
 	ld hl,Ctrl_3
 	set 0,(hl) 											; Indica Frame completo. 
