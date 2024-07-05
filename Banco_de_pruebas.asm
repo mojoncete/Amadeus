@@ -674,20 +674,39 @@ Main
 
 ; En 1er lugar, ... existe (Impacto) en esta entidad ???
 
-;! ------------------------------------------------------------------------------------------------------------------------ 3/7/24 EXPLOSIÓN DE ENTIDAD.
+	ld a,(Impacto)										 
+	and a
+	jr z,8F
+
+; 5/7/24
+; Nota importante: 
+; Dos entidades pueden chocar entre ellas en zona de Amadeus. La rutina [Detecta_colision_nave_entidad] comprobará si existe colisión con la última entidad gestionada, (colisionada) y _
+;	_en caso de no existir colisión pondrá su .db (Impacto) a "0" pero esa 1ª entidad "colisionada" seguirá manteniendo su .db (Impacto) a "1" por lo que para considerarse "colisión",_
+;	_es requisito imprescindible que Amadeus tenga su .db (Impacto) también a "1"; en caso contrario colocaremos el .db (Impacto) de la entidad a "0" para que se vuelva a gestionar.
+
+	ld a,(Impacto_Amadeus)
+	and a
+	jr nz,Colision_desastrosa
+
+; Falsa colisión !!!	
+	
+	ld (Impacto),a										 ; Colocamos el .db (Impacto) de la entidad en curso a "0".
+	jr 8F
+
+;! ------------------------------------------------------------------------------------------------------------------------ 5/7/24 Colisión Entidad-Amadeus.
+
+Colision_desastrosa 
+
+	di
+	jr $
+	ei
+
+
 ; Hay Impacto en esta entidad.
 
 ;	ld hl,Clock_explosion								
 ;	dec (hl)
 ;	jr nz,17F											; Gestionamos la siguiente entidad.
-	
-	ld a,(Impacto)										 
-	and a
-	jr z,8F
-
-	di
-	jr $
-	ei
 
 ;	ld (hl),4 											; Reiniciamos (Clock_explosion), (velocidad de la explosión).
 
