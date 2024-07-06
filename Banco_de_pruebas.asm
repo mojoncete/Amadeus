@@ -649,7 +649,7 @@ Main
 
 11 ld a,(Entidades_en_curso)
 	and a
-	jr z,Gestion_de_Amadeus								; Si no hay entidades en curso saltamos a [Avanza_puntero_de_Scanlines_album_de_entidades].
+	jp z,Gestion_de_Amadeus								; Si no hay entidades en curso saltamos a [Avanza_puntero_de_Scanlines_album_de_entidades].
 	ld b,a												; No hay entidades que gestionar.
 
 ; ( Código que ejecutamos con cada entidad: ).
@@ -686,51 +686,13 @@ Main
 
 	ld a,(Impacto_Amadeus)
 	and a
-	jr nz,Colision_desastrosa
+	call nz,Genera_explosion
+	jr Gestiona_siguiente_entidad
 
 ; Falsa colisión !!!	
 	
-	ld (Impacto),a										 ; Colocamos el .db (Impacto) de la entidad en curso a "0".
+	ld (Impacto),a											; Colocamos el .db (Impacto) de la entidad en curso a "0".
 	jr 8F
-
-;! ------------------------------------------------------------------------------------------------------------------------ 5/7/24 Colisión Entidad-Amadeus.
-
-Colision_desastrosa 
-
-	di
-	jr $
-	ei
-
-
-; Hay Impacto en esta entidad.
-
-;	ld hl,Clock_explosion								
-;	dec (hl)
-;	jr nz,17F											; Gestionamos la siguiente entidad.
-
-;	ld (hl),4 											; Reiniciamos (Clock_explosion), (velocidad de la explosión).
-
-;	call Repone_datos_de_borrado
-;	call Limpia_Variables_de_borrado					; Guarda los datos de la entidad `impactada´ para borrarla.
-
-;!!!!!! Desintegración/Explosión!!!!!!!!!!!
-
-;	ld a,(Ctrl_2)
-;	bit 1,a
-;	jr nz,7F											; Se han iniciado los punteros de explosión???									
-
-; Inicialización del proceso de explosión. Omitimos si ya hemos imprimido el 1er FRAME de la explosión.
-
-;	ld a,(CTRL_DESPLZ)
-;	and a
-;	jr nz,18F
-
-;	ld hl,Indice_Explosion_2x2-2
-;	ld (Puntero_DESPLZ_der),hl
-;	jr 19F
-
-;18 ld hl,Indice_Explosion_2x3-2
-;	ld (Puntero_DESPLZ_der),hl
 
 ;19 ld hl,Ctrl_2											; Activamos el proceso de explosión.
 ;	set 1,(hl)
@@ -801,22 +763,12 @@ Colision_desastrosa
 ;	ld hl,Ctrl_3
 ;	set 1,(hl)
 
-; Impacto ???
-
-
-
-
 ; -------------------------------------------
 
 8 call Recauda_informacion_de_entidad_en_curso					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
 	call Ajusta_velocidad_entidad								; Ajusta el perfil de velocidad de la entidad en función de (Contader_de_vueltas).
 	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
 	call Genera_datos_de_impresion
-;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
-;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
-;																; La rutina [Genera_datos_de_impresion] activa las interrupciones antes del RET.
-; Actualizamos (Contador_de_mov_masticados) tras la foto.	
-
 	call Decrementa_Contador_de_mov_masticados
 
 ; -------------------------------------------
@@ -826,20 +778,22 @@ Colision_desastrosa
 	ld hl,(Puntero_de_impresion)
 	call Genera_coordenadas
 
-	call Colision_Entidad_Amadeus											; Si hay posibilidad de COLISION, set 2,(Impacto2) y (Impacto) de entidad en curso a "1".
+	call Colision_Entidad_Amadeus								; Si hay posibilidad de COLISION, set 2,(Impacto2) y (Impacto) de entidad en curso a "1".
 
 ;	ld hl,Ctrl_0
-; 	res 4,(hl)																; Inicializamos el FLAG de movimiento de la entidad.
+; 	res 4,(hl)													; Inicializamos el FLAG de movimiento de la entidad.
 
-17 call Store_Restore_cajas
-
+Gestiona_siguiente_entidad
+ 
+ 	call Store_Restore_cajas
 	pop bc
-	
 	djnz 15B
 
-	call Inicializa_India_y_limpia_Tabla_de_impresion 						; Inicializa el puntero (India_SP) y sanea la (Tabla_para_ordenar_entidades_antes_de_pintar).
+; Hemos gestionado todas las entidades. 
+
+	call Inicializa_India_y_limpia_Tabla_de_impresion 			; Inicializa el puntero (India_SP) y sanea la (Tabla_para_ordenar_entidades_antes_de_pintar).
 	call Ordena_tabla_de_impresion
-	call Inicia_punteros_de_cajas 											; Hemos terminado de mover todas las entidades. Nos situamos al principio del índice de entidades.
+	call Inicia_punteros_de_cajas 								; Hemos terminado de mover todas las entidades. Nos situamos al principio del índice de entidades.
 
 ;! Activando estas líneas podemos habilitar 2 explosiones en el mismo FRAME.
 ; Hemos gestionado todas las unidades.
@@ -881,9 +835,6 @@ End_frame
 
 	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
-
-;	ld hl,Impacto2
-;	res 3,(hl)
 
 	ld hl,Ctrl_3
 	set 0,(hl) 											; Indica Frame completo. 
@@ -1592,6 +1543,20 @@ Cargamos_registros_con_mov_masticado
 
 	ret
 
+;	6/7/24
+
+Cargamos_registros_con_explosion
+
+	ld hl,(Puntero_de_almacen_de_mov_masticados)
+	call Extrae_address
+
+	ld e,l
+	ld d,h 															; Puntero objeto, (Explosión), en DE.
+
+	ld ix,(Puntero_de_impresion)									; IX contiene Puntero_de_impresion.
+
+	ret
+
 ; --------------------------------------------------------------------------------------------------------------
 ;
 ;	17/06/24
@@ -1764,16 +1729,21 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 
 ; **************************************************************************************************
 ;
-;	24/6/24
+;	06/07/24
 ;
 ;	Cargamos los datos de la caja de entidades señalada por el puntero (Puntero_store_caja) a la BANDEJA_DRAW.
-
+	
 Restore_entidad 
 
-	ld hl,(Puntero_store_caja)						; 369 t/states.
+	ld hl,(Puntero_store_caja)						
+	ld a,(hl)
+	and a
+	call z,Incrementa_punteros_de_cajas					; Caja vacía. Saltamos a la siguiente caja.
+	jr z,Restore_entidad
+
 	ld de,Bandeja_DRAW
 	ld bc,14
-	ldir											; Transferimos (Ctrl_2) y (Velocidad).
+	ldir											
 	ret
 
 ; **************************************************************************************************
@@ -1793,22 +1763,6 @@ Incrementa_punteros_de_cajas
     call Extrae_address
     ld (Puntero_restore_caja),hl
     ret
-
-; -----------------------------------------------------------
-;
-;	21/12/23
-;
-; 	Limpia los datos del almacén de entidades de DRAW, (donde se encuentra la "entidad impactada").
-;
-;	Destruye: HL,BC,DE,A
-
-;Borra_datos_entidad ld hl,Bandeja_DRAW
-;	ld bc,41
-;	xor a
-;	ld (hl),a;
-;	ld de,Bandeja_DRAW+1
-;	ldir
-;	ret
 
 ; -----------------------------------------------------------
 
@@ -1989,6 +1943,55 @@ Teclado
 
 ;	call Genera_disparo
 ;	ret
+; ------------------------------------------------------------------------------------------------------------------------ 
+;
+;	06/07/24
+;
+
+Genera_explosion 
+
+	ld hl,Clock_explosion								
+	dec (hl)
+	jr z,Siguiente_frame_explosion									; Gestionamos la siguiente entidad.
+
+Borra_entidad_colisionada
+
+	call Recauda_informacion_de_entidad_en_curso					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
+	call Cargamos_registros_con_explosion
+	call Genera_datos_de_impresion
+	ret
+
+Siguiente_frame_explosion
+
+	ld (hl),4 														; Inicializamos (Clock_explosion), (velocidad de la explosión).
+
+; Avanza Frame de explosión.
+
+	ld hl,(Puntero_de_almacen_de_mov_masticados)
+	ld bc,Explosion_2x3_1-2
+	ld a,c
+	sub l
+	jr nz,1F
+
+; Fín de la entidad !!!!!!!!!!!!!
+
+	ld hl,Entidades_en_curso
+	dec (hl)
+
+	call Limpiamos_bandeja_DRAW
+
+;	ld hl,Impacto2
+;	set 3,(hl)
+;	ret
+
+1 inc l
+	inc l
+	ld (Puntero_de_almacen_de_mov_masticados),hl
+
+	call Recauda_informacion_de_entidad_en_curso					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
+	call Cargamos_registros_con_explosion
+	call Genera_datos_de_impresion
+	ret
 
 ; ---------------------------------------------------------------
 
