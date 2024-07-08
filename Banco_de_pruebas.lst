@@ -1403,31 +1403,31 @@
  392  8A13              ;																 Una de la entidades ha entrado en zona de Amadeus y alguna de sus columnas coincide con las de nuestra nave.
  393  8A13              ;																 El bit indica que hay que ejecutar [Detecta_colision_nave_entidad] al principio de [Main], (Construcción del frame).
  394  8A13
- 395  8A13
- 396  8A13 00 00        Entidad_sospechosa_de_colision defw 0					; Almacena la dirección de memoria donde se encuentra el .db_
- 397  8A15              ;														; _(Impacto) de la entidad que ocupa el mismo espacio que Amadeus.
- 398  8A15              ;														; Necesitaremos poner a "0" este .db en el caso de que finalmente no se produzca colisión.
- 399  8A15
- 400  8A15              ;Coordenadas_disparo_certero ds 2						; Almacenamos aquí las coordenadas del disparo que ha alcanzado a Amadeus.
- 401  8A15              ;											            ; (Coordenadas_disparo_certero)=Y ..... (Coordenadas_disparo_certero +1)=X.
- 402  8A15 00 00 00     Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 posibles columnas_
- 403  8A18              ;														; _ que puede ocupar el sprite de una entidad. (Colisión).
- 404  8A18 00 00 00     Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posibles columnas_
- 405  8A1B              ;														; _ que puede ocupar el sprite de Amadeus. (Colisión).
- 406  8A1B              ;Velocidad_disparo_entidades db 2	  					; Nº de scanlines, (NextScan) que avanza el disparo de las entidades.
- 407  8A1B
- 408  8A1B              ;---------------------------------------------------------------------------------------------------------------
- 409  8A1B
- 410  8A1B              ; Relojes y temporizaciones.
- 411  8A1B
- 412  8A1B 04           Clock_explosion db 4									; Temporización de las explosiones, (velocidad de la explosión).
- 413  8A1C
- 414  8A1C 96 86        RND_SP defw Numeros_aleatorios							; Puntero que se irá desplazando por el SET de nº aleatorios.
- 415  8A1E
- 416  8A1E 00 00        Clock_next_entity defw 0								; Transcurrido este tiempo aparece una nueva entidad.
- 417  8A20 00           Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
- 418  8A21              ;														; Repite la oleada de entidades.
- 419  8A21 01           Disparo_Amadeus db 1									; A "1", se puede generar disparo.
+ 395  8A13 00 00        Entidad_sospechosa_de_colision defw 0					; Almacena la dirección de memoria donde se encuentra el .db_
+ 396  8A15              ;														; _(Impacto) de la entidad que ocupa el mismo espacio que Amadeus.
+ 397  8A15              ;														; Necesitaremos poner a "0" este .db en el caso de que finalmente no se produzca colisión.
+ 398  8A15
+ 399  8A15              ;Coordenadas_disparo_certero ds 2						; Almacenamos aquí las coordenadas del disparo que ha alcanzado a Amadeus.
+ 400  8A15              ;											            ; (Coordenadas_disparo_certero)=Y ..... (Coordenadas_disparo_certero +1)=X.
+ 401  8A15 00 00 00     Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 posibles columnas_
+ 402  8A18              ;														; _ que puede ocupar el sprite de una entidad. (Colisión).
+ 403  8A18 00 00 00     Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posibles columnas_
+ 404  8A1B              ;														; _ que puede ocupar el sprite de Amadeus. (Colisión).
+ 405  8A1B              ;Velocidad_disparo_entidades db 2	  					; Nº de scanlines, (NextScan) que avanza el disparo de las entidades.
+ 406  8A1B
+ 407  8A1B              ;---------------------------------------------------------------------------------------------------------------
+ 408  8A1B
+ 409  8A1B              ; Relojes y temporizaciones.
+ 410  8A1B
+ 411  8A1B 04           Clock_explosion db 4									; Temporización de las explosiones, (velocidad de la explosión).
+ 412  8A1C
+ 413  8A1C 96 86        RND_SP defw Numeros_aleatorios							; Puntero que se irá desplazando por el SET de nº aleatorios.
+ 414  8A1E
+ 415  8A1E 00 00        Clock_next_entity defw 0								; Transcurrido este tiempo aparece una nueva entidad.
+ 416  8A20 00           Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
+ 417  8A21              ;														; Repite la oleada de entidades.
+ 418  8A21 01           Disparo_Amadeus db 1									; A "1", se puede generar disparo.
+ 419  8A22
  420  8A22              ;CLOCK_repone_disparo_Amadeus_BACKUP db 30				; Restaura (CLOCK_repone_disparo_Amadeus).
  421  8A22              ;CLOCK_repone_disparo_Amadeus db 30 						; Reloj, decreciente.
  422  8A22
@@ -2826,9 +2826,9 @@
 1815  8DD6
 1816  8DD6 3A 10 8A     	ld a,(Ctrl_3)
 1817  8DD9 CB 47        	bit 0,a
-1818  8DDB 28 2C        	jr z,Borrando_Amadeus												; No pintamos si el FRAME no se ha completado.
+1818  8DDB 28 2C        	jr z,Ejecuta_shield												; No pintamos si el FRAME no se ha completado.
 1819  8DDD CB 57        	bit 2,a
-1820  8DDF 28 28        	jr z,Borrando_Amadeus                                               ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
+1820  8DDF 28 28        	jr z,Ejecuta_shield                                             ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
 1821  8DE1
 1822  8DE1              Borrando_entidades
 1823  8DE1
@@ -2855,160 +2855,167 @@
 1844  8E04 CD 19 91     	call Pinta_Sprites
 1845  8E07 18 E7        	jr Pintando_entidades
 1846  8E09
-1847  8E09              Borrando_Amadeus
+1847  8E09              Ejecuta_shield
 1848  8E09
-1849  8E09 21 10 8A     	ld hl,Ctrl_3
-1850  8E0C CB 6E        	bit 5,(hl)
-1851  8E0E 28 1A        	jr z,1F												; No pintamos. No hay movimiento.
-1852  8E10
-1853  8E10 2A 01 8A     	ld hl,(Album_de_borrado_Amadeus)
-1854  8E13 CD 5B 8D     	call Extrae_address
-1855  8E16 24           	inc h
-1856  8E17 25           	dec h
-1857  8E18 28 03        	jr z,Pintando_Amadeus
-1858  8E1A CD 19 91     	call Pinta_Sprites
-1859  8E1D
-1860  8E1D              Pintando_Amadeus
-1861  8E1D
-1862  8E1D 2A FF 89     	ld hl,(Album_de_pintado_Amadeus)
-1863  8E20 CD 5B 8D     	call Extrae_address
-1864  8E23 24           	inc h
-1865  8E24 25           	dec h
-1866  8E25 28 03        	jr z,1F
-1867  8E27 CD 19 91     	call Pinta_Sprites
-1868  8E2A
-1869  8E2A 21 10 8A     1 ld hl,Ctrl_3
-1870  8E2D CB 86        	res 0,(hl)											; Reinicia el flag de FRAME completo.
-1871  8E2F CB 96        	res 2,(hl)											; Reinicia el flag DETECTA MOVIMIENTO.
-1872  8E31 CB AE        	res 5,(hl)
-1873  8E33
-1874  8E33 3E 01        	ld a,1												; Borde azul.
-1875  8E35 D3 FE        	out ($fe),a
-1876  8E37
-1877  8E37 C9           	ret
-1878  8E38
-1879  8E38              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-1880  8E38              ;
-1881  8E38              ;	19/6/24
-1882  8E38              ;
-1883  8E38
-1884  8E38              Teclado
+1849  8E09
+1850  8E09
+1851  8E09
+1852  8E09
+1853  8E09
+1854  8E09              Borrando_Amadeus
+1855  8E09
+1856  8E09 21 10 8A     	ld hl,Ctrl_3
+1857  8E0C CB 6E        	bit 5,(hl)
+1858  8E0E 28 1A        	jr z,1F															; No pintamos. No hay movimiento.
+1859  8E10
+1860  8E10 2A 01 8A     	ld hl,(Album_de_borrado_Amadeus)
+1861  8E13 CD 5B 8D     	call Extrae_address
+1862  8E16 24           	inc h
+1863  8E17 25           	dec h
+1864  8E18 28 03        	jr z,Pintando_Amadeus
+1865  8E1A CD 19 91     	call Pinta_Sprites
+1866  8E1D
+1867  8E1D              Pintando_Amadeus
+1868  8E1D
+1869  8E1D 2A FF 89     	ld hl,(Album_de_pintado_Amadeus)
+1870  8E20 CD 5B 8D     	call Extrae_address
+1871  8E23 24           	inc h
+1872  8E24 25           	dec h
+1873  8E25 28 03        	jr z,1F
+1874  8E27 CD 19 91     	call Pinta_Sprites
+1875  8E2A
+1876  8E2A 21 10 8A     1 ld hl,Ctrl_3
+1877  8E2D CB 86        	res 0,(hl)											; Reinicia el flag de FRAME completo.
+1878  8E2F CB 96        	res 2,(hl)											; Reinicia el flag DETECTA MOVIMIENTO.
+1879  8E31 CB AE        	res 5,(hl)
+1880  8E33
+1881  8E33 3E 01        	ld a,1												; Borde azul.
+1882  8E35 D3 FE        	out ($fe),a
+1883  8E37
+1884  8E37 C9           	ret
 1885  8E38
-1886  8E38              ; Examina_disparo
-1887  8E38
-1888  8E38 3A 21 8A     	ld a,(Disparo_Amadeus)
-1889  8E3B 3D           	dec a
-1890  8E3C 20 14        	jr nz,1F
-1891  8E3E
-1892  8E3E 3E F7        	ld a,$f7													; "5" para disparar.
-1893  8E40 DB FE        	in a,($fe)
-1894  8E42 E6 10        	and $10
-1895  8E44
-1896  8E44              ;	push af
-1897  8E44              ;	call z,Genera_disparo
-1898  8E44              ;	pop af
-1899  8E44
-1900  8E44 20 0C        	jr nz,1F
-1901  8E46
-1902  8E46 3A 21 8A     	ld a,(Disparo_Amadeus)
-1903  8E49 EE 01        	xor 1
-1904  8E4B 32 21 8A     	ld (Disparo_Amadeus),a
-1905  8E4E
-1906  8E4E F3           	di
-1907  8E4F 18 FE        	jr $
-1908  8E51 FB           	ei
-1909  8E52
-1910  8E52 3E F7        1 ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
-1911  8E54 DB FE        	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
-1912  8E56 E6 01        	and $01													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $01 resulta "0"  llama a la rutina "Mov_izq".
-1913  8E58 CC 86 98         call z,Amadeus_a_izquierda
-1914  8E5B
-1915  8E5B 3E F7        	ld a,$f7
-1916  8E5D DB FE        	in a,($fe)
-1917  8E5F E6 01        	and $01
-1918  8E61 C8           	ret z
-1919  8E62
-1920  8E62 3E F7        	ld a,$f7
-1921  8E64 DB FE        	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
-1922  8E66 E6 02        	and $02													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $02 resulta "0"  llama a la rutina "Mov_der".
-1923  8E68 CC 9E 98     	call z,Amadeus_a_derecha
-1924  8E6B
-1925  8E6B C9           	ret
-1926  8E6C
-1927  8E6C              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-1928  8E6C              ;
-1929  8E6C              ;	Rutina provisional para que los malotes cagen balas.
-1930  8E6C
-1931  8E6C              ;Detecta_disparo_entidad
-1932  8E6C
-1933  8E6C              ;	ld a,(Disparo_entidad)
-1934  8E6C              ;	and a
-1935  8E6C              ;	ret z
-1936  8E6C
-1937  8E6C              ;! Aquí hemos de implementar la rutina/s que generan disparo...
-1938  8E6C
-1939  8E6C              ;	ld a,$7f				; Detecta SPACE.
-1940  8E6C              ;	in a,($fe)
-1941  8E6C              ;	and 1
-1942  8E6C              ;	ret nz
+1886  8E38              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1887  8E38              ;
+1888  8E38              ;	19/6/24
+1889  8E38              ;
+1890  8E38
+1891  8E38              Teclado
+1892  8E38
+1893  8E38              ; Examina_disparo
+1894  8E38
+1895  8E38 3A 21 8A     	ld a,(Disparo_Amadeus)
+1896  8E3B 3D           	dec a
+1897  8E3C 20 14        	jr nz,1F
+1898  8E3E
+1899  8E3E 3E F7        	ld a,$f7													; "5" para disparar.
+1900  8E40 DB FE        	in a,($fe)
+1901  8E42 E6 10        	and $10
+1902  8E44
+1903  8E44              ;	push af
+1904  8E44              ;	call z,Genera_disparo
+1905  8E44              ;	pop af
+1906  8E44
+1907  8E44 20 0C        	jr nz,1F
+1908  8E46
+1909  8E46 3A 21 8A     	ld a,(Disparo_Amadeus)
+1910  8E49 EE 01        	xor 1
+1911  8E4B 32 21 8A     	ld (Disparo_Amadeus),a
+1912  8E4E
+1913  8E4E F3           	di
+1914  8E4F 18 FE        	jr $
+1915  8E51 FB           	ei
+1916  8E52
+1917  8E52 3E F7        1 ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
+1918  8E54 DB FE        	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
+1919  8E56 E6 01        	and $01													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $01 resulta "0"  llama a la rutina "Mov_izq".
+1920  8E58 CC 86 98         call z,Amadeus_a_izquierda
+1921  8E5B
+1922  8E5B 3E F7        	ld a,$f7
+1923  8E5D DB FE        	in a,($fe)
+1924  8E5F E6 01        	and $01
+1925  8E61 C8           	ret z
+1926  8E62
+1927  8E62 3E F7        	ld a,$f7
+1928  8E64 DB FE        	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
+1929  8E66 E6 02        	and $02													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $02 resulta "0"  llama a la rutina "Mov_der".
+1930  8E68 CC 9E 98     	call z,Amadeus_a_derecha
+1931  8E6B
+1932  8E6B C9           	ret
+1933  8E6C
+1934  8E6C              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1935  8E6C              ;
+1936  8E6C              ;	Rutina provisional para que los malotes cagen balas.
+1937  8E6C
+1938  8E6C              ;Detecta_disparo_entidad
+1939  8E6C
+1940  8E6C              ;	ld a,(Disparo_entidad)
+1941  8E6C              ;	and a
+1942  8E6C              ;	ret z
 1943  8E6C
-1944  8E6C              ;	call Genera_disparo
-1945  8E6C              ;	ret
-1946  8E6C              ; ------------------------------------------------------------------------------------------------------------------------
-1947  8E6C              ;
-1948  8E6C              ;	06/07/24
-1949  8E6C              ;
+1944  8E6C              ;! Aquí hemos de implementar la rutina/s que generan disparo...
+1945  8E6C
+1946  8E6C              ;	ld a,$7f				; Detecta SPACE.
+1947  8E6C              ;	in a,($fe)
+1948  8E6C              ;	and 1
+1949  8E6C              ;	ret nz
 1950  8E6C
-1951  8E6C              Genera_explosion
-1952  8E6C
-1953  8E6C 21 1B 8A     	ld hl,Clock_explosion
-1954  8E6F 35           	dec (hl)
-1955  8E70 28 0A        	jr z,Siguiente_frame_explosion									; Gestionamos la siguiente entidad.
-1956  8E72
-1957  8E72              Borra_entidad_colisionada
-1958  8E72
-1959  8E72 CD E7 8B     	call Recauda_informacion_de_entidad_en_curso					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
-1960  8E75 CD EC 8C     	call Cargamos_registros_con_explosion
-1961  8E78 CD 41 AD     	call Genera_datos_de_impresion
-1962  8E7B C9           	ret
-1963  8E7C
-1964  8E7C              Siguiente_frame_explosion
-1965  8E7C
-1966  8E7C 36 04        	ld (hl),4 														; Inicializamos (Clock_explosion), (velocidad de la explosión).
-1967  8E7E
-1968  8E7E              ; Avanza Frame de explosión.
-1969  8E7E
-1970  8E7E 2A B0 89     	ld hl,(Puntero_de_almacen_de_mov_masticados)
-1971  8E81 01 94 85     	ld bc,Explosion_2x3_1-2
-1972  8E84 79           	ld a,c
-1973  8E85 95           	sub l
-1974  8E86 20 07        	jr nz,1F
-1975  8E88
-1976  8E88              ; Fín de la entidad !!!!!!!!!!!!!
-1977  8E88
-1978  8E88 21 F1 89     	ld hl,Entidades_en_curso
-1979  8E8B 35           	dec (hl)
-1980  8E8C
-1981  8E8C CD 9A AB     	call Limpiamos_bandeja_DRAW
-1982  8E8F
-1983  8E8F              ;	ld hl,Impacto2
-1984  8E8F              ;	set 3,(hl)
-1985  8E8F              ;	ret
-1986  8E8F
-1987  8E8F 2C           1 inc l
-1988  8E90 2C           	inc l
-1989  8E91 22 B0 89     	ld (Puntero_de_almacen_de_mov_masticados),hl
-1990  8E94
-1991  8E94 CD E7 8B     	call Recauda_informacion_de_entidad_en_curso					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
-1992  8E97 CD EC 8C     	call Cargamos_registros_con_explosion
-1993  8E9A CD 41 AD     	call Genera_datos_de_impresion
-1994  8E9D C9           	ret
-1995  8E9E
-1996  8E9E              ; ---------------------------------------------------------------
-1997  8E9E
-1998  8E9E              	org $aa7f
-1999  AA7F
-2000  AA7F              	include "RND_Derivando.asm"
+1951  8E6C              ;	call Genera_disparo
+1952  8E6C              ;	ret
+1953  8E6C              ; ------------------------------------------------------------------------------------------------------------------------
+1954  8E6C              ;
+1955  8E6C              ;	06/07/24
+1956  8E6C              ;
+1957  8E6C
+1958  8E6C              Genera_explosion
+1959  8E6C
+1960  8E6C 21 1B 8A     	ld hl,Clock_explosion
+1961  8E6F 35           	dec (hl)
+1962  8E70 28 0A        	jr z,Siguiente_frame_explosion									; Gestionamos la siguiente entidad.
+1963  8E72
+1964  8E72              Borra_entidad_colisionada
+1965  8E72
+1966  8E72 CD E7 8B     	call Recauda_informacion_de_entidad_en_curso					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
+1967  8E75 CD EC 8C     	call Cargamos_registros_con_explosion
+1968  8E78 CD 41 AD     	call Genera_datos_de_impresion
+1969  8E7B C9           	ret
+1970  8E7C
+1971  8E7C              Siguiente_frame_explosion
+1972  8E7C
+1973  8E7C 36 04        	ld (hl),4 														; Inicializamos (Clock_explosion), (velocidad de la explosión).
+1974  8E7E
+1975  8E7E              ; Avanza Frame de explosión.
+1976  8E7E
+1977  8E7E 2A B0 89     	ld hl,(Puntero_de_almacen_de_mov_masticados)
+1978  8E81 01 94 85     	ld bc,Explosion_2x3_1-2
+1979  8E84 79           	ld a,c
+1980  8E85 95           	sub l
+1981  8E86 20 07        	jr nz,1F
+1982  8E88
+1983  8E88              ; Fín de la entidad !!!!!!!!!!!!!
+1984  8E88
+1985  8E88 21 F1 89     	ld hl,Entidades_en_curso
+1986  8E8B 35           	dec (hl)
+1987  8E8C
+1988  8E8C CD 9A AB     	call Limpiamos_bandeja_DRAW
+1989  8E8F
+1990  8E8F              ;	ld hl,Impacto2
+1991  8E8F              ;	set 3,(hl)
+1992  8E8F              ;	ret
+1993  8E8F
+1994  8E8F 2C           1 inc l
+1995  8E90 2C           	inc l
+1996  8E91 22 B0 89     	ld (Puntero_de_almacen_de_mov_masticados),hl
+1997  8E94
+1998  8E94 CD E7 8B     	call Recauda_informacion_de_entidad_en_curso					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
+1999  8E97 CD EC 8C     	call Cargamos_registros_con_explosion
+2000  8E9A CD 41 AD     	call Genera_datos_de_impresion
+2001  8E9D C9           	ret
+2002  8E9E
+2003  8E9E              ; ---------------------------------------------------------------
+2004  8E9E
+2005  8E9E              	org $aa7f
+2006  AA7F
+2007  AA7F              	include "RND_Derivando.asm"
 # file opened: RND_Derivando.asm
    1+ AA7F              ; ******************************************************************************************************************************************************************************************
    2+ AA7F              ;
@@ -3070,7 +3077,7 @@
   58+ AAAF
   59+ AAAF
 # file closed: RND_Derivando.asm
-2001  AAAF              	include "Rutinas_de_inicio_y_niveles.asm"
+2008  AAAF              	include "Rutinas_de_inicio_y_niveles.asm"
 # file opened: Rutinas_de_inicio_y_niveles.asm
    1+ AAAF              ;---------------------------------------------------------------------------------------------------------------
    2+ AAAF              ;
@@ -3700,7 +3707,7 @@
  626+ ACCF C9           2 ret
  627+ ACD0
 # file closed: Rutinas_de_inicio_y_niveles.asm
-2002  ACD0              	include "calcula_tercio.asm"
+2009  ACD0              	include "calcula_tercio.asm"
 # file opened: calcula_tercio.asm
    1+ ACD0              ; ******************************************* Indica el tercio de pantalla en el que nos encontramos según el valor del registro H ********************************************************
    2+ ACD0              ;
@@ -3717,7 +3724,7 @@
   13+ ACD9 C9           	ret
   14+ ACDA
 # file closed: calcula_tercio.asm
-2003  ACDA              	include "Cls.asm"
+2010  ACDA              	include "Cls.asm"
 # file opened: Cls.asm
    1+ ACDA              ; *********************************** Limpia la pantalla, CLEAR SCREEN ****************************************************************
    2+ ACDA              ;
@@ -3752,7 +3759,7 @@
   31+ ACED C9           	ret
   32+ ACEE
 # file closed: Cls.asm
-2004  ACEE              	include "Genera_coordenadas.asm"
+2011  ACEE              	include "Genera_coordenadas.asm"
 # file opened: Genera_coordenadas.asm
    1+ ACEE              ; ------------------------------------------------------------------------
    2+ ACEE              ;
@@ -3839,7 +3846,7 @@
   83+ AD31 C9           	ret
   84+ AD32
 # file closed: Genera_coordenadas.asm
-2005  AD32              	include "Relojes_y_temporizaciones.asm"
+2012  AD32              	include "Relojes_y_temporizaciones.asm"
 # file opened: Relojes_y_temporizaciones.asm
    1+ AD32              ; Relojes y temporizaciones.
    2+ AD32
@@ -3882,7 +3889,7 @@
   39+ AD3F 77           	ld (hl),a
   40+ AD40 C9           	ret
 # file closed: Relojes_y_temporizaciones.asm
-2006  AD41              	include "Genera_datos_de_impresion.asm"
+2013  AD41              	include "Genera_datos_de_impresion.asm"
 # file opened: Genera_datos_de_impresion.asm
    1+ AD41              ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
    2+ AD41              ;
@@ -4163,8 +4170,8 @@
  277+ AE35 C9               ret
  278+ AE36
 # file closed: Genera_datos_de_impresion.asm
-2007  AE36
-2008  AE36              	include "Pinta_Sprites.asm"
+2014  AE36
+2015  AE36              	include "Pinta_Sprites.asm"
 # file opened: Pinta_Sprites.asm
    1+ AE36              ; -----------------------------------------------------------------------------
    2+ AE36              ;
@@ -4505,7 +4512,7 @@
  337+ 9237 ED 7B F7 89      ld sp,(Stack)
  338+ 923B C9               ret
 # file closed: Pinta_Sprites.asm
-2009  923C              	include "Draw_XOR.asm"
+2016  923C              	include "Draw_XOR.asm"
 # file opened: Draw_XOR.asm
    1+ 923C              ; ******************************************************************************************************************************************************************************************
    2+ 923C              ;
@@ -5174,7 +5181,7 @@
  665+ 950C
  666+ 950C
 # file closed: Draw_XOR.asm
-2010  950C              	include "Direcciones.asm"
+2017  950C              	include "Direcciones.asm"
 # file opened: Direcciones.asm
    1+ 950C
    2+ 950C              ; ******************************************************************************************************************************************************************************************
@@ -5994,7 +6001,7 @@
  816+ 98B7 35           1 dec (hl)									; 	Salimos. No hay movimiento. No pintamos la nave.
  817+ 98B8 C9           	ret
 # file closed: Direcciones.asm
-2011  98B9              	include "Movimiento.asm"
+2018  98B9              	include "Movimiento.asm"
 # file opened: Movimiento.asm
    1+ 98B9              ; ----- ----- ----- ----- -----
    2+ 98B9              ;
@@ -6388,7 +6395,7 @@
  390+ 9A32 C9               ret
  391+ 9A33
 # file closed: Movimiento.asm
-2012  9A33              	include "Disparo_2.asm"
+2019  9A33              	include "Disparo_2.asm"
 # file opened: Disparo_2.asm
    1+ 9A33              Colision_Entidad_Amadeus
    2+ 9A33
@@ -6641,11 +6648,11 @@
  249+ 9B08
  250+ 9B08
 # file closed: Disparo_2.asm
-2013  9B08
-2014  9B08
-2015  9B08              	SAVESNA "Pruebas.sna", START
-2016  9B08
-2017  9B08
-2018  9B08
-2019  9B08
+2020  9B08              0
+2021  9B08
+2022  9B08              	SAVESNA "Pruebas.sna", START
+2023  9B08
+2024  9B08
+2025  9B08
+2026  9B08
 # file closed: Banco_de_pruebas.asm

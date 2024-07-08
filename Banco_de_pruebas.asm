@@ -392,7 +392,6 @@ Impacto2 db 0											; Este byte indica que se ha producido impacto:
 ;																 Una de la entidades ha entrado en zona de Amadeus y alguna de sus columnas coincide con las de nuestra nave.
 ;																 El bit indica que hay que ejecutar [Detecta_colision_nave_entidad] al principio de [Main], (Construcción del frame).
 
-
 Entidad_sospechosa_de_colision defw 0					; Almacena la dirección de memoria donde se encuentra el .db_
 ;														; _(Impacto) de la entidad que ocupa el mismo espacio que Amadeus.
 ;														; Necesitaremos poner a "0" este .db en el caso de que finalmente no se produzca colisión.
@@ -417,6 +416,7 @@ Clock_next_entity defw 0								; Transcurrido este tiempo aparece una nueva ent
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
 Disparo_Amadeus db 1									; A "1", se puede generar disparo.
+
 ;CLOCK_repone_disparo_Amadeus_BACKUP db 30				; Restaura (CLOCK_repone_disparo_Amadeus). 
 ;CLOCK_repone_disparo_Amadeus db 30 						; Reloj, decreciente.
 
@@ -1815,9 +1815,9 @@ Actualiza_pantalla
 
 	ld a,(Ctrl_3)
 	bit 0,a
-	jr z,Borrando_Amadeus												; No pintamos si el FRAME no se ha completado.
+	jr z,Ejecuta_shield												; No pintamos si el FRAME no se ha completado.
 	bit 2,a
-	jr z,Borrando_Amadeus                                               ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
+	jr z,Ejecuta_shield                                             ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
 
 Borrando_entidades
 
@@ -1844,11 +1844,18 @@ Pintando_entidades
 	call Pinta_Sprites
 	jr Pintando_entidades
 
+Ejecuta_shield
+
+
+
+
+
+
 Borrando_Amadeus
 
 	ld hl,Ctrl_3
 	bit 5,(hl)
-	jr z,1F												; No pintamos. No hay movimiento.
+	jr z,1F															; No pintamos. No hay movimiento.
 
 	ld hl,(Album_de_borrado_Amadeus)
 	call Extrae_address
@@ -2010,7 +2017,7 @@ Siguiente_frame_explosion
 	include "Direcciones.asm"
 	include "Movimiento.asm"
 	include "Disparo_2.asm"
-
+0
 
 	SAVESNA "Pruebas.sna", START
 
