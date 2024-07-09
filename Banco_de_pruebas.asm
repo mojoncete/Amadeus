@@ -16,10 +16,26 @@
 	push hl
 
 ; -------------------
-	ld hl,Ctrl_3	;	STOP si no hemos terminado de construir el FRAME.
+	ld hl,Ctrl_3				;	STOP si no hemos terminado de construir el FRAME.
 	bit 0,(hl)
 	jr z,$
-; -------------------
+
+
+; Shield -----------------------
+
+Temporizacion_shield 
+
+	ld a,(Shield)
+	and a
+	jr z,Incrementa_FRAMES			
+
+	dec a
+	ld (Shield),a				 ;	Decrementa hasta llegar a "0".
+
+	ld hl,Shield_2				 ;  Rotamos el bit a izquierda.
+	rlc (hl)
+
+Incrementa_FRAMES
 
 	ld hl,(FRAMES)
 	inc hl
@@ -433,6 +449,13 @@ Puntero_indice_NIVELES defw 0
 Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos bytes_
 ; 														; _ que definen el NIVEL.
 
+;---------------------------------------------------------------------------------------------------------------
+
+; Temporizaciones Shield.
+
+Shield db 150
+Shield_2 db 1 
+
 ; 	INICIO  *************************************************************************************************************************************************************************
 ;
 ;	5/1/24
@@ -564,7 +587,7 @@ Main
 ; Si alguna de las coordenadas_X de alguna entidad que esté en zona de Amadeus coincide con alguna de las coordenadas_X de Amadeus, habrá que comprobar si existe colisión.
 ; Este hecho lo indica el bit2 de (Impacto2).
 
-	call Detecta_colision_nave_entidad 					; La rutina verifica la colisión entre una entidad y Amadeus, (SET 3 Impacto2 - RES 2 Impacto2).
+	call Detecta_colision_nave_entidad 					; La rutina verifica la colisión entre una entidad y Amadeus, (RES 2 Impacto2).
 
 16 ld hl,(Clock_next_entity)
 	ld bc,(FRAMES)
@@ -1815,9 +1838,9 @@ Actualiza_pantalla
 
 	ld a,(Ctrl_3)
 	bit 0,a
-	jr z,Ejecuta_shield												; No pintamos si el FRAME no se ha completado.
+	jr z,Borrando_Amadeus										 	  ; No pintamos si el FRAME no se ha completado.
 	bit 2,a
-	jr z,Ejecuta_shield                                             ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
+	jr z,Borrando_Amadeus                                             ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
 
 Borrando_entidades
 
@@ -1843,13 +1866,6 @@ Pintando_entidades
 	call Extrae_address
 	call Pinta_Sprites
 	jr Pintando_entidades
-
-Ejecuta_shield
-
-
-
-
-
 
 Borrando_Amadeus
 
@@ -1986,10 +2002,6 @@ Siguiente_frame_explosion
 	dec (hl)
 
 	call Limpiamos_bandeja_DRAW
-
-;	ld hl,Impacto2
-;	set 3,(hl)
-;	ret
 
 1 inc l
 	inc l
