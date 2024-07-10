@@ -25,15 +25,25 @@
 
 Temporizacion_shield 
 
-	ld a,(Shield)
+	ld hl,Shield
+	ld a,(hl)
 	and a
-	jr z,Incrementa_FRAMES			
+	jr z,Incrementa_FRAMES		;	Se terminó el escudo.		
 
-	dec a
-	ld (Shield),a				 ;	Decrementa hasta llegar a "0".
+	dec (hl)					;	Decrementa tiempo Shield, (Shield).	
+	inc hl
+	dec (hl)					;	Decrementa temporizador de estados, (Shield_2).
+	jr nz,Incrementa_FRAMES
 
-	ld hl,Shield_2				 ;  Rotamos el bit a izquierda.
-	rlc (hl)
+; El temporizador de estados a llegado a "0". 
+
+	inc hl
+
+
+	set 0,(hl)					;	Bit 0 de (Shield_3) a "1". Indica que en este FRAME sólo borramos Amadeus, NO PINTAMOS.
+	dec hl
+	ld a,1
+	ld (hl),a					;	Colocamos el temporizador de estados (Shield_2) a "1" para cambiar de estado en el siguiente FRAME.
 
 Incrementa_FRAMES
 
@@ -453,8 +463,8 @@ Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos
 
 ; Temporizaciones Shield.
 
-Shield db 150
-Shield_2 db 1 
+Shield db 0
+Shield_2 db 20 
 
 ; 	INICIO  *************************************************************************************************************************************************************************
 ;
@@ -1838,9 +1848,9 @@ Actualiza_pantalla
 
 	ld a,(Ctrl_3)
 	bit 0,a
-	jr z,Borrando_Amadeus										 	  ; No pintamos si el FRAME no se ha completado.
+	jr z,Funcion_SHIELD										 	  	; No pintamos si el FRAME no se ha completado.
 	bit 2,a
-	jr z,Borrando_Amadeus                                             ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
+	jr z,Funcion_SHIELD                                             ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
 
 Borrando_entidades
 
@@ -1866,6 +1876,14 @@ Pintando_entidades
 	call Extrae_address
 	call Pinta_Sprites
 	jr Pintando_entidades
+
+Funcion_SHIELD
+
+	ld a,(Shield)
+	and a
+	jr z,Borrando_Amadeus
+	call Aplica_Shield
+	jr 1F
 
 Borrando_Amadeus
 
@@ -1898,6 +1916,12 @@ Pintando_Amadeus
 	out ($fe),a
 
 	ret									 
+
+Aplica_Shield 
+
+	jr $
+
+	ret
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
