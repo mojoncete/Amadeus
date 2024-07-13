@@ -28,22 +28,39 @@ Temporizacion_shield
 	ld hl,Shield
 	ld a,(hl)
 	and a
-	jr z,Incrementa_FRAMES		;	Se terminó el escudo.		
+	jr z,Incrementa_FRAMES		;	No hay escudo. Se agotó el tiempo Shield.		
 
 	dec (hl)					;	Decrementa tiempo Shield, (Shield).	
+
 	inc hl
 	dec (hl)					;	Decrementa temporizador de estados, (Shield_2).
+
 	jr nz,Incrementa_FRAMES
 
-; El temporizador de estados a llegado a "0". 
+; El temporizador de estados a llegado a "0". HL apunta a (Shield_2).
 
+Cambio_de_estado
+
+;	Indica cambio de estado.
+
+	inc hl						;	Sitúa en (Shield_3).	
+
+	bit 3,(hl)
+	jr z,2F	
+
+	call Inicia_Shield	
+
+	jr Incrementa_FRAMES
+
+2 rlc (hl)						; 	Sitúa en (Shield_3) y rotamos bit. (Indica cambio de comportamiento).
+
+;	Carga en (Shield_2) la siguiente temporización.
+
+	ld hl,(Puntero_datos_shield)
 	inc hl
-
-
-	set 0,(hl)					;	Bit 0 de (Shield_3) a "1". Indica que en este FRAME sólo borramos Amadeus, NO PINTAMOS.
-	dec hl
-	ld a,1
-	ld (hl),a					;	Colocamos el temporizador de estados (Shield_2) a "1" para cambiar de estado en el siguiente FRAME.
+	ld (Puntero_datos_shield),hl
+	ld a,(hl)
+	ld (Shield_2),a
 
 Incrementa_FRAMES
 
@@ -459,12 +476,15 @@ Puntero_indice_NIVELES defw 0
 Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos bytes_
 ; 														; _ que definen el NIVEL.
 
-;---------------------------------------------------------------------------------------------------------------
+; ---------------------------------------------------------------------------------------------------------------
 
 ; Temporizaciones Shield.
 
-Shield db 0
-Shield_2 db 20 
+Datos_Shield db 6,1,6,1									; Tiempos.
+Puntero_datos_shield defw 0								; Señala distintos tiempos para introducirlos en (Shield_2).
+Shield db $ff											; Temporización principal. Indica el tiempo que el escudo está activo. No hay escudo cuando (Shield)="0".					
+Shield_2 db 0 											; Almacena un tiempo, ( hacía el que apunta:  Puntero_datos_shield ).
+Shield_3 db 0
 
 ; 	INICIO  *************************************************************************************************************************************************************************
 ;
@@ -569,6 +589,9 @@ START
 ; Damos por concluida la construcción del FRAME. 
 ; 
 
+	call Inicia_Shield
+
+
 6 ld hl,(Scanlines_album_SP)
 	ld (Techo_Scanlines_album),hl
 
@@ -596,6 +619,12 @@ Main
 ; En el FRAME que acabamos de pintar puede existir una posible colisión entre alguna entidad y Amadeus. 
 ; Si alguna de las coordenadas_X de alguna entidad que esté en zona de Amadeus coincide con alguna de las coordenadas_X de Amadeus, habrá que comprobar si existe colisión.
 ; Este hecho lo indica el bit2 de (Impacto2).
+
+;	ld hl,Shield_3
+;	bit 3,(hl)
+;	di
+;	jr nz,$
+;	ei
 
 	call Detecta_colision_nave_entidad 					; La rutina verifica la colisión entre una entidad y Amadeus, (RES 2 Impacto2).
 
@@ -1825,12 +1854,30 @@ Pulsa_ENTER ld a,$bf 									; Esperamos la pulsación de la tecla "ENTER".
 
 ;	!!!!!!!! DESTRUYE BC !!!!!!!!!!!
 
-DELAY LD BC,$0900							;$0320 ..... Delay mínimo
-wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: si el Sprite ocupa la 1ª y 2ª_				
-	LD A,B 										
-	AND A
-	JR NZ,wait
-	RET
+;DELAY LD BC,$0900							;$0320 ..... Delay mínimo
+;wait DEC BC  								;Sumaremos $0045 por FILA a esta cantidad inicial. Ejempl: si el Sprite ocupa la 1ª y 2ª_				
+;	LD A,B 										
+;	AND A
+;	JR NZ,wait
+;	RET
+
+; ---------------------------------------------------------------------------------------------------------------
+;
+;	13/07/24
+;
+
+Inicia_Shield	
+
+	ld hl,Datos_Shield
+	ld (Puntero_datos_shield),hl 						; Inicia el puntero (Puntero_datos_shield), lo situamos en la 1ª temporización.
+
+	ld a,(hl)
+	ld (Shield_2),a										; (Shield_2) contiene la primera temporización.
+
+	ld a,1
+	ld (Shield_3),a										; (Shield_3) se inicia con "1".
+
+	ret
 
 ; ---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------
 ;
@@ -1848,9 +1895,9 @@ Actualiza_pantalla
 
 	ld a,(Ctrl_3)
 	bit 0,a
-	jr z,Funcion_SHIELD										 	  	; No pintamos si el FRAME no se ha completado.
+	jr z,Borrando_Amadeus									 	  	; No pintamos si el FRAME no se ha completado.
 	bit 2,a
-	jr z,Funcion_SHIELD                                             ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
+	jr z,Borrando_Amadeus                                           ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
 
 Borrando_entidades
 
@@ -1877,13 +1924,7 @@ Pintando_entidades
 	call Pinta_Sprites
 	jr Pintando_entidades
 
-Funcion_SHIELD
-
-	ld a,(Shield)
-	and a
-	jr z,Borrando_Amadeus
-	call Aplica_Shield
-	jr 1F
+; --------------------- ----------------------- ---------------------- ---------------------- ---------------
 
 Borrando_Amadeus
 
@@ -1907,6 +1948,8 @@ Pintando_Amadeus
 	jr z,1F
 	call Pinta_Sprites
 
+; --------------------- ----------------------- ---------------------- ---------------------- ---------------
+
 1 ld hl,Ctrl_3
 	res 0,(hl)											; Reinicia el flag de FRAME completo.
 	res 2,(hl)											; Reinicia el flag DETECTA MOVIMIENTO.
@@ -1917,9 +1960,59 @@ Pintando_Amadeus
 
 	ret									 
 
+; ---------------- -------------------- -------------------- ------------------------
+
 Aplica_Shield 
 
-	jr $
+;	Bit 1 "1" (Shield_3) Sólo borra.
+;		  "0"     ""     Borra/Pinta.
+;	Bit 2    ""  RET.	 No borra, no pinta. 
+
+	ld hl,Shield_3
+
+	bit 3,(hl)
+	jr nz,2F
+
+	bit 2,(hl)
+	ret nz
+
+	bit 1,(hl)
+	jr nz,1F	; No borramos, no pintamos. No existe Amadeus.
+
+; Borra-pinta, independientemente de que exista movimiento.
+
+	call Borra_Amadeus_shield
+2 call Pinta_Amadeus_shield
+	ret
+
+; Sólo borramos Amadeus.
+
+1 call Borra_Amadeus_shield
+	ret
+
+Borra_Amadeus_shield
+
+	ld hl,(Album_de_borrado_Amadeus)
+	call Extrae_address
+	inc h
+	dec h
+	jr z,1F
+
+	call Pinta_Sprites
+
+1 ld hl,(Album_de_pintado_Amadeus)
+	call Extrae_address
+
+	call Pinta_Sprites
+
+	ret
+	
+Pinta_Amadeus_shield 
+
+	ld hl,(Album_de_pintado_Amadeus)
+	call Extrae_address
+
+	call Pinta_Sprites
 
 	ret
 
