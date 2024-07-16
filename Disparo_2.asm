@@ -2,6 +2,12 @@ Colision_Entidad_Amadeus
 
 ; Posible contacto de entidad con Amadeus. ?????
 
+; Exclusiones:
+
+    ld hl,Impacto2                                         ; Salimos si tenemos una posible colisión con una entidad anterior. Tenemos almacenadas las coordenadas X de otra entidad.
+    bit 2,(hl)
+    ret nz
+
 	ld a,(Coordenada_y)
 	cp $14
 	ret c                                                  ; Salimos si la entidad no está en zona de Amadeus.
