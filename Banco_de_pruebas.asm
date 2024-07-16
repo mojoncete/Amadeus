@@ -1651,7 +1651,7 @@ Genera_datos_de_impresion_Amadeus
 														
 	ld a,ixl
 	and $1f
-	ld (CX_Amadeus),a 													; Coordenada X del Amadeus, (0-$1f). Columnas.
+	ld (CX_Amadeus),a 												; Coordenada X del Amadeus, (0-$1f). Columnas.
 
 	ld hl,(Scanlines_album_SP)
 	push hl
