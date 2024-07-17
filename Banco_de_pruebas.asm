@@ -480,7 +480,7 @@ Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos
 
 ; Temporizaciones Shield.
 
-Datos_Shield db 8,1,8,1									; Tiempos.
+Datos_Shield db 2,1,3,1									; Tiempos.
 Puntero_datos_shield defw 0								; Señala distintos tiempos para introducirlos en (Shield_2).
 Shield db 120											; Temporización principal. Indica el tiempo que el escudo está activo. No hay escudo cuando (Shield)="0".					
 Shield_2 db 0 											; Almacena un tiempo, ( hacía el que apunta:  Puntero_datos_shield ).
@@ -1897,7 +1897,7 @@ Actualiza_pantalla
 ;	bit 0,a
 ;	jr z,Ejecuta_escudo									 		  	; No pintamos si el FRAME no se ha completado.
 	bit 2,a
-	jr z,Ejecuta_escudo                                             ; No pintamos si no hay movimiento. El último FRAME impreso NO SE HA MODIFICADO!!.
+	jr z,Ejecuta_escudo                                             ; No hay movimiento de entidades. Saltamos a Amadeus.
 
 Borrando_entidades
 
@@ -1977,34 +1977,33 @@ Aplica_Shield
 	ld hl,Shield_3
 
 	bit 3,(hl)
-	call nz,Pinta_Amadeus_shield
-	jr nz,1B
+	jr nz,Pintando_Amadeus
 
 	bit 2,(hl)
 	jr nz,1B
 
 	bit 1,(hl)
 	call nz,Borra_Amadeus_shield
-	call z,Borra_Pinta_Amadeus_shield
+	
+	jr z,Borrando_Amadeus
 	jr 1B
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- -----  
 
 Borra_Amadeus_shield
 
-	ld hl,(Album_de_borrado_Amadeus)
-	call Extrae_address
-	inc h
-	dec h
+	ld a,(Ctrl_3)
+	bit 5,a
 	jr z,1F
 
-	call Pinta_Sprites
-	ret
+	ld hl,(Album_de_borrado_Amadeus)
+	call Extrae_address
+	jr 2F
 
 1 ld hl,(Album_de_pintado_Amadeus)
 	call Extrae_address
 
-	call Pinta_Sprites
+2 call Pinta_Sprites
 
 	xor a
 	inc a											; Asegura NZ en la salida de la rutina.
