@@ -452,6 +452,7 @@ Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posi
 ; Relojes y temporizaciones.
 
 Clock_explosion db 4									; Temporización de las explosiones, (velocidad de la explosión).
+Clock_explosion_Amadeus db 4
 
 RND_SP defw Numeros_aleatorios							; Puntero que se irá desplazando por el SET de nº aleatorios.
 
@@ -480,9 +481,9 @@ Datos_de_nivel defw 0									; Este puntero se va desplazando por los distintos
 
 ; Temporizaciones Shield.
 
-Datos_Shield db 2,1,3,1									; Tiempos.
+Datos_Shield db 2,1,2,1									; Tiempos.
 Puntero_datos_shield defw 0								; Señala distintos tiempos para introducirlos en (Shield_2).
-Shield db 120											; Temporización principal. Indica el tiempo que el escudo está activo. No hay escudo cuando (Shield)="0".					
+Shield db 90											; Temporización principal. Indica el tiempo que el escudo está activo. No hay escudo cuando (Shield)="0".					
 Shield_2 db 0 											; Almacena un tiempo, ( hacía el que apunta:  Puntero_datos_shield ).
 Shield_3 db 0
 
@@ -749,12 +750,11 @@ Main
 	ld a,(Impacto_Amadeus)
 	and a
 	call nz,Genera_explosion
-	jr Gestiona_siguiente_entidad
+	jr nz,Gestiona_siguiente_entidad
 
 ; Falsa colisión !!!	
 	
 	ld (Impacto),a											; Colocamos el .db (Impacto) de la entidad en curso a "0".
-	jr 8F
 
 ;19 ld hl,Ctrl_2											; Activamos el proceso de explosión.
 ;	set 1,(hl)
@@ -880,7 +880,11 @@ Gestiona_siguiente_entidad
 
 Gestion_de_Amadeus
  
-; Existe movimiento???, Disparamos???, Pausamos el juego???
+; Hay Impacto???, Existe movimiento???, Disparamos???, Pausamos el juego???
+
+	ld a,(Impacto_Amadeus)
+	and a
+	call nz, Genera_explosion_Amadeus
 
 	call Teclado
 
@@ -1605,7 +1609,9 @@ Cargamos_registros_con_mov_masticado
 
 	ret
 
-;	6/7/24
+; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
+;
+;	22/7/24
 
 Cargamos_registros_con_explosion
 
@@ -1616,6 +1622,19 @@ Cargamos_registros_con_explosion
 	ld d,h 															; Puntero objeto, (Explosión), en DE.
 
 	ld ix,(Puntero_de_impresion)									; IX contiene Puntero_de_impresion.
+
+	ret
+
+
+Cargamos_registros_con_explosion_Amadeus
+
+	ld hl,(Pamm_Amadeus)
+	call Extrae_address
+
+	ld e,l
+	ld d,h 	
+
+	ld ix,(p.imp.amadeus)
 
 	ret
 
@@ -2110,6 +2129,10 @@ Borra_entidad_colisionada
 	call Recauda_informacion_de_entidad_en_curso					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
 	call Cargamos_registros_con_explosion
 	call Genera_datos_de_impresion
+
+	xor a
+	inc a 															; Necesario NZ a la salida de la subrutina.
+
 	ret
 
 Siguiente_frame_explosion
@@ -2138,7 +2161,32 @@ Siguiente_frame_explosion
 	call Recauda_informacion_de_entidad_en_curso					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
 	call Cargamos_registros_con_explosion
 	call Genera_datos_de_impresion
+
+	xor a
+	inc a 															; Necesario NZ a la salida de la subrutina.
+
 	ret
+
+Genera_explosion_Amadeus
+
+	di
+	jr $
+	ei
+
+	ld hl,Clock_explosion_Amadeus								
+	dec (hl)
+	jr z,Siguiente_frame_explosion_Amadeus							; Gestionamos la siguiente entidad.
+
+Borra_Amadeus_impactado.
+
+	call Cargamos_registros_con_explosion_Amadeus
+;	call Genera_datos_de_impresion
+
+
+
+Siguiente_frame_explosion_Amadeus 
+
+
 
 ; ---------------------------------------------------------------
 
