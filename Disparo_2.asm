@@ -236,7 +236,7 @@ Detecta_colision_nave_entidad
 
 ; Situamos también el (Puntero_de_almacen_de_mov_masticados) de Amadeus en la primero explosión.
 
-    ld hl,(Pamm_Amadeus)
+    ld hl,Pamm_Amadeus
     ld (hl),e
     inc l
     ld (hl),d

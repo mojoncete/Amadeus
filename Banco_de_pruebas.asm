@@ -621,10 +621,10 @@ Main
 ; Si alguna de las coordenadas_X de alguna entidad que esté en zona de Amadeus coincide con alguna de las coordenadas_X de Amadeus, habrá que comprobar si existe colisión.
 ; Este hecho lo indica el bit2 de (Impacto2).
 
-;	ld hl,Shield_3
-;	bit 3,(hl)
+;	ld a,(Clock_explosion_Amadeus)
+;	cp 3
 ;	di
-;	jr nz,$
+;	jr z,$
 ;	ei
 
 	call Detecta_colision_nave_entidad 					; La rutina verifica la colisión entre una entidad y Amadeus, (RES 2 Impacto2).
@@ -885,6 +885,7 @@ Gestion_de_Amadeus
 	ld a,(Impacto_Amadeus)
 	and a
 	call nz, Genera_explosion_Amadeus
+	jr nz, End_frame
 
 	call Teclado
 
@@ -1615,6 +1616,7 @@ Cargamos_registros_con_mov_masticado
 
 Cargamos_registros_con_explosion
 
+
 	ld hl,(Puntero_de_almacen_de_mov_masticados)
 	call Extrae_address
 
@@ -1630,6 +1632,7 @@ Cargamos_registros_con_explosion_Amadeus
 
 	ld hl,(Pamm_Amadeus)
 	call Extrae_address
+
 
 	ld e,l
 	ld d,h 	
@@ -1662,13 +1665,20 @@ Cargamos_registros_con_mov_masticado_Amadeus
 ;
 ;	18/6/24
 ;
-;	Genera la coordenada X de Amadeus y los datos de impresión en la nave en su (Album_de_pintado_Amadeus).
+;	Genera la coordenada X de Amadeus y los datos de impresión de la nave en su (Album_de_pintado_Amadeus).
 
 Genera_datos_de_impresion_Amadeus 
 
-	call Cargamos_registros_con_mov_masticado_Amadeus			
-														
-	ld a,ixl
+	ld a,(Impacto_Amadeus)
+	and a
+	jr nz,1F
+
+; Si existe impacto en Amadeus ya tendremos modificados los registros DE con (Puntero_objeto)_
+; _apuntando a la correspondiente explosión.
+
+	call Cargamos_registros_con_mov_masticado_Amadeus	
+
+1 ld a,ixl
 	and $1f
 	ld (CX_Amadeus),a 												; Coordenada X del Amadeus, (0-$1f). Columnas.
 
@@ -2087,6 +2097,7 @@ Teclado
 	and $01
 	ret z
 
+
 	ld a,$f7
 	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
 	and $02													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $02 resulta "0"  llama a la rutina "Mov_der".
@@ -2151,40 +2162,71 @@ Siguiente_frame_explosion
 
 	ld hl,Entidades_en_curso
 	dec (hl)
-
 	call Limpiamos_bandeja_DRAW
 
 1 inc l
 	inc l
 	ld (Puntero_de_almacen_de_mov_masticados),hl
+	jr Borra_entidad_colisionada
 
-	call Recauda_informacion_de_entidad_en_curso					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
-	call Cargamos_registros_con_explosion
-	call Genera_datos_de_impresion
+; ----- ----- ----- ----- -----
+
+Genera_explosion_Amadeus
+
+	ld hl,Ctrl_3
+	set 5,(hl)														; Indicamos que hay movimiento, (se modifica el Sprite debido a la explosión).
+
+	ld hl,Clock_explosion_Amadeus								
+	dec (hl)
+	jr z,Siguiente_frame_explosion_Amadeus							; Gestionamos la siguiente entidad.
+
+Borra_Amadeus_impactado
+
+	call Change_Amadeus
+	call Cargamos_registros_con_explosion_Amadeus
+	call Genera_datos_de_impresion_Amadeus
 
 	xor a
 	inc a 															; Necesario NZ a la salida de la subrutina.
 
 	ret
 
-Genera_explosion_Amadeus
+Siguiente_frame_explosion_Amadeus 
+
+	ld (hl),4 														; Inicializamos (Clock_explosion_Amadeus), (velocidad de la explosión).
+
+; Avanza Frame de explosión.
+
+	ld hl,(Pamm_Amadeus)
+	ld bc,Explosion_2x3_1-2
+	ld a,c
+	sub l
+	jr nz,1F
+
+; Fín de Amadeus !!!!!!!!!!!!!
 
 	di
 	jr $
 	ei
 
-	ld hl,Clock_explosion_Amadeus								
-	dec (hl)
-	jr z,Siguiente_frame_explosion_Amadeus							; Gestionamos la siguiente entidad.
-
-Borra_Amadeus_impactado.
-
-	call Cargamos_registros_con_explosion_Amadeus
-;	call Genera_datos_de_impresion
+1 inc l
+	inc l
+	ld (Pamm_Amadeus),hl
+	jr Borra_Amadeus_impactado
 
 
 
-Siguiente_frame_explosion_Amadeus 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
