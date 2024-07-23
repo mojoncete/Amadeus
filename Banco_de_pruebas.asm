@@ -402,7 +402,8 @@ Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una únic
 ;																_ a la baja. 
 ; 															BIT 4, "1" Indica que hemos terminado de ordenar la Tabla_de_pintado. Podremos salir así de la rutina [Ordena_tabla_de_impresion].
 ;															BIT 5, "1" Indica que existe movimiento de Amadeus.
-
+;															BIT 6, "1" Indica que Amadeus ha sido destruido. Este bit lo activa la rutina [Genera_explosion_Amadeus] despues de pintar_
+; 																_ el último frame de la explosión de nuestra nave.
 
 Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una única entidad. Lo utiliza la rutina [Inicia_entidad].
 ;
@@ -453,6 +454,7 @@ Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posi
 
 Clock_explosion db 4									; Temporización de las explosiones, (velocidad de la explosión).
 Clock_explosion_Amadeus db 4
+Temp_new_live db $ff									; Tiempo que tarda en aparecer una nueva nave Amadeus tras ser destruida.
 
 RND_SP defw Numeros_aleatorios							; Puntero que se irá desplazando por el SET de nº aleatorios.
 
@@ -486,6 +488,7 @@ Puntero_datos_shield defw 0								; Señala distintos tiempos para introducirlo
 Shield db 90											; Temporización principal. Indica el tiempo que el escudo está activo. No hay escudo cuando (Shield)="0".					
 Shield_2 db 0 											; Almacena un tiempo, ( hacía el que apunta:  Puntero_datos_shield ).
 Shield_3 db 0
+Lives db 10
 
 ; 	INICIO  *************************************************************************************************************************************************************************
 ;
@@ -533,6 +536,7 @@ START
 
 	call Inicia_albumes_de_lineas						 ; (Album_de_pintado) contiene $8000
 ;														 ; (Album_de_borrado) contiene $9000
+	call Inicia_albumes_de_lineas_Amadeus
 
 4 call Inicia_Entidades						 
 	call Inicia_Amadeus
@@ -620,12 +624,6 @@ Main
 ; En el FRAME que acabamos de pintar puede existir una posible colisión entre alguna entidad y Amadeus. 
 ; Si alguna de las coordenadas_X de alguna entidad que esté en zona de Amadeus coincide con alguna de las coordenadas_X de Amadeus, habrá que comprobar si existe colisión.
 ; Este hecho lo indica el bit2 de (Impacto2).
-
-;	ld a,(Clock_explosion_Amadeus)
-;	cp 3
-;	di
-;	jr z,$
-;	ei
 
 	call Detecta_colision_nave_entidad 					; La rutina verifica la colisión entre una entidad y Amadeus, (RES 2 Impacto2).
 
@@ -880,7 +878,52 @@ Gestiona_siguiente_entidad
 
 Gestion_de_Amadeus
  
+	ld hl,Ctrl_3
+	bit 6,(hl)
+	jr z,Amadeus_vivo
+
+; Amadeus ha sido destruido.
+; Decrementa (Temp_new_live).
+
+	ld hl,Temp_new_live
+	dec (hl)
+	jr nz,End_frame
+
+; Una vida menos. Reinicia Amadeus, reinicia Shield. (aparece nueva nave).
+
+	ld hl,Lives
+	dec (hl)
+	di
+	jr z,$
+	ei
+
+; Nueva nave.
+
+Reinicia_Amadeus
+
+;	Reinicia posición y estado.
+
+	ld hl,$50cf
+	ld (p.imp.amadeus),hl
+	ld hl,$e0f0
+	ld (Pamm_Amadeus),hl
+	ld hl,$003d
+	ld (Comm_Amadeus),hl
+
+	ld hl,Ctrl_3
+	res 6,(hl)
+
+
+	di
+	jr $
+	ei
+
+
+
+
 ; Hay Impacto???, Existe movimiento???, Disparamos???, Pausamos el juego???
+
+Amadeus_vivo
 
 	ld a,(Impacto_Amadeus)
 	and a
@@ -1711,7 +1754,9 @@ Inicia_albumes_de_lineas
 	ld hl,Scanlines_album_2
 	ld (Album_de_borrado),hl
 
-;	Amadeus.
+	ret
+
+Inicia_albumes_de_lineas_Amadeus
 
 	ld hl,Amadeus_scanlines_album
 	ld (Album_de_pintado_Amadeus),hl
@@ -1719,8 +1764,6 @@ Inicia_albumes_de_lineas
 	ld (Album_de_borrado_Amadeus),hl
 
 	ret
-
-
 
 ; ---------------------------------------------------------------------------------------------------------------------
 ;
@@ -2204,10 +2247,12 @@ Siguiente_frame_explosion_Amadeus
 	jr nz,1F
 
 ; Fín de Amadeus !!!!!!!!!!!!!
+; Activamos el FLAG de Amadeus destruido, ( bit_6 Ctrl_3 ).
 
-	di
-	jr $
-	ei
+	xor a
+	ld (Impacto_Amadeus),a
+	ld hl,Ctrl_3
+	set 6,(hl)
 
 1 inc l
 	inc l

@@ -4,7 +4,11 @@ Colision_Entidad_Amadeus
 
 ; Exclusiones:
 
-    ld hl,Impacto2                                         ; Salimos si tenemos una posible colisión con una entidad anterior. Tenemos almacenadas las coordenadas X de otra entidad.
+    ld hl,Ctrl_3
+    bit 6,(hl)
+    ret nz                                                 ; Salimos si Amadeus ha sido destruido y estamos esperando nueva nave o mensaje final.
+
+    ld hl,Impacto2                                         ; Salimos si tenemos una posible colisión de una entidad anterior. Tenemos almacenadas las coordenadas X de otra entidad.
     bit 2,(hl)
     ret nz
 
@@ -131,6 +135,8 @@ Comparando_1 cp b
 ;   
 
 Detecta_colision_nave_entidad 
+
+; Exclusiones:
 
 ; Salimos de la rutina si no hay advertencia de posible colisión.
 
