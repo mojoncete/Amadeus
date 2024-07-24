@@ -4,6 +4,10 @@ Colision_Entidad_Amadeus
 
 ; Exclusiones:
 
+    ld a,(Shield)
+    and a
+    ret nz                                                 ; No comprobamos contacto si existe Shield.
+
     ld hl,Ctrl_3
     bit 6,(hl)
     ret nz                                                 ; Salimos si Amadeus ha sido destruido y estamos esperando nueva nave o mensaje final.

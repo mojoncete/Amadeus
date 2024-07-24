@@ -454,7 +454,7 @@ Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posi
 
 Clock_explosion db 4									; Temporización de las explosiones, (velocidad de la explosión).
 Clock_explosion_Amadeus db 4
-Temp_new_live db $ff									; Tiempo que tarda en aparecer una nueva nave Amadeus tras ser destruida.
+Temp_new_live db 100									; Tiempo que tarda en aparecer una nueva nave Amadeus tras ser destruida.
 
 RND_SP defw Numeros_aleatorios							; Puntero que se irá desplazando por el SET de nº aleatorios.
 
@@ -488,7 +488,8 @@ Puntero_datos_shield defw 0								; Señala distintos tiempos para introducirlo
 Shield db 90											; Temporización principal. Indica el tiempo que el escudo está activo. No hay escudo cuando (Shield)="0".					
 Shield_2 db 0 											; Almacena un tiempo, ( hacía el que apunta:  Puntero_datos_shield ).
 Shield_3 db 0
-Lives db 10
+
+Lives db 6
 
 ; 	INICIO  *************************************************************************************************************************************************************************
 ;
@@ -893,33 +894,17 @@ Gestion_de_Amadeus
 
 	ld hl,Lives
 	dec (hl)
+
+;! Fin del juego
+
 	di
 	jr z,$
 	ei
 
 ; Nueva nave.
 
-Reinicia_Amadeus
-
-;	Reinicia posición y estado.
-
-	ld hl,$50cf
-	ld (p.imp.amadeus),hl
-	ld hl,$e0f0
-	ld (Pamm_Amadeus),hl
-	ld hl,$003d
-	ld (Comm_Amadeus),hl
-
-	ld hl,Ctrl_3
-	res 6,(hl)
-
-
-	di
-	jr $
-	ei
-
-
-
+	call Reinicia_Amadeus
+	jr End_frame
 
 ; Hay Impacto???, Existe movimiento???, Disparamos???, Pausamos el juego???
 
@@ -1156,6 +1141,56 @@ End_frame
 ;	call Limpia_Variables_de_borrado
 
 ;3 ret													
+
+; ----- ----- ----- ----- ----- ----- ----- ----- -----
+;
+;	24/07/24
+
+Reinicia_Amadeus
+
+; 	Restauramos el FLAG: Amadeus vivo.
+
+	ld hl,Ctrl_3
+	res 6,(hl)
+
+;	Reinicia posición y estado.
+
+	ld hl,$50cf
+	ld (p.imp.amadeus),hl
+	ld hl,$e0f0
+	ld (Pamm_Amadeus),hl
+	ld hl,$003d
+	ld (Comm_Amadeus),hl
+
+;	limpiamos el álbum de borrado.
+
+	ld hl,(Album_de_borrado_Amadeus)
+
+	push hl
+	pop de
+	inc de
+
+	ld bc,35
+	ldir
+
+	call Genera_datos_de_impresion_Amadeus
+
+;	Fuerza la impresión de la nave en el siguiente frame.
+
+ 	ld hl,Ctrl_3	
+	set 5,(hl)
+
+;	Reinicia temporizaciones.
+
+	call Inicia_Shield
+
+	ld a,90
+	ld (Shield),a
+
+	ld a,100
+	ld (Temp_new_live),a
+
+	ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
@@ -1675,7 +1710,6 @@ Cargamos_registros_con_explosion_Amadeus
 
 	ld hl,(Pamm_Amadeus)
 	call Extrae_address
-
 
 	ld e,l
 	ld d,h 	
