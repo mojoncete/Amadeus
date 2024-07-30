@@ -139,7 +139,7 @@ Indice_de_cajas_de_entidades
 
 ; Relleno para que no se corrompa el movimiento. ?????
 
-	db 0
+;	db 0
 
 ; ---------- ---------- ---------- ---------- ----------
 ;

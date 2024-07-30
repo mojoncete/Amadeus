@@ -453,7 +453,7 @@ Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posi
 ; Relojes y temporizaciones.
 
 Clock_explosion db 4									; Temporización de las explosiones, (velocidad de la explosión).
-Clock_explosion_Amadeus db 4
+Clock_explosion_Amadeus db 5
 Temp_new_live db 100									; Tiempo que tarda en aparecer una nueva nave Amadeus tras ser destruida.
 
 RND_SP defw Numeros_aleatorios							; Puntero que se irá desplazando por el SET de nº aleatorios.
@@ -2230,7 +2230,7 @@ Siguiente_frame_explosion
 ; Avanza Frame de explosión.
 
 	ld hl,(Puntero_de_almacen_de_mov_masticados)
-	ld bc,Explosion_2x3_1-2
+	ld bc,Explosion_entidades_1-2
 	ld a,c
 	sub l
 	jr nz,1F
@@ -2270,12 +2270,12 @@ Borra_Amadeus_impactado
 
 Siguiente_frame_explosion_Amadeus 
 
-	ld (hl),4 														; Inicializamos (Clock_explosion_Amadeus), (velocidad de la explosión).
+	ld (hl),5 														; Inicializamos (Clock_explosion_Amadeus), (velocidad de la explosión).
 
 ; Avanza Frame de explosión.
 
 	ld hl,(Pamm_Amadeus)
-	ld bc,Explosion_2x3_1-2
+	ld bc,Explosion_Amadeus_1-2
 	ld a,c
 	sub l
 	jr nz,1F

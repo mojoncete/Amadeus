@@ -253,11 +253,11 @@ Amadeus_Fd DEFB	$00,$06,$00,$00,$8F,$10,$00,$99
 
 ;	org $8690
 
-Indice_Explosion_2x3 defw Explosion_2x3_1
-	defw Explosion_2x3_2
-	defw Explosion_2x3_3
+Indice_Explosion_entidades defw Explosion_entidades_1
+	defw Explosion_entidades_2
+	defw Explosion_entidades_3
 
-Explosion_2x3_1 DEFB $00,$10,$00
+Explosion_entidades_1 DEFB $00,$10,$00
 	DEFB 	$08,$10,$00
 	DEFB	$04,$38,$40
 	DEFB	$03,$7D,$80
@@ -274,7 +274,7 @@ Explosion_2x3_1 DEFB $00,$10,$00
 	DEFB	$04,$00,$00
 	DEFB	$08,$00,$00
 
-Explosion_2x3_2 DEFB $08,$00,$00,$05,$38,$10,$03,$BC
+Explosion_entidades_2 DEFB $08,$00,$00,$05,$38,$10,$03,$BC
 	DEFB	$20,$06,$00,$C0,$04,$06,$C0,$00
 	DEFB	$37,$00,$00,$7F,$00,$03,$DD,$80
 	DEFB	$03,$FE,$00,$03,$3A,$70,$01,$9C
@@ -283,7 +283,7 @@ Explosion_2x3_2 DEFB $08,$00,$00,$05,$38,$10,$03,$BC
 
 	org $8600
 
-Explosion_2x3_3 DEFB $03,$18,$10,$04,$00,$20,$08,$00
+Explosion_entidades_3 DEFB $03,$18,$10,$04,$00,$20,$08,$00
 	DEFB	$40,$00,$00,$C0,$00,$06,$00,$00
 	DEFB	$15,$00,$08,$1E,$00,$00,$14,$30
 	DEFB	$08,$66,$00,$00,$38,$00,$01,$08
@@ -292,27 +292,58 @@ Explosion_2x3_3 DEFB $03,$18,$10,$04,$00,$20,$08,$00
 
 ; ------------------------------------------
 
-Indice_Explosion_2x2 defw Explosion_2x2_1
-	defw Explosion_2x2_2
-	defw Explosion_2x2_3
+Indice_Explosion_Amadeus defw Explosion_Amadeus_1
+	defw Explosion_Amadeus_2
+	defw Explosion_Amadeus_3
 
-Explosion_2x2_1 DEFB $01,$00,$81,$00,$43,$84,$37,$D8
-	DEFB	$2E,$68,$1B,$70,$17,$F0,$3D,$D8
-	DEFB	$FF,$FE,$33,$B8,$19,$D0,$1F,$60
-	DEFB	$2F,$D8,$30,$04,$40,$00,$80,$00
+Explosion_Amadeus_1	DEFB $00,$18,$02
+	DEFB	$02,$3C,$36
+	DEFB	$02,$66,$56
+	DEFB	$02,$42,$48
+	DEFB	$02,$C3,$32
+	DEFB	$06,$DB,$0C
+	DEFB	$06,$FE,$46
+	DEFB	$06,$79,$68
+	DEFB	$0E,$76,$D8
+	DEFB	$1E,$34,$6C
+	DEFB	$0F,$6E,$BE
+	DEFB	$0F,$EF,$B0
+	DEFB	$0F,$B5,$A0
+	DEFB	$0F,$B1,$8A
+	DEFB	$08,$BA,$4C
+	DEFB	$07,$19,$80
 
+Explosion_Amadeus_2	DEFB $00,$18,$02
+	DEFB	$00,$3C,$36
+	DEFB	$00,$66,$56
+	DEFB	$04,$42,$48
+	DEFB	$0A,$03,$32
+	DEFB	$14,$DB,$0C
+	DEFB	$1C,$DE,$46
+	DEFB 	$36,$49,$68
+	DEFB	$0C,$76,$D8
+	DEFB	$10,$34,$6C
+	DEFB	$2B,$6E,$BE
+	DEFB	$0E,$AF,$B0
+	DEFB	$29,$B5,$A0
+	DEFB	$0C,$91,$8A
+	DEFB	$08,$BA,$4C
+	DEFB	$07,$19,$80
 
-Explosion_2x2_2	DEFB $80,$00,$53,$81,$3B,$C2,$60,$0C
-	DEFB	$40,$6C,$03,$70,$07,$F0,$3D,$D8
-	DEFB	$3F,$E0,$33,$A7,$19,$C6,$1F,$64
-	DEFB	$4F,$88,$60,$00,$80,$00,$00,$00
-
-Explosion_2x2_3	DEFB $31,$81,$40,$02,$88,$04,$10,$0C
-	DEFB	$20,$60,$01,$50,$81,$E0,$01,$43
-	DEFB	$86,$60,$03,$80,$10,$80,$18,$00
-	DEFB	$08,$00,$40,$32,$60,$01,$80,$02
-
-
-
-			
+Explosion_Amadeus_3	DEFB $00,$00,$00
+	DEFB	$00,$00,$00
+	DEFB	$00,$00,$00
+	DEFB	$00,$00,$40
+	DEFB	$00,$00,$30
+	DEFB	$00,$00,$08
+	DEFB	$00,$82,$40
+	DEFB	$04,$04,$68
+	DEFB	$04,$20,$58
+	DEFB	$18,$12,$2C
+	DEFB	$2A,$40,$3C
+	DEFB	$0F,$C2,$30
+	DEFB	$29,$80,$A0
+	DEFB	$0F,$84,$88
+	DEFB	$08,$A0,$4C
+	DEFB	$07,$11,$80		
 

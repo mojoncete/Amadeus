@@ -235,7 +235,7 @@ Detecta_colision_nave_entidad
     ld hl,Impacto2                                 ; Cuando se produce Colisión, RES el bit2 de (Impacto2) y_
     res 2,(hl)                                     ; _ SET el bit3. El bit3 de (Impacto2) indica que hay contacto_
 
-    ld de,Indice_Explosion_2x3
+    ld de,Indice_Explosion_entidades
     ld hl,(Entidad_sospechosa_de_colision)         ; Situamos el (Puntero_de_almacen_de_mov_masticados) de la entidad impactada en la primera palabra del índice de explosiones.
     inc l
     inc l
@@ -246,6 +246,7 @@ Detecta_colision_nave_entidad
 
 ; Situamos también el (Puntero_de_almacen_de_mov_masticados) de Amadeus en la primero explosión.
 
+    ld de,Indice_Explosion_Amadeus
     ld hl,Pamm_Amadeus
     ld (hl),e
     inc l
