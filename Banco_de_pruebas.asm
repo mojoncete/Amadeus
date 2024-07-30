@@ -1166,6 +1166,9 @@ Reinicia_Amadeus
 
 	ld hl,(Album_de_borrado_Amadeus)
 
+	xor a
+	ld (hl),a
+
 	push hl
 	pop de
 	inc de
@@ -1174,11 +1177,6 @@ Reinicia_Amadeus
 	ldir
 
 	call Genera_datos_de_impresion_Amadeus
-
-;	Fuerza la impresión de la nave en el siguiente frame.
-
- 	ld hl,Ctrl_3	
-	set 5,(hl)
 
 ;	Reinicia temporizaciones.
 
@@ -1189,6 +1187,11 @@ Reinicia_Amadeus
 
 	ld a,100
 	ld (Temp_new_live),a
+
+;	Fuerza la impresión de la nave en el siguiente frame.
+
+ 	ld hl,Ctrl_3	
+	set 5,(hl)
 
 	ret
 
@@ -2239,6 +2242,7 @@ Siguiente_frame_explosion
 
 	ld hl,Entidades_en_curso
 	dec (hl)
+
 	call Limpiamos_bandeja_DRAW
 
 1 inc l
