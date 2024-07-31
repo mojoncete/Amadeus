@@ -357,7 +357,7 @@ Indice_restore_caja defw 0
 Numero_de_entidades db 0								; Nº total de entidades maliciosas que contiene el nivel.
 Numero_parcial_de_entidades db 7						; Nº de cajas que contiene un bloque de entidades. (7 Cajas).
 Entidades_en_curso db 0									; ..... ..... .....
-Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
+;Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
 ;														; Esta variable es utilizada por la rutina [Genera_datos_de_impresion]_
 ;														; _ para actualizar el puntero (Scanlines_album_SP) o reiniciarlo cuando_
 ;														; _ (Numero_de_malotes)="0".
@@ -435,6 +435,13 @@ Impacto2 db 0											; Este byte indica que se ha producido impacto:
 ;														; bit_2. La rutina [Genera_coordenadas_X] coloca este bit a "1" para indicar que hay una posible colisión entre una entidad y Amadeus.
 ;																 Una de la entidades ha entrado en zona de Amadeus y alguna de sus columnas coincide con las de nuestra nave.
 ;																 El bit indica que hay que ejecutar [Detecta_colision_nave_entidad] al principio de [Main], (Construcción del frame).
+
+
+
+
+
+
+
 
 Entidad_sospechosa_de_colision defw 0					; Almacena la dirección de memoria donde se encuentra el .db_
 ;														; _(Impacto) de la entidad que ocupa el mismo espacio que Amadeus.
@@ -1148,10 +1155,6 @@ End_frame
 
 Reinicia_Amadeus
 
-; 	Restauramos el FLAG: Amadeus vivo.
-
-	ld hl,Ctrl_3
-	res 6,(hl)
 
 ;	Reinicia posición y estado.
 
@@ -1187,6 +1190,11 @@ Reinicia_Amadeus
 
 	ld a,100
 	ld (Temp_new_live),a
+
+; 	Restauramos el FLAG: Amadeus vivo.
+
+	ld hl,Ctrl_3
+	res 6,(hl)
 
 ;	Fuerza la impresión de la nave en el siguiente frame.
 
@@ -2240,8 +2248,10 @@ Siguiente_frame_explosion
 
 ; Fín de la entidad !!!!!!!!!!!!!
 
-	ld hl,Entidades_en_curso
+	ld hl,Numero_parcial_de_entidades
 	dec (hl)
+	inc hl
+	dec (hl)														; Decrementa (Numero_de_entidades) y (Numero_parcial_de_entidades).
 
 	call Limpiamos_bandeja_DRAW
 
@@ -2254,9 +2264,6 @@ Siguiente_frame_explosion
 
 Genera_explosion_Amadeus
 
-	ld hl,Ctrl_3
-	set 5,(hl)														; Indicamos que hay movimiento, (se modifica el Sprite debido a la explosión).
-
 	ld hl,Clock_explosion_Amadeus								
 	dec (hl)
 	jr z,Siguiente_frame_explosion_Amadeus							; Gestionamos la siguiente entidad.
@@ -2266,6 +2273,9 @@ Borra_Amadeus_impactado
 	call Change_Amadeus
 	call Cargamos_registros_con_explosion_Amadeus
 	call Genera_datos_de_impresion_Amadeus
+
+	ld hl,Ctrl_3
+	set 5,(hl)														; Indicamos que hay movimiento, (se modifica el Sprite debido a la explosión).
 
 	xor a
 	inc a 															; Necesario NZ a la salida de la subrutina.
