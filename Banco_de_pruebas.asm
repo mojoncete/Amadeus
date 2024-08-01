@@ -426,8 +426,10 @@ Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una únic
 ; Gestión de Disparos.
 
 ;Numero_de_disparotes db 0	
-;Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
-;Puntero_DESPLZ_DISPARO_AMADEUS defw 0
+
+Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
+Puntero_DESPLZ_DISPARO_AMADEUS defw 0
+
 Impacto2 db 0											; Este byte indica que se ha producido impacto:
 ; 														; (Impacto)="1". El impacto se produce en una entidad.
 ;														; (Impacto)="2". El impacto se produce en Amadeus.
@@ -534,16 +536,8 @@ START
 ;														 ; Situa (Puntero_indice_NIVELES) el el primer defw., (nivel) del índice de niveles.
 ;														 ; Inicializa (Numero_de_entidades) con el nº total de malotes del nivel.
 ;														 ; Inicializa (Datos_de_nivel) con el `tipo´ de la 1ª entidad del nivel. 
-	;	Provisional, (para desarrollo).
-	;-
-;	ld hl,Numero_parcial_de_entidades
-;	ld b,(hl)
-;	inc b
-;	dec b
-;	jr z,3F	;-									   		 ; Si no hay entidades, cargamos AMADEUS.
-
-	call Inicia_albumes_de_lineas						 ; (Album_de_pintado) contiene $8000
-;														 ; (Album_de_borrado) contiene $9000
+	call Inicia_albumes_de_lineas						 
+;														 
 	call Inicia_albumes_de_lineas_Amadeus
 
 4 call Inicia_Entidades						 
@@ -569,6 +563,7 @@ START
 
 	call Inicia_punteros_de_cajas						 ; Situa (Puntero_store_caja) en el 1er .db de la 1ª caja del índice de entidades.
 ;														 ; Situa (Puntero_restore_caja) en el 1er .db de la 2ª caja del índice de cajas de entidades.
+
 ; Si Amadeus ya está iniciado, saltamos a [Inicia_punteros_de_cajas] y [Restore_entidad].
 ; (Esto se dá cuando se inicia una nueva oleada).
 
@@ -581,8 +576,8 @@ START
 
 ; 	INICIA DISPAROS !!!!!
 
-;	call Inicia_Puntero_Disparo_Entidades
-;	call Inicia_Puntero_Disparo_Amadeus
+	call Inicia_Puntero_Disparo_Entidades
+	call Inicia_Puntero_Disparo_Amadeus
 
 ; Una vez inicializadas las entidades y Amadeus, Cargamos la 1ª entidad en DRAW.
 
@@ -1837,12 +1832,12 @@ Inicia_punteros_de_cajas
 ;
 ;	Inicializamos los punteros de selección de los 2 índices de disparo, Amadeus y Entidades.
 
-;Inicia_Puntero_Disparo_Entidades ld hl,Indice_de_disparos_entidades
-;	ld (Puntero_DESPLZ_DISPARO_ENTIDADES),hl
-;	ret
-;Inicia_Puntero_Disparo_Amadeus ld hl,Indice_de_disparos_Amadeus
-;	ld (Puntero_DESPLZ_DISPARO_AMADEUS),hl
-;	ret
+Inicia_Puntero_Disparo_Entidades ld hl,Indice_de_disparos_entidades
+	ld (Puntero_DESPLZ_DISPARO_ENTIDADES),hl
+	ret
+Inicia_Puntero_Disparo_Amadeus ld hl,Indice_de_disparos_Amadeus
+	ld (Puntero_DESPLZ_DISPARO_AMADEUS),hl
+	ret
 
 ; *************************************************************************************************************************************************************
 ;
@@ -2151,18 +2146,18 @@ Borra_Pinta_Amadeus_shield
 	
 Teclado
 
-; Examina_disparo 
+; Está habilitado el disparo de Amadeus??, podemos disparar??. Si no es así saltamos a 1F.
 
 	ld a,(Disparo_Amadeus)
 	dec a
 	jr nz,1F
 
-	ld a,$f7													; "5" para disparar.
+	ld a,$f7												; "5" para disparar.
 	in a,($fe)
 	and $10
 
 ;	push af
-;	call z,Genera_disparo
+	call z,Genera_disparo
 ;	pop af
 
 	jr nz,1F

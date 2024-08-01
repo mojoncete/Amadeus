@@ -42,12 +42,10 @@ Indice_de_disparos_Amadeus defw Disparo_1A
 Disparo_1A defw 0									; Control.
 	defw 0											; Puntero objeto.
 ON_Disparo_2A defw 0								; Puntero de impresión.
-	defw 0											; Rutina de impresión.										
-
+							
 Disparo_2A defw 0									; Control.
 	defw 0											; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	defw 0											; Rutina de impresión.			
 
 Disparo_3A defw 0	
 
@@ -66,52 +64,42 @@ Indice_de_disparos_entidades defw Disparo_1
 Disparo_1 defw 0									; Control. 
 	defw 0											; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	defw 0											; Rutina de impresión.										
-
+						
 Disparo_2 defw 0									; Control.
 	defw 0											; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	defw 0											; Rutina de impresión.				
 
 Disparo_3 defw 0									; Control.
 	defw 0											; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	defw 0											; Rutina de impresión.								
-
+						
 Disparo_4 defw 0									; Control.
 	defw 0											; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	defw 0											; Rutina de impresión.		
 
 Disparo_5 defw 0									; Control.
 	defw 0											; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	defw 0											; Rutina de impresión.		
 
 Disparo_6 defw 0									; Control.
 	defw 0											; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	defw 0											; Rutina de impresión.		
 
 Disparo_7 defw 0									; Control.
 	defw 0											; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	defw 0											; Rutina de impresión.									
 
 Disparo_8 defw 0									; Control.
 	defw 0											; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	defw 0											; Rutina de impresión.		
 
 Disparo_9 defw 0									; Control.
 	defw 0											; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	defw 0											; Rutina de impresión.									
 
 Disparo_10 defw 0									; Control.
 	defw 0											; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	defw 0											; Rutina de impresión.		
 
 Disparo_11 defw 0
 
