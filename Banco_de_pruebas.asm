@@ -182,6 +182,29 @@ Contador_de_mov_masticados defw 0						; Contador de 16bits. La "Entidad_guía" 
 
 ; Variables de funcionamiento de las rutinas de movimiento. (Mov_left), (Mov_right), (Mov_up), (Mov_down).
 
+Velocidad db 0 											; 5 vueltas max. 5 vueltas       1 - 0 (1ª vuelta - velocidad 0)
+;																						 2 - 0 (2ª vuelta - velocidad 0)
+;																						 4 - 1 (3ª vuelta - velocidad 1)
+;																						 8 - 2 (4ª vuelta - velocidad 2)
+;																					   $10 - 4 (5ª vuelta - velocidad 3) 																		
+
+Ctrl_2 db 0 											
+;														BIT 0, Los sprites se inician con un `sprite vacío', (sprite formado por "ceros"), cuando la rutina_
+;															_ [Genera_datos_de_impresion] guarda su 1ª imagen.
+;															_ Más adelante las rutinas [Mov_left] y [Mov_right] restauraran (Puntero_objeto). Si el 1er movimiento
+; 															_ que hace la entidad después de iniciarse es hacia arriba/abajo no se restaurará (Puntero_objeto), pués_
+; 															_ las rutinas [Mov_up] y [Mov_down] no necesitan modificar el sprite.
+;															_ El bit5 a "1" nos indica que el sprite se inicia por arriba o por abajo y por lo tanto hay que restaurar_
+;															_ (Puntero_objeto) con (Repone_puntero_objeto) una vez iniciado y realizada su 1ª `foto'.
+;														
+;														BIT 1, Este bit a "1" indica que se ha iniciado el proceso de EXPLOSIÓN en una entidad.
+;														BIT 2, Este bit es activado por [Movimiento]. Indica que hemos `iniciado un desplazamiento'._
+;															_ Evita que volvamos a iniciar el desplazamiento cada vez que ejecutemos [Movimiento].
+;														BIT 3, Indica que (Cola_de_desplazamiento)="254". Esto quiere decir que repetiremos (1-255 veces),_
+;															_ el último MOVIMIENTO que hayamos ejecutado.
+;														BIT 4, ???
+;														BIT 5, Este bit a "1" indica que esta entidad es una "Entidad_guía".
+
 Ctrl_0 db 0 											; Byte de control. A través de este byte de control. Las rutinas de desplazamiento: [Mov_right], [Mov_left], [Mov_up] y [Mov_down],_
 ;														; _indican a las subrutinas de recolocación del objeto de la rutina [DRAW]: [Comprueba_limite_horizontal] y [Comprueba_limite_vertical],_
 ; 														; _que desaparecemos por un extremo de la pantalla y hemos de `reaparecer´ por el contrario. 
@@ -207,29 +230,6 @@ Ctrl_0 db 0 											; Byte de control. A través de este byte de control. Las
 ; 														SET 7, El bit 7 se encuentra alto, ("1"), cuando el último movimiento horizontal se ha producido a la "DERECHA".
 ; 															   _ Utilizo la información que proporciona este BIT para modificar (CTRL_DESPLZ) si el siguiente movimiento_
 ; 															   _ se va a producir a la izquierda. "1" DERECHA - "0" IZQUIERDA.
-
-Ctrl_2 db 0 											
-;														BIT 0, Los sprites se inician con un `sprite vacío', (sprite formado por "ceros"), cuando la rutina_
-;															_ [Genera_datos_de_impresion] guarda su 1ª imagen.
-;															_ Más adelante las rutinas [Mov_left] y [Mov_right] restauraran (Puntero_objeto). Si el 1er movimiento
-; 															_ que hace la entidad después de iniciarse es hacia arriba/abajo no se restaurará (Puntero_objeto), pués_
-; 															_ las rutinas [Mov_up] y [Mov_down] no necesitan modificar el sprite.
-;															_ El bit5 a "1" nos indica que el sprite se inicia por arriba o por abajo y por lo tanto hay que restaurar_
-;															_ (Puntero_objeto) con (Repone_puntero_objeto) una vez iniciado y realizada su 1ª `foto'.
-;														
-;														BIT 1, Este bit a "1" indica que se ha iniciado el proceso de EXPLOSIÓN en una entidad.
-;														BIT 2, Este bit es activado por [Movimiento]. Indica que hemos `iniciado un desplazamiento'._
-;															_ Evita que volvamos a iniciar el desplazamiento cada vez que ejecutemos [Movimiento].
-;														BIT 3, Indica que (Cola_de_desplazamiento)="254". Esto quiere decir que repetiremos (1-255 veces),_
-;															_ el último MOVIMIENTO que hayamos ejecutado.
-;														BIT 4, ???
-;														BIT 5, Este bit a "1" indica que esta entidad es una "Entidad_guía".
-
-Velocidad db 0 											; 5 vueltas max. 5 vueltas       1 - 0 (1ª vuelta - velocidad 0)
-;																						 2 - 0 (2ª vuelta - velocidad 0)
-;																						 4 - 1 (3ª vuelta - velocidad 1)
-;																						 8 - 2 (4ª vuelta - velocidad 2)
-;																					   $10 - 4 (5ª vuelta - velocidad 3) 																		
 
 ; ----- ----- De aquí para arriba son los datos que se trasfieren a las cajas de entidades. ¡¡¡¡¡
 
@@ -1150,7 +1150,6 @@ End_frame
 
 Reinicia_Amadeus
 
-
 ;	Reinicia posición y estado.
 
 	ld hl,$50cf
@@ -1916,7 +1915,7 @@ Restore_entidad
 	jr z,Restore_entidad
 
 	ld de,Bandeja_DRAW
-	ld bc,14
+	ld bc,12
 	ldir											
 	ret
 
@@ -2249,6 +2248,7 @@ Siguiente_frame_explosion
 	dec (hl)														; Decrementa (Numero_de_entidades) y (Numero_parcial_de_entidades).
 
 	call Limpiamos_bandeja_DRAW
+	jr Borra_entidad_colisionada
 
 1 inc l
 	inc l
@@ -2296,6 +2296,7 @@ Siguiente_frame_explosion_Amadeus
 	ld (Impacto_Amadeus),a
 	ld hl,Ctrl_3
 	set 6,(hl)
+	jr Borra_Amadeus_impactado
 
 1 inc l
 	inc l
