@@ -25,7 +25,7 @@
 ;           _ 4 valores distintos, ((el valor dependerá del que tenga la variable (CTRL_DESPLZ)_
 ;           _ en el momento de generarse la bala)).
 
-Genera_disparo 
+Genera_disparo_Amadeus
 
 ;   Esta parte de la rutina se encarga de `RETORNAR' sin generar disparo cuando (CTRL_DESPLZ)_
 ;   _ tenga valores distintos de $00, $f9, $fb y $fd.
@@ -47,6 +47,7 @@ Genera_disparo
 ;    ld a,(Velocidad_disparo_entidades)  ; No se genera disparo si (Vel_down) de la entidad es superior a_
 ;    cp b                                ; _ la velocidad del disparo de las entidades. La entidad se _
 ;    ret c                               ; _ atropellaría con su propio disparo.                               
+
 ;    ld a,(Columnas)
 ;    ld b,a
 ;    ld a,(Columns)
@@ -55,15 +56,16 @@ Genera_disparo
 
 ; ----- ----- ----- 
 
-    ld a,(Ctrl_0)                       
-    bit 6,a                             
-    jr nz,14F
+;    ld a,(Ctrl_0)                       
+;    bit 6,a                             
+;    jr nz,14F
 
 ;    ld a,(Coordenada_y)
 ;    cp $13                              ; Una entidad no podrá disparar si se encuentra por_
 ;    ret nc                              ; _ debajo de la fila "$14" de pantalla.
 
 14 
+
 ;    ld hl,Indice_disparo
 ;    ld a,(CTRL_DESPLZ)
 ;    ld c,a
@@ -329,6 +331,9 @@ Genera_disparo
 ;    call Almacena_disparo                      
 
 6 
+
+    xor a                                           ;   Siempre "Z" cuando ejecutamos [Genera_disparo_Amadeus].
+
     ret
 
 ; ----------------------------------------------------------------

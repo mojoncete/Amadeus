@@ -2155,10 +2155,7 @@ Teclado
 	in a,($fe)
 	and $10
 
-;	push af
-	call z,Genera_disparo
-;	pop af
-
+	call z,Genera_disparo_Amadeus
 	jr nz,1F
 
 	ld a,(Disparo_Amadeus)
