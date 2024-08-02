@@ -1,6 +1,13 @@
 
 Genera_disparo_Amadeus
 
+;   Un disparo nos dará la siguiente información:
+
+;   Indicará si lo lanza Amadeus, (se desplaza hacia arriba), o una entidad, (hacia abajo).
+;   Indicará si ha colisionado.
+;   Puntero de impresión.
+;   Puntero objeto.
+
     di
     jr $
     ei
