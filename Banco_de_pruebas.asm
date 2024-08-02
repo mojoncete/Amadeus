@@ -2184,25 +2184,6 @@ Teclado
 
 	ret	
 
-; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;
-;	Rutina provisional para que los malotes cagen balas.
-
-;Detecta_disparo_entidad 
-
-;	ld a,(Disparo_entidad)
-;	and a
-;	ret z
-
-;! Aquí hemos de implementar la rutina/s que generan disparo...
-
-;	ld a,$7f				; Detecta SPACE.
-;	in a,($fe)
-;	and 1
-;	ret nz
-
-;	call Genera_disparo
-;	ret
 ; ------------------------------------------------------------------------------------------------------------------------ 
 ;
 ;	06/07/24
@@ -2300,22 +2281,6 @@ Siguiente_frame_explosion_Amadeus
 	ld (Pamm_Amadeus),hl
 	jr Borra_Amadeus_impactado
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ; ---------------------------------------------------------------
 
 	org $aa7f
@@ -2332,7 +2297,7 @@ Siguiente_frame_explosion_Amadeus
 	include "Draw_XOR.asm"
 	include "Direcciones.asm"
 	include "Movimiento.asm"
-	include "Disparo_2.asm"
+	include "Disparo.asm"
 0
 
 	SAVESNA "Pruebas.sna", START
