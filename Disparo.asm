@@ -243,7 +243,7 @@ Detecta_colision_nave_entidad
     ld (hl),0                                       ; Coloca a "0" el .db (Impacto) de la (Entidad_sospechosa_de_colision).
     ret
 
-;   HAY COLISIÓN !!!!!.
+;   POSIBLE COLISIÓN !!!!!.
 ;
 ;   .db (Impacto) de Amadeus a "1".
 ;   SET el bit3 de (Impacto2).

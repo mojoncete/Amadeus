@@ -404,6 +404,8 @@ Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una únic
 ;															BIT 5, "1" Indica que existe movimiento de Amadeus.
 ;															BIT 6, "1" Indica que Amadeus ha sido destruido. Este bit lo activa la rutina [Genera_explosion_Amadeus] despues de pintar_
 ; 																_ el último frame de la explosión de nuestra nave.
+;															BIT 7, "1" Indica que se ha iniciado el proceso de explosión en Amadeus.
+;																_ Mientras este bit este activo, no se generarán dos explosiones de entidades a la vez.
 
 Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una única entidad. Lo utiliza la rutina [Inicia_entidad].
 ;
@@ -748,6 +750,10 @@ Main
 ;	_en caso de no existir colisión pondrá su .db (Impacto) a "0" pero esa 1ª entidad "colisionada" seguirá manteniendo su .db (Impacto) a "1" por lo que para considerarse "colisión",_
 ;	_es requisito imprescindible que Amadeus tenga su .db (Impacto) también a "1"; en caso contrario colocaremos el .db (Impacto) de la entidad a "0" para que se vuelva a gestionar.
 
+	ld a,(Ctrl_3)
+	bit 7,a
+	jr nz,8F												; El bit 7 de (Ctrl_3) indica que Amadeus esta explotando.
+;															; No vamos a generar una nueva explosión en más de una entidad a la vez.
 	ld a,(Impacto_Amadeus)
 	and a
 	call nz,Genera_explosion
@@ -2191,6 +2197,8 @@ Teclado
 
 Genera_explosion 
 
+
+
 	ld hl,Clock_explosion								
 	dec (hl)
 	jr z,Siguiente_frame_explosion									; Gestionamos la siguiente entidad.
@@ -2237,6 +2245,9 @@ Siguiente_frame_explosion
 
 Genera_explosion_Amadeus
 
+	ld hl,(Ctrl_3)
+	set 7,(hl)														; Indica proceso de explosión en Amadeus.
+
 	ld hl,Clock_explosion_Amadeus								
 	dec (hl)
 	jr z,Siguiente_frame_explosion_Amadeus							; Gestionamos la siguiente entidad.
@@ -2274,6 +2285,7 @@ Siguiente_frame_explosion_Amadeus
 	ld (Impacto_Amadeus),a
 	ld hl,Ctrl_3
 	set 6,(hl)
+	res 7,(hl)
 	jr Borra_Amadeus_impactado
 
 1 inc l
