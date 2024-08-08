@@ -20,6 +20,17 @@ Genera_disparo_Amadeus
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- 
 
+; -------------------------------------------------------------------------------------------------------------
+;
+;   8/8/24
+;   
+;   La entidad se encuentra en la fila $14,$15 o $16 de pantalla.
+;   Vamos a comprobar si la entidad ocupa alguna de las columnas ocupadas por Amadeus y por lo_
+;   _ tanto, existe riesgo alto de colisión entre ambas. 
+;
+;   MODIFICA: HL,DE,BC y A.
+;   OUTPUTS: (Coordenadas_X_Entidad) y (Coordenadas_X_Amadeus) contienen el nº de las columnas que ocupan en pantalla.
+;            (Impacto) se coloca a "1" si coincide alguna de las columnas. Alto riesgo de colisión.
 
 Colision_Entidad_Amadeus
 
@@ -43,21 +54,9 @@ Colision_Entidad_Amadeus
 	cp $14
 	ret c                                                  ; Salimos si la entidad no está en zona de Amadeus.
 
-    ld a,(Impacto)
-    dec a
-    ret z                                                  ; Salimos si la unidad que está en zona de Amadeus ya está impactada. 
-
-; -------------------------------------------------------------------------------------------------------------
-;
-;   25/06/24
-;   
-;   La entidad se encuentra en la fila $14,$15 o $16 de pantalla.
-;   Vamos a comprobar si la entidad ocupa alguna de las columnas ocupadas por Amadeus y por lo_
-;   _ tanto, existe riesgo alto de colisión entre ambas. 
-;
-;   MODIFICA: HL,DE,BC y A.
-;   OUTPUTS: (Coordenadas_X_Entidad) y (Coordenadas_X_Amadeus) contienen el nº de las columnas que ocupan en pantalla.
-;            (Impacto) se coloca a "1" si coincide alguna de las columnas. Alto riesgo de colisión.
+    ld a,(Impacto_Amadeus)                                 ; Evita que se produzca colisión con dos entidades a la vez. 
+    and a
+    ret nz
 
 Genera_coordenadas_X
 

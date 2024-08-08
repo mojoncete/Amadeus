@@ -2197,8 +2197,6 @@ Teclado
 
 Genera_explosion 
 
-
-
 	ld hl,Clock_explosion								
 	dec (hl)
 	jr z,Siguiente_frame_explosion									; Gestionamos la siguiente entidad.
@@ -2245,9 +2243,6 @@ Siguiente_frame_explosion
 
 Genera_explosion_Amadeus
 
-	ld hl,(Ctrl_3)
-	set 7,(hl)														; Indica proceso de explosión en Amadeus.
-
 	ld hl,Clock_explosion_Amadeus								
 	dec (hl)
 	jr z,Siguiente_frame_explosion_Amadeus							; Gestionamos la siguiente entidad.
@@ -2285,7 +2280,6 @@ Siguiente_frame_explosion_Amadeus
 	ld (Impacto_Amadeus),a
 	ld hl,Ctrl_3
 	set 6,(hl)
-	res 7,(hl)
 	jr Borra_Amadeus_impactado
 
 1 inc l
