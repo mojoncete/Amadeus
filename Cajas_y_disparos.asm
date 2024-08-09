@@ -37,17 +37,14 @@ Indice_de_mov_segun_tipo_de_entidad defw Indice_mov_Baile_de_BadSat
 
 Indice_de_disparos_Amadeus defw Disparo_1A
 	defw Disparo_2A
-	defw Disparo_3A
 
-Disparo_1A defw 0									; Control.
-	defw 0											; Puntero objeto.
-ON_Disparo_2A defw 0								; Puntero de impresión.
-							
-Disparo_2A defw 0									; Control.
-	defw 0											; Puntero objeto.
+Disparo_1A defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
-
-Disparo_3A defw 0	
+	db 0											; Impacto.
+							
+Disparo_2A defw 0									; Puntero objeto.
+	defw 0											; Puntero de impresión.
+	db 0											; Impacto.
 
 Indice_de_disparos_entidades defw Disparo_1
 	defw Disparo_2
@@ -59,49 +56,46 @@ Indice_de_disparos_entidades defw Disparo_1
 	defw Disparo_8
 	defw Disparo_9
 	defw Disparo_10
-	defw Disparo_11
 
-Disparo_1 defw 0									; Control. 
-	defw 0											; Puntero objeto.
+Disparo_1 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
+	db 0											; Control.
 						
-Disparo_2 defw 0									; Control.
-	defw 0											; Puntero objeto.
+Disparo_2 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
+	db 0											; Control.
 
-Disparo_3 defw 0									; Control.
-	defw 0											; Puntero objeto.
+Disparo_3 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
+	db 0											; Control.
 						
-Disparo_4 defw 0									; Control.
-	defw 0											; Puntero objeto.
+Disparo_4 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
+	db 0											; Control.
 
-Disparo_5 defw 0									; Control.
-	defw 0											; Puntero objeto.
+Disparo_5 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
-
-Disparo_6 defw 0									; Control.
-	defw 0											; Puntero objeto.
+	db 0											; Control.
+						
+Disparo_6 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
+	db 0											; Control.
 
-Disparo_7 defw 0									; Control.
-	defw 0											; Puntero objeto.
+Disparo_7 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
-
-Disparo_8 defw 0									; Control.
-	defw 0											; Puntero objeto.
+	db 0											; Control.
+						
+Disparo_8 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
+	db 0											; Control.
 
-Disparo_9 defw 0									; Control.
-	defw 0											; Puntero objeto.
+Disparo_9 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
-
-Disparo_10 defw 0									; Control.
-	defw 0											; Puntero objeto.
+	db 0											; Control.
+						
+Disparo_10 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
-
-Disparo_11 defw 0
+	db 0											; Control.
 
 ; -------------------------------------------------------------------------------------
 ;
