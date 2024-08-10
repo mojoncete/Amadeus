@@ -1,12 +1,81 @@
 
 Genera_disparo_Amadeus
 
-;   Un disparo nos dará la siguiente información:
+Define_puntero_objeto_disparo
 
-;   Indicará si lo lanza Amadeus, (se desplaza hacia arriba), o una entidad, (hacia abajo).
-;   Indicará si ha colisionado.
-;   Puntero de impresión.
-;   Puntero objeto.
+;   Inicializamos contador.
+
+    ld b,0
+    ld hl,(p.imp.amadeus)
+    inc l
+
+    ld a,$80
+    cp (hl)
+    jr z,1F
+
+    inc b
+    ld a,$60
+    cp (hl)
+    jr z,1F
+
+    inc b
+    ld a,$18
+    cp (hl)
+    jr z,1F
+
+    inc b
+
+;   Calcula el Puntero_de_impresión del disparo.
+
+1 call PreviousScan
+    call PreviousScan
+    call PreviousScan
+
+    ld a,b
+    srl a
+    jr z,4F
+
+; --- Guarda el puntero_de_impresión del disparo en la pila.
+    push hl
+    jr 5F
+4 dec l  
+    push hl
+; ---
+
+;   Calcula el Puntero_objeto del disparo.
+
+5 ld hl,Indice_disparo
+    inc b
+    dec b
+    jr z,2F
+
+;   Nos desplazamos por el índice de disparos.
+
+3 inc l
+    inc l
+    djnz 3B
+
+; --- Guarda el Puntero_objeto del disparo en la pila.
+2 call Extrae_address
+    push hl                               
+; ---
+
+; Almacenamos (Puntero_objeto) y (Puntero_de_impresion) en su correspondiente caja.
+
+    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
+    call Extrae_address
+
+    ld b,2
+
+6 pop de
+    ld (hl),e
+    inc hl
+    ld (hl),d
+    inc hl
+
+    djnz 6B
+
+;   Notas: En este punto HL apunta al .db Impacto de la correspondiente caja de disparo.
 
     di
     jr $
