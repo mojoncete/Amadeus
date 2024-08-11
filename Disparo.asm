@@ -1,5 +1,10 @@
+; --------------------------------------------------------------------------------------
+;
+;   11/8/24
+;
 
 Genera_disparo_Amadeus
+
 
 Define_puntero_objeto_disparo
 
@@ -60,7 +65,25 @@ Define_puntero_objeto_disparo
     push hl                               
 ; ---
 
+Detecta_impacto_en_disparo_Amadeus
+
+    di
+    jr $
+    ei
+
+
+
+
+
+
+
+
+
+
+
+
 ; Almacenamos (Puntero_objeto) y (Puntero_de_impresion) en su correspondiente caja.
+; HL en el 1er .db de la caja y (Puntero_DESPLZ_DISPARO_AMADEUS) avanza una posición en el índice.
 
     ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
     call Extrae_address
@@ -76,10 +99,6 @@ Define_puntero_objeto_disparo
     djnz 6B
 
 ;   Notas: En este punto HL apunta al .db Impacto de la correspondiente caja de disparo.
-
-    di
-    jr $
-    ei
 
     xor a                                                  ;   Siempre "Z" cuando ejecutamos [Genera_disparo_Amadeus].
 

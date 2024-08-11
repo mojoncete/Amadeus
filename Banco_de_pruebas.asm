@@ -264,14 +264,6 @@ Puntero_DESPLZ_izq defw 0
 
 Posicion_inicio defw 0									; Dirección de pantalla donde aparece el objeto. [DRAW].
 Cuad_objeto db 0										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
-
-; Variables de objeto. (Características).
-
-; Variables_de_borrado ds 6 							
-
-
-; Variables de funcionamiento. [DRAW].
-
 Columnas db 0
 Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado en función del tamaño del Sprite. Si el objeto llega a esta línea se modifica_    
 ; 														; _(Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
@@ -457,7 +449,6 @@ Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 pos
 ;														; _ que puede ocupar el sprite de una entidad. (Colisión).
 Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posibles columnas_
 ;														; _ que puede ocupar el sprite de Amadeus. (Colisión).
-;Velocidad_disparo_entidades db 2	  					; Nº de scanlines, (NextScan) que avanza el disparo de las entidades.
 
 ;---------------------------------------------------------------------------------------------------------------
 
