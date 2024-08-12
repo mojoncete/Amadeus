@@ -359,7 +359,7 @@ Datos_de_entidad defw 0									; Contiene los bytes de información de la entid
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;	02/07/24
+;	12/08/24
 ;
 ;	Álbumes.
 
@@ -424,14 +424,13 @@ Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una únic
 Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
 Puntero_DESPLZ_DISPARO_AMADEUS defw 0
 
-Impacto2 db 0											; Este byte indica que se ha producido impacto:
-; 														; (Impacto)="1". El impacto se produce en una entidad.
-;														; (Impacto)="2". El impacto se produce en Amadeus.
+Impacto2 db 0											; Byte de control de impactos.
+
 ;
 ;														; bit_2. La rutina [Genera_coordenadas_X] coloca este bit a "1" para indicar que hay una posible colisión entre una entidad y Amadeus.
 ;																 Una de la entidades ha entrado en zona de Amadeus y alguna de sus columnas coincide con las de nuestra nave.
 ;																 El bit indica que hay que ejecutar [Detecta_colision_nave_entidad] al principio de [Main], (Construcción del frame).
-
+;														; bit_3. La rutina [Genera_coordenadas_de_disparo_Amadeus] pone este bit a "1" para indicar que un disparo de Amadeus ha alcanzado a una entidad.
 
 
 
@@ -2144,26 +2143,13 @@ Teclado
 
 ; Está habilitado el disparo de Amadeus??, podemos disparar??. Si no es así saltamos a 1F.
 
-	ld a,(Disparo_Amadeus)
-	dec a
-	jr nz,1F
-
 	ld a,$f7												; "5" para disparar.
 	in a,($fe)
 	and $10
 
 	call z,Genera_disparo_Amadeus
-	jr nz,1F
 
-	ld a,(Disparo_Amadeus)
-	xor 1
-	ld (Disparo_Amadeus),a
-
-	di
-	jr $
-	ei
-
-1 ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
+	ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
 	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
 	and $01													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $01 resulta "0"  llama a la rutina "Mov_izq".
     call z,Amadeus_a_izquierda							
@@ -2172,7 +2158,6 @@ Teclado
 	in a,($fe)
 	and $01
 	ret z
-
 
 	ld a,$f7
 	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.

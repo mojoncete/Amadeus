@@ -1,13 +1,20 @@
 ; --------------------------------------------------------------------------------------
 ;
-;   11/8/24
+;   12/8/24
 ;
 
 Genera_disparo_Amadeus
 
 ;   Exclusiones.
 
+    ld a,(Disparo_Amadeus)
+    and a
+    ret z                                                    ; Salimos si el disparo de nuestra nave no está habilitado.
+
 Define_puntero_objeto_disparo
+
+;    dec a                                                  
+;    ld (Disparo_Amadeus),a                                  ;  Deshabilita el disparo.
 
 ;   Inicializamos contador.
 
@@ -84,34 +91,47 @@ Define_puntero_objeto_disparo
 
 Detecta_impacto_en_disparo_de_Amadeus
 
-
     call Detecta_impacto_en_disparo_de_Amadeus01
+
+    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
+    inc hl
+    inc hl
+    call Extrae_address
+    dec hl                                               ;  Sitúa el puntero en el .db (Impacto) de la caja del disparo.
+    jr z,7F
+    ld a,1
+7 ld (hl),a
+    ret z
+
+Genera_coordenadas_de_disparo_Amadeus
+
+;   Esta parte de la rutina sólo aplica cuando un disparo nuestro alcanza a una entidad.
+;   Genera las coordenadas de nuestro disparo certero y activa el correspondiente FLAG, (bit3 Impacto2).
 
     di
     jr $
     ei
 
     ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
-    push hl
-
-    inc hl
-    inc hl
     call Extrae_address
-    dec hl                                               ;  Sitúa el puntero en el .db (Impacto) de la caja del disparo.
-    jr z,7F
-    ld a,1    
-7 ld (hl),a                                              ;   Siempre "Z" cuando ejecutamos [Genera_disparo_Amadeus].
+    inc hl
+    inc hl
 
-;    jr z,8F
+    call Extrae_address                                 ;   Puntero_de_impresión del disparo en HL.
+    call Genera_coordenadas
 
-    pop hl
-;    call Extrae_address
-;    inc hl
-;    inc hl
-;    call Genera_coordenadas
+    dec a
 
+    ld hl,Coordenadas_disparo_certero
+    ld (hl),a                                           ;   Almacenamos la Coordenada_Y, (Fila) del disparo.
+    inc hl
+    ld a,(Coordenada_X)                                 
+    ld (hl),a                                           ;   Almacenamos la Coordenada_X, (Columna) del disparo.
+    
+    ld hl,Impacto2
+    set 3,(hl)                                          ;   Indica que un disparo de nuestra nave ha alcanzado a una entidad.
 
-8 xor a
+    xor a                                               ;   Siempre "Z" cuando ejecutamos [Genera_disparo_Amadeus].
     ret
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- 
