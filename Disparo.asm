@@ -5,6 +5,7 @@
 
 Genera_disparo_Amadeus
 
+;   Exclusiones.
 
 Define_puntero_objeto_disparo
 
@@ -65,23 +66,6 @@ Define_puntero_objeto_disparo
     push hl                               
 ; ---
 
-Detecta_impacto_en_disparo_Amadeus
-
-    di
-    jr $
-    ei
-
-
-
-
-
-
-
-
-
-
-
-
 ; Almacenamos (Puntero_objeto) y (Puntero_de_impresion) en su correspondiente caja.
 ; HL en el 1er .db de la caja y (Puntero_DESPLZ_DISPARO_AMADEUS) avanza una posición en el índice.
 
@@ -98,15 +82,80 @@ Detecta_impacto_en_disparo_Amadeus
 
     djnz 6B
 
-;   Notas: En este punto HL apunta al .db Impacto de la correspondiente caja de disparo.
+Detecta_impacto_en_disparo_de_Amadeus
 
-    xor a                                                  ;   Siempre "Z" cuando ejecutamos [Genera_disparo_Amadeus].
 
+    call Detecta_impacto_en_disparo_de_Amadeus01
+
+    di
+    jr $
+    ei
+
+    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
+    push hl
+
+    inc hl
+    inc hl
+    call Extrae_address
+    dec hl                                               ;  Sitúa el puntero en el .db (Impacto) de la caja del disparo.
+    jr z,7F
+    ld a,1    
+7 ld (hl),a                                              ;   Siempre "Z" cuando ejecutamos [Genera_disparo_Amadeus].
+
+;    jr z,8F
+
+    pop hl
+;    call Extrae_address
+;    inc hl
+;    inc hl
+;    call Genera_coordenadas
+
+
+8 xor a
     ret
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- 
+
+; ----------------------------------------------
+;
+;   12/08/24
+;
+
+
+Detecta_impacto_en_disparo_de_Amadeus01
+
+Extraccion_de_datos                                        
+
+    ld hl,Indice_de_disparos_Amadeus
+    call Extrae_address
+
+    ld e,(hl)
+    inc hl
+    ld d,(hl)
+    inc hl                                                 ;    Puntero_objeto del disparo en DE.
+
+    ld c,(hl)
+    inc hl
+    ld b,(hl)
+    inc hl                                                 ;    Puntero_de_impresión del disparo en BC.
+
+    push bc 
+    pop hl                                                 ;    Puntero_de_impresión del disparo en HL.
+
+Detecta_impacto_
+
+    ld a,(de)
+    and (hl)
+    ret nz
+
+    inc de
+    inc hl
+
+    ld a,(de)
+    and (hl)
+    ret
 
 ; -------------------------------------------------------------------------------------------------------------
 ;

@@ -443,7 +443,7 @@ Entidad_sospechosa_de_colision defw 0					; Almacena la dirección de memoria do
 ;														; _(Impacto) de la entidad que ocupa el mismo espacio que Amadeus.
 ;														; Necesitaremos poner a "0" este .db en el caso de que finalmente no se produzca colisión.
 
-;Coordenadas_disparo_certero ds 2						; Almacenamos aquí las coordenadas del disparo que ha alcanzado a Amadeus.
+Coordenadas_disparo_certero ds 2						; Almacenamos aquí las coordenadas del disparo que alcanza a una entidad, (Fila, Columna).
 ;											            ; (Coordenadas_disparo_certero)=Y ..... (Coordenadas_disparo_certero +1)=X.
 Coordenadas_X_Entidad ds 3  							; 3 Bytes reservados para almacenar las 3 posibles columnas_
 ;														; _ que puede ocupar el sprite de una entidad. (Colisión).
