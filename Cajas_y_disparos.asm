@@ -28,13 +28,6 @@ Indice_de_mov_segun_tipo_de_entidad defw Indice_mov_Baile_de_BadSat
 ; 	defw ...
 	defw 0
 
-; Control. %00000001 00000001 
-;
-;     [Byte 0] ..... Impacto. "$81" Cuando dispara Amadeus, (hacia arriba), "$80" cuando lo_
-;                    _ hacen las entidades hacia abajo.
-;
-;     [Byte 1] ..... Dirección. "$81" Cuando se produce colisión al generar un disparo."$80" si no la hay.
-
 Indice_de_disparos_Amadeus defw Disparo_1A
 	defw Disparo_2A
 

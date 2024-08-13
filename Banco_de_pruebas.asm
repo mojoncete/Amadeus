@@ -2,24 +2,71 @@
 
 	DEVICE ZXSPECTRUM48
 
-;	IM_2 *************************************************************************************************************************************************************************
+;	Reloj del juego. IM2 *******************************************************************************************************************************************************************
 ;
-;	20/6/24
+;	13/08/24
+;
+;	
 
-	org $a9ff
+	org $fdff															; (Debajo de la pila).
 
-	defw $aa01
+	defw $82fc															; Indica al vector de interrupciones, (IM2), que el clock del programa se encuentra en $82a0.
 
-;	Incrementa FRAMES. (ROM).
+;
+;	13/08/24
+;
+; 	Constantes del programa.
+;
+ 
+FRAMES equ $5c78														; Variable de 24 bits. Almacena el nº de cuadros, (frames) que llevamos construidos. Reloj en tiempo real.
+FRAMES_3 equ $5c7a
+
+Sprite_vacio equ $eae0													; ($eae0 - $eb10) 48 Bytes de "0".
+
+Centro_arriba equ $0160 												; Emplearemos estas constantes en la rutina de `recolocación´ del objeto:_
+Centro_abajo equ $0180 													; _[Comprueba_limite_horizontal]. El byte alto en las dos primeras constantes_
+Centro_izquierda equ $0f 												; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
+Centro_derecha equ $10 													; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
+
+Almacen_de_movimientos_masticados_Entidad_1 equ $eb20					; $eb20 - $f87b ..... 3419 bytes. 
+Almacen_de_movimientos_masticados_Amadeus equ $e000						; ($e000 - $e1e3), 483 bytes. Movimientos masticados de Amadeus.
+
+Scanlines_album equ $8000	;	($8000 - $8118) 						; Inicialmente 280 bytes, $118. 
+Scanlines_album_2 equ $811a	;    ($811a - $8232)
+Amadeus_scanlines_album equ $8234	;	($8234 - $8256) 				; Inicialmente 34 bytes, $22.
+Amadeus_scanlines_album_2 equ $8258	;	($8258 - $827a)
+Disparos_Amadeus_scanlines_album equ $827c	;	($827c - $8286) 		; Inicialmente 10 bytes, $0a.
+Disparos_Amadeus_scanlines_album_2 equ $8288	;	($8288 - $8292)	
+Disparos_Entidades_scanlines_album equ $8294	;	($8294 - $82c6)		; Inicialmente 50 bytes, $32.
+Disparos_Entidades_scanlines_album_2 equ $82c8	;	($82c8 - $82fa)
+
+
+
+
+;																		; Scanlines_album. 
+
+;                                                       				; 35 bytes por entidad, (7 entidades). 
+
+;																		; 1. 2 Bytes ..... .defw  Puntero_objeto, (mem. address donde se encuentran los .db que forman los distintos sprites).
+;                                                       				; 2. 1 Byte ..... .db  Indica el nº de scanlines que vamos a imprimir del sprite. Generalmente 16 scanlines.
+;																		; El nº de scanlines será menor cuando estemos `desapareciendo´ por la parte baja de la pantalla.					 	
+; 																		; 3. 32 Bytes, (como máximo). Screen mem. address de cada uno de los scanlines que forman el sprite.
+
+;	Reloj del juego. IM2 ---------------------------------------------------------------------------------------------------------------------------------------------------
+;
+;	13/08/24
+;
+
+	org $82fc
 
 	push af
 	push hl
 
-; -------------------
-	ld hl,Ctrl_3				;	STOP si no hemos terminado de construir el FRAME.
+;! ------------------- STOP si no hemos terminado de construir el FRAME.
+	ld hl,Ctrl_3				
 	bit 0,(hl)
 	jr z,$
-
+;! -------------------
 
 ; Shield -----------------------
 
@@ -91,58 +138,16 @@ Incrementa_FRAMES
 
 ; --------------------------------------------------------------------------------
 
-	include "Sprites_e_indices.asm"
+	include "Sprites_e_indices.asm"						; Comienza en $83a0
 	include "Cajas_y_disparos.asm"
 	include "Patrones_de_mov.asm"
 	include "Niveles.asm"
 
-; ******************************************************************************************************************************************************************************************
-; Constantes. 
-; ****************************************************************************************************************************************************************************************** 
-;
-; 09/03/24
-
-;
-; Constantes.
-;
- 
-;Variables ROM. FRAMES y KEYBOARD. Rutina Interrupción mascarable $0038.
-
-FRAMES equ $5c78										; Variable de 24 bits. Almacena el nº de cuadros, (frames) que llevamos construidos. Reloj en tiempo real.
-FRAMES_3 equ $5c7a
-
-; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-Sprite_vacio equ $eae0									; ($eae0 - $eb10) 48 Bytes de "0".
-
-Centro_arriba equ $0160 								; Emplearemos estas constantes en la rutina de `recolocación´ del objeto:_
-Centro_abajo equ $0180 									; _[Comprueba_limite_horizontal]. El byte alto en las dos primeras constantes_
-Centro_izquierda equ $0f 								; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
-Centro_derecha equ $10 									; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
-
-Almacen_de_movimientos_masticados_Entidad_1 equ $eb20	; $eb20 - $f87b ..... 3419 bytes. Guardaremos los movimientos masticados que ha hido generando la entidad guía.
-Almacen_de_movimientos_masticados_Amadeus equ $e000		; ($e000 - $e1e3), 483 bytes. Movimientos masticados de Amadeus.
-
-Scanlines_album equ $8000	;	($8000 - $8118) 		; Inicialmente 280 bytes. 
-Scanlines_album_2 equ $9000    ;    ($9000 - $9118)
-Amadeus_scanlines_album equ $8120	;	($8120 - $8142)
-Amadeus_scanlines_album_2 equ $8143	;	($8143 - $8166)
-
-;                                                       ; 35 bytes por entidad. 
-;														; 1. 2 Bytes ..... .defw  Puntero_objeto, (mem. address donde se encuentran los .db que forman los distintos sprites).
-;                                                       ; 2. 1 Byte ..... .db  Indica el nº de scanlines que vamos a imprimir del sprite. Generalmente 16 scanlines.
-;														; El nº de scanlines será menor cuando estemos `desapareciendo´ por la parte baja de la pantalla.					 	
-; 														; 3. 32 Bytes, (como máximo). Screen mem. address de cada uno de los scanlines que forman el sprite.
-
-
-; ******************************************************************************************************************************************************************************************
-; Variables. 
-; ****************************************************************************************************************************************************************************************** 
-
+; --------------------------------------------------------------------------------
 ;
 ; 12/05/24
 ;
-; Variables de DRAW. (Motor principal).	44 Bytes.	
+; Parámetros DRAW. 	
 ;
 
 Bandeja_DRAW ; -----------------------------------------------------------------------------------------------
@@ -499,7 +504,7 @@ Lives db 6
 START 
 
 	ld sp,0												; Situamos el inicio de Stack.
-	ld a,$a9 											; Habilitamos el modo 2 de interrupciones y fijamos el salto a $a9ff
+	ld a,$fd 											; IM2 ON. Vector de interrupciones a $fdff, (defw debajo de la pila).
 	ld i,a 												; Byte alto de la dirección donde se encuentra nuestro vector de interrupciones en el registro I. ($a9). El byte bajo será siempre $ff.
 	IM 2 											    ; Habilitamos el modo 2 de INTERRUPCIONES.
 	DI 					
@@ -2256,6 +2261,11 @@ Siguiente_frame_explosion_Amadeus
 	ld (Impacto_Amadeus),a
 	ld hl,Ctrl_3
 	set 6,(hl)
+
+	di
+	jr $
+	ei
+
 	jr Borra_Amadeus_impactado
 
 1 inc l
@@ -2265,22 +2275,17 @@ Siguiente_frame_explosion_Amadeus
 
 ; ---------------------------------------------------------------
 
-	org $aa7f
-
 	include "RND_Derivando.asm"
 	include "Rutinas_de_inicio_y_niveles.asm"
 	include "calcula_tercio.asm"
 	include "Cls.asm"
 	include "Genera_coordenadas.asm"
-	include "Relojes_y_temporizaciones.asm"
 	include "Genera_datos_de_impresion.asm"
-
 	include "Pinta_Sprites.asm"
 	include "Draw_XOR.asm"
 	include "Direcciones.asm"
 	include "Movimiento.asm"
 	include "Disparo.asm"
-0
 
 	SAVESNA "Pruebas.sna", START
 

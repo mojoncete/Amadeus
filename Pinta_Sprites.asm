@@ -3,8 +3,6 @@
 ;   11/03/24
 ;
 
-    org $9119
-
 Pinta_Sprites 
 
 ;    ld hl,(Scanlines_album_SP)
