@@ -416,17 +416,20 @@ Detecta_colision_nave_entidad
 
     ld de,Indice_Explosion_entidades
     ld hl,(Entidad_sospechosa_de_colision)         ; Situamos el (Puntero_de_almacen_de_mov_masticados) de la entidad impactada en la primera palabra del índice de explosiones.
+
     inc hl
     inc hl
     inc hl
+
     ld (hl),e
-    inc l
+    inc hl
     ld (hl),d
 
 ; Situamos también el (Puntero_de_almacen_de_mov_masticados) de Amadeus en la primero explosión.
 
     ld de,Indice_Explosion_Amadeus
     ld hl,Pamm_Amadeus
+ 
     ld (hl),e
     inc hl
     ld (hl),d
