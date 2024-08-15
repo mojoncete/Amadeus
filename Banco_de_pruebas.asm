@@ -10,7 +10,7 @@
 
 	org $fdff															; (Debajo de la pila).
 
-	defw $82fc															; Indica al vector de interrupciones, (IM2), que el clock del programa se encuentra en $82a0.
+	defw $8345															; Indica al vector de interrupciones, (IM2), que el clock del programa se encuentra en $82a0.
 
 ;
 ;	13/08/24
@@ -35,10 +35,10 @@ Scanlines_album equ $8000	;	($8000 - $8118) 						; Inicialmente 280 bytes, $118
 Scanlines_album_2 equ $811a	;    ($811a - $8232)
 Amadeus_scanlines_album equ $8234	;	($8234 - $8256) 				; Inicialmente 34 bytes, $22.
 Amadeus_scanlines_album_2 equ $8258	;	($8258 - $827a)
-Disparos_Amadeus_scanlines_album equ $827c	;	($827c - $8286) 		; Inicialmente 10 bytes, $0a.
-Disparos_Amadeus_scanlines_album_2 equ $8288	;	($8288 - $8292)	
-Disparos_Entidades_scanlines_album equ $8294	;	($8294 - $82c6)		; Inicialmente 50 bytes, $32.
-Disparos_Entidades_scanlines_album_2 equ $82c8	;	($82c8 - $82fa)
+Disparos_Amadeus_scanlines_album equ $827c	;	($827c - $828c) 		; Inicialmente 16 bytes, $10.
+Disparos_Amadeus_scanlines_album_2 equ $828e	;	($828e - $829e)	
+Disparos_Entidades_scanlines_album equ $82a1	;	($82a1 - $82f1)		; Inicialmente 80 bytes, $50.
+Disparos_Entidades_scanlines_album_2 equ $82f3	;	($82f3 - $8343)
 
 
 
@@ -57,7 +57,7 @@ Disparos_Entidades_scanlines_album_2 equ $82c8	;	($82c8 - $82fa)
 ;	13/08/24
 ;
 
-	org $82fc
+	org $8345
 
 	push af
 	push hl
@@ -138,7 +138,7 @@ Incrementa_FRAMES
 
 ; --------------------------------------------------------------------------------
 
-	include "Sprites_e_indices.asm"						; Comienza en $83a0
+	include "Sprites_e_indices.asm"						; Comienza en $83c0
 	include "Cajas_y_disparos.asm"
 	include "Patrones_de_mov.asm"
 	include "Niveles.asm"
@@ -2216,8 +2216,8 @@ Siguiente_frame_explosion
 	call Limpiamos_bandeja_DRAW
 	jr Borra_entidad_colisionada
 
-1 inc l
-	inc l
+1 inc hl
+	inc hl
 	ld (Puntero_de_almacen_de_mov_masticados),hl
 	jr Borra_entidad_colisionada
 
@@ -2266,8 +2266,8 @@ Siguiente_frame_explosion_Amadeus
 
 	jr Borra_Amadeus_impactado
 
-1 inc l
-	inc l
+1 inc hl
+	inc hl
 	ld (Pamm_Amadeus),hl
 	jr Borra_Amadeus_impactado
 

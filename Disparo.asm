@@ -399,7 +399,7 @@ Detecta_colision_nave_entidad
     ld (hl),0                                       ; Coloca a "0" el .db (Impacto) de la (Entidad_sospechosa_de_colision).
     ret
 
-;   POSIBLE COLISIÓN !!!!!.
+;   COLISIÓN !!!!!.
 ;
 ;   .db (Impacto) de Amadeus a "1".
 ;   SET el bit3 de (Impacto2).
@@ -416,9 +416,9 @@ Detecta_colision_nave_entidad
 
     ld de,Indice_Explosion_entidades
     ld hl,(Entidad_sospechosa_de_colision)         ; Situamos el (Puntero_de_almacen_de_mov_masticados) de la entidad impactada en la primera palabra del índice de explosiones.
-    inc l
-    inc l
-    inc l
+    inc hl
+    inc hl
+    inc hl
     ld (hl),e
     inc l
     ld (hl),d
@@ -428,7 +428,7 @@ Detecta_colision_nave_entidad
     ld de,Indice_Explosion_Amadeus
     ld hl,Pamm_Amadeus
     ld (hl),e
-    inc l
+    inc hl
     ld (hl),d
 
     ret

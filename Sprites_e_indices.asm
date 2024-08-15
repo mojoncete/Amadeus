@@ -4,7 +4,7 @@
 ;
 ;	Sprites e índices.
 
-	org $83a0
+	org $83c0
 
 ; Disparo.
 
@@ -35,6 +35,8 @@ Indice_Badsat_izq defw Badsat_izquierda
 	defw Badsat_izq_f9
 	defw Badsat_izq_f8
 
+	org $8400
+
 Badsat_izquierda DEFB $00,$08,$00
 	DEFB 	$02,$14,$00
 	DEFB 	$02,$2A,$00
@@ -51,8 +53,6 @@ Badsat_izquierda DEFB $00,$08,$00
 	DEFB 	$54,$00,$00
 	DEFB 	$28,$00,$00
 	DEFB 	$10,$00,$00	 ; Sprite principal a izquierda, (sin desplazar).
-
-	org $8400
 
 Badsat_izq_f8 DEFB $00,$04,$00,$01,$0A,$00,$01,$15
 	DEFB	$00,$01,$2A,$80,$01,$55,$00,$01
@@ -82,14 +82,14 @@ Badsat_izq_fb DEFB $00,$00,$80,$00,$21,$40,$00,$22
 	DEFB	$80,$05,$44,$00,$0A,$A6,$00,$05
 	DEFB	$40,$00,$02,$80,$00,$01,$00,$00 ; $Fb (4º DESPLZ a izquierda).
 
+	org $8500
+
 Badsat_izq_fc DEFB $00,$00,$40,$00,$10,$A0,$00,$11
 	DEFB	$50,$00,$12,$A8,$00,$15,$50,$00
 	DEFB	$12,$A0,$03,$FF,$40,$00,$1B,$00
 	DEFB	$00,$57,$00,$00,$BF,$C0,$01,$5F
 	DEFB	$40,$02,$A2,$00,$05,$53,$00,$02
 	DEFB	$A0,$00,$01,$40,$00,$00,$80,$00 ; $Fc (3er DESPLZ a izquierda).
-
-	org $8500
 
 Badsat_izq_fd DEFB $00,$00,$20,$00,$08,$50,$00,$08
 	DEFB	$A8,$00,$09,$54,$00,$0A,$A8,$00
@@ -174,6 +174,8 @@ Badsat_der_fd DEFB $00,$40,$00,$00,$A1,$00,$01,$51
 	DEFB	$50,$00,$08,$A8,$00,$09,$54,$00
 	DEFB	$08,$A8,$00,$00,$50,$00,$00,$20 ; $Fd (6º DESPLZ a derecha).
 
+	org $8700
+
 Badsat_der_fe DEFB $00,$20,$00,$00,$50,$80,$00,$A8
 	DEFB	$80,$01,$54,$80,$00,$AA,$80,$00
 	DEFB	$54,$80,$00,$2F,$FC,$00,$0D,$80
@@ -234,6 +236,8 @@ Amadeus_Fb DEFB	$00,$18,$00,$02,$3C,$40,$02,$66
 	DEFB	$F0,$0F,$FF,$F0,$0F,$BD,$F0,$0F
 	DEFB	$BD,$F0,$08,$BD,$10,$07,$18,$E0 ; $Fb (4º DESPLZ a derecha).
 
+	org $8800
+
 Amadeus_Fd DEFB	$00,$06,$00,$00,$8F,$10,$00,$99
 	DEFB	$90,$00,$90,$90,$00,$B0,$D0,$01
 	DEFB	$B6,$D8,$01,$BF,$D8,$01,$9F,$98
@@ -246,8 +250,6 @@ Amadeus_Fd DEFB	$00,$06,$00,$00,$8F,$10,$00,$99
 Indice_Explosion_entidades defw Explosion_entidades_1
 	defw Explosion_entidades_2
 	defw Explosion_entidades_3
-
-	org $8800
 
 Explosion_entidades_1 DEFB $00,$10,$00
 	DEFB 	$08,$10,$00
@@ -303,6 +305,8 @@ Explosion_Amadeus_1	DEFB $00,$18,$02
 	DEFB	$08,$BA,$4C
 	DEFB	$07,$19,$80
 
+	org $8900
+
 Explosion_Amadeus_2	DEFB $00,$18,$02
 	DEFB	$00,$3C,$36
 	DEFB	$00,$66,$56
@@ -319,8 +323,6 @@ Explosion_Amadeus_2	DEFB $00,$18,$02
 	DEFB	$0C,$91,$8A
 	DEFB	$08,$BA,$4C
 	DEFB	$07,$19,$80
-
-	org $8900
 
 Explosion_Amadeus_3	DEFB $00,$00,$00
 	DEFB	$00,$00,$00
