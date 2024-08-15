@@ -14,13 +14,13 @@ Indice_disparo defw Disparo_0
 	defw Disparo_fd
 
 ; Disparo (CTRL_DESPLZ)="0".
-Disparo_0 DEFB $01,$80,$01,$80,$01,$80
+Disparo_0 DEFB $01,$80
 ; Disparo (CTRL_DESPLZ)="f9"
-Disparo_f9 DEFB $00,$60,$00,$60,$00,$60
+Disparo_f9 DEFB $00,$60
 ; Disparo (CTRL_DESPLZ)="fb" 
-Disparo_fb DEFB $18,$00,$18,$00,$18,$00
+Disparo_fb DEFB $18,$00
 ; Disparo (CTRL_DESPLZ)="fd" 
-Disparo_fd DEFB $06,$00,$06,$00,$06,$00
+Disparo_fd DEFB $06,$00
 
 ; ----------------------------------------------------------------------------------------
 
@@ -51,6 +51,8 @@ Badsat_izquierda DEFB $00,$08,$00
 	DEFB 	$54,$00,$00
 	DEFB 	$28,$00,$00
 	DEFB 	$10,$00,$00	 ; Sprite principal a izquierda, (sin desplazar).
+
+	org $8400
 
 Badsat_izq_f8 DEFB $00,$04,$00,$01,$0A,$00,$01,$15
 	DEFB	$00,$01,$2A,$80,$01,$55,$00,$01

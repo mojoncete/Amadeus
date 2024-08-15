@@ -2200,7 +2200,8 @@ Siguiente_frame_explosion
 ; Avanza Frame de explosión.
 
 	ld hl,(Puntero_de_almacen_de_mov_masticados)
-	ld bc,Explosion_entidades_1-2
+	ld bc,Indice_Explosion_entidades+4
+
 	ld a,c
 	sub l
 	jr nz,1F
@@ -2249,7 +2250,8 @@ Siguiente_frame_explosion_Amadeus
 ; Avanza Frame de explosión.
 
 	ld hl,(Pamm_Amadeus)
-	ld bc,Explosion_Amadeus_1-2
+	ld bc,Indice_Explosion_Amadeus+4
+
 	ld a,c
 	sub l
 	jr nz,1F
@@ -2261,10 +2263,6 @@ Siguiente_frame_explosion_Amadeus
 	ld (Impacto_Amadeus),a
 	ld hl,Ctrl_3
 	set 6,(hl)
-
-	di
-	jr $
-	ei
 
 	jr Borra_Amadeus_impactado
 
