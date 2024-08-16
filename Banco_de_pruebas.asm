@@ -380,6 +380,11 @@ Album_de_pintado defw 0
 Album_de_borrado defw 0
 Album_de_pintado_Amadeus defw 0
 Album_de_borrado_Amadeus defw 0
+Album_de_pintado_disparos_Amadeus defw 0
+Album_de_borrado_disparos_Amadeus defw 0
+Album_de_pintado_disparos_entidades defw 0
+Album_de_borrado_disparos_entidades defw 0
+
 Techo_Scanlines_album defw 0
 Techo_Scanlines_album_2 defw 0
 Switch db 0
@@ -533,9 +538,14 @@ START
 ;														 ; Situa (Puntero_indice_NIVELES) el el primer defw., (nivel) del índice de niveles.
 ;														 ; Inicializa (Numero_de_entidades) con el nº total de malotes del nivel.
 ;														 ; Inicializa (Datos_de_nivel) con el `tipo´ de la 1ª entidad del nivel. 
+
+;	Inicia los álbumes de líneas.
+
 	call Inicia_albumes_de_lineas						 
 ;														 
 	call Inicia_albumes_de_lineas_Amadeus
+	call Inicia_albumes_de_disparos
+
 
 4 call Inicia_Entidades						 
 	call Inicia_Amadeus
@@ -928,6 +938,8 @@ Amadeus_vivo
 
 	call Change_Amadeus
 	call Genera_datos_de_impresion_Amadeus
+
+	call Genera_datos_de_impresion_disparos_Amadeus
 
 End_frame 
 
@@ -1782,10 +1794,9 @@ Genera_datos_de_impresion_Amadeus
 ;
 ;	13/03/24
 ;
+;	Inicialización de los álbumes de líneas, (pintado/borrado).
 
 Inicia_albumes_de_lineas
-
-;	Entidades.
 
 	ld hl,Scanlines_album
 	ld (Album_de_pintado),hl
@@ -1802,6 +1813,20 @@ Inicia_albumes_de_lineas_Amadeus
 	ld (Album_de_pintado_Amadeus),hl
 	ld hl,Amadeus_scanlines_album_2
 	ld (Album_de_borrado_Amadeus),hl
+
+	ret
+
+Inicia_albumes_de_disparos
+
+	ld hl,Disparos_Amadeus_scanlines_album
+	ld (Album_de_pintado_disparos_Amadeus),hl
+	ld hl,Disparos_Amadeus_scanlines_album_2
+	ld (Album_de_borrado_disparos_Amadeus),hl
+
+	ld hl,Disparos_Entidades_scanlines_album
+	ld (Album_de_pintado_disparos_entidades),hl
+	ld hl,Disparos_Entidades_scanlines_album_2
+	ld (Album_de_borrado_disparos_entidades),hl
 
 	ret
 

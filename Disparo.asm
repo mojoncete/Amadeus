@@ -1,5 +1,24 @@
 ; --------------------------------------------------------------------------------------
 ;
+;   16/8/24
+;
+Genera_datos_de_impresion_disparos_Amadeus
+
+    ret
+
+
+
+
+
+
+
+
+
+
+
+
+; --------------------------------------------------------------------------------------
+;
 ;   12/8/24
 ;
 
@@ -12,9 +31,6 @@ Genera_disparo_Amadeus
     ret z                                                    ; Salimos si el disparo de nuestra nave no está habilitado.
 
 Define_puntero_objeto_disparo
-
-;    dec a                                                  
-;    ld (Disparo_Amadeus),a                                  ;  Deshabilita el disparo.
 
 ;   Inicializamos contador.
 
@@ -107,10 +123,6 @@ Genera_coordenadas_de_disparo_Amadeus
 
 ;   Esta parte de la rutina sólo aplica cuando un disparo nuestro alcanza a una entidad.
 ;   Genera las coordenadas de nuestro disparo certero y activa el correspondiente FLAG, (bit3 Impacto2).
-
-    di
-    jr $
-    ei
 
     ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
     call Extrae_address
