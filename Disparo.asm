@@ -1,8 +1,60 @@
 ; --------------------------------------------------------------------------------------
 ;
-;   16/8/24
+;   17/8/24
 ;
+;   Modifica: HL y DE.
+
+
 Genera_datos_de_impresion_disparos_Amadeus
+
+    ld (Stack),sp
+    ld sp,Disparo_1A                                          ; SP se sitúa en el .db (Puntero objeto) de la 1ª caja de disparos de Amadeus.
+
+1 ld hl,Indice_de_disparos_entidades                          ; Compararemos SP con HL para saber cual es la última caja que examinar.
+
+    pop de                                                    ; Puntero_objeto del disparo en DE.
+
+    inc d
+    dec d
+
+    jr z,Siguiente_disparo_Amadeus
+
+Genera_scanlines_de_disparo_Amadeus
+
+    pop hl                                                    ; Puntero_objeto del disparo en DE.
+;                                                             ; Puntero_de_impresión del disparo en HL.
+    di
+    jr $
+    ei
+
+    ld sp,Disparos_Amadeus_scanlines_album
+
+    pop bc
+    pop bc
+    pop bc
+    pop bc
+
+
+    push hl                                                   ; 3er scanline del disparo.
+    call PreviousScan
+    push hl                                                   ; 2º scanline.
+    call PreviousScan
+    push hl                                                   ; 1er scanline.
+    push de                                                   ; Puntero_objeto del disparo.
+
+    ld (Stack),sp
+
+
+
+Siguiente_disparo_Amadeus    
+
+    pop de
+    inc sp
+
+    sbc hl,sp                                                 ; Última caja ??? 
+    jr nz,1B
+
+    ld sp,(Stack)
 
     ret
 
@@ -19,7 +71,7 @@ Genera_datos_de_impresion_disparos_Amadeus
 
 ; --------------------------------------------------------------------------------------
 ;
-;   12/8/24
+;   17/08/24
 ;
 
 Genera_disparo_Amadeus
@@ -56,9 +108,9 @@ Define_puntero_objeto_disparo
 
 ;   Calcula el Puntero_de_impresión del disparo.
 
+;   El Puntero_de_impresión del disparo apunta al último scanline de los tres que componen el disparo, (el de abajo).
+  
 1 call PreviousScan
-    call PreviousScan
-    call PreviousScan
 
     ld a,b
     srl a

@@ -930,6 +930,8 @@ Amadeus_vivo
 
 	call Teclado
 
+	call Genera_datos_de_impresion_disparos_Amadeus
+
 	ld hl,Ctrl_3
 	bit 5,(hl)
 	jr z,End_frame
@@ -938,8 +940,6 @@ Amadeus_vivo
 
 	call Change_Amadeus
 	call Genera_datos_de_impresion_Amadeus
-
-	call Genera_datos_de_impresion_disparos_Amadeus
 
 End_frame 
 
