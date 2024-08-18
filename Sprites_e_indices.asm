@@ -4,7 +4,7 @@
 ;
 ;	Sprites e índices.
 
-	org $83c0
+	org $8370
 
 ; Disparo.
 
@@ -35,8 +35,6 @@ Indice_Badsat_izq defw Badsat_izquierda
 	defw Badsat_izq_f9
 	defw Badsat_izq_f8
 
-	org $8400
-
 Badsat_izquierda DEFB $00,$08,$00
 	DEFB 	$02,$14,$00
 	DEFB 	$02,$2A,$00
@@ -61,6 +59,8 @@ Badsat_izq_f8 DEFB $00,$04,$00,$01,$0A,$00,$01,$15
 	DEFB	$00,$2A,$20,$00,$55,$30,$00,$2A
 	DEFB	$00,$00,$14,$00,$00,$08,$00,$00 ; $F8 (7º DESPLZ a izquierda).
 
+	org $8400
+
 Badsat_izq_f9 DEFB $00,$02,$00,$00,$85,$00,$00,$8A
 	DEFB	$80,$00,$95,$40,$00,$AA,$80,$00
 	DEFB	$95,$00,$1F,$FA,$00,$00,$D8,$00
@@ -82,8 +82,6 @@ Badsat_izq_fb DEFB $00,$00,$80,$00,$21,$40,$00,$22
 	DEFB	$80,$05,$44,$00,$0A,$A6,$00,$05
 	DEFB	$40,$00,$02,$80,$00,$01,$00,$00 ; $Fb (4º DESPLZ a izquierda).
 
-	org $8500
-
 Badsat_izq_fc DEFB $00,$00,$40,$00,$10,$A0,$00,$11
 	DEFB	$50,$00,$12,$A8,$00,$15,$50,$00
 	DEFB	$12,$A0,$03,$FF,$40,$00,$1B,$00
@@ -97,6 +95,8 @@ Badsat_izq_fd DEFB $00,$00,$20,$00,$08,$50,$00,$08
 	DEFB	$00,$2B,$80,$00,$5F,$F8,$00,$AF
 	DEFB	$80,$01,$51,$00,$02,$A9,$00,$01
 	DEFB	$51,$00,$00,$A0,$00,$00,$40,$00 ; $Fd (2º DESPLZ a izquierda).
+
+	org $8500
 
 Badsat_izq_fe DEFB $00,$00,$10,$00,$04,$28,$00,$04
 	DEFB	$54,$00,$04,$AA,$00,$05,$54,$00
@@ -174,8 +174,6 @@ Badsat_der_fd DEFB $00,$40,$00,$00,$A1,$00,$01,$51
 	DEFB	$50,$00,$08,$A8,$00,$09,$54,$00
 	DEFB	$08,$A8,$00,$00,$50,$00,$00,$20 ; $Fd (6º DESPLZ a derecha).
 
-	org $8700
-
 Badsat_der_fe DEFB $00,$20,$00,$00,$50,$80,$00,$A8
 	DEFB	$80,$01,$54,$80,$00,$AA,$80,$00
 	DEFB	$54,$80,$00,$2F,$FC,$00,$0D,$80
@@ -204,6 +202,8 @@ Indice_Amadeus_izq defw Amadeus
 	defw 0	
 	defw Amadeus_F9							; [$FD] right - [$FE] left 
 	defw 0	 								; (Fín de índice).
+
+	org $8700
 
 Amadeus DEFB $01,$80,0
 	DEFB	$23,$C4,0
@@ -236,8 +236,6 @@ Amadeus_Fb DEFB	$00,$18,$00,$02,$3C,$40,$02,$66
 	DEFB	$F0,$0F,$FF,$F0,$0F,$BD,$F0,$0F
 	DEFB	$BD,$F0,$08,$BD,$10,$07,$18,$E0 ; $Fb (4º DESPLZ a derecha).
 
-	org $8800
-
 Amadeus_Fd DEFB	$00,$06,$00,$00,$8F,$10,$00,$99
 	DEFB	$90,$00,$90,$90,$00,$B0,$D0,$01
 	DEFB	$B6,$D8,$01,$BF,$D8,$01,$9F,$98
@@ -267,6 +265,8 @@ Explosion_entidades_1 DEFB $00,$10,$00
 	DEFB	$03,$00,$40
 	DEFB	$04,$00,$00
 	DEFB	$08,$00,$00
+
+	org $8800
 
 Explosion_entidades_2 DEFB $08,$00,$00,$05,$38,$10,$03,$BC
 	DEFB	$20,$06,$00,$C0,$04,$06,$C0,$00
@@ -304,8 +304,6 @@ Explosion_Amadeus_1	DEFB $00,$18,$02
 	DEFB	$0F,$B1,$8A
 	DEFB	$08,$BA,$4C
 	DEFB	$07,$19,$80
-
-	org $8900
 
 Explosion_Amadeus_2	DEFB $00,$18,$02
 	DEFB	$00,$3C,$36

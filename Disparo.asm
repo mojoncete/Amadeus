@@ -11,29 +11,37 @@ Genera_datos_de_impresion_disparos_Amadeus
     ld sp,Disparo_1A                                          ; SP se sitúa en el .db (Puntero objeto) de la 1ª caja de disparos de Amadeus.
 
 1 ld hl,Indice_de_disparos_entidades                          ; Compararemos SP con HL para saber cual es la última caja que examinar.
+    sbc hl,sp                                                 ; Última caja ??? 
+    jr z,Salida
 
     pop de                                                    ; Puntero_objeto del disparo en DE.
 
     inc d
     dec d
 
-    jr z,Siguiente_disparo_Amadeus
+    jr nz,Genera_scanlines_de_disparo_Amadeus
+
+Siguiente_disparo_Amadeus    
+
+    pop de
+    inc sp
+    jr 1B
 
 Genera_scanlines_de_disparo_Amadeus
 
     pop hl                                                    ; Puntero_objeto del disparo en DE.
 ;                                                             ; Puntero_de_impresión del disparo en HL.
-    di
-    jr $
-    ei
+    inc sp
+    ld (Puntero_rancio_disparos_album),sp                     ; Siguiente disparo en (Nivel_scanlines_disparos_album).
 
-    ld sp,Disparos_Amadeus_scanlines_album
+    ld sp,(Nivel_scanlines_disparos_album)
 
     pop bc
     pop bc
     pop bc
     pop bc
 
+    ld (Nivel_scanlines_disparos_album),sp                    ; Nuevo nivel del album de disparos.
 
     push hl                                                   ; 3er scanline del disparo.
     call PreviousScan
@@ -42,32 +50,11 @@ Genera_scanlines_de_disparo_Amadeus
     push hl                                                   ; 1er scanline.
     push de                                                   ; Puntero_objeto del disparo.
 
-    ld (Stack),sp
+    ld sp,(Puntero_rancio_disparos_album)
+    jr 1B
 
-
-
-Siguiente_disparo_Amadeus    
-
-    pop de
-    inc sp
-
-    sbc hl,sp                                                 ; Última caja ??? 
-    jr nz,1B
-
-    ld sp,(Stack)
-
+Salida ld sp,(Stack)
     ret
-
-
-
-
-
-
-
-
-
-
-
 
 ; --------------------------------------------------------------------------------------
 ;
@@ -81,6 +68,11 @@ Genera_disparo_Amadeus
     ld a,(Disparo_Amadeus)
     and a
     ret z                                                    ; Salimos si el disparo de nuestra nave no está habilitado.
+
+;! Provisionalmente sólo 1 disparo !!!!!!
+    dec a
+    ld (Disparo_Amadeus),a
+; ----- ----- ----- -----
 
 Define_puntero_objeto_disparo
 

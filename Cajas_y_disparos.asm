@@ -13,7 +13,9 @@
 
 Numeros_aleatorios ds 7
 
-Tabla_de_pintado ds 27
+	org $8900	
+
+Tabla_de_pintado ds 27								 ; No puede haber cambio de byte alto en la Tabla_de_pintado, ese es el motivo del "org".
 
 ;	db 0, defw 0
 ;	db 0, defw 0
@@ -46,9 +48,6 @@ Indice_de_disparos_entidades defw Disparo_1
 	defw Disparo_5
 	defw Disparo_6
 	defw Disparo_7
-	defw Disparo_8
-	defw Disparo_9
-	defw Disparo_10
 
 Disparo_1 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
@@ -78,18 +77,6 @@ Disparo_7 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
 	db 0											; Control.
 						
-Disparo_8 defw 0									; Puntero objeto.
-	defw 0											; Puntero de impresión.
-	db 0											; Control.
-
-Disparo_9 defw 0									; Puntero objeto.
-	defw 0											; Puntero de impresión.
-	db 0											; Control.
-						
-Disparo_10 defw 0									; Puntero objeto.
-	defw 0											; Puntero de impresión.
-	db 0											; Control.
-
 ; -------------------------------------------------------------------------------------
 ;
 ;	Índice de cajas de entidades.

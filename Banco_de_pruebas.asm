@@ -10,7 +10,7 @@
 
 	org $fdff															; (Debajo de la pila).
 
-	defw $8345															; Indica al vector de interrupciones, (IM2), que el clock del programa se encuentra en $82a0.
+	defw $82f4															; Indica al vector de interrupciones, (IM2), que el clock del programa se encuentra en $82a0.
 
 ;
 ;	13/08/24
@@ -35,13 +35,8 @@ Scanlines_album equ $8000	;	($8000 - $8118) 						; Inicialmente 280 bytes, $118
 Scanlines_album_2 equ $811a	;    ($811a - $8232)
 Amadeus_scanlines_album equ $8234	;	($8234 - $8256) 				; Inicialmente 34 bytes, $22.
 Amadeus_scanlines_album_2 equ $8258	;	($8258 - $827a)
-Disparos_Amadeus_scanlines_album equ $827c	;	($827c - $828c) 		; Inicialmente 16 bytes, $10.
-Disparos_Amadeus_scanlines_album_2 equ $828e	;	($828e - $829e)	
-Disparos_Entidades_scanlines_album equ $82a1	;	($82a1 - $82f1)		; Inicialmente 80 bytes, $50.
-Disparos_Entidades_scanlines_album_2 equ $82f3	;	($82f3 - $8343)
-
-
-
+Disparos_scanlines_album equ $827c	;	($827c - $82b6) 				; Inicialmente 58 bytes, $3a.
+Disparos_scanlines_album_2 equ $828e	;	($82b8 - $82f2)	
 
 ;																		; Scanlines_album. 
 
@@ -57,7 +52,7 @@ Disparos_Entidades_scanlines_album_2 equ $82f3	;	($82f3 - $8343)
 ;	13/08/24
 ;
 
-	org $8345
+	org $82f4
 
 	push af
 	push hl
@@ -138,7 +133,7 @@ Incrementa_FRAMES
 
 ; --------------------------------------------------------------------------------
 
-	include "Sprites_e_indices.asm"						; Comienza en $83c0
+	include "Sprites_e_indices.asm"						; Comienza en $8370
 	include "Cajas_y_disparos.asm"
 	include "Patrones_de_mov.asm"
 	include "Niveles.asm"
@@ -380,10 +375,11 @@ Album_de_pintado defw 0
 Album_de_borrado defw 0
 Album_de_pintado_Amadeus defw 0
 Album_de_borrado_Amadeus defw 0
-Album_de_pintado_disparos_Amadeus defw 0
-Album_de_borrado_disparos_Amadeus defw 0
-Album_de_pintado_disparos_entidades defw 0
-Album_de_borrado_disparos_entidades defw 0
+Album_de_pintado_disparos defw 0
+Album_de_borrado_disparos defw 0
+
+Nivel_scanlines_disparos_album defw 0
+Puntero_rancio_disparos_album defw 0
 
 Techo_Scanlines_album defw 0
 Techo_Scanlines_album_2 defw 0
@@ -904,6 +900,10 @@ Gestion_de_Amadeus
 	jr nz,End_frame
 
 ; Una vida menos. Reinicia Amadeus, reinicia Shield. (aparece nueva nave).
+
+	di
+	jr $
+	ei
 
 	ld hl,Lives
 	dec (hl)
@@ -1818,15 +1818,13 @@ Inicia_albumes_de_lineas_Amadeus
 
 Inicia_albumes_de_disparos
 
-	ld hl,Disparos_Amadeus_scanlines_album
-	ld (Album_de_pintado_disparos_Amadeus),hl
-	ld hl,Disparos_Amadeus_scanlines_album_2
-	ld (Album_de_borrado_disparos_Amadeus),hl
+	ld hl,Disparos_scanlines_album
+	ld (Album_de_pintado_disparos),hl
+	ld hl,Disparos_scanlines_album_2
+	ld (Album_de_borrado_disparos),hl
 
-	ld hl,Disparos_Entidades_scanlines_album
-	ld (Album_de_pintado_disparos_entidades),hl
-	ld hl,Disparos_Entidades_scanlines_album_2
-	ld (Album_de_borrado_disparos_entidades),hl
+	ld hl,Disparos_scanlines_album
+	ld (Nivel_scanlines_disparos_album),hl
 
 	ret
 
@@ -2031,9 +2029,6 @@ Actualiza_pantalla
 	out ($fe),a												
 
 	ld a,(Ctrl_3)
-;	bit 0,a
-;	jr z,Ejecuta_escudo									 		  	; No pintamos si el FRAME no se ha completado.
-	bit 2,a
 	jr z,Ejecuta_escudo                                             ; No hay movimiento de entidades. Saltamos a Amadeus.
 
 Borrando_entidades
