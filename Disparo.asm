@@ -1,5 +1,96 @@
 ; --------------------------------------------------------------------------------------
 ;
+;   21/8/24
+;
+
+Pinta_disparos 
+
+    push de
+
+    ld (Stack),sp
+Borra_disparos ld sp,(Album_de_borrado_disparos)
+    pop de
+    
+    inc d
+    dec d
+
+    jr z,Pinta_disparos_00
+
+    jr $
+
+Pinta_disparos_00     
+
+    ld sp,(Album_de_pintado_disparos)
+    pop de
+
+    inc d
+    dec d
+
+    jr z,1F
+
+    ld hl,Ctrl_5
+    set 0,(hl)
+
+ ; Pinta disparo.
+
+    pop hl
+
+; Puntero objeto en DE.
+; Puntero_de_impresión en HL.
+
+; 1er scanline.
+
+    ld a,(de)
+    xor (hl)
+    ld (hl),a
+
+    inc de
+    inc l
+
+    ld a,(de)
+    xor (hl)
+    ld (hl),a
+
+; 2º scanline.
+
+    pop hl
+    dec de
+
+    ld a,(de)
+    xor (hl)
+    ld (hl),a
+
+    inc de
+    inc l
+
+    ld a,(de)
+    xor (hl)
+    ld (hl),a
+
+; 3er scanline.
+
+    pop hl
+    dec de
+
+    ld a,(de)
+    xor (hl)
+    ld (hl),a
+
+    inc de
+    inc l
+
+    ld a,(de)
+    xor (hl)
+    ld (hl),a
+
+    jr $
+
+1 ld sp,(Stack)
+    pop de
+    ret
+
+; --------------------------------------------------------------------------------------
+;
 ;   17/8/24
 ;
 ;   Modifica: HL y DE.

@@ -63,6 +63,10 @@ Disparos_scanlines_album_2 equ $828e	;	($82b8 - $82f2)
 	jr z,$
 ;! -------------------
 
+; Disparos.
+
+	call Pinta_disparos 
+
 ; Shield -----------------------
 
 Temporizacion_shield 
@@ -422,6 +426,7 @@ Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una únic
 ;	                                                        BIT 6 (Ctrl_4) ..... MOV_MASTICADOS GENERADOS. Entidad de (Tipo)_3.
 ;	                                                        BIT 7 (Ctrl_4) ..... MOV_MASTICADOS GENERADOS. Entidad de (Tipo)_4.
 
+Ctrl_5 db 0
 
 ; Gestión de Disparos.
 
@@ -630,6 +635,12 @@ Main
 ; En el FRAME que acabamos de pintar puede existir una posible colisión entre alguna entidad y Amadeus. 
 ; Si alguna de las coordenadas_X de alguna entidad que esté en zona de Amadeus coincide con alguna de las coordenadas_X de Amadeus, habrá que comprobar si existe colisión.
 ; Este hecho lo indica el bit2 de (Impacto2).
+
+	ld a,(Ctrl_5)
+	bit 0,a
+	di
+	jr nz,$
+	ei
 
 	call Detecta_colision_nave_entidad 					; La rutina verifica la colisión entre una entidad y Amadeus, (RES 2 Impacto2).
 
@@ -900,10 +911,6 @@ Gestion_de_Amadeus
 	jr nz,End_frame
 
 ; Una vida menos. Reinicia Amadeus, reinicia Shield. (aparece nueva nave).
-
-	di
-	jr $
-	ei
 
 	ld hl,Lives
 	dec (hl)
@@ -2029,6 +2036,7 @@ Actualiza_pantalla
 	out ($fe),a												
 
 	ld a,(Ctrl_3)
+	bit 2,a
 	jr z,Ejecuta_escudo                                             ; No hay movimiento de entidades. Saltamos a Amadeus.
 
 Borrando_entidades
