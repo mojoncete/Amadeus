@@ -5,33 +5,19 @@
 
 Pinta_disparos 
 
-    push de
-
     ld (Stack),sp
+    ld b,2
+
 Borra_disparos ld sp,(Album_de_borrado_disparos)
-    pop de
+
+2 pop de
     
-    inc d
-    dec d
-
-    jr z,Pinta_disparos_00
-
-    jr $
-
-Pinta_disparos_00     
-
-    ld sp,(Album_de_pintado_disparos)
-    pop de
-
     inc d
     dec d
 
     jr z,1F
 
-    ld hl,Ctrl_5
-    set 0,(hl)
-
- ; Pinta disparo.
+Imprime_scanlines_de_disparo     
 
     pop hl
 
@@ -67,31 +53,20 @@ Pinta_disparos_00
     xor (hl)
     ld (hl),a
 
-; 3er scanline.
+; Seguimos pintando / borrando disparos si los hay. SP está situado ahora en el siguiente disparo del álbum de scanlines de disparos.
 
-    pop hl
-    dec de
+    jr 2B
 
-    ld a,(de)
-    xor (hl)
-    ld (hl),a
+3 ld sp,(Album_de_pintado_disparos)
+    jr 2B
 
-    inc de
-    inc l
-
-    ld a,(de)
-    xor (hl)
-    ld (hl),a
-
-    jr $
-
-1 ld sp,(Stack)
-    pop de
+1 djnz 3B
+    ld sp,(Stack)
     ret
 
 ; --------------------------------------------------------------------------------------
 ;
-;   17/8/24
+;   21/8/24
 ;
 ;   Modifica: HL y DE.
 
@@ -123,23 +98,20 @@ Genera_scanlines_de_disparo_Amadeus
     pop hl                                                    ; Puntero_objeto del disparo en DE.
 ;                                                             ; Puntero_de_impresión del disparo en HL.
     inc sp
-    ld (Puntero_rancio_disparos_album),sp                     ; Siguiente disparo en (Nivel_scanlines_disparos_album).
+    ld (Puntero_rancio_disparos_album),sp                     ; Guardamos la dirección de la siguiente caja de disparos que tenemos que comprobar.
 
-    ld sp,(Nivel_scanlines_disparos_album)
+    ld sp,(Nivel_scan_disparos_album_de_pintado)
 
     pop bc
     pop bc
     pop bc
-    pop bc
 
-    ld (Nivel_scanlines_disparos_album),sp                    ; Nuevo nivel del album de disparos.
+    ld (Nivel_scan_disparos_album_de_pintado),sp              ; Nuevo nivel del album de disparos.
 
-    push hl                                                   ; 3er scanline del disparo.
+    push hl                                                   ; Sube 2º scanline al álbum.
     call PreviousScan
-    push hl                                                   ; 2º scanline.
-    call PreviousScan
-    push hl                                                   ; 1er scanline.
-    push de                                                   ; Puntero_objeto del disparo.
+    push hl                                                   ; Sube 1er scanline al álbum.
+    push de                                                   ; Sube Puntero_objeto del disparo al álbum.
 
     ld sp,(Puntero_rancio_disparos_album)
     jr 1B

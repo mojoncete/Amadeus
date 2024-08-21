@@ -382,7 +382,12 @@ Album_de_borrado_Amadeus defw 0
 Album_de_pintado_disparos defw 0
 Album_de_borrado_disparos defw 0
 
-Nivel_scanlines_disparos_album defw 0
+Nivel_scan_disparos_album_de_pintado defw 0
+Nivel_scan_disparos_album_de_borrado defw 0
+
+Numero_de_disparos_de_Amadeus db 0
+Numero_de_disparos_de_entidades db 0
+
 Puntero_rancio_disparos_album defw 0
 
 Techo_Scanlines_album defw 0
@@ -636,11 +641,7 @@ Main
 ; Si alguna de las coordenadas_X de alguna entidad que esté en zona de Amadeus coincide con alguna de las coordenadas_X de Amadeus, habrá que comprobar si existe colisión.
 ; Este hecho lo indica el bit2 de (Impacto2).
 
-	ld a,(Ctrl_5)
-	bit 0,a
-	di
-	jr nz,$
-	ei
+	call Change_Disparos								; Intercambiamos los álbumes de disparos.
 
 	call Detecta_colision_nave_entidad 					; La rutina verifica la colisión entre una entidad y Amadeus, (RES 2 Impacto2).
 
@@ -774,75 +775,6 @@ Main
 ; Falsa colisión !!!	
 	
 	ld (Impacto),a											; Colocamos el .db (Impacto) de la entidad en curso a "0".
-
-;19 ld hl,Ctrl_2											; Activamos el proceso de explosión.
-;	set 1,(hl)
-;	jr 7F
-
-; Si el bit2 de (Ctrl_1) está alzado, "1", hemos de comparar (Coordenadas_disparo_certero)_
-; _con las coordenadas de la entidad almacenada en DRAW.
-
-;	ld a,(Ctrl_1)
-;	bit 2,a
-;	jr z,7F	
-
-;	ld hl,(Coordenadas_disparo_certero)
-;	ex de,hl 											; D contiene la coordenada_y del disparo.
-;														; E contiene la coordenada_X del disparo.	
-;	ld hl,(Coordenada_X) 								; L COLUMNA (Coordenada_x de la entidad).
-;														; H FILA, (Coordenada_y de la entidad).	
-;	and a
-;	sbc hl,de
-
-;	call Determina_resultado_comparativa
-
-;	ld a,b
-;	and a
-;	jr z,7F												; B="0" significa que esta entidad no es la impactada.
-
-; ----- ----- -----
-
-;	ld a,1												; Esta entidad ha sido alcanzada por un disparo_
-;	ld (Impacto),a 										; _de Amadeus. Lo indicamos activando su .db (Impacto).
-
-;	ld hl,Ctrl_1
-;	res 2,(hl)
-
-;7 call Mov_obj											; MOVEMOS y decrementamos (Numero_de_malotes)
-
-;	ld a,(Ctrl_0)
-;	bit 4,a
-;	jr z,17F                                       	    ; Si no ha habido movimiento, NO HEMOS BORRADO, NI VAMOS A PINTAR NADA.!!!
-
-; Voy a utilizar una rutina de lectura de teclado para disparar con cualquier entidad.
-; [[[
-;	call Detecta_disparo_entidad
-; ]]]
-
-;	dec a
-;	ld (Impacto),a
-
-; Existe "Entidad_guía" ???.
-; Si la Entidad_guía ha sido fulminada hemos de reemplazarla.
-
-;	ld a,(Ctrl_3)
-;	bit 1,a
-;	jr nz,22F
-
-; Almacén de "Movimientos_masticados" lleno ???
-; Una "Entidad_guía" a dejado de serlo ???, (Reinicio??).
-; En ese caso NO SE ACTIVA UNA NUEVA "ENTIDAD_GUÍA".
-
-;;	ld a,(Ctrl_3)
-;;	bit 3,a
-;;	jr nz,22F
-
-; Activa "Entidad_guía" siempre que no esté ya completo el almacén de productos_masticados.
-
-;	ld hl,Ctrl_2
-;	set 5,(hl)
-;	ld hl,Ctrl_3
-;	set 1,(hl)
 
 ; -------------------------------------------
 
@@ -1245,7 +1177,7 @@ Ajusta_velocidad_entidad ld a,(Velocidad)
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	18/06/24
+;	21/08/24
 
 Change 
 
@@ -1267,6 +1199,15 @@ Change_Amadeus
 	ex de,hl
 	ld (Album_de_pintado_Amadeus),hl
 	ld (Album_de_borrado_Amadeus),de
+	ret
+
+Change_Disparos
+
+	ld hl,(Album_de_pintado_disparos)
+	ld de,(Album_de_borrado_disparos)
+	ex de,hl
+	ld (Album_de_pintado_disparos),hl
+	ld (Album_de_borrado_disparos),de
 	ret
 
 ; ------------------------------------
@@ -1831,7 +1772,7 @@ Inicia_albumes_de_disparos
 	ld (Album_de_borrado_disparos),hl
 
 	ld hl,Disparos_scanlines_album
-	ld (Nivel_scanlines_disparos_album),hl
+	ld (Nivel_scan_disparos_album_de_pintado),hl
 
 	ret
 
