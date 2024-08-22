@@ -1,9 +1,97 @@
 ; --------------------------------------------------------------------------------------
 ;
+;   22/08/24
+;
+
+Mueve_Disparos
+
+;    Exclusiones:
+
+    ld a,(Numero_de_disparos_de_Amadeus)
+    and a
+    jr z,2F                                                             ; Salimos si no hay ningún disparo generado.
+
+; .........................
+
+; Nos situamos en el puntero_de_impresión de la caja.
+
+    ld hl,Disparo_1A+3
+    inc (hl)
+    dec (hl)
+    jr z,1F
+
+    dec hl
+    call Mueve_disparo_Amadeus
+
+1 ld hl,Disparo_2A+3
+    inc (hl)
+    dec (hl)
+    jr z,2F
+
+    dec hl
+    call Mueve_disparo_Amadeus
+
+; Disparos de entidades.
+
+2 ld a,(Numero_de_disparos_de_entidades)
+    and a
+    ret z
+
+    ld b,7                                                               ; Contador de disparos.
+    ld hl,Indice_de_disparos_entidades
+
+4 call Extrae_address 
+    inc de
+    inc de
+    ld (Puntero_rancio_disparos_album),de
+
+    inc hl
+
+    inc (hl)                                                           ; Dispone de Puntero_objeto ???
+    dec (hl)
+    jr z,3F
+
+3 ex de,hl
+    djnz 4B
+
+    ret
+
+; -------------------------------------------
+;
+;
+
+Mueve_disparo_Amadeus
+
+    call Extrae_address                                               ; Puntero_de_impresión del disparo en HL.
+
+    call PreviousScan 
+    call PreviousScan 
+    call PreviousScan 
+    call PreviousScan 
+
+
+; Introduce nuevo puntero_de_impresión en la caja.
+
+    ex de,hl
+
+    ld (hl),e
+    inc hl
+    ld (hl),d
+
+    ret
+
+; --------------------------------------------------------------------------------------
+;
 ;   21/8/24
 ;
 
 Pinta_disparos 
+
+;    Exclusiones:
+
+    ld a,(Numero_de_disparos_de_Amadeus)
+    and a
+    ret z                                                             ; Salimos si no hay ningún disparo generado.
 
     ld (Stack),sp
     ld b,2
@@ -73,6 +161,12 @@ Imprime_scanlines_de_disparo
 
 Genera_datos_de_impresion_disparos_Amadeus
 
+;   Exclusiones:
+
+    ld a,(Numero_de_disparos_de_Amadeus)
+    and a
+    ret z                                                     ; Salimos si no hay ningún disparo generado.
+
     ld (Stack),sp
     ld sp,Disparo_1A                                          ; SP se sitúa en el .db (Puntero objeto) de la 1ª caja de disparos de Amadeus.
 
@@ -135,6 +229,12 @@ Genera_disparo_Amadeus
 ;! Provisionalmente sólo 1 disparo !!!!!!
     dec a
     ld (Disparo_Amadeus),a
+
+;   Inc nº de disparos de Amadeus.
+
+    ld hl,Numero_de_disparos_de_Amadeus
+    inc (hl)
+
 ; ----- ----- ----- -----
 
 Define_puntero_objeto_disparo

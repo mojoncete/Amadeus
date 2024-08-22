@@ -635,13 +635,16 @@ START
 
 Main 
 ;
-; 13/05/24
+; 22/08/24
+
+; Gestión de disparos.
+
+	call Change_Disparos								; Intercambiamos los álbumes de disparos.
+	call Mueve_Disparos
 
 ; En el FRAME que acabamos de pintar puede existir una posible colisión entre alguna entidad y Amadeus. 
 ; Si alguna de las coordenadas_X de alguna entidad que esté en zona de Amadeus coincide con alguna de las coordenadas_X de Amadeus, habrá que comprobar si existe colisión.
 ; Este hecho lo indica el bit2 de (Impacto2).
-
-	call Change_Disparos								; Intercambiamos los álbumes de disparos.
 
 	call Detecta_colision_nave_entidad 					; La rutina verifica la colisión entre una entidad y Amadeus, (RES 2 Impacto2).
 
@@ -1203,11 +1206,22 @@ Change_Amadeus
 
 Change_Disparos
 
+;	Exclusiones:
+
+	ld a,(Numero_de_disparos_de_Amadeus)
+	and a
+	ret z
+
+	ld hl,(Nivel_scan_disparos_album_de_pintado)
+	ld (Nivel_scan_disparos_album_de_borrado),hl
+
 	ld hl,(Album_de_pintado_disparos)
 	ld de,(Album_de_borrado_disparos)
 	ex de,hl
 	ld (Album_de_pintado_disparos),hl
 	ld (Album_de_borrado_disparos),de
+	ld (Nivel_scan_disparos_album_de_pintado),hl
+
 	ret
 
 ; ------------------------------------
