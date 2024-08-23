@@ -1,5 +1,22 @@
 ; --------------------------------------------------------------------------------------
 ;
+;   23/08/24
+;
+
+Limpia_album_de_pintado_disparos
+
+    ld a,(Numero_de_disparos_de_Amadeus)
+    and a
+    ret z                                                               ; Salimos si no hay ningún disparo generado.
+
+    di
+    jr $
+    ei
+
+    ret
+
+; --------------------------------------------------------------------------------------
+;
 ;   22/08/24
 ;
 
@@ -56,7 +73,7 @@ Mueve_Disparos
 
     ret
 
-; -------------------------------------------
+; ----------------------
 ;
 ;
 
@@ -64,19 +81,66 @@ Mueve_disparo_Amadeus
 
     call Extrae_address                                               ; Puntero_de_impresión del disparo en HL.
 
-    call PreviousScan 
+    call PreviousScan
     call PreviousScan 
     call PreviousScan 
     call PreviousScan 
 
+; Después de mover el disparo comprobamos si ha salido de la parte alta de la pantalla.
 
-; Introduce nuevo puntero_de_impresión en la caja.
+    ld a,h
+    sub $40
+    jr c,Elimina_disparo
+
+ ; Introduce nuevo puntero_de_impresión en la caja.
 
     ex de,hl
 
     ld (hl),e
     inc hl
     ld (hl),d
+
+    ret
+
+; ----------------------
+;
+;   23/08/24
+
+Elimina_disparo
+
+    ex de,hl
+
+; HL apunta al .db (Puntero_de_impresion) del disparo.
+; Recordemos la estructura de datos de una caja de disparos de Amadeus:
+
+;   Disparo_1A defw 0									; Puntero objeto.
+;   	defw 0											; Puntero de impresión.
+;   	db 0											; Impacto.
+
+    dec hl
+    dec hl
+
+    xor a
+    ld (hl),a
+    inc hl
+    ld (hl),a                                           ; Puntero_objeto borrado.
+    inc hl
+    ld (hl),a
+    inc hl
+    ld (hl),a                                           ; Puntero_de_impresion borrado.
+    inc hl
+    ld (hl),a                                           ; Impacto borrado.
+
+    ld hl,Numero_de_disparos_de_Amadeus
+    dec (hl)
+
+    ld a,(Disparo_Amadeus)
+    or 1
+    ld (Disparo_Amadeus),a
+
+    ld hl,Ctrl_5
+    set 0,(hl)
+
 
     ret
 

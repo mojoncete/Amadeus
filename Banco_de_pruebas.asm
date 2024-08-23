@@ -388,6 +388,9 @@ Nivel_scan_disparos_album_de_borrado defw 0
 Numero_de_disparos_de_Amadeus db 0
 Numero_de_disparos_de_entidades db 0
 
+Disparo_Amadeus db 1									; A "1", se puede generar disparo.
+;Disparo_entidad db 1									; A "1", se puede generar disparo.
+
 Puntero_rancio_disparos_album defw 0
 
 Techo_Scanlines_album defw 0
@@ -478,12 +481,9 @@ RND_SP defw Numeros_aleatorios							; Puntero que se irá desplazando por el SE
 Clock_next_entity defw 0								; Transcurrido este tiempo aparece una nueva entidad.
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
-Disparo_Amadeus db 1									; A "1", se puede generar disparo.
 
 ;CLOCK_repone_disparo_Amadeus_BACKUP db 30				; Restaura (CLOCK_repone_disparo_Amadeus). 
 ;CLOCK_repone_disparo_Amadeus db 30 						; Reloj, decreciente.
-
-;Disparo_entidad db 1									; A "1", se puede generar disparo.
 ;CLOCK_repone_disparo_entidad_BACKUP db 20				; Restaura (CLOCK_repone_disparo_entidad). 
 ;CLOCK_repone_disparo_entidad db 20						; Reloj, decreciente.
 
@@ -872,7 +872,11 @@ Amadeus_vivo
 
 	call Teclado
 
+; 23/08/24 Llegados a este punto: NO HAY POSIBILIDAD DE GENERAR MÁS DISPAROS.
+; Generamos los datos de impresión en el álbum_de_pintado y limpiamos el sobrante de datos del anterior FRAME si toca.
+
 	call Genera_datos_de_impresion_disparos_Amadeus
+;	call Limpia_album_de_pintado_disparos
 
 	ld hl,Ctrl_3
 	bit 5,(hl)
@@ -1212,8 +1216,8 @@ Change_Disparos
 	and a
 	ret z
 
-	ld hl,(Nivel_scan_disparos_album_de_pintado)
-	ld (Nivel_scan_disparos_album_de_borrado),hl
+;	ld hl,(Nivel_scan_disparos_album_de_pintado)
+;	ld (Nivel_scan_disparos_album_de_borrado),hl
 
 	ld hl,(Album_de_pintado_disparos)
 	ld de,(Album_de_borrado_disparos)
@@ -2060,8 +2064,6 @@ Pintando_Amadeus
 	out ($fe),a
 
 	ret									 
-
-
 
 Aplica_Shield 
 
