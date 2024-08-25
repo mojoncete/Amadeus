@@ -5,13 +5,40 @@
 
 Limpia_album_de_pintado_disparos
 
+;   Exclusiones.
+
     ld a,(Numero_de_disparos_de_Amadeus)
     and a
     ret z                                                               ; Salimos si no hay ningún disparo generado.
 
-    di
+    ld a,(Num_de_bytes_album_de_disparos_2)
+    and a
+    ret z
+
+; ----- ----- -----
+
+    xor a
+
+    ld a,(Num_de_bytes_album_de_disparos_2)
+    ld b,a    
+    ld a,(Num_de_bytes_album_de_disparos)
+
+    jr c,2F
+
+    ret
+
+2 di
     jr $
     ei
+
+
+    ld hl,(Nivel_scan_disparos_album_de_pintado)
+    ld b,a                                                              ; Nº de bytes a borrar en B.
+    xor a                                                               ; "0".
+
+1 ld (hl),a
+    inc l
+    djnz 1B
 
     ret
 
@@ -231,6 +258,8 @@ Genera_datos_de_impresion_disparos_Amadeus
     and a
     ret z                                                     ; Salimos si no hay ningún disparo generado.
 
+; -----
+
     ld (Stack),sp
     ld sp,Disparo_1A                                          ; SP se sitúa en el .db (Puntero objeto) de la 1ª caja de disparos de Amadeus.
 
@@ -274,7 +303,20 @@ Genera_scanlines_de_disparo_Amadeus
     ld sp,(Puntero_rancio_disparos_album)
     jr 1B
 
-Salida ld sp,(Stack)
+
+Salida 
+
+;   Calcula el nº de bytes totales que se han almacenado en el (Album_de_pintado_disparos).
+
+    ld hl,(Album_de_pintado_disparos)
+    ld b,l
+    ld hl,(Nivel_scan_disparos_album_de_pintado)
+    ld a,l
+
+    sub b
+    ld (Num_de_bytes_album_de_disparos),a
+
+    ld sp,(Stack)
     ret
 
 ; --------------------------------------------------------------------------------------

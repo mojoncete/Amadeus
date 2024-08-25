@@ -353,10 +353,7 @@ Indice_restore_caja defw 0
 Numero_de_entidades db 0								; Nº total de entidades maliciosas que contiene el nivel.
 Numero_parcial_de_entidades db 7						; Nº de cajas que contiene un bloque de entidades. (7 Cajas).
 Entidades_en_curso db 0									; ..... ..... .....
-;Numero_de_malotes db 0									; Inicialmente, (Numero_de_malotes)=(Numero_de_entidades).
-;														; Esta variable es utilizada por la rutina [Genera_datos_de_impresion]_
-;														; _ para actualizar el puntero (Scanlines_album_SP) o reiniciarlo cuando_
-;														; _ (Numero_de_malotes)="0".
+
 Puntero_indice_ENTIDADES defw 0 						; Se desplazará por el índice de entidades para `meterlas' en cajas.
 Datos_de_entidad defw 0									; Contiene los bytes de información de la entidad hacia la que apunta el 
 ;														; _ puntero (Indice_entidades).
@@ -383,7 +380,8 @@ Album_de_pintado_disparos defw 0
 Album_de_borrado_disparos defw 0
 
 Nivel_scan_disparos_album_de_pintado defw 0
-Nivel_scan_disparos_album_de_borrado defw 0
+Num_de_bytes_album_de_disparos db 0
+Num_de_bytes_album_de_disparos_2 db 0
 
 Numero_de_disparos_de_Amadeus db 0
 Numero_de_disparos_de_entidades db 0
@@ -437,8 +435,6 @@ Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una únic
 Ctrl_5 db 0
 
 ; Gestión de Disparos.
-
-;Numero_de_disparotes db 0	
 
 Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
 Puntero_DESPLZ_DISPARO_AMADEUS defw 0
@@ -875,8 +871,8 @@ Amadeus_vivo
 ; 23/08/24 Llegados a este punto: NO HAY POSIBILIDAD DE GENERAR MÁS DISPAROS.
 ; Generamos los datos de impresión en el álbum_de_pintado y limpiamos el sobrante de datos del anterior FRAME si toca.
 
-	call Genera_datos_de_impresion_disparos_Amadeus
-;	call Limpia_album_de_pintado_disparos
+	call Genera_datos_de_impresion_disparos_Amadeus		; Genera los datos de impresión de los disparos.
+	call Limpia_album_de_pintado_disparos
 
 	ld hl,Ctrl_3
 	bit 5,(hl)
@@ -885,7 +881,7 @@ Amadeus_vivo
 ; Existe movimiento de Amadeus, Cambiamos álbum borrado-pintado y generamos los datos de impresión.
 
 	call Change_Amadeus
-	call Genera_datos_de_impresion_Amadeus
+	call Genera_datos_de_impresion_Amadeus				; Genera los datos de impresión de la nave.
 
 End_frame 
 
@@ -1184,7 +1180,7 @@ Ajusta_velocidad_entidad ld a,(Velocidad)
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	21/08/24
+;	25/08/24
 
 Change 
 
@@ -1216,8 +1212,7 @@ Change_Disparos
 	and a
 	ret z
 
-;	ld hl,(Nivel_scan_disparos_album_de_pintado)
-;	ld (Nivel_scan_disparos_album_de_borrado),hl
+; -----
 
 	ld hl,(Album_de_pintado_disparos)
 	ld de,(Album_de_borrado_disparos)
@@ -1225,6 +1220,9 @@ Change_Disparos
 	ld (Album_de_pintado_disparos),hl
 	ld (Album_de_borrado_disparos),de
 	ld (Nivel_scan_disparos_album_de_pintado),hl
+
+	ld a,(Num_de_bytes_album_de_disparos)
+	ld (Num_de_bytes_album_de_disparos_2),a
 
 	ret
 
