@@ -635,6 +635,7 @@ Main
 
 ; Gestión de disparos.
 
+	call Limpia_album_de_borrado_disparos
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
 	call Mueve_Disparos
 
@@ -868,12 +869,6 @@ Amadeus_vivo
 
 	call Teclado
 
-; 23/08/24 Llegados a este punto: NO HAY POSIBILIDAD DE GENERAR MÁS DISPAROS.
-; Generamos los datos de impresión en el álbum_de_pintado y limpiamos el sobrante de datos del anterior FRAME si toca.
-
-	call Genera_datos_de_impresion_disparos_Amadeus		; Genera los datos de impresión de los disparos.
-	call Limpia_album_de_pintado_disparos
-
 	ld hl,Ctrl_3
 	bit 5,(hl)
 	jr z,End_frame
@@ -884,6 +879,15 @@ Amadeus_vivo
 	call Genera_datos_de_impresion_Amadeus				; Genera los datos de impresión de la nave.
 
 End_frame 
+
+; 23/08/24 Llegados a este punto: NO HAY POSIBILIDAD DE GENERAR MÁS DISPAROS.
+; Generamos los datos de impresión en el álbum_de_pintado y limpiamos el sobrante de datos del anterior FRAME si toca.
+
+	call Genera_datos_de_impresion_disparos_Amadeus		; Genera los datos de impresión de los disparos.
+	call Calcula_bytes_pintado_disparos
+	call Limpia_album_de_pintado_disparos
+
+; ------------ ------------- --------------
 
 	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl

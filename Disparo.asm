@@ -1,5 +1,52 @@
 ; --------------------------------------------------------------------------------------
 ;
+;   26/08/24
+;
+
+Limpia_album_de_borrado_disparos
+
+    ld hl,Ctrl_5
+    bit 0,(hl)
+    ret z
+    res 0,(hl)
+
+    ld a,(Numero_de_disparos_de_Amadeus)    
+    and a
+    ret nz
+
+Limpiando
+
+    xor a
+    ld hl,(Album_de_borrado_disparos)
+    ld (hl),a
+    ld e,l
+    ld d,h
+    inc e                                           ; DE = HL+1
+    ld bc,$003a
+    ldir
+
+    ret
+
+
+; --------------------------------------------------------------------------------------
+;
+;   26/08/24
+;
+
+Calcula_bytes_pintado_disparos
+
+    ld hl,(Album_de_pintado_disparos)
+    ld b,l
+    ld hl,(Nivel_scan_disparos_album_de_pintado)
+    ld a,l
+
+    sub b
+    ld (Num_de_bytes_album_de_disparos),a
+
+    ret
+
+; --------------------------------------------------------------------------------------
+;
 ;   23/08/24
 ;
 
@@ -7,30 +54,22 @@ Limpia_album_de_pintado_disparos
 
 ;   Exclusiones.
 
-    ld a,(Numero_de_disparos_de_Amadeus)
-    and a
-    ret z                                                               ; Salimos si no hay ningún disparo generado.
-
     ld a,(Num_de_bytes_album_de_disparos_2)
     and a
     ret z
 
-; ----- ----- -----
+; -----
 
-    xor a
+    and a
 
-    ld a,(Num_de_bytes_album_de_disparos_2)
-    ld b,a    
     ld a,(Num_de_bytes_album_de_disparos)
+    ld b,a    
+    ld a,(Num_de_bytes_album_de_disparos_2)
 
-    jr c,2F
+    sub b
 
-    ret
-
-2 di
-    jr $
-    ei
-
+    ret z
+    ret c
 
     ld hl,(Nivel_scan_disparos_album_de_pintado)
     ld b,a                                                              ; Nº de bytes a borrar en B.
@@ -111,7 +150,7 @@ Mueve_disparo_Amadeus
     call PreviousScan
     call PreviousScan 
     call PreviousScan 
-    call PreviousScan 
+;    call PreviousScan 
 
 ; Después de mover el disparo comprobamos si ha salido de la parte alta de la pantalla.
 
@@ -177,12 +216,6 @@ Elimina_disparo
 ;
 
 Pinta_disparos 
-
-;    Exclusiones:
-
-    ld a,(Numero_de_disparos_de_Amadeus)
-    and a
-    ret z                                                             ; Salimos si no hay ningún disparo generado.
 
     ld (Stack),sp
     ld b,2
@@ -305,16 +338,6 @@ Genera_scanlines_de_disparo_Amadeus
 
 
 Salida 
-
-;   Calcula el nº de bytes totales que se han almacenado en el (Album_de_pintado_disparos).
-
-    ld hl,(Album_de_pintado_disparos)
-    ld b,l
-    ld hl,(Nivel_scan_disparos_album_de_pintado)
-    ld a,l
-
-    sub b
-    ld (Num_de_bytes_album_de_disparos),a
 
     ld sp,(Stack)
     ret
