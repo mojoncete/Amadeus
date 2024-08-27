@@ -49,6 +49,9 @@ Calcula_bytes_pintado_disparos
 ;
 ;   23/08/24
 ;
+;   Limpia la diferencia de bytes entre el (album_de_pintado_disparos) del FRAME anterior y el_
+;   _(album_de_pintado_disparos) del FRAME actual, (siempre que el álbum del FRAME anterior contenga más_ 
+;   _disparos que el álbum del FRAME actual). 
 
 Limpia_album_de_pintado_disparos
 
@@ -83,7 +86,7 @@ Limpia_album_de_pintado_disparos
 
 ; --------------------------------------------------------------------------------------
 ;
-;   22/08/24
+;   27/08/24
 ;
 
 Mueve_Disparos
@@ -96,17 +99,34 @@ Mueve_Disparos
 
 ; .........................
 
-; Nos situamos en el puntero_de_impresión de la caja.
+; Nos situamos en el (puntero_de_impresión) de la 1ª caja.
 
     ld hl,Disparo_1A+3
+
     inc (hl)
     dec (hl)
     jr z,1F
+
+; La caja contiene disparo. Existe (Impacto) en algún disparo de Amadeus ??
+; Consultamos FLAG.
+; Si hay impacto, se trata de este disparo??
+
+    ld a,(Impacto2)
+    bit 3,a
+    call nz, Averigua_Impacto
+    
+    di
+    jr nz,$
+    ei
+
+
+; En este disparo no hay impacto. MOVEMOS !!!
 
     dec hl
     call Mueve_disparo_Amadeus
 
 1 ld hl,Disparo_2A+3
+
     inc (hl)
     dec (hl)
     jr z,2F
@@ -143,9 +163,25 @@ Mueve_Disparos
 ;
 ;
 
+Averigua_Impacto
+
+    inc hl
+
+    inc (hl)
+    dec (hl)
+
+    dec hl
+
+    ret 
+
+; ----------------------
+;
+;
+;   INPUTS: HL debe apuntar al (Puntero_de_impresion) del disparo.
+
 Mueve_disparo_Amadeus
 
-    call Extrae_address                                               ; Puntero_de_impresión del disparo en HL.
+    call Extrae_address                                               
 
     call PreviousScan
     call PreviousScan 
@@ -371,6 +407,7 @@ Define_puntero_objeto_disparo
 ;   Inicializamos contador.
 
     ld b,0
+
     ld hl,(p.imp.amadeus)
     inc l
 
@@ -379,11 +416,14 @@ Define_puntero_objeto_disparo
     jr z,1F
 
     inc b
+
     ld a,$60
     cp (hl)
     jr z,1F
 
+
     inc b
+
     ld a,$18
     cp (hl)
     jr z,1F
@@ -443,17 +483,23 @@ Define_puntero_objeto_disparo
 
 Detecta_impacto_en_disparo_de_Amadeus
 
+    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
+    call Extrae_address
+
+    inc de
+    inc de
+    push de
+
     call Detecta_impacto_en_disparo_de_Amadeus01
 
-    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
-    inc hl
-    inc hl
+    pop hl
     call Extrae_address
     dec hl                                               ;  Sitúa el puntero en el .db (Impacto) de la caja del disparo.
-    jr z,7F
-    ld a,1
-7 ld (hl),a
+
     ret z
+
+    ld a,1
+    ld (hl),a
 
 Genera_coordenadas_de_disparo_Amadeus
 
@@ -488,16 +534,16 @@ Genera_coordenadas_de_disparo_Amadeus
 
 ; ----------------------------------------------
 ;
-;   12/08/24
+;   27/08/24
 ;
+;   INPUTS: HL contiene la dirección de caja del disparo correspondiente, (1er .db de la caja).
 
+;    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
+;    call Extrae_address
 
 Detecta_impacto_en_disparo_de_Amadeus01
 
 Extraccion_de_datos                                        
-
-    ld hl,Indice_de_disparos_Amadeus
-    call Extrae_address
 
     ld e,(hl)
     inc hl
