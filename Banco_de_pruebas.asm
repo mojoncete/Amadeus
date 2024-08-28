@@ -751,7 +751,14 @@ Main
 
 ; Datos de la entidad en curso en la bandeja DRAW y puntero (Scanlines_album_SP) en DE.
 
-; En 1er lugar, ... existe (Impacto) en esta entidad ???
+; En 1er lugar, ... existe (Impacto) de un disparo de Amadeus en esta entidad ???
+
+	ld hl,Impacto2
+	bit 3,(hl)
+	call nz,Compara_con_coordenadas_de_disparo
+
+
+; En 2º lugar, ... existe Colisión de esta entidad con Amadeus ???
 
 	ld a,(Impacto)										 
 	and a
@@ -831,6 +838,19 @@ Gestiona_siguiente_entidad
 
 Gestion_de_Amadeus
  
+; ----- ----- -----
+
+	ld hl,Impacto2
+	res 3,(hl)																; Deshabilitamos el FLAG de "Impacto" en disparos de Amadeus.
+;																			; Vuelta a empezar.
+	ld hl,Coordenadas_disparo_certero
+	xor a
+	ld (hl),a
+	inc hl
+	ld (hl),a
+
+; ----- ----- -----
+
 	ld hl,Ctrl_3
 	bit 6,(hl)
 	jr z,Amadeus_vivo

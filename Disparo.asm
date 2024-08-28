@@ -1,5 +1,28 @@
 ; --------------------------------------------------------------------------------------
 ;
+;   28/08/24
+;
+
+Compara_con_coordenadas_de_disparo
+
+;    di
+;    jr $
+;    ei
+
+    ld a,(Coordenada_y)
+    ld b,a
+    ld a,(Coordenadas_disparo_certero)
+
+    cp b
+
+    di
+    jr z,$
+    ei
+
+    ret
+
+; --------------------------------------------------------------------------------------
+;
 ;   26/08/24
 ;
 
@@ -107,32 +130,21 @@ Mueve_Disparos
     dec (hl)
     jr z,1F
 
-; La caja contiene disparo. Existe (Impacto) en algún disparo de Amadeus ??
-; Consultamos FLAG.
-; Si hay impacto, se trata de este disparo??
+; Esta caja contiene un disparo.
 
-    ld a,(Impacto2)
-    bit 3,a
-    call nz, Averigua_Impacto
-    
-    di
-    jr nz,$
-    ei
+    call Elimina_disparo_si_procede
+    call z,Mueve_disparo_Amadeus
 
-
-; En este disparo no hay impacto. MOVEMOS !!!
-
-    dec hl
-    call Mueve_disparo_Amadeus
-
-1 ld hl,Disparo_2A+3
+1 ld hl,Disparo_2A+3 
 
     inc (hl)
     dec (hl)
     jr z,2F
 
-    dec hl
-    call Mueve_disparo_Amadeus
+; Esta caja contiene un disparo.
+
+    call Elimina_disparo_si_procede
+    call z,Mueve_disparo_Amadeus
 
 ; Disparos de entidades.
 
@@ -159,6 +171,25 @@ Mueve_Disparos
 
     ret
 
+; --------------------------------------------------------
+;
+;   28/8/24
+;
+;   Averigua si existe impacto en este disparo. Lo elimina si es así.
+;   Mueve el disparo si este no está impactado.
+
+
+Elimina_disparo_si_procede 
+
+;    ld a,(Impacto2)
+;    bit 3,a
+;    ret z                                       ; Salimos. No existe impacto.
+
+    call  Averigua_Impacto
+    call nz, Elimina_disparo                    ; HL apunta al .db (Puntero_de-impresion) del disparo.
+
+    ret 
+
 ; ----------------------
 ;
 ;
@@ -170,6 +201,7 @@ Averigua_Impacto
     inc (hl)
     dec (hl)
 
+    dec hl
     dec hl
 
     ret 
@@ -202,6 +234,38 @@ Mueve_disparo_Amadeus
     inc hl
     ld (hl),d
 
+; Hemos movido el disparo.
+; Cada vez que movemos un disparo debemos comprobar si existe Impacto en la nueva posición.
+
+    push hl
+
+    dec hl
+    dec hl
+    dec hl
+
+    call Detecta_impacto_en_disparo_de_Amadeus01
+
+; El FLAG Z indica si existe (Impacto) tras el desplazamiento.
+; (NZ) indica (Impacto).
+
+    pop hl
+    inc hl                                      ; .db (Impacto) del disparo
+
+    ret z
+
+; (Impacto) a "1".
+
+    ld a,1
+    ld (hl),a
+
+    dec hl
+    dec hl
+
+    call Genera_coordenadas_de_disparo_Amadeus
+
+    ld hl,Impacto2                              ; Existe Impacto, lo indicamos con el FLAG correspondiente.
+    set 3,(hl)
+
     ret
 
 ; ----------------------
@@ -209,8 +273,6 @@ Mueve_disparo_Amadeus
 ;   23/08/24
 
 Elimina_disparo
-
-    ex de,hl
 
 ; HL apunta al .db (Puntero_de_impresion) del disparo.
 ; Recordemos la estructura de datos de una caja de disparos de Amadeus:
@@ -243,6 +305,8 @@ Elimina_disparo
     ld hl,Ctrl_5
     set 0,(hl)
 
+    xor a
+    inc a                                               ; Fuerza NZ a la salida.
 
     ret
 
@@ -501,17 +565,22 @@ Detecta_impacto_en_disparo_de_Amadeus
     ld a,1
     ld (hl),a
 
+    dec hl
+    dec hl                                               ;  Sitúa en (Puntero_de_impresion) para generar coordenadas del disparo.
+
 Genera_coordenadas_de_disparo_Amadeus
 
 ;   Esta parte de la rutina sólo aplica cuando un disparo nuestro alcanza a una entidad.
 ;   Genera las coordenadas de nuestro disparo certero y activa el correspondiente FLAG, (bit3 Impacto2).
 
-    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
-    call Extrae_address
-    inc hl
-    inc hl
+;    push hl
 
-    call Extrae_address                                 ;   Puntero_de_impresión del disparo en HL.
+;   Exclusiones:
+
+
+
+
+    call Extrae_address
     call Genera_coordenadas
 
     dec a
