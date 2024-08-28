@@ -383,10 +383,10 @@ Nivel_scan_disparos_album_de_pintado defw 0
 Num_de_bytes_album_de_disparos db 0
 Num_de_bytes_album_de_disparos_2 db 0
 
-Numero_de_disparos_de_Amadeus db 0
+Numero_de_disparos_de_Amadeus db 2						; Inicialmente disponemos de 2 disparos.
 Numero_de_disparos_de_entidades db 0
 
-Disparo_Amadeus db 1									; A "1", se puede generar disparo.
+Permiso_de_disparo_Amadeus db 1							; A "1", se puede generar disparo.
 ;Disparo_entidad db 1									; A "1", se puede generar disparo.
 
 Puntero_rancio_disparos_album defw 0
@@ -752,6 +752,7 @@ Main
 ; Datos de la entidad en curso en la bandeja DRAW y puntero (Scanlines_album_SP) en DE.
 
 ; En 1er lugar, ... existe (Impacto) de un disparo de Amadeus en esta entidad ???
+; Si es así, comprobamos si es la entidad en curso la alcanzada por nuestro disparo. 
 
 	ld hl,Impacto2
 	bit 3,(hl)
@@ -839,6 +840,8 @@ Gestiona_siguiente_entidad
 Gestion_de_Amadeus
  
 ; ----- ----- -----
+;
+;	Restaura pepinasso de Amadeus a BIXO !!!!!!!
 
 	ld hl,Impacto2
 	res 3,(hl)																; Deshabilitamos el FLAG de "Impacto" en disparos de Amadeus.

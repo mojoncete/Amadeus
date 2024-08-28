@@ -5,9 +5,9 @@
 
 Compara_con_coordenadas_de_disparo
 
-;    di
-;    jr $
-;    ei
+    di
+    jr z,$
+    ei
 
     ld a,(Coordenada_y)
     ld b,a
@@ -34,7 +34,8 @@ Limpia_album_de_borrado_disparos
     res 0,(hl)
 
     ld a,(Numero_de_disparos_de_Amadeus)    
-    and a
+    dec a
+    dec a
     ret nz
 
 Limpiando
@@ -117,7 +118,8 @@ Mueve_Disparos
 ;    Exclusiones:
 
     ld a,(Numero_de_disparos_de_Amadeus)
-    and a
+    dec a
+    dec a
     jr z,2F                                                             ; Salimos si no hay ningún disparo generado.
 
 ; .........................
@@ -128,6 +130,7 @@ Mueve_Disparos
 
     inc (hl)
     dec (hl)
+    
     jr z,1F
 
 ; Esta caja contiene un disparo.
@@ -224,11 +227,10 @@ Mueve_disparo_Amadeus
 
     ld a,h
     sub $40
+    ex de,hl
     jr c,Elimina_disparo
 
  ; Introduce nuevo puntero_de_impresión en la caja.
-
-    ex de,hl
 
     ld (hl),e
     inc hl
@@ -296,11 +298,11 @@ Elimina_disparo
     ld (hl),a                                           ; Impacto borrado.
 
     ld hl,Numero_de_disparos_de_Amadeus
-    dec (hl)
+    inc (hl)
 
-    ld a,(Disparo_Amadeus)
+    ld a,(Permiso_de_disparo_Amadeus)
     or 1
-    ld (Disparo_Amadeus),a
+    ld (Permiso_de_disparo_Amadeus),a
 
     ld hl,Ctrl_5
     set 0,(hl)
@@ -378,7 +380,7 @@ Imprime_scanlines_de_disparo
 
 ; --------------------------------------------------------------------------------------
 ;
-;   21/8/24
+;   28/8/24
 ;
 ;   Modifica: HL y DE.
 
@@ -388,7 +390,8 @@ Genera_datos_de_impresion_disparos_Amadeus
 ;   Exclusiones:
 
     ld a,(Numero_de_disparos_de_Amadeus)
-    and a
+    dec a
+    dec a
     ret z                                                     ; Salimos si no hay ningún disparo generado.
 
 ; -----
@@ -417,6 +420,7 @@ Genera_scanlines_de_disparo_Amadeus
 
     pop hl                                                    ; Puntero_objeto del disparo en DE.
 ;                                                             ; Puntero_de_impresión del disparo en HL.
+
     inc sp
     ld (Puntero_rancio_disparos_album),sp                     ; Guardamos la dirección de la siguiente caja de disparos que tenemos que comprobar.
 
@@ -451,20 +455,38 @@ Genera_disparo_Amadeus
 
 ;   Exclusiones.
 
-    ld a,(Disparo_Amadeus)
+    ld a,(Permiso_de_disparo_Amadeus)
     and a
-    ret z                                                    ; Salimos si el disparo de nuestra nave no está habilitado.
-
-;! Provisionalmente sólo 1 disparo !!!!!!
+    ret z                                                    ; Salimos si no hay permiso de disparo.
     dec a
-    ld (Disparo_Amadeus),a
+    ld (Permiso_de_disparo_Amadeus),a
 
-;   Inc nº de disparos de Amadeus.
+    ld a,(Numero_de_disparos_de_Amadeus)
+    and a
+    ret z                                                    ; Hay 2 disparos en pantalla, no hay cajas libres.
+
+; ---------------------------------------------------------------------------------------------------------------
+
+;   Dec nº de disparos de Amadeus.
 
     ld hl,Numero_de_disparos_de_Amadeus
-    inc (hl)
+    dec (hl)
 
-; ----- ----- ----- -----
+;   Nos situamos en la 1ª caja que encontramos vacía.
+
+    ld hl,Disparo_1A+1
+
+    inc (hl)
+    dec (hl)
+    dec hl
+
+    jr z,7F
+
+    ld hl,Disparo_2A
+
+7 ld (Puntero_DESPLZ_DISPARO_AMADEUS),hl
+
+; ---------------------------------------------------------------------------------------------------------------
 
 Define_puntero_objeto_disparo
 
@@ -530,10 +552,9 @@ Define_puntero_objeto_disparo
 ; ---
 
 ; Almacenamos (Puntero_objeto) y (Puntero_de_impresion) en su correspondiente caja.
-; HL en el 1er .db de la caja y (Puntero_DESPLZ_DISPARO_AMADEUS) avanza una posición en el índice.
+; HL en el 1er .db de la caja.
 
     ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
-    call Extrae_address
 
     ld b,2
 
@@ -545,40 +566,37 @@ Define_puntero_objeto_disparo
 
     djnz 6B
 
-Detecta_impacto_en_disparo_de_Amadeus
+    ret
 
-    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
-    call Extrae_address
 
-    inc de
-    inc de
-    push de
+;Detecta_impacto_en_disparo_de_Amadeus
 
-    call Detecta_impacto_en_disparo_de_Amadeus01
+;    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
+;    call Extrae_address
 
-    pop hl
-    call Extrae_address
-    dec hl                                               ;  Sitúa el puntero en el .db (Impacto) de la caja del disparo.
+;    inc de
+;    inc de
+;    push de
 
-    ret z
+;   call Detecta_impacto_en_disparo_de_Amadeus01
 
-    ld a,1
-    ld (hl),a
+;    pop hl
+;    call Extrae_address
+;    dec hl                                               ;  Sitúa el puntero en el .db (Impacto) de la caja del disparo.
 
-    dec hl
-    dec hl                                               ;  Sitúa en (Puntero_de_impresion) para generar coordenadas del disparo.
+;    ret z
+
+;    ld a,1
+;    ld (hl),a
+
+;    dec hl
+;    dec hl                                               ;  Sitúa en (Puntero_de_impresion) para generar coordenadas del disparo.
 
 Genera_coordenadas_de_disparo_Amadeus
 
+;   HL deberá apuntar al .db (Puntero_de_impresion) del disparo.
 ;   Esta parte de la rutina sólo aplica cuando un disparo nuestro alcanza a una entidad.
 ;   Genera las coordenadas de nuestro disparo certero y activa el correspondiente FLAG, (bit3 Impacto2).
-
-;    push hl
-
-;   Exclusiones:
-
-
-
 
     call Extrae_address
     call Genera_coordenadas
@@ -591,10 +609,6 @@ Genera_coordenadas_de_disparo_Amadeus
     ld a,(Coordenada_X)                                 
     ld (hl),a                                           ;   Almacenamos la Coordenada_X, (Columna) del disparo.
     
-    ld hl,Impacto2
-    set 3,(hl)                                          ;   Indica que un disparo de nuestra nave ha alcanzado a una entidad.
-
-    xor a                                               ;   Siempre "Z" cuando ejecutamos [Genera_disparo_Amadeus].
     ret
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- 
@@ -606,11 +620,18 @@ Genera_coordenadas_de_disparo_Amadeus
 ;   27/08/24
 ;
 ;   INPUTS: HL contiene la dirección de caja del disparo correspondiente, (1er .db de la caja).
-
-;    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
-;    call Extrae_address
+;   OUTPUT: FLAG Z indica NO IMPACTO, NZ indica IMPACTO.
 
 Detecta_impacto_en_disparo_de_Amadeus01
+
+; Exclusiones:
+
+    ld a,(Impacto2)
+    bit 3,a
+    jr z,Extraccion_de_datos
+
+    xor a
+    ret
 
 Extraccion_de_datos                                        
 
@@ -622,8 +643,7 @@ Extraccion_de_datos
     ld c,(hl)
     inc hl
     ld b,(hl)
-    inc hl                                                 ;    Puntero_de_impresión del disparo en BC.
-
+ 
     push bc 
     pop hl                                                 ;    Puntero_de_impresión del disparo en HL.
 
