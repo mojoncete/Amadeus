@@ -113,7 +113,7 @@ Limpia_album_de_pintado_disparos
 ;   27/08/24
 ;
 
-Mueve_Disparos
+Motor_Disparos
 
 ;    Exclusiones:
 
@@ -184,11 +184,7 @@ Mueve_Disparos
 
 Elimina_disparo_si_procede 
 
-;    ld a,(Impacto2)
-;    bit 3,a
-;    ret z                                       ; Salimos. No existe impacto.
-
-    call  Averigua_Impacto
+    call  Consulta_Impacto
     call nz, Elimina_disparo                    ; HL apunta al .db (Puntero_de-impresion) del disparo.
 
     ret 
@@ -196,8 +192,12 @@ Elimina_disparo_si_procede
 ; ----------------------
 ;
 ;
+;   Nos colocamos en el .db (Impacto) e interrogamos.
+;
+;   OUTPUT: (Z) / (NZ) FLAG. NZ indica que existe (Impacto).
 
-Averigua_Impacto
+
+Consulta_Impacto
 
     inc hl
 
@@ -207,7 +207,25 @@ Averigua_Impacto
     dec hl
     dec hl
 
-    ret 
+    ret z
+
+; Existe (Impacto).
+; Activamos el FLAG correspondiente y generamos las coordenadas del disparo.
+
+    ld a,(Impacto2)    
+    set 3,a
+    ld (Impacto2),a
+
+; (Puntero_de_impresion) en HL.
+
+    push hl
+    call Genera_coordenadas_de_disparo_Amadeus
+    pop hl
+
+    xor a
+    inc a                                           ; Fuerza NZ a la salida para forzar la "eliminación" del disparo.
+
+    ret
 
 ; ----------------------
 ;
@@ -245,7 +263,7 @@ Mueve_disparo_Amadeus
     dec hl
     dec hl
 
-    call Detecta_impacto_en_disparo_de_Amadeus01
+    call Detecta_impacto_en_disparo_de_Amadeus
 
 ; El FLAG Z indica si existe (Impacto) tras el desplazamiento.
 ; (NZ) indica (Impacto).
@@ -260,13 +278,10 @@ Mueve_disparo_Amadeus
     ld a,1
     ld (hl),a
 
-    dec hl
-    dec hl
+;    di                                         ; 8 pruebas OK.
+;    jr $
+;    ei
 
-    call Genera_coordenadas_de_disparo_Amadeus
-
-    ld hl,Impacto2                              ; Existe Impacto, lo indicamos con el FLAG correspondiente.
-    set 3,(hl)
 
     ret
 
@@ -304,7 +319,7 @@ Elimina_disparo
     or 1
     ld (Permiso_de_disparo_Amadeus),a
 
-    ld hl,Ctrl_5
+    ld hl,Ctrl_5                                        ; Indica que ha desaparecido un disparo.
     set 0,(hl)
 
     xor a
@@ -568,30 +583,6 @@ Define_puntero_objeto_disparo
 
     ret
 
-
-;Detecta_impacto_en_disparo_de_Amadeus
-
-;    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
-;    call Extrae_address
-
-;    inc de
-;    inc de
-;    push de
-
-;   call Detecta_impacto_en_disparo_de_Amadeus01
-
-;    pop hl
-;    call Extrae_address
-;    dec hl                                               ;  Sitúa el puntero en el .db (Impacto) de la caja del disparo.
-
-;    ret z
-
-;    ld a,1
-;    ld (hl),a
-
-;    dec hl
-;    dec hl                                               ;  Sitúa en (Puntero_de_impresion) para generar coordenadas del disparo.
-
 Genera_coordenadas_de_disparo_Amadeus
 
 ;   HL deberá apuntar al .db (Puntero_de_impresion) del disparo.
@@ -622,7 +613,7 @@ Genera_coordenadas_de_disparo_Amadeus
 ;   INPUTS: HL contiene la dirección de caja del disparo correspondiente, (1er .db de la caja).
 ;   OUTPUT: FLAG Z indica NO IMPACTO, NZ indica IMPACTO.
 
-Detecta_impacto_en_disparo_de_Amadeus01
+Detecta_impacto_en_disparo_de_Amadeus
 
 ; Exclusiones:
 

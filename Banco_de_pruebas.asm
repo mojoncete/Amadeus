@@ -637,7 +637,7 @@ Main
 
 	call Limpia_album_de_borrado_disparos
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
-	call Mueve_Disparos
+	call Motor_Disparos
 
 ; En el FRAME que acabamos de pintar puede existir una posible colisión entre alguna entidad y Amadeus. 
 ; Si alguna de las coordenadas_X de alguna entidad que esté en zona de Amadeus coincide con alguna de las coordenadas_X de Amadeus, habrá que comprobar si existe colisión.
@@ -754,10 +754,9 @@ Main
 ; En 1er lugar, ... existe (Impacto) de un disparo de Amadeus en esta entidad ???
 ; Si es así, comprobamos si es la entidad en curso la alcanzada por nuestro disparo. 
 
-	ld hl,Impacto2
-	bit 3,(hl)
+	ld a,(Impacto2)
+	bit 3,a
 	call nz,Compara_con_coordenadas_de_disparo
-
 
 ; En 2º lugar, ... existe Colisión de esta entidad con Amadeus ???
 
