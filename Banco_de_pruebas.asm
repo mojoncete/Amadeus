@@ -764,6 +764,12 @@ Main
 	and a
 	jr z,8F
 
+	di
+	jr $
+	ei
+
+
+
 ; 5/7/24
 ; Nota importante: 
 ; Dos entidades pueden chocar entre ellas en zona de Amadeus. La rutina [Detecta_colision_nave_entidad] comprobará si existe colisión con la última entidad gestionada, (colisionada) y _

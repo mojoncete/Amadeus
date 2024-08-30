@@ -5,21 +5,31 @@
 
 Compara_con_coordenadas_de_disparo
 
-    di
-    jr z,$
-    ei
+;    di
+;    jr $
+;    ei
 
     ld a,(Coordenada_y)
     ld b,a
     ld a,(Coordenadas_disparo_certero)
+    sub b
 
-    cp b
+; A = "0" ok
+; A = "1" ok
 
-    di
-    jr z,$
-    ei
+    jr z,Activa_Impacto_en_entidad
+    dec a
+    jr z,Activa_Impacto_en_entidad
+    
+    ret
+
+Activa_Impacto_en_entidad
+
+    ld a,1
+    ld (Impacto),a
 
     ret
+
 
 ; --------------------------------------------------------------------------------------
 ;
@@ -277,11 +287,6 @@ Mueve_disparo_Amadeus
 
     ld a,1
     ld (hl),a
-
-;    di                                         ; 8 pruebas OK.
-;    jr $
-;    ei
-
 
     ret
 
@@ -614,15 +619,6 @@ Genera_coordenadas_de_disparo_Amadeus
 ;   OUTPUT: FLAG Z indica NO IMPACTO, NZ indica IMPACTO.
 
 Detecta_impacto_en_disparo_de_Amadeus
-
-; Exclusiones:
-
-    ld a,(Impacto2)
-    bit 3,a
-    jr z,Extraccion_de_datos
-
-    xor a
-    ret
 
 Extraccion_de_datos                                        
 
