@@ -179,7 +179,6 @@ Puntero_de_impresion defw 0								; Contiene el puntero de impresión, (calcula
 Puntero_de_almacen_de_mov_masticados defw 0
 
 ;	Almacén donde la entidad guía va guardando comportamiento ya calculado, (rutinas DRAW).
-;	Almacén donde una entidad "sombra" recoge el siguiente desplazamiento ya masticado, (para imprimir).
 
 Contador_de_mov_masticados defw 0						; Contador de 16bits. La "Entidad_guía" lo aumenta en una unidad cada vez que hace el "pushado" de las tres_
 ;														; _palabras que componen el "movimiento_masticado".  
@@ -649,7 +648,7 @@ Main
 	ld bc,(FRAMES)
 	and a
 	sbc hl,bc
-	jr nz,13F
+	jr nz,11F
 
 ; Si aún quedan entidades por aparecer del bloque de entidades, (7 cajas), incrementaremos (Entidades_en_curso) y calcularemos_ 
 ; _ (Clock_next_entity) para la siguiente entidad.
@@ -658,8 +657,8 @@ Main
 	ld b,a
 	ld a,(Entidades_en_curso)
 	cp b
-	jr z,13F
-	jr nc,13F
+	jr z,11F
+	jr nc,11F
 
 	inc a
 	ld (Entidades_en_curso),a
@@ -701,17 +700,16 @@ Main
 	bit 3,a
 	call nz,Compara_con_coordenadas_de_disparo
 
-; En 2º lugar, ... existe Colisión de esta entidad con Amadeus ???
-
 	ld a,(Impacto)
 	bit 1,a
-	di
-	jr nz,$
-	ei
+	call nz,Genera_explosion
+	jr nz,Gestiona_siguiente_entidad
 
 	ld a,(Impacto)										 
 	and a
 	jr z,8F
+
+; IMPACTO en entidad por colisión con Amadeus.
 
 ; 5/7/24
 ; Nota importante: 
@@ -1345,7 +1343,7 @@ Recauda_informacion_de_entidad_en_curso
 
 ; Almacena la dirección de memoria, (dentro del album de scanlines), de la entidad en curso.
 
-;	ld de,(Scanlines_album_SP)
+	ld de,(Scanlines_album_SP)
 
 	ld (hl),e
 	inc l

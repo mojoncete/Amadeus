@@ -51,17 +51,24 @@ Comprueba_coordenada_X
 
 Activa_Impacto_en_entidad
 
+;   Indica Impacto en la entidad por disparo de Amadeus, "2".
+
     ld a,2
     ld (Impacto),a
 
+;   (Puntero_de_almacen_de_mov_masticados) ahora apuntará a la explosión.
+
+    ld de,Indice_Explosion_entidades
+    ld hl,Puntero_de_almacen_de_mov_masticados
+
+    ld (hl),e
+    inc hl
+    ld (hl),d
+
+;   Hemos encontrado la entidad impactada, Restauramos FLAG para dejar de buscar en este FRAME.
+
     ld hl,Impacto2
     res 3,(hl)
-
-	ld hl,Coordenadas_disparo_certero
-	xor a
-	ld (hl),a
-	inc hl
-	ld (hl),a
 
     ret
 
