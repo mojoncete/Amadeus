@@ -1,13 +1,9 @@
 ; --------------------------------------------------------------------------------------
 ;
-;   28/08/24
+;   31/08/24
 ;
 
 Compara_con_coordenadas_de_disparo
-
-;    di
-;    jr $
-;    ei
 
     ld a,(Coordenada_y)
     ld b,a
@@ -17,19 +13,57 @@ Compara_con_coordenadas_de_disparo
 ; A = "0" ok
 ; A = "1" ok
 
+    jr z,Comprueba_coordenada_X
+    dec a
+    jr z,Comprueba_coordenada_X
+    
+; A = "$ff" ok
+
+    cp $fe
+    jr z,Comprueba_coordenada_X
+
+    ret
+
+Comprueba_coordenada_X
+
+    ld a,(Coordenada_X)
+    ld b,a
+    ld hl,Coordenadas_disparo_certero+1
+    ld a,(hl)
+    sub b
+
+; A = "0" ok
+; A = "1" ok
+
     jr z,Activa_Impacto_en_entidad
     dec a
     jr z,Activa_Impacto_en_entidad
-    
-    ret
+
+; A = "2" ok
+
+    dec a
+    jr z,Activa_Impacto_en_entidad    
+
+; A = "$ff"
+
+    cp $fd 
+    ret nz
 
 Activa_Impacto_en_entidad
 
-    ld a,1
+    ld a,2
     ld (Impacto),a
 
-    ret
+    ld hl,Impacto2
+    res 3,(hl)
 
+	ld hl,Coordenadas_disparo_certero
+	xor a
+	ld (hl),a
+	inc hl
+	ld (hl),a
+
+    ret
 
 ; --------------------------------------------------------------------------------------
 ;
@@ -217,25 +251,7 @@ Consulta_Impacto
     dec hl
     dec hl
 
-    ret z
-
-; Existe (Impacto).
-; Activamos el FLAG correspondiente y generamos las coordenadas del disparo.
-
-    ld a,(Impacto2)    
-    set 3,a
-    ld (Impacto2),a
-
-; (Puntero_de_impresion) en HL.
-
-    push hl
-    call Genera_coordenadas_de_disparo_Amadeus
-    pop hl
-
-    xor a
-    inc a                                           ; Fuerza NZ a la salida para forzar la "eliminación" del disparo.
-
-    ret
+    ret 
 
 ; ----------------------
 ;
@@ -249,7 +265,7 @@ Mueve_disparo_Amadeus
     call PreviousScan
     call PreviousScan 
     call PreviousScan 
-;    call PreviousScan 
+    call PreviousScan 
 
 ; Después de mover el disparo comprobamos si ha salido de la parte alta de la pantalla.
 
@@ -287,6 +303,20 @@ Mueve_disparo_Amadeus
 
     ld a,1
     ld (hl),a
+
+; Existe (Impacto).
+; Activamos el FLAG correspondiente y generamos las coordenadas del disparo.
+
+    ld a,(Impacto2)    
+    set 3,a
+    ld (Impacto2),a
+
+; (Puntero_de_impresion) en HL.
+
+    dec hl
+    dec hl
+
+    call Genera_coordenadas_de_disparo_Amadeus
 
     ret
 
@@ -326,9 +356,6 @@ Elimina_disparo
 
     ld hl,Ctrl_5                                        ; Indica que ha desaparecido un disparo.
     set 0,(hl)
-
-    xor a
-    inc a                                               ; Fuerza NZ a la salida.
 
     ret
 

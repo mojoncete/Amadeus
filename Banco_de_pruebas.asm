@@ -360,7 +360,7 @@ Datos_de_entidad defw 0									; Contiene los bytes de información de la entid
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;	12/08/24
+;	31/08/24
 ;
 ;	Álbumes.
 
@@ -432,8 +432,8 @@ Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una únic
 ;	                                                        BIT 6 (Ctrl_4) ..... MOV_MASTICADOS GENERADOS. Entidad de (Tipo)_3.
 ;	                                                        BIT 7 (Ctrl_4) ..... MOV_MASTICADOS GENERADOS. Entidad de (Tipo)_4.
 
-Ctrl_5 db 0
-
+Ctrl_5 db 0												;	BIT 0, "1" Indica que se ha eliminado un disparo. (Esta información es necesaria para borrar un único disparo de la pantalla).	
+;															BIT 1, "1" Indica que la entidad en curso es la alcanzada por nuestro disparo. La comparativa entre coordenadas ha sido satisfactoria. 
 ; Gestión de Disparos.
 
 Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
@@ -760,15 +760,15 @@ Main
 
 ; En 2º lugar, ... existe Colisión de esta entidad con Amadeus ???
 
+	ld a,(Impacto)
+	bit 1,a
+	di
+	jr nz,$
+	ei
+
 	ld a,(Impacto)										 
 	and a
 	jr z,8F
-
-	di
-	jr $
-	ei
-
-
 
 ; 5/7/24
 ; Nota importante: 
@@ -776,10 +776,6 @@ Main
 ;	_en caso de no existir colisión pondrá su .db (Impacto) a "0" pero esa 1ª entidad "colisionada" seguirá manteniendo su .db (Impacto) a "1" por lo que para considerarse "colisión",_
 ;	_es requisito imprescindible que Amadeus tenga su .db (Impacto) también a "1"; en caso contrario colocaremos el .db (Impacto) de la entidad a "0" para que se vuelva a gestionar.
 
-	ld a,(Ctrl_3)
-	bit 7,a
-	jr nz,8F												; El bit 7 de (Ctrl_3) indica que Amadeus esta explotando.
-;															; No vamos a generar una nueva explosión en más de una entidad a la vez.
 	ld a,(Impacto_Amadeus)
 	and a
 	call nz,Genera_explosion
@@ -806,9 +802,6 @@ Main
 
 	call Colision_Entidad_Amadeus								; Si hay posibilidad de COLISION, set 2,(Impacto2) y (Impacto) de entidad en curso a "1".
 
-;	ld hl,Ctrl_0
-; 	res 4,(hl)													; Inicializamos el FLAG de movimiento de la entidad.
-
 Gestiona_siguiente_entidad
  
  	call Store_Restore_cajas
@@ -816,6 +809,19 @@ Gestiona_siguiente_entidad
 	djnz 15B
 
 ; Hemos gestionado todas las entidades. 
+
+;	Restaura pepinasso de Amadeus a BIXO !!!!!!!
+
+;	ld hl,Impacto2
+;	res 3,(hl)																; Deshabilitamos el FLAG de "Impacto" en disparos de Amadeus.
+;																			; Vuelta a empezar.
+;	ld hl,Coordenadas_disparo_certero
+;	xor a
+;	ld (hl),a
+;	inc hl
+;	ld (hl),a
+
+; ----- ----- -----
 
 	call Inicializa_India_y_limpia_Tabla_de_impresion 			; Inicializa el puntero (India_SP) y sanea la (Tabla_para_ordenar_entidades_antes_de_pintar).
 	call Ordena_tabla_de_impresion
@@ -844,21 +850,6 @@ Gestiona_siguiente_entidad
 
 Gestion_de_Amadeus
  
-; ----- ----- -----
-;
-;	Restaura pepinasso de Amadeus a BIXO !!!!!!!
-
-	ld hl,Impacto2
-	res 3,(hl)																; Deshabilitamos el FLAG de "Impacto" en disparos de Amadeus.
-;																			; Vuelta a empezar.
-	ld hl,Coordenadas_disparo_certero
-	xor a
-	ld (hl),a
-	inc hl
-	ld (hl),a
-
-; ----- ----- -----
-
 	ld hl,Ctrl_3
 	bit 6,(hl)
 	jr z,Amadeus_vivo
