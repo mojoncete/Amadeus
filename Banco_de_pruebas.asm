@@ -669,63 +669,6 @@ Main
 	call Extrae_numero_aleatorio_y_avanza 				; A contiene un nº aleatorio (0-255). De 0 a 5 segundos, aproximadamente.
 	call Define_Clock_next_entity
 
-; -------------------------------------------------------------------------------------------------------------
-
-; Habilita disparos.
-
-13 
-
-;	ld hl,Disparo_Amadeus
-;	ld de,CLOCK_repone_disparo_Amadeus
-;	call Habilita_disparos 								; 30 Frames como mínimo entre cada disparo de Amadeus.
-
-;	ld hl,Disparo_entidad 								; El nº de frames mínimo entre disparos de entidad será_
-;	ld de,CLOCK_repone_disparo_entidad 					; _ variable y variará en función de la dificultad.
-;	call Habilita_disparos 								
-
-; COLISIONES.
-
-;	call Selector_de_impactos							; Analizamos el contenido de (Impacto2).
-
-; Bit 0 a "1" Impacto en entidad por disparo. ($01)
-; Bit 1 a "1" Impacto en Amadeus por disparo. ($02)
-; Bit 2 a "1" Colisión de Amadeus con entidad, (sin disparo). ($04)
-
-;	xor a
-;	ld (Impacto2),a										; Flag (Impacto2) a "0".
-
-;	call Inicia_punteros_de_cajas 
-;12 call Restore_entidad 								; Vuelca los datos de la entidad, hacia la que apunta (Puntero_store_caja),_
-; 														; _ en DRAW.
-
-;	ld a,(Filas)
-;	and a
-;	jr nz,10F 											; Nos situamos en la 1ª entidad NO VACÍA del índice de ENTIDADES.
-;	call Incrementa_punteros_de_cajas
-;	jr 12B
-
-; ---------------------------------------------------------------------------------------
-
-;10 ld a,(Numero_parcial_de_entidades)
-;    ld b,a
-;	and a
-;	jr nz,11F
-
-;	ld hl,Ctrl_1;
-;	bit 4,(hl)
-;	jp nz,16F
-
-;! Cuando hemos destruido a todas las entidades del bloque preparamos una NUEVA OLEADA !!!!!
-
-;	ld hl,Ctrl_1
-;	set 3,(hl)											; Señal de RECARGA de las cajas DRAW activada. NUEVA OLEADA !!!!!!!!
-
-;	ld a,(Contador_de_frames)
-;	inc a
-;	ld (Activa_recarga_cajas),a
-
-; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- ----- 
-
 11 ld a,(Entidades_en_curso)
 	and a
 	jp z,Gestion_de_Amadeus								; Si no hay entidades en curso saltamos a [Avanza_puntero_de_Scanlines_album_de_entidades].
