@@ -478,7 +478,7 @@ Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilit
 ;														; Repite la oleada de entidades.
 
 ;CLOCK_repone_disparo_Amadeus_BACKUP db 30				; Restaura (CLOCK_repone_disparo_Amadeus). 
-;CLOCK_repone_disparo_Amadeus db 30 						; Reloj, decreciente.
+CLOCK_repone_disparo_Amadeus db 30	 					; Reloj, decreciente.
 ;CLOCK_repone_disparo_entidad_BACKUP db 20				; Restaura (CLOCK_repone_disparo_entidad). 
 ;CLOCK_repone_disparo_entidad db 20						; Reloj, decreciente.
 
@@ -644,21 +644,23 @@ Main
 
 	call Detecta_colision_nave_entidad 					; La rutina verifica la colisión entre una entidad y Amadeus, (RES 2 Impacto2).
 
-16 ld hl,(Clock_next_entity)
+;	TEMPORIZACIONES !!!!!!!!!!!!!!!!
+
+	ld hl,(Clock_next_entity)
 	ld bc,(FRAMES)
 	and a
 	sbc hl,bc
-	jr nz,11F
+	jr nz,1F
 
 ; Si aún quedan entidades por aparecer del bloque de entidades, (7 cajas), incrementaremos (Entidades_en_curso) y calcularemos_ 
 ; _ (Clock_next_entity) para la siguiente entidad.
 
-21 ld a,(Numero_parcial_de_entidades)
+	ld a,(Numero_parcial_de_entidades)
 	ld b,a
 	ld a,(Entidades_en_curso)
 	cp b
-	jr z,11F
-	jr nc,11F
+	jr z,1F
+	jr nc,1F
 
 	inc a
 	ld (Entidades_en_curso),a
@@ -668,7 +670,7 @@ Main
 	call Extrae_numero_aleatorio_y_avanza 				; A contiene un nº aleatorio (0-255). De 0 a 5 segundos, aproximadamente.
 	call Define_Clock_next_entity
 
-11 ld a,(Entidades_en_curso)
+1 ld a,(Entidades_en_curso)
 	and a
 	jp z,Gestion_de_Amadeus								; Si no hay entidades en curso saltamos a [Avanza_puntero_de_Scanlines_album_de_entidades].
 	ld b,a												; No hay entidades que gestionar.
@@ -686,7 +688,7 @@ Main
 	set 2,(hl)
 	call Change
 
-15 push bc 												; Nº de entidades en curso.
+2 push bc 												; Nº de entidades en curso.
 
 	call Restore_entidad								; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
 	ld de,(Scanlines_album_SP)
@@ -707,7 +709,7 @@ Main
 
 	ld a,(Impacto)										 
 	and a
-	jr z,8F
+	jr z,3F
 
 ; IMPACTO en entidad por colisión con Amadeus.
 
@@ -728,7 +730,7 @@ Main
 
 ; -------------------------------------------
 
-8 call Recauda_informacion_de_entidad_en_curso					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
+3 call Recauda_informacion_de_entidad_en_curso					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
 	call Ajusta_velocidad_entidad								; Ajusta el perfil de velocidad de la entidad en función de (Contader_de_vueltas).
 	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
 	call Genera_datos_de_impresion
@@ -747,20 +749,9 @@ Gestiona_siguiente_entidad
  
  	call Store_Restore_cajas
 	pop bc
-	djnz 15B
+	djnz 2B
 
 ; Hemos gestionado todas las entidades. 
-
-;	Restaura pepinasso de Amadeus a BIXO !!!!!!!
-
-;	ld hl,Impacto2
-;	res 3,(hl)																; Deshabilitamos el FLAG de "Impacto" en disparos de Amadeus.
-;																			; Vuelta a empezar.
-;	ld hl,Coordenadas_disparo_certero
-;	xor a
-;	ld (hl),a
-;	inc hl
-;	ld (hl),a
 
 ; ----- ----- -----
 

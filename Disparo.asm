@@ -175,21 +175,21 @@ Motor_Disparos
 
 ; .........................
 
-; Nos situamos en el (puntero_de_impresión) de la 1ª caja.
+;   Averiguamos si la 1ª caja contiene disparo, para ello nos situamos en el byte alto del (Puntero_de_impresion).
 
-    ld hl,Disparo_1A+3
+    ld hl,Disparo_1A+1
 
     inc (hl)
     dec (hl)
     
     jr z,1F
 
-; Esta caja contiene un disparo.
+;   Esta caja contiene un disparo.
 
-    call Elimina_disparo_si_procede
+    call Consulta_Impacto
     call z,Mueve_disparo_Amadeus
 
-1 ld hl,Disparo_2A+3 
+1 ld hl,Disparo_2A+1 
 
     inc (hl)
     dec (hl)
@@ -197,7 +197,7 @@ Motor_Disparos
 
 ; Esta caja contiene un disparo.
 
-    call Elimina_disparo_si_procede
+    call Consulta_Impacto
     call z,Mueve_disparo_Amadeus
 
 ; Disparos de entidades.
@@ -216,7 +216,7 @@ Motor_Disparos
 
     inc hl
 
-    inc (hl)                                                           ; Dispone de Puntero_objeto ???
+    inc (hl)                                                             ; Dispone de Puntero_objeto ???
     dec (hl)
     jr z,3F
 
@@ -224,21 +224,6 @@ Motor_Disparos
     djnz 4B
 
     ret
-
-; --------------------------------------------------------
-;
-;   28/8/24
-;
-;   Averigua si existe impacto en este disparo. Lo elimina si es así.
-;   Mueve el disparo si este no está impactado.
-
-
-Elimina_disparo_si_procede 
-
-    call  Consulta_Impacto
-    call nz, Elimina_disparo                    ; HL apunta al .db (Puntero_de-impresion) del disparo.
-
-    ret 
 
 ; ----------------------
 ;
@@ -250,15 +235,29 @@ Elimina_disparo_si_procede
 
 Consulta_Impacto
 
-    inc hl
+;   Vamos a comprobar si existe (Impacto) de este disparo con alguna entidad antes de mover la entidad y el propio disparo. Lo vamos a hacer así para que la detección_
+;   _sea lo más coherente posible. 
 
-    inc (hl)
-    dec (hl)
+    push hl
+    dec hl                                      
+    call Detecta_impacto_en_disparo_de_Amadeus                          ; Nos situamos en el 1er .db de la caja y comprobamos Impacto.  
+    pop hl
+    inc hl                                                              ; (Puntero_de_impresion) en HL.
 
-    dec hl
-    dec hl
+    ret z
 
-    ret 
+;   IMPACTO !!!!!
+
+    ld a,(Impacto2)    
+    set 3,a
+    ld (Impacto2),a
+ 
+    push hl
+    call Genera_coordenadas_de_disparo_Amadeus
+    pop hl
+    call Elimina_disparo
+
+    ret
 
 ; ----------------------
 ;
@@ -287,49 +286,11 @@ Mueve_disparo_Amadeus
     inc hl
     ld (hl),d
 
-; Hemos movido el disparo.
-; Cada vez que movemos un disparo debemos comprobar si existe Impacto en la nueva posición.
-
-    push hl
-
-    dec hl
-    dec hl
-    dec hl
-
-    call Detecta_impacto_en_disparo_de_Amadeus
-
-; El FLAG Z indica si existe (Impacto) tras el desplazamiento.
-; (NZ) indica (Impacto).
-
-    pop hl
-    inc hl                                      ; .db (Impacto) del disparo
-
-    ret z
-
-; (Impacto) a "1".
-
-    ld a,1
-    ld (hl),a
-
-; Existe (Impacto).
-; Activamos el FLAG correspondiente y generamos las coordenadas del disparo.
-
-    ld a,(Impacto2)    
-    set 3,a
-    ld (Impacto2),a
-
-; (Puntero_de_impresion) en HL.
-
-    dec hl
-    dec hl
-
-    call Genera_coordenadas_de_disparo_Amadeus
-
     ret
 
 ; ----------------------
 ;
-;   23/08/24
+;   2/9/24
 
 Elimina_disparo
 
@@ -363,6 +324,9 @@ Elimina_disparo
 
     ld hl,Ctrl_5                                        ; Indica que ha desaparecido un disparo.
     set 0,(hl)
+
+    xor a
+    inc a                                               ; Siempre que eliminamos un disparo tenemos: "NZ".
 
     ret
 
@@ -639,6 +603,9 @@ Genera_coordenadas_de_disparo_Amadeus
     ld a,(Coordenada_X)                                 
     ld (hl),a                                           ;   Almacenamos la Coordenada_X, (Columna) del disparo.
     
+    xor a
+    inc a                                               ;   Fuerza "NZ" a la salida.
+
     ret
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- 
@@ -667,6 +634,9 @@ Extraccion_de_datos
  
     push bc 
     pop hl                                                 ;    Puntero_de_impresión del disparo en HL.
+
+    call PreviousScan
+    call PreviousScan
 
 Detecta_impacto_
 
