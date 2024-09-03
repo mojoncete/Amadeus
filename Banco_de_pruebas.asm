@@ -478,7 +478,7 @@ Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilit
 ;														; Repite la oleada de entidades.
 
 ;CLOCK_repone_disparo_Amadeus_BACKUP db 30				; Restaura (CLOCK_repone_disparo_Amadeus). 
-CLOCK_repone_disparo_Amadeus db 30	 					; Reloj, decreciente.
+CLOCK_repone_disparo_Amadeus db 20	 					; Reloj, decreciente.
 ;CLOCK_repone_disparo_entidad_BACKUP db 20				; Restaura (CLOCK_repone_disparo_entidad). 
 ;CLOCK_repone_disparo_entidad db 20						; Reloj, decreciente.
 
@@ -646,7 +646,20 @@ Main
 
 ;	TEMPORIZACIONES !!!!!!!!!!!!!!!!
 
-	ld hl,(Clock_next_entity)
+;	ld a,(Permiso_de_disparo_Amadeus)
+;	and a
+;	jr nz,4F
+
+;	ld hl,CLOCK_repone_disparo_Amadeus
+;	inc (hl)
+;	dec (hl)
+
+;	call z,Autoriza_disparo_Amadeus_y_repone_clock
+
+;	dec (hl)
+
+
+4 ld hl,(Clock_next_entity)
 	ld bc,(FRAMES)
 	and a
 	sbc hl,bc
@@ -859,6 +872,20 @@ End_frame
 ;	bit 3,a												; Si este bit es "1". Hay recarga de nueva oleada.
 	jp z,Main
 
+; ----------------------------------------
+
+Autoriza_disparo_Amadeus_y_repone_clock 
+
+	ld a,21
+	ld (hl),21
+
+	ld a,1
+	ld (Permiso_de_disparo_Amadeus),a
+
+	ret
+
+; ----------------------------------------
+
 ; RECARGA DE NUEVA OLEADA.
 
 ;	ld a,(Contador_de_frames)
@@ -947,112 +974,6 @@ End_frame
 ;	ld (Puntero_de_scanlines_masticados_a_borrar),hl
 
 ;	ret
-
-; --------------------------------------------------------------------------------------------------------------
-;
-;	15/12/23
-
-;Mov_obj 
-
-;	ld a,(Ctrl_2)
-;	bit 1,a
-;	jr z,2F											; Se ha iniciado la EXPLOSIÓN???									
-
-; Explosión:
-
-;	ld a,(Frames_explosion)
-;	and a
-;	jr nz,4F
-
-;!  Una alimaña menos!!!!!!!!!1
-
-; Se trataba de una Entidad_guía ???
-
-;	ld a,(Ctrl_2)
-;	bit 5,a 										; El bit5 de (Ctrl_2) indica si se trata de una Entidad_guía.
-;	jr z,5F
-
-;	ld hl,Ctrl_3
-;	res 1,(hl) 										; FLAG (Existencia de Entidad_guía) a "0".
-
-;!! Cuando se elimina a una entidad_guía tenemos que limpiar el almacen_de_mov_masticados de esta entidad. Así el siguiente movimiento_
-;!! _generado puede ser distinto, (aletoriedad).
-
-;5 call Borra_datos_entidad							; Borramos todos los datos de la entidad.
-;	ld hl,Numero_parcial_de_entidades				; Una alimaña menos.
-;	dec (hl)
-;	ld hl,Entidades_en_curso
-;	dec (hl)
-;	ld hl,Numero_de_entidades
-;	dec (hl)
-;	jr 3F
-	
-; -----
-
-;	`Movemos´ la explosión.
-
-;4 ld hl,(Puntero_DESPLZ_der)
-;	inc hl
-;	inc hl
-;	call Extrae_address
-;;	ld (Puntero_objeto),hl
-
-;;	ld hl,Frames_explosion
-;;	dec (hl)
-
-;;	ld hl,Ctrl_0
-;;	set 4,(hl);;
-
-;;	jr 3F
-
-;	NO HAY EXPLOSIÓN ----- ----- ----- ----- -----
-
-;2 xor a
-;	ld (Ctrl_0),a 										; El bit4 de (Ctrl_0) puede estar alzado debido al movimiento de Amadeus. Inicializamos.
-
-; Movemos Entidades malignas.
-; Se trata de una "Entidad_guía" ???. Si es así ejecutamos la rutina que construye el patrón de movimiento.
-
-;	ld a,(Ctrl_2)
-;	bit 5,a
-;	jr nz,8F
-
-;	ld hl,Ctrl_0										; Movemos una entidad "FANTASMA". Activamos el FLAG de movimiento y evitamos_
-;	set 4,(hl)											; _ ejecutar la rutina de Movimiento.
-;	jr 7F
-
-;8 call Movimiento										; Desplazamos el objeto. MOVEMOS !!!!!
-
-;	ld a,(Ctrl_0) 										; Salimos de la rutina SI NO HA HABIDO MOVIMIENTO !!!!!
-;	bit 4,a
-;	ret z
-
-; Ha habido desplazamiento de la entidad maligna.
-; Ha llegado a zona de AMADEUS ???
-
-;7 ld a,(Coordenada_y)
-;	cp $14
-;	jr c,1F						
-
-; --------- 
-
-;	Si la entidad en curso entra en zona de Amadeus, generamos y guardamos las 2 o 3 columnas que ocupa la entidad_ 
-;	_ y las 2 o 3 columnas que ocupa Amadeus y las comparamos por si hubiera coincidencia. 
-
-;	di
-;	call Genera_coordenadas_X
-;	call Compara_coordenadas_X 
-;	ei
-
-;	En el caso de existir coincidencia colocamos a "1" el .db (Impacto) de la entidad en curso y el bit2 del flag (Impacto2).
-
-; ---------
-
-;1 call Prepara_var_pintado	 			                		; HEMOS DESPLAZADO LA ENTIDAD!!!. Almaceno las `VARIABLES DE PINTADO´en su {Variables_de_pintado}.      
-;	call Repone_datos_de_borrado 								; ! BORRAMOS !!!. Guardamos la foto de las {Variables_de_borrado} en Scanlines_album.
-;	call Limpia_Variables_de_borrado
-
-;3 ret													
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- -----
 ;

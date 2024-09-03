@@ -431,7 +431,6 @@ Genera_datos_de_impresion_disparos_Amadeus
 Siguiente_disparo_Amadeus    
 
     pop de
-    inc sp
     jr 1B
 
 Genera_scanlines_de_disparo_Amadeus
@@ -439,7 +438,6 @@ Genera_scanlines_de_disparo_Amadeus
     pop hl                                                    ; Puntero_objeto del disparo en DE.
 ;                                                             ; Puntero_de_impresión del disparo en HL.
 
-    inc sp
     ld (Puntero_rancio_disparos_album),sp                     ; Guardamos la dirección de la siguiente caja de disparos que tenemos que comprobar.
 
     ld sp,(Nivel_scan_disparos_album_de_pintado)

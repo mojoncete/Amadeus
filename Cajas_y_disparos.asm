@@ -35,11 +35,11 @@ Indice_de_disparos_Amadeus defw Disparo_1A
 
 Disparo_1A defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	db 0											; Impacto.
+;	db 0											; Impacto.
 							
 Disparo_2A defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	db 0											; Impacto.
+;	db 0											; Impacto.
 
 Indice_de_disparos_entidades defw Disparo_1
 	defw Disparo_2
