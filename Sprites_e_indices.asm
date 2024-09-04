@@ -15,12 +15,16 @@ Indice_disparo defw Disparo_0
 
 ; Disparo (CTRL_DESPLZ)="0".
 Disparo_0 DEFB $01,$80
+Disparo_0b DEFB $07,$e0 						; (No se imprime, detección de colisión).
 ; Disparo (CTRL_DESPLZ)="f9"
 Disparo_f9 DEFB $00,$60
+Disparo_f9b DEFB $01,$f8 						; (No se imprime, detección de colisión).
 ; Disparo (CTRL_DESPLZ)="fb" 
 Disparo_fb DEFB $18,$00
+Disparo_fbb DEFB $7e,$00 						; (No se imprime, detección de colisión).
 ; Disparo (CTRL_DESPLZ)="fd" 
 Disparo_fd DEFB $06,$00
+Disparo_fdb DEFB $1f,$80 						; (No se imprime, detección de colisión).
 
 ; ----------------------------------------------------------------------------------------
 

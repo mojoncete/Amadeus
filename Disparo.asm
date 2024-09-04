@@ -621,10 +621,14 @@ Detecta_impacto_en_disparo_de_Amadeus
 
 Extraccion_de_datos                                        
 
+    inc de
+    inc de                                                 ;    Se sitúa en Puntero_objeto aumentdao del disparo para comprobar colisión.   
+
     ld e,(hl)
     inc hl
     ld d,(hl)
-    inc hl                                                 ;    Puntero_objeto del disparo en DE.
+
+    inc hl                                                 
 
     ld c,(hl)
     inc hl
@@ -632,6 +636,8 @@ Extraccion_de_datos
  
     push bc 
     pop hl                                                 ;    Puntero_de_impresión del disparo en HL.
+
+;   La detección de colisión se efectúa con el disparo impreso en pantalla.
 
     call PreviousScan
     call PreviousScan
