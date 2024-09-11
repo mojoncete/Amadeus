@@ -74,7 +74,7 @@ Activa_Impacto_en_entidad
 
 ; --------------------------------------------------------------------------------------
 ;
-;   26/08/24
+;   11/09/24
 ;
 
 Limpia_album_de_borrado_disparos
@@ -83,11 +83,6 @@ Limpia_album_de_borrado_disparos
     bit 0,(hl)
     ret z
     res 0,(hl)
-
-    ld a,(Numero_de_disparos_de_Amadeus)    
-    dec a
-    dec a
-    ret nz
 
 Limpiando
 
@@ -122,7 +117,7 @@ Calcula_bytes_pintado_disparos
 
 ; --------------------------------------------------------------------------------------
 ;
-;   23/08/24
+;   11/09/24
 ;
 ;   Limpia la diferencia de bytes entre el (album_de_pintado_disparos) del FRAME anterior y el_
 ;   _(album_de_pintado_disparos) del FRAME actual, (siempre que el álbum del FRAME anterior contenga más_ 
@@ -130,15 +125,13 @@ Calcula_bytes_pintado_disparos
 
 Limpia_album_de_pintado_disparos
 
-;   Exclusiones.
+;*   Exclusiones.
 
     ld a,(Num_de_bytes_album_de_disparos_2)
     and a
     ret z
 
 ; -----
-
-    and a
 
     ld a,(Num_de_bytes_album_de_disparos)
     ld b,a    
@@ -246,8 +239,6 @@ Consulta_Impacto
 
     ret z
 
-;   IMPACTO !!!!!
-
     ld a,(Impacto2)    
     set 3,a
     ld (Impacto2),a
@@ -290,7 +281,7 @@ Mueve_disparo_Amadeus
 
 ; ----------------------
 ;
-;   2/9/24
+;   11/9/24
 
 Elimina_disparo
 
@@ -299,7 +290,6 @@ Elimina_disparo
 
 ;   Disparo_1A defw 0									; Puntero objeto.
 ;   	defw 0											; Puntero de impresión.
-;   	db 0											; Impacto.
 
     dec hl
     dec hl
@@ -307,26 +297,24 @@ Elimina_disparo
     xor a
     ld (hl),a
     inc hl
-    ld (hl),a                                           ; Puntero_objeto borrado.
+    ld (hl),a                                           ;? Puntero_objeto borrado.
+
     inc hl
     ld (hl),a
     inc hl
-    ld (hl),a                                           ; Puntero_de_impresion borrado.
-    inc hl
-    ld (hl),a                                           ; Impacto borrado.
+    ld (hl),a                                           ;? Puntero_de_impresion borrado.
 
     ld hl,Numero_de_disparos_de_Amadeus
     inc (hl)
 
-    ld a,(Permiso_de_disparo_Amadeus)
-    or 1
+    ld a,1
     ld (Permiso_de_disparo_Amadeus),a
 
-    ld hl,Ctrl_5                                        ; Indica que ha desaparecido un disparo.
+    ld hl,Ctrl_5                                        ;? Indica que ha desaparecido un disparo.
     set 0,(hl)
 
     xor a
-    inc a                                               ; Siempre que eliminamos un disparo tenemos: "NZ".
+    inc a                                               ;? Siempre que eliminamos un disparo tenemos: "NZ".
 
     ret
 
@@ -405,23 +393,22 @@ Imprime_scanlines_de_disparo
 
 Genera_datos_de_impresion_disparos_Amadeus
 
-;   Exclusiones:
+;*   Exclusiones:
 
     ld a,(Numero_de_disparos_de_Amadeus)
-    dec a
-    dec a
-    ret z                                                     ; Salimos si no hay ningún disparo generado.
+    cp 2
+    ret z                                                     ;? Salimos si no hay ningún disparo generado.
 
 ; -----
 
     ld (Stack),sp
-    ld sp,Disparo_1A                                          ; SP se sitúa en el .db (Puntero objeto) de la 1ª caja de disparos de Amadeus.
+    ld sp,Disparo_1A                                          ;? SP se sitúa en el .db (Puntero objeto) de la 1ª caja de disparos de Amadeus.
 
-1 ld hl,Indice_de_disparos_entidades                          ; Compararemos SP con HL para saber cual es la última caja que examinar.
-    sbc hl,sp                                                 ; Última caja ??? 
+1 ld hl,Indice_de_disparos_entidades                          ;? Compararemos SP con HL para saber cual es la última caja que examinar.
+    sbc hl,sp                                                 ;? Última caja ??? 
     jr z,Salida
 
-    pop de                                                    ; Puntero_objeto del disparo en DE.
+    pop de                                                    ;? Puntero_objeto del disparo en DE.
 
     inc d
     dec d
@@ -435,10 +422,10 @@ Siguiente_disparo_Amadeus
 
 Genera_scanlines_de_disparo_Amadeus
 
-    pop hl                                                    ; Puntero_objeto del disparo en DE.
-;                                                             ; Puntero_de_impresión del disparo en HL.
+    pop hl                                                    ;? Puntero_objeto del disparo en DE.
+;                                                             ;? Puntero_de_impresión del disparo en HL.
 
-    ld (Puntero_rancio_disparos_album),sp                     ; Guardamos la dirección de la siguiente caja de disparos que tenemos que comprobar.
+    ld (Puntero_rancio_disparos_album),sp                     ;? Guardamos la dirección de la siguiente caja de disparos que tenemos que comprobar.
 
     ld sp,(Nivel_scan_disparos_album_de_pintado)
 
@@ -446,12 +433,12 @@ Genera_scanlines_de_disparo_Amadeus
     pop bc
     pop bc
 
-    ld (Nivel_scan_disparos_album_de_pintado),sp              ; Nuevo nivel del album de disparos.
+    ld (Nivel_scan_disparos_album_de_pintado),sp              ;? Nuevo nivel del album de disparos.
 
-    push hl                                                   ; Sube 2º scanline al álbum.
+    push hl                                                   ;? Sube 2º scanline al álbum.
     call PreviousScan
-    push hl                                                   ; Sube 1er scanline al álbum.
-    push de                                                   ; Sube Puntero_objeto del disparo al álbum.
+    push hl                                                   ;? Sube 1er scanline al álbum.
+    push de                                                   ;? Sube Puntero_objeto del disparo al álbum.
 
     ld sp,(Puntero_rancio_disparos_album)
     jr 1B
@@ -464,26 +451,30 @@ Salida
 
 ; --------------------------------------------------------------------------------------
 ;
-;   17/08/24
+;   11/09/24
 ;
 
 Genera_disparo_Amadeus
 
-;   Exclusiones.
-
-    ld a,(Permiso_de_disparo_Amadeus)
-    and a
-    ret z                                                    ; Salimos si no hay permiso de disparo.
-    dec a
-    ld (Permiso_de_disparo_Amadeus),a
+;*  Exclusiones.
 
     ld a,(Numero_de_disparos_de_Amadeus)
     and a
-    ret z                                                    ; Hay 2 disparos en pantalla, no hay cajas libres.
+    ret z                                                    ;? Hay 2 disparos en pantalla, no hay cajas libres.
 
+    ld a,(Permiso_de_disparo_Amadeus)
+    and a
+    ret z                                                    ;? Salimos si no hay permiso de disparo.
+
+    dec a
+    ld (Permiso_de_disparo_Amadeus),a                        ;? Cada vez que se genera un disparo de Amadeus hay que esperar (CLOCK_repone_disparo_Amadeus) para volver_
+;                                                            ;? _ a tener (Permiso_de_disparo_Amadeus).
 ; ---------------------------------------------------------------------------------------------------------------
+;
+;*  Vamos a generar un disparo.
+;*  Tenemos 1 o 2 cajas de disparos libres y permiso de disparo.
 
-;   Dec nº de disparos de Amadeus.
+;   Dec. el nº de disparos de Amadeus.
 
     ld hl,Numero_de_disparos_de_Amadeus
     dec (hl)

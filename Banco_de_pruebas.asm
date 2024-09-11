@@ -36,7 +36,7 @@ Scanlines_album_2 equ $811a	;    ($811a - $8232)
 Amadeus_scanlines_album equ $8234	;	($8234 - $8256) 				; Inicialmente 34 bytes, $22.
 Amadeus_scanlines_album_2 equ $8258	;	($8258 - $827a)
 Disparos_scanlines_album equ $827c	;	($827c - $82b6) 				; Inicialmente 58 bytes, $3a.
-Disparos_scanlines_album_2 equ $828e	;	($82b8 - $82f2)	
+Disparos_scanlines_album_2 equ $82b8	;	($82b8 - $82f2)	
 
 ;																		; Scanlines_album. 
 
@@ -359,7 +359,7 @@ Datos_de_entidad defw 0									; Contiene los bytes de información de la entid
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;	31/08/24
+;	11/09/24
 ;
 ;	Álbumes.
 
@@ -478,7 +478,7 @@ Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilit
 ;														; Repite la oleada de entidades.
 
 ;CLOCK_repone_disparo_Amadeus_BACKUP db 30				; Restaura (CLOCK_repone_disparo_Amadeus). 
-CLOCK_repone_disparo_Amadeus db 20	 					; Reloj, decreciente.
+CLOCK_repone_disparo_Amadeus db 18	 					; Reloj, decreciente. Nº de frames mínimo que hay entre disparo y disparo de Amadeus.
 ;CLOCK_repone_disparo_entidad_BACKUP db 20				; Restaura (CLOCK_repone_disparo_entidad). 
 ;CLOCK_repone_disparo_entidad db 20						; Reloj, decreciente.
 
@@ -644,22 +644,9 @@ Main
 
 	call Detecta_colision_nave_entidad 					; La rutina verifica la colisión entre una entidad y Amadeus, (RES 2 Impacto2).
 
-;	TEMPORIZACIONES !!!!!!!!!!!!!!!!
+; TEMPORIZACIONES !!!!!!!!!!!!!!!!
 
-;	ld a,(Permiso_de_disparo_Amadeus)
-;	and a
-;	jr nz,4F
-
-;	ld hl,CLOCK_repone_disparo_Amadeus
-;	inc (hl)
-;	dec (hl)
-
-;	call z,Autoriza_disparo_Amadeus_y_repone_clock
-
-;	dec (hl)
-
-
-4 ld hl,(Clock_next_entity)
+	ld hl,(Clock_next_entity)
 	ld bc,(FRAMES)
 	and a
 	sbc hl,bc
@@ -874,18 +861,6 @@ End_frame
 
 ; ----------------------------------------
 
-Autoriza_disparo_Amadeus_y_repone_clock 
-
-	ld a,21
-	ld (hl),21
-
-	ld a,1
-	ld (Permiso_de_disparo_Amadeus),a
-
-	ret
-
-; ----------------------------------------
-
 ; RECARGA DE NUEVA OLEADA.
 
 ;	ld a,(Contador_de_frames)
@@ -1082,11 +1057,11 @@ Change_Amadeus
 
 Change_Disparos
 
-;	Exclusiones:
+; Exclusiones:
 
 	ld a,(Numero_de_disparos_de_Amadeus)
-	and a
-	ret z
+	cp 2
+	ret z																;? Salimos de la rutina. No hay ningún disparo en pantalla.
 
 ; -----
 
