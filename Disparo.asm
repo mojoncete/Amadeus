@@ -159,36 +159,16 @@ Limpia_album_de_pintado_disparos
 
 Motor_Disparos
 
-;    Exclusiones:
-
-    ld a,(Numero_de_disparos_de_Amadeus)
-    dec a
-    dec a
-    jr z,2F                                                             ; Salimos si no hay ningún disparo generado.
-
-; .........................
-
 ;   Averiguamos si la 1ª caja contiene disparo, para ello nos situamos en el byte alto del (Puntero_de_impresion).
 
-    ld hl,Disparo_1A+1
+    ld hl,Disparo_Amad+1
 
     inc (hl)
     dec (hl)
     
-    jr z,1F
-
-;   Esta caja contiene un disparo.
-
-    call Consulta_Impacto
-    call z,Mueve_disparo_Amadeus
-
-1 ld hl,Disparo_2A+1 
-
-    inc (hl)
-    dec (hl)
     jr z,2F
 
-; Esta caja contiene un disparo.
+;   Esta caja contiene un disparo.
 
     call Consulta_Impacto
     call z,Mueve_disparo_Amadeus
@@ -304,9 +284,6 @@ Elimina_disparo
     inc hl
     ld (hl),a                                           ;? Puntero_de_impresion borrado.
 
-    ld hl,Numero_de_disparos_de_Amadeus
-    inc (hl)
-
     ld a,1
     ld (Permiso_de_disparo_Amadeus),a
 
@@ -393,16 +370,8 @@ Imprime_scanlines_de_disparo
 
 Genera_datos_de_impresion_disparos_Amadeus
 
-;*   Exclusiones:
-
-    ld a,(Numero_de_disparos_de_Amadeus)
-    cp 2
-    ret z                                                     ;? Salimos si no hay ningún disparo generado.
-
-; -----
-
     ld (Stack),sp
-    ld sp,Disparo_1A                                          ;? SP se sitúa en el .db (Puntero objeto) de la 1ª caja de disparos de Amadeus.
+    ld sp,Disparo_Amad                                        ;? SP se sitúa en el .db (Puntero objeto) de la caja de disparos de Amadeus.
 
 1 ld hl,Indice_de_disparos_entidades                          ;? Compararemos SP con HL para saber cual es la última caja que examinar.
     sbc hl,sp                                                 ;? Última caja ??? 
@@ -451,45 +420,31 @@ Salida
 
 ; --------------------------------------------------------------------------------------
 ;
-;   11/09/24
+;   12/09/24
 ;
 
 Genera_disparo_Amadeus
 
 ;*  Exclusiones.
 
-    ld a,(Numero_de_disparos_de_Amadeus)
-    and a
-    ret z                                                    ;? Hay 2 disparos en pantalla, no hay cajas libres.
-
     ld a,(Permiso_de_disparo_Amadeus)
     and a
     ret z                                                    ;? Salimos si no hay permiso de disparo.
 
     dec a
-    ld (Permiso_de_disparo_Amadeus),a                        ;? Cada vez que se genera un disparo de Amadeus hay que esperar (CLOCK_repone_disparo_Amadeus) para volver_
-;                                                            ;? _ a tener (Permiso_de_disparo_Amadeus).
+    ld (Permiso_de_disparo_Amadeus),a                        ;? No volveremos a tener permiso de disparo hasta que desaparezaca este disparo.
+
 ; ---------------------------------------------------------------------------------------------------------------
 ;
 ;*  Vamos a generar un disparo.
-;*  Tenemos 1 o 2 cajas de disparos libres y permiso de disparo.
-
-;   Dec. el nº de disparos de Amadeus.
-
-    ld hl,Numero_de_disparos_de_Amadeus
-    dec (hl)
 
 ;   Nos situamos en la 1ª caja que encontramos vacía.
 
-    ld hl,Disparo_1A+1
+    di
+    jr $
+    ei
 
-    inc (hl)
-    dec (hl)
-    dec hl
-
-    jr z,7F
-
-    ld hl,Disparo_2A
+    ld hl,Disparo_Amad
 
 7 ld (Puntero_DESPLZ_DISPARO_AMADEUS),hl
 

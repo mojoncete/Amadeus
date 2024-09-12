@@ -382,7 +382,6 @@ Nivel_scan_disparos_album_de_pintado defw 0
 Num_de_bytes_album_de_disparos db 0
 Num_de_bytes_album_de_disparos_2 db 0
 
-Numero_de_disparos_de_Amadeus db 2						; Inicialmente disponemos de 2 disparos.
 Numero_de_disparos_de_entidades db 0
 
 Permiso_de_disparo_Amadeus db 1							; A "1", se puede generar disparo.
@@ -476,9 +475,7 @@ RND_SP defw Numeros_aleatorios							; Puntero que se irá desplazando por el SE
 Clock_next_entity defw 0								; Transcurrido este tiempo aparece una nueva entidad.
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
-
 ;CLOCK_repone_disparo_Amadeus_BACKUP db 30				; Restaura (CLOCK_repone_disparo_Amadeus). 
-CLOCK_repone_disparo_Amadeus db 18	 					; Reloj, decreciente. Nº de frames mínimo que hay entre disparo y disparo de Amadeus.
 ;CLOCK_repone_disparo_entidad_BACKUP db 20				; Restaura (CLOCK_repone_disparo_entidad). 
 ;CLOCK_repone_disparo_entidad db 20						; Reloj, decreciente.
 
@@ -585,7 +582,6 @@ START
 ; 	INICIA DISPAROS !!!!!
 
 	call Inicia_Puntero_Disparo_Entidades
-	call Inicia_Puntero_Disparo_Amadeus
 
 ; Una vez inicializadas las entidades y Amadeus, Cargamos la 1ª entidad en DRAW.
 
@@ -1056,14 +1052,6 @@ Change_Amadeus
 	ret
 
 Change_Disparos
-
-; Exclusiones:
-
-	ld a,(Numero_de_disparos_de_Amadeus)
-	cp 2
-	ret z																;? Salimos de la rutina. No hay ningún disparo en pantalla.
-
-; -----
 
 	ld hl,(Album_de_pintado_disparos)
 	ld de,(Album_de_borrado_disparos)
@@ -1672,9 +1660,6 @@ Inicia_punteros_de_cajas
 
 Inicia_Puntero_Disparo_Entidades ld hl,Indice_de_disparos_entidades
 	ld (Puntero_DESPLZ_DISPARO_ENTIDADES),hl
-	ret
-Inicia_Puntero_Disparo_Amadeus ld hl,Indice_de_disparos_Amadeus
-	ld (Puntero_DESPLZ_DISPARO_AMADEUS),hl
 	ret
 
 ; *************************************************************************************************************************************************************

@@ -30,13 +30,9 @@ Indice_de_mov_segun_tipo_de_entidad defw Indice_mov_Baile_de_BadSat
 ; 	defw ...
 	defw 0
 
-Indice_de_disparos_Amadeus defw Disparo_1A
-	defw Disparo_2A
+;* Caja del disparo de Amadeus y cajas de disparos de entidades.
 
-Disparo_1A defw 0									; Puntero objeto.
-	defw 0											; Puntero de impresión.
-
-Disparo_2A defw 0									; Puntero objeto.
+Disparo_Amad defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
 
 Indice_de_disparos_entidades defw Disparo_1
