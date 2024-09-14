@@ -385,7 +385,7 @@ Num_de_bytes_album_de_disparos_2 db 0
 Numero_de_disparos_de_entidades db 0
 
 Permiso_de_disparo_Amadeus db 1							; A "1", se puede generar disparo.
-;Disparo_entidad db 1									; A "1", se puede generar disparo.
+Permiso_de_disparo_Entidades db 0						; A "1", se puede generar disparo.
 
 Puntero_rancio_disparos_album defw 0
 
@@ -435,7 +435,7 @@ Ctrl_5 db 0												;	BIT 0, "1" Indica que se ha eliminado un disparo. (Esta
 ; Gestión de Disparos.
 
 Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
-Puntero_DESPLZ_DISPARO_AMADEUS defw 0
+;Puntero_DESPLZ_DISPARO_AMADEUS defw 0
 
 Impacto2 db 0											; Byte de control de impactos.
 
@@ -471,13 +471,14 @@ Clock_explosion_Amadeus db 5
 Temp_new_live db 100									; Tiempo que tarda en aparecer una nueva nave Amadeus tras ser destruida.
 
 RND_SP defw Numeros_aleatorios							; Puntero que se irá desplazando por el SET de nº aleatorios.
+RND_SP_Disparos defw Numeros_aleatorios					; Puntero que se irá desplazando por el SET de nº aleatorios, (para generar disparos de entidades).
+DB_RND_disparos db 0
 
 Clock_next_entity defw 0								; Transcurrido este tiempo aparece una nueva entidad.
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
-;CLOCK_repone_disparo_Amadeus_BACKUP db 30				; Restaura (CLOCK_repone_disparo_Amadeus). 
-;CLOCK_repone_disparo_entidad_BACKUP db 20				; Restaura (CLOCK_repone_disparo_entidad). 
-;CLOCK_repone_disparo_entidad db 20						; Reloj, decreciente.
+CLOCK_disparo_entidad_MASTER db $ff						; Reloj, decreciente.
+CLOCK_disparo_entidad db $ff
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -543,7 +544,6 @@ START
 ;														 
 	call Inicia_albumes_de_lineas_Amadeus
 	call Inicia_albumes_de_disparos
-
 
 4 call Inicia_Entidades						 
 	call Inicia_Amadeus
@@ -642,6 +642,10 @@ Main
 
 ; TEMPORIZACIONES !!!!!!!!!!!!!!!!
 
+	ld hl,CLOCK_disparo_entidad
+	dec (hl)
+	call z,Autoriza_disparo_de_entidades
+
 	ld hl,(Clock_next_entity)
 	ld bc,(FRAMES)
 	and a
@@ -673,7 +677,7 @@ Main
 
 ; ( Código que ejecutamos con cada entidad: ).
 
-;	--------------------------------------- GESTIÓN DE ENTIDADES. !!!!!!!!!!
+; --------------------------------------- GESTIÓN DE ENTIDADES. !!!!!!!!!!
 ;
 ;	Se produce MOVIMIENTO. Intercambio de Álbumes, (borrado-pintado).
 
@@ -722,7 +726,7 @@ Main
 
 ; Falsa colisión !!!	
 	
-	ld (Impacto),a											; Colocamos el .db (Impacto) de la entidad en curso a "0".
+	ld (Impacto),a												; Colocamos el .db (Impacto) de la entidad en curso a "0".
 
 ; -------------------------------------------
 
@@ -739,7 +743,13 @@ Main
 	ld hl,(Puntero_de_impresion)
 	call Genera_coordenadas
 
-	call Colision_Entidad_Amadeus								; Si hay posibilidad de COLISION, set 2,(Impacto2) y (Impacto) de entidad en curso a "1".
+; TODO: Generamos disparo ???
+
+	ld a,(Permiso_de_disparo_Entidades)
+	and a
+	call nz,Entidad_genera_disparo_si_procede
+
+4 call Colision_Entidad_Amadeus									; Si hay posibilidad de COLISION, set 2,(Impacto2) y (Impacto) de entidad en curso a "1".
 
 Gestiona_siguiente_entidad
  
@@ -748,6 +758,9 @@ Gestiona_siguiente_entidad
 	djnz 2B
 
 ; Hemos gestionado todas las entidades. 
+
+	xor a
+	ld (Permiso_de_disparo_Entidades),a							; Volvemos a deshabilitar el permiso de disparo para las entidades hasta que (CLOCK_disparo_entidad) llegue a "0".
 
 ; ----- ----- -----
 
@@ -855,7 +868,60 @@ End_frame
 ;	bit 3,a												; Si este bit es "1". Hay recarga de nueva oleada.
 	jp z,Main
 
-; ----------------------------------------
+;------------------------------------------
+;
+;	14/09/24
+
+Autoriza_disparo_de_entidades
+
+	ld a,1
+	ld (Permiso_de_disparo_Entidades),a
+
+	ld a,(CLOCK_disparo_entidad_MASTER)
+	ld (CLOCK_disparo_entidad),a
+
+	ld hl,(RND_SP_Disparos)
+
+2 ld a,(hl)
+	and a
+	jr z,1F
+
+	ld (DB_RND_disparos),a
+	inc hl
+	ld (RND_SP_Disparos),hl
+
+	ret
+
+1	ld hl,Numeros_aleatorios
+	ld (RND_SP_Disparos),hl
+	jr 2B
+
+;------------------------------------------
+;
+;	14/09/24
+;
+;	Nota: en la bandeja DRAW se encuentran los datos de la entidad que va a disparar.
+
+Entidad_genera_disparo_si_procede 
+
+	ld a,(Entidades_en_curso)
+	and a
+	ret z
+
+	ld a,(DB_RND_disparos)
+	bit 0,a
+	push af											; Guardamos FLAGS.
+
+	rla	
+	rla
+
+	ld (DB_RND_disparos),a
+
+	pop af
+	call nz,Genera_disparo_de_entidad_maldosa
+
+	ret
+
 
 ; RECARGA DE NUEVA OLEADA.
 

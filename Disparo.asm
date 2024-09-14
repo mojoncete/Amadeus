@@ -1,5 +1,18 @@
 ; --------------------------------------------------------------------------------------
 ;
+;   14/09/24
+;
+
+Genera_disparo_de_entidad_maldosa
+
+    di
+    jr $
+    ei
+    
+    ret
+
+; --------------------------------------------------------------------------------------
+;
 ;   31/08/24
 ;
 
@@ -363,7 +376,7 @@ Imprime_scanlines_de_disparo
 
 ; --------------------------------------------------------------------------------------
 ;
-;   28/8/24
+;   14/09/24
 ;
 ;   Modifica: HL y DE.
 
@@ -372,30 +385,17 @@ Genera_datos_de_impresion_disparos_Amadeus
 
     ld (Stack),sp
     ld sp,Disparo_Amad                                        ;? SP se sitúa en el .db (Puntero objeto) de la caja de disparos de Amadeus.
-
-1 ld hl,Indice_de_disparos_entidades                          ;? Compararemos SP con HL para saber cual es la última caja que examinar.
-    sbc hl,sp                                                 ;? Última caja ??? 
-    jr z,Salida
-
     pop de                                                    ;? Puntero_objeto del disparo en DE.
 
-    inc d
+    inc d                                                     ;? Salimos si no hay disparo.
     dec d
 
-    jr nz,Genera_scanlines_de_disparo_Amadeus
-
-Siguiente_disparo_Amadeus    
-
-    pop de
-    jr 1B
+    jr z,Salida
 
 Genera_scanlines_de_disparo_Amadeus
 
     pop hl                                                    ;? Puntero_objeto del disparo en DE.
 ;                                                             ;? Puntero_de_impresión del disparo en HL.
-
-    ld (Puntero_rancio_disparos_album),sp                     ;? Guardamos la dirección de la siguiente caja de disparos que tenemos que comprobar.
-
     ld sp,(Nivel_scan_disparos_album_de_pintado)
 
     pop bc
@@ -408,10 +408,6 @@ Genera_scanlines_de_disparo_Amadeus
     call PreviousScan
     push hl                                                   ;? Sube 1er scanline al álbum.
     push de                                                   ;? Sube Puntero_objeto del disparo al álbum.
-
-    ld sp,(Puntero_rancio_disparos_album)
-    jr 1B
-
 
 Salida 
 
@@ -433,22 +429,6 @@ Genera_disparo_Amadeus
 
     dec a
     ld (Permiso_de_disparo_Amadeus),a                        ;? No volveremos a tener permiso de disparo hasta que desaparezaca este disparo.
-
-; ---------------------------------------------------------------------------------------------------------------
-;
-;*  Vamos a generar un disparo.
-
-;   Nos situamos en la 1ª caja que encontramos vacía.
-
-    di
-    jr $
-    ei
-
-    ld hl,Disparo_Amad
-
-7 ld (Puntero_DESPLZ_DISPARO_AMADEUS),hl
-
-; ---------------------------------------------------------------------------------------------------------------
 
 Define_puntero_objeto_disparo
 
@@ -516,7 +496,7 @@ Define_puntero_objeto_disparo
 ; Almacenamos (Puntero_objeto) y (Puntero_de_impresion) en su correspondiente caja.
 ; HL en el 1er .db de la caja.
 
-    ld hl,(Puntero_DESPLZ_DISPARO_AMADEUS)
+    ld hl,Disparo_Amad
 
     ld b,2
 
