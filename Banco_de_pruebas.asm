@@ -435,7 +435,6 @@ Ctrl_5 db 0												;	BIT 0, "1" Indica que se ha eliminado un disparo. (Esta
 ; Gestión de Disparos.
 
 Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
-;Puntero_DESPLZ_DISPARO_AMADEUS defw 0
 
 Impacto2 db 0											; Byte de control de impactos.
 
@@ -477,8 +476,8 @@ DB_RND_disparos db 0
 Clock_next_entity defw 0								; Transcurrido este tiempo aparece una nueva entidad.
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
-CLOCK_disparo_entidad_MASTER db $ff						; Reloj, decreciente.
-CLOCK_disparo_entidad db $ff
+CLOCK_disparo_entidad_MASTER db $90						; Reloj, decreciente.
+CLOCK_disparo_entidad db $90
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -545,6 +544,8 @@ START
 	call Inicia_albumes_de_lineas_Amadeus
 	call Inicia_albumes_de_disparos
 
+	call Inicia_Puntero_Disparo_Entidades
+
 4 call Inicia_Entidades						 
 	call Inicia_Amadeus
 
@@ -580,8 +581,6 @@ START
 ;	call Store_Amadeus
 
 ; 	INICIA DISPAROS !!!!!
-
-	call Inicia_Puntero_Disparo_Entidades
 
 ; Una vez inicializadas las entidades y Amadeus, Cargamos la 1ª entidad en DRAW.
 
@@ -909,7 +908,7 @@ Entidad_genera_disparo_si_procede
 	ret z
 
 	ld a,(DB_RND_disparos)
-	bit 0,a
+	bit 1,a
 	push af											; Guardamos FLAGS.
 
 	rla	
@@ -1722,7 +1721,7 @@ Inicia_punteros_de_cajas
 ;
 ; 8/1/23
 ;
-;	Inicializamos los punteros de selección de los 2 índices de disparo, Amadeus y Entidades.
+;	Inicializamos el puntero que se irá desplazando por el índice de disparos de Entidades.
 
 Inicia_Puntero_Disparo_Entidades ld hl,Indice_de_disparos_entidades
 	ld (Puntero_DESPLZ_DISPARO_ENTIDADES),hl

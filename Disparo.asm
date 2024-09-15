@@ -5,10 +5,111 @@
 
 Genera_disparo_de_entidad_maldosa
 
+;   Estructura de un disparo de entidades.
+
+;   Disparo_1 defw 0								; Puntero objeto.
+; 	defw 0											; Puntero de impresión.
+;	db 0											; Control.
+
+;*  Exclusiones.
+
+    ld a,(Coordenada_y)
+    and a
+    ret z
+
+Define_puntero_objeto_disparo_de_entidades
+
+;   En este punto el registro B siempre está a "0" y HL apunta al puntero de impresión de la entidad.
+
+ 
     di
     jr $
     ei
-    
+ 
+ 
+ 
+ 
+    ld hl,(Puntero_de_almacen_de_mov_masticados)
+
+ 
+
+;   
+    ret
+
+    inc l
+
+
+
+
+    ld a,$80
+    cp (hl)
+    jr z,1F
+
+    inc b
+
+    ld a,$60
+    cp (hl)
+    jr z,1F
+
+
+    inc b
+
+    ld a,$18
+    cp (hl)
+    jr z,1F
+
+    inc b
+
+;   Calcula el Puntero_de_impresión del disparo.
+
+;   El Puntero_de_impresión del disparo apunta al último scanline de los tres que componen el disparo, (el de abajo).
+  
+;1 call PreviousScan
+
+;    ld a,b
+;    srl a
+;    jr z,4F
+
+; --- Guarda el puntero_de_impresión del disparo en la pila.
+;    push hl
+;    jr 5F
+;4 dec l  
+;    push hl
+; ---
+
+;   Calcula el Puntero_objeto del disparo.
+
+;5 ld hl,Indice_disparo
+;    inc b
+;    dec b
+;    jr z,2F
+
+;   Nos desplazamos por el índice de disparos.
+
+;3 inc l
+;    inc l
+;    djnz 3B
+
+; --- Guarda el Puntero_objeto del disparo en la pila.
+;2 call Extrae_address
+;    push hl                               
+; ---
+
+; Almacenamos (Puntero_objeto) y (Puntero_de_impresion) en su correspondiente caja.
+; HL en el 1er .db de la caja.
+
+;    ld hl,Disparo_Amad
+
+;    ld b,2
+
+;6 pop de
+;    ld (hl),e
+;    inc hl
+;    ld (hl),d
+;    inc hl
+
+;    djnz 6B
+
     ret
 
 ; --------------------------------------------------------------------------------------
