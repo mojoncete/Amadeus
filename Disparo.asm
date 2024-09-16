@@ -13,27 +13,41 @@ Genera_disparo_de_entidad_maldosa
 
 ;*  Exclusiones.
 
+;   La entidad no podrá disparar mientras se encuentre en las filas: 0,1,14,15,16.
+
     ld a,(Coordenada_y)
     and a
     ret z
 
+    dec a
+    ret z
+
+    cp 13
+    ret nc
+
 Define_puntero_objeto_disparo_de_entidades
 
 ;   En este punto el registro B siempre está a "0" y HL apunta al puntero de impresión de la entidad.
+;   El disparo inicial siempre será el mismo en cualquier caso, ( para que quede centrado ) con cualquier_
+;   _ posición de cualquier entidad.
+;
+;   (Puntero_objeto) = "$00,$18"
 
- 
-    di
-    jr $
-    ei
- 
- 
- 
- 
-    ld hl,(Puntero_de_almacen_de_mov_masticados)
+    ld a,l
+    add $40
 
- 
+    ld l,a
 
-;   
+    ld c,l
+    ld b,h
+
+;   Puntero de impresión del disparo en BC , (1 scanline libre entre la entidad y el disparo).
+ 
+;    di
+;    jr $
+;    ei
+ 
+ ;   
     ret
 
     inc l
@@ -578,7 +592,7 @@ Define_puntero_objeto_disparo
 
 ;   Calcula el Puntero_objeto del disparo.
 
-5 ld hl,Indice_disparo
+5 ld hl,Indice_disparo_Amadeus
     inc b
     dec b
     jr z,2F
