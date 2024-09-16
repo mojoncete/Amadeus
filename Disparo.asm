@@ -27,104 +27,67 @@ Genera_disparo_de_entidad_maldosa
 
 Define_puntero_objeto_disparo_de_entidades
 
-;   En este punto el registro B siempre está a "0" y HL apunta al puntero de impresión de la entidad.
-;   El disparo inicial siempre será el mismo en cualquier caso, ( para que quede centrado ) con cualquier_
-;   _ posición de cualquier entidad.
+;   En este punto el registro B siempre está a "0" y HL apunta al `nuevo´ ( Puntero de impresión) de la entidad.
+;   (Puntero_objeto) del disparo inicial siempre será el mismo en cualquier caso, ( para que quede centrado ) en cualquier_
+;   _ posición de cualquier entidad, (como ocurre con el puntero de impresión de las explosiones de entidades).
 ;
 ;   (Puntero_objeto) = "$00,$18"
 
     ld a,l
     add $40
-
     ld l,a
 
     ld c,l
     ld b,h
 
 ;   Puntero de impresión del disparo en BC , (1 scanline libre entre la entidad y el disparo).
- 
-;    di
-;    jr $
-;    ei
- 
- ;   
-    ret
 
-    inc l
+    ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
+1 call Extrae_address
 
+;   Comprobamos si la caja está vacía.
 
+    inc hl
+    ld a,(hl)
+    and a
 
+    jr nz,Situa_en_siguiente_disparo                    ; Avanza a la siguiente caja si esta esta completa. 
 
-    ld a,$80
-    cp (hl)
-    jr z,1F
+;   Generamos disparo.
 
-    inc b
+    dec hl
 
-    ld a,$60
-    cp (hl)
-    jr z,1F
+    ld (hl),$00
+    inc hl
+    ld (hl),$18
+    inc hl
 
+    ld (hl),c
+    inc hl
+    ld (hl),b
+    inc hl
 
-    inc b
+    di
+    jr $
+    ei
 
-    ld a,$18
-    cp (hl)
-    jr z,1F
+; 
+Situa_en_siguiente_disparo 
 
-    inc b
+    di
+    jr $
+    ei
 
-;   Calcula el Puntero_de_impresión del disparo.
+    inc de
+    inc de
 
-;   El Puntero_de_impresión del disparo apunta al último scanline de los tres que componen el disparo, (el de abajo).
-  
-;1 call PreviousScan
+    ld hl,Disparo_1
+    ld a,l
+    sub e
+    ret z                                               ; 
 
-;    ld a,b
-;    srl a
-;    jr z,4F
-
-; --- Guarda el puntero_de_impresión del disparo en la pila.
-;    push hl
-;    jr 5F
-;4 dec l  
-;    push hl
-; ---
-
-;   Calcula el Puntero_objeto del disparo.
-
-;5 ld hl,Indice_disparo
-;    inc b
-;    dec b
-;    jr z,2F
-
-;   Nos desplazamos por el índice de disparos.
-
-;3 inc l
-;    inc l
-;    djnz 3B
-
-; --- Guarda el Puntero_objeto del disparo en la pila.
-;2 call Extrae_address
-;    push hl                               
-; ---
-
-; Almacenamos (Puntero_objeto) y (Puntero_de_impresion) en su correspondiente caja.
-; HL en el 1er .db de la caja.
-
-;    ld hl,Disparo_Amad
-
-;    ld b,2
-
-;6 pop de
-;    ld (hl),e
-;    inc hl
-;    ld (hl),d
-;    inc hl
-
-;    djnz 6B
-
-    ret
+    ex de,hl
+    jr 1B
 
 ; --------------------------------------------------------------------------------------
 ;

@@ -8,8 +8,6 @@
 
 ; Disparo.
 
-Disparo_inicial_de_entidades db $00,$18
-
 Indice_disparo_Amadeus defw Disparo_0
 	defw Disparo_f9
 	defw Disparo_fb
