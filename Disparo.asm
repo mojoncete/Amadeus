@@ -34,29 +34,21 @@ Genera_datos_de_impresion_disparos_Entidades
 
 Genera_scanlines_de_los_disparos_de_entidades.
 
-    pop de
+    pop bc
     pop hl                                                    ;? Puntero_objeto del disparo en DE.
 ;                                                             ;? Puntero_de_impresión del disparo en HL.
     ld sp,(Nivel_scan_disparos_album_de_pintado)
 
-    pop bc
-    pop bc
-    pop bc
+    pop af
+    pop af
+    pop af
 
     ld (Nivel_scan_disparos_album_de_pintado),sp              ;? Nuevo nivel del album de disparos.
 
     push hl                                                   ;? Sube 2º scanline al álbum.
     call NextScan
     push hl                                                   ;? Sube 1er scanline al álbum.
-    push de                                                   ;? Sube Puntero_objeto del disparo al álbum.
-
-Salida_01
-
-    ld sp,(Stack)
-    ret
-
-
-
+    push bc                                                   ;? Sube Puntero_objeto del disparo al álbum.
 
 Situa_en_siguiente_caja
 
