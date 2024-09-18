@@ -45,31 +45,31 @@ Indice_de_disparos_entidades defw Disparo_1
 
 Disparo_1 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	db 0											; Control.
+	defw 0											; Control.
 						
 Disparo_2 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	db 0											; Control.
+	defw 0											; Control.
 
 Disparo_3 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	db 0											; Control.
+	defw 0											; Control.
 						
 Disparo_4 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	db 0											; Control.
+	defw 0											; Control.
 
 Disparo_5 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	db 0											; Control.
+	defw 0											; Control.
 						
 Disparo_6 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	db 0											; Control.
+	defw 0											; Control.
 
 Disparo_7 defw 0									; Puntero objeto.
 	defw 0											; Puntero de impresión.
-	db 0											; Control.
+	defw 0											; Control.
 						
 ; -------------------------------------------------------------------------------------
 ;

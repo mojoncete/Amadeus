@@ -1,6 +1,6 @@
 ; --------------------------------------------------------------------------------------
 ;
-;   14/09/24
+;   18/09/24
 ;
 
 Genera_disparo_de_entidad_maldosa
@@ -9,11 +9,29 @@ Genera_disparo_de_entidad_maldosa
 
 ;   Disparo_1 defw 0								; Puntero objeto.
 ; 	defw 0											; Puntero de impresión.
-;	db 0											; Control.
+;	defw 0											; Control.
+
+;   El byte bajo de Control indica la velocidad a la que fué lanzado el disparo, (Velocidad)_
+;   _de la entidad en el momento de disparar.
+
+;   El byte alto muestra la siguiente información:
+;
+;   Bits (0) y (1) ..... Siempre estarán activos. Indica el nº de desplazamientos hacia abajo del_
+;                        _disparo antes de desplazarse a derecha/izquierda.
+;
+;   Bits (2) y (3) ..... Indican si el disparo va hacia la derecha o hacia la izquierda.
+;
+;                        10xx ..... Izquierda.
+;                        01xx ..... Derecha.
+;                        00xx ..... Recto.
 
 ;*  Exclusiones.
 
 ;   La entidad no podrá disparar mientras se encuentre en las filas: 0,1,14,15,16.
+
+    ld a,(Numero_de_disparos_de_entidades)
+    and a
+    ret z
 
     ld a,(Coordenada_y)
     and a
@@ -24,8 +42,6 @@ Genera_disparo_de_entidad_maldosa
 
     cp 13
     ret nc
-
-Define_puntero_objeto_disparo_de_entidades
 
 ;   En este punto el registro B siempre está a "0" y HL apunta al `nuevo´ ( Puntero de impresión) de la entidad.
 ;   (Puntero_objeto) del disparo inicial siempre será el mismo en cualquier caso, ( para que quede centrado ) en cualquier_
@@ -40,6 +56,11 @@ Define_puntero_objeto_disparo_de_entidades
     ld c,l
     ld b,h
 
+;   Decrementa el numero de disparos de entidades.   
+
+    ld hl,Numero_de_disparos_de_entidades
+    dec (hl)
+
 ;   Puntero de impresión del disparo en BC , (1 scanline libre entre la entidad y el disparo).
 
     ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
@@ -53,38 +74,63 @@ Define_puntero_objeto_disparo_de_entidades
 
     jr nz,Situa_en_siguiente_disparo                    ; Avanza a la siguiente caja si esta esta completa. 
 
-;   Generamos disparo.
+;   Generamos disparo. !!!!!!!!!!!!!!!!
 
     dec hl
 
     ld (hl),$00
     inc hl
     ld (hl),$18
-    inc hl
+    inc hl                                              ; Guarda el puntero objeto del disparo en la caja.
 
     ld (hl),c
     inc hl
     ld (hl),b
+    inc hl                                              ; Guarda el puntero de impresión.
+
+    ld a,(Velocidad)                                    ; Byte bajo de Control guarda la velocidad de la entidad/disparo.
+    ld (hl),a
+
     inc hl
 
-    di
-    jr $
-    ei
+;! Ajusta el grado de inclinación del disparo.
 
-; 
+    ld (hl),7
+
+; Determina tendencia del disparo.
+
+    ld a,(CX_Amadeus)
+    ld b,a
+    ld a,(Coordenada_X)
+    sub b
+    jr c,Disparo_a_derecha
+
+Disparo_a_izquierda cp 4
+
+    ret c
+    ret z
+
+    set 7,(hl)
+    ret
+
+Disparo_a_derecha ld b,a
+    ld a,$ff
+    sub b
+
+    cp 4    
+
+    ret c
+    ret z
+
+    set 6,(hl)
+    ret
+
+;   --- --- ---
+
 Situa_en_siguiente_disparo 
 
-    di
-    jr $
-    ei
-
     inc de
     inc de
-
-    ld hl,Disparo_1
-    ld a,l
-    sub e
-    ret z                                               ; 
 
     ex de,hl
     jr 1B

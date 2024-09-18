@@ -382,7 +382,7 @@ Nivel_scan_disparos_album_de_pintado defw 0
 Num_de_bytes_album_de_disparos db 0
 Num_de_bytes_album_de_disparos_2 db 0
 
-Numero_de_disparos_de_entidades db 0
+Numero_de_disparos_de_entidades db 7
 
 Permiso_de_disparo_Amadeus db 1							; A "1", se puede generar disparo.
 Permiso_de_disparo_Entidades db 0						; A "1", se puede generar disparo.
