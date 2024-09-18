@@ -432,6 +432,12 @@ Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una únic
 
 Ctrl_5 db 0												;	BIT 0, "1" Indica que se ha eliminado un disparo. (Esta información es necesaria para borrar un único disparo de la pantalla).	
 ;															BIT 1, "1" Indica que la entidad en curso es la alcanzada por nuestro disparo. La comparativa entre coordenadas ha sido satisfactoria. 
+;                                                           BIT 2, "1" DEBUG !! Indica que se ha generado un disparo de entidad.														
+
+
+
+
+
 ; Gestión de Disparos.
 
 Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
@@ -757,10 +763,6 @@ Gestiona_siguiente_entidad
 	djnz 2B
 
 ; Hemos gestionado todas las entidades. 
-
-	xor a
-	ld (Permiso_de_disparo_Entidades),a							; Volvemos a deshabilitar el permiso de disparo para las entidades hasta que (CLOCK_disparo_entidad) llegue a "0".
-
 ; ----- ----- -----
 
 	call Inicializa_India_y_limpia_Tabla_de_impresion 			; Inicializa el puntero (India_SP) y sanea la (Tabla_para_ordenar_entidades_antes_de_pintar).
@@ -783,8 +785,11 @@ Gestiona_siguiente_entidad
 	ex de,hl
 	ld (hl),c
 	inc l
-	ld (hl),b																; Nuevo techo, mayor que el anterior.
+	ld (hl),b													; Nuevo techo, mayor que el anterior.
 
+	xor a
+	ld (Permiso_de_disparo_Entidades),a							; Volvemos a deshabilitar el permiso de disparo para las entidades hasta que (CLOCK_disparo_entidad) llegue a "0".
+	call Genera_datos_de_impresion_disparos_Entidades
 
 ;! GESTIONA AMADEUS !!!!!!!!!!
 

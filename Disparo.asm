@@ -3,6 +3,87 @@
 ;   18/09/24
 ;
 
+Genera_datos_de_impresion_disparos_Entidades
+
+;*  Exclusiones.
+
+    ld a,(Numero_de_disparos_de_entidades)
+    cp 7
+    ret z                                                     ;? Salimos si no hay generado ningún disparo de entidad.
+
+    di
+    jr $
+    ei
+;! ---------------
+
+;   En 1er lugar nos situamos en la 1ª caja de disparos de entidades.
+
+    ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
+    call Extrae_address
+ 
+    inc hl
+    ld a,(hl)
+    and a
+
+    jr z,Situa_en_siguiente_caja                              ;? Avanza a la siguiente caja si esta está vacía. 
+   
+    dec hl
+
+    ld (Stack),sp
+    ld sp,hl                                                  ;? SP se sitúa en el .db (Puntero objeto) de la caja de disparos de Amadeus.
+
+Genera_scanlines_de_los_disparos_de_entidades.
+
+    pop de
+    pop hl                                                    ;? Puntero_objeto del disparo en DE.
+;                                                             ;? Puntero_de_impresión del disparo en HL.
+    ld sp,(Nivel_scan_disparos_album_de_pintado)
+
+    pop bc
+    pop bc
+    pop bc
+
+    ld (Nivel_scan_disparos_album_de_pintado),sp              ;? Nuevo nivel del album de disparos.
+
+    push hl                                                   ;? Sube 2º scanline al álbum.
+    call NextScan
+    push hl                                                   ;? Sube 1er scanline al álbum.
+    push de                                                   ;? Sube Puntero_objeto del disparo al álbum.
+
+Salida_01
+
+    ld sp,(Stack)
+    ret
+
+
+
+
+Situa_en_siguiente_caja
+
+    di
+    jr $
+    ei
+
+    inc de
+    inc de
+
+    ex de,hl
+    jr 1B
+
+
+
+
+
+
+
+
+
+
+; --------------------------------------------------------------------------------------
+;
+;   18/09/24
+;
+
 Genera_disparo_de_entidad_maldosa
 
 ;   Estructura de un disparo de entidades.
@@ -16,10 +97,10 @@ Genera_disparo_de_entidad_maldosa
 
 ;   El byte alto muestra la siguiente información:
 ;
-;   Bits (0) y (1) ..... Siempre estarán activos. Indica el nº de desplazamientos hacia abajo del_
-;                        _disparo antes de desplazarse a derecha/izquierda.
+;   Nibble bajo    ..... Inicialmente contiene "7d". Utilizaremos estos bits para desplazar X nº de veces el disparo hacia abajo_
+;                        _antes de desplazarse a derecha/izquierda.
 ;
-;   Bits (2) y (3) ..... Indican si el disparo va hacia la derecha o hacia la izquierda.
+;   Nibble alto    ..... Bits (2) y (3) ..... Indican si el disparo va hacia la derecha o hacia la izquierda.
 ;
 ;                        10xx ..... Izquierda.
 ;                        01xx ..... Derecha.
@@ -28,6 +109,7 @@ Genera_disparo_de_entidad_maldosa
 ;*  Exclusiones.
 
 ;   La entidad no podrá disparar mientras se encuentre en las filas: 0,1,14,15,16.
+;   La entidad no podrá disparar si hay 7 disparos en pantalla.
 
     ld a,(Numero_de_disparos_de_entidades)
     and a
@@ -40,7 +122,7 @@ Genera_disparo_de_entidad_maldosa
     dec a
     ret z
 
-    cp 13
+    cp 14
     ret nc
 
 ;   En este punto el registro B siempre está a "0" y HL apunta al `nuevo´ ( Puntero de impresión) de la entidad.
