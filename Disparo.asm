@@ -1,3 +1,74 @@
+Motor_de_disparos_entidades
+
+ ld a,(Numero_de_disparos_de_entidades)
+    cp 7
+    ret z
+
+    ld b,7                                                               ; Contador de disparos.
+    ld hl,Indice_de_disparos_entidades
+
+1 call Extrae_address 
+    inc de
+    inc de
+    ld (Puntero_rancio_disparos_album),de
+
+    inc hl
+
+    inc (hl)                                                             ; Dispone de Puntero_objeto ???
+    dec (hl)
+    jr z,3F
+
+    inc hl
+
+;;;Mueve_disparo_Entidad
+
+;    ld a,(Ctrl_5)
+;    bit 2,a
+;    di
+;    jr nz,$
+;    ei
+
+    call Extrae_address    
+    call NextScan
+    call NextScan 
+;    call NextScan 
+;    call NextScan 
+
+; Después de mover el disparo comprobamos si ha salido por la parte baja de la pantalla.
+
+    push de
+
+    push hl
+    pop de
+
+    and a
+    ld hl,$57ff
+    sbc hl,de
+
+    di
+    jr c,$
+    ei
+
+    ex de,hl
+    pop de
+
+;    jr c,Elimina_disparo
+
+    ex de,hl
+
+    ld (hl),e
+    inc hl
+    ld (hl),d
+
+    ret
+
+
+3 ex de,hl
+    djnz 1B
+
+    ret
+
+
 ; --------------------------------------------------------------------------------------
 ;
 ;   19/09/24
@@ -13,13 +84,10 @@ Genera_datos_de_impresion_disparos_Entidades
 
 ; ---------------
 
-    ld hl,Ctrl_5
-    set 2,(hl)
-
 ;   En 1er lugar nos situamos en la 1ª caja de disparos de entidades.
 
     ld a,7
-    ex af,af                                                   ;? 7 Cajas como 7 soles. Contador de cajas alojado en A´.
+    ex af,af                                                  ;? 7 Cajas como 7 soles. Contador de cajas alojado en A´.
 
     ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
 1 call Extrae_address
@@ -38,7 +106,7 @@ Genera_datos_de_impresion_disparos_Entidades
 Genera_scanlines_de_los_disparos_de_entidades.
 
     pop bc
-    pop hl                                                    ;? Puntero_objeto del disparo en DE.
+    pop hl                                                    ;? Puntero_objeto del disparo en BC.
 ;                                                             ;? Puntero_de_impresión del disparo en HL.
     ld sp,(Nivel_scan_disparos_album_de_pintado)
 
@@ -55,11 +123,9 @@ Genera_scanlines_de_los_disparos_de_entidades.
 
 Situa_en_siguiente_caja
 
-    ld sp,(Stack)
-
     ex af,af                                                  ;? Actualiza contador de cajas y RET si "Z".
     dec a
-    ret z
+    jr z,2F
     ex af,af
 
     inc de
@@ -67,6 +133,10 @@ Situa_en_siguiente_caja
 
     ex de,hl
     jr 1B
+
+2 ld sp,(Stack)
+
+    ret
 
 ; --------------------------------------------------------------------------------------
 ;
@@ -118,12 +188,11 @@ Genera_disparo_de_entidad_maldosa
 ;   (Puntero_objeto) del disparo inicial siempre será el mismo en cualquier caso, ( para que quede centrado ) en cualquier_
 ;   _ posición de cualquier entidad, (como ocurre con el puntero de impresión de las explosiones de entidades).
 ;
-
     ld iy,Disparo_entidad
 
-    ld a,l
-    add $40
-    ld l,a
+    ld b,17
+3 call NextScan
+    djnz 3B
 
     ld c,l
     ld b,h
@@ -371,7 +440,7 @@ Limpia_album_de_pintado_disparos
 ;   27/08/24
 ;
 
-Motor_Disparos
+Motor_Disparos_Amadeus
 
 ;   Averiguamos si la 1ª caja contiene disparo, para ello nos situamos en el byte alto del (Puntero_de_impresion).
 
@@ -380,35 +449,12 @@ Motor_Disparos
     inc (hl)
     dec (hl)
     
-    jr z,2F
+    ret z
 
 ;   Esta caja contiene un disparo.
 
     call Consulta_Impacto
     call z,Mueve_disparo_Amadeus
-
-; Disparos de entidades.
-
-2 ld a,(Numero_de_disparos_de_entidades)
-    and a
-    ret z
-
-    ld b,7                                                               ; Contador de disparos.
-    ld hl,Indice_de_disparos_entidades
-
-4 call Extrae_address 
-    inc de
-    inc de
-    ld (Puntero_rancio_disparos_album),de
-
-    inc hl
-
-    inc (hl)                                                             ; Dispone de Puntero_objeto ???
-    dec (hl)
-    jr z,3F
-
-3 ex de,hl
-    djnz 4B
 
     ret
 
@@ -515,10 +561,6 @@ Elimina_disparo
 ;
 
 Pinta_disparos 
-
-    ld a,(Ctrl_5)
-    bit 2,a
-    jr nz,$
 
     ld (Stack),sp
     ld b,2

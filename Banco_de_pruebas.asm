@@ -637,7 +637,8 @@ Main
 
 	call Limpia_album_de_borrado_disparos
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
-	call Motor_Disparos
+	call Motor_Disparos_Amadeus
+	call Motor_de_disparos_entidades
 
 ; En el FRAME que acabamos de pintar puede existir una posible colisión entre alguna entidad y Amadeus. 
 ; Si alguna de las coordenadas_X de alguna entidad que esté en zona de Amadeus coincide con alguna de las coordenadas_X de Amadeus, habrá que comprobar si existe colisión.
@@ -787,14 +788,14 @@ Gestiona_siguiente_entidad
 	inc l
 	ld (hl),b													; Nuevo techo, mayor que el anterior.
 
-	xor a
-	ld (Permiso_de_disparo_Entidades),a							; Volvemos a deshabilitar el permiso de disparo para las entidades hasta que (CLOCK_disparo_entidad) llegue a "0".
-	call Genera_datos_de_impresion_disparos_Entidades
-
 ;! GESTIONA AMADEUS !!!!!!!!!!
 
 Gestion_de_Amadeus
  
+	xor a
+	ld (Permiso_de_disparo_Entidades),a							; Volvemos a deshabilitar el permiso de disparo para las entidades hasta que (CLOCK_disparo_entidad) llegue a "0".
+	call Genera_datos_de_impresion_disparos_Entidades
+
 	ld hl,Ctrl_3
 	bit 6,(hl)
 	jr z,Amadeus_vivo
@@ -2043,7 +2044,7 @@ Teclado
 
 	call z,Genera_disparo_Amadeus
 
-	ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
+1 ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
 	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
 	and $01													; Detecta cuando la tecla (1) está actuada. "1" no pulsada "0" pulsada. Cuando la operación AND $01 resulta "0"  llama a la rutina "Mov_izq".
     call z,Amadeus_a_izquierda							
