@@ -8,6 +8,8 @@
 
 ; Disparo.
 
+Disparo_entidad DEFB $00,$18
+
 Indice_disparo_Amadeus defw Disparo_0
 	defw Disparo_f9
 	defw Disparo_fb

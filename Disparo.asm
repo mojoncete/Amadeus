@@ -1,6 +1,6 @@
 ; --------------------------------------------------------------------------------------
 ;
-;   18/09/24
+;   19/09/24
 ;
 
 Genera_datos_de_impresion_disparos_Entidades
@@ -11,15 +11,18 @@ Genera_datos_de_impresion_disparos_Entidades
     cp 7
     ret z                                                     ;? Salimos si no hay generado ningún disparo de entidad.
 
-    di
-    jr $
-    ei
-;! ---------------
+; ---------------
+
+    ld hl,Ctrl_5
+    set 2,(hl)
 
 ;   En 1er lugar nos situamos en la 1ª caja de disparos de entidades.
 
+    ld a,7
+    ex af,af                                                   ;? 7 Cajas como 7 soles. Contador de cajas alojado en A´.
+
     ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
-    call Extrae_address
+1 call Extrae_address
  
     inc hl
     ld a,(hl)
@@ -52,24 +55,18 @@ Genera_scanlines_de_los_disparos_de_entidades.
 
 Situa_en_siguiente_caja
 
-    di
-    jr $
-    ei
+    ld sp,(Stack)
+
+    ex af,af                                                  ;? Actualiza contador de cajas y RET si "Z".
+    dec a
+    ret z
+    ex af,af
 
     inc de
     inc de
 
     ex de,hl
     jr 1B
-
-
-
-
-
-
-
-
-
 
 ; --------------------------------------------------------------------------------------
 ;
@@ -121,7 +118,8 @@ Genera_disparo_de_entidad_maldosa
 ;   (Puntero_objeto) del disparo inicial siempre será el mismo en cualquier caso, ( para que quede centrado ) en cualquier_
 ;   _ posición de cualquier entidad, (como ocurre con el puntero de impresión de las explosiones de entidades).
 ;
-;   (Puntero_objeto) = "$00,$18"
+
+    ld iy,Disparo_entidad
 
     ld a,l
     add $40
@@ -132,6 +130,9 @@ Genera_disparo_de_entidad_maldosa
 
 ;   Decrementa el numero de disparos de entidades.   
 
+    ld hl,Ctrl_5
+    set 2,(hl)
+
     ld hl,Numero_de_disparos_de_entidades
     dec (hl)
 
@@ -139,7 +140,7 @@ Genera_disparo_de_entidad_maldosa
 
     ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
 1 call Extrae_address
-
+    
 ;   Comprobamos si la caja está vacía.
 
     inc hl
@@ -152,9 +153,11 @@ Genera_disparo_de_entidad_maldosa
 
     dec hl
 
-    ld (hl),$00
+    ld a,iyl
+    ld (hl),a
     inc hl
-    ld (hl),$18
+    ld a,iyh
+    ld (hl),a
     inc hl                                              ; Guarda el puntero objeto del disparo en la caja.
 
     ld (hl),c
@@ -512,6 +515,10 @@ Elimina_disparo
 ;
 
 Pinta_disparos 
+
+    ld a,(Ctrl_5)
+    bit 2,a
+    jr nz,$
 
     ld (Stack),sp
     ld b,2
