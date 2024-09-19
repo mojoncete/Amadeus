@@ -648,9 +648,9 @@ Main
 
 ; TEMPORIZACIONES !!!!!!!!!!!!!!!!
 
-	ld hl,CLOCK_disparo_entidad
-	dec (hl)
-	call z,Autoriza_disparo_de_entidades
+;	ld hl,CLOCK_disparo_entidad
+;	dec (hl)
+;	call z,Autoriza_disparo_de_entidades
 
 	ld hl,(Clock_next_entity)
 	ld bc,(FRAMES)
