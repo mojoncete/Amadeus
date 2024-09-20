@@ -1,16 +1,16 @@
 Motor_de_disparos_entidades
 
- ld a,(Numero_de_disparos_de_entidades)
+    ld a,(Numero_de_disparos_de_entidades)
     cp 7
-    ret z
+    ret z                                                                ; Salimos si todas las cajas están vacías.
 
-    ld b,7                                                               ; Contador de disparos.
+    ld b,7                                                               ; Contador de disparos, (cajas de disparos).
     ld hl,Indice_de_disparos_entidades
 
 1 call Extrae_address 
     inc de
     inc de
-    ld (Puntero_rancio_disparos_album),de
+    ld (Puntero_DESPLZ_DISPARO_ENTIDADES),de
 
     inc hl
 

@@ -1,6 +1,6 @@
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
-;	11/03/24
+;	20/09/24
 ;
 ;   (Scanlines_album_SP) se sitúa inicialmente al comienzo de Scanlines_album.
 ;   DE contiene Puntero_objeto.
@@ -207,6 +207,12 @@ Genera_scanlines_rapidos ; -----------------------------------------------------
     call NextScan
     ex de,hl
 
+;   Vamos a guardar esta dirección de VRAM por si hay que generar un disparo, así no habra que hacer_
+;   _ 16 o 17 llamadas a Nextscan. Una entidad con "permiso de disparo" siempre utiliza esta rutina para_
+;   _ generar sus scanlines.
+
+;    ld (Puntero_de_impresion_disparo),de
+
     ld (hl),e
     inc hl
     ld (hl),d
@@ -215,6 +221,15 @@ Genera_scanlines_rapidos ; -----------------------------------------------------
 ; Todos los scanlines generados. actualizamos el puntero (Scanlines_album_SP).
 
     ld (Scanlines_album_SP),hl
+
+    ex de,hl
+
+; El disparo aparecerá dos líneas por debajo de la entidad.
+
+    call NextScan
+    call NextScan
+
+    ld (Puntero_de_impresion_disparo_de_entidad),hl
 
 ; Completamos la casilla pendiente, (define el nº total de scanlines). 
 

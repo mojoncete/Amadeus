@@ -387,8 +387,6 @@ Numero_de_disparos_de_entidades db 7
 Permiso_de_disparo_Amadeus db 1							; A "1", se puede generar disparo.
 Permiso_de_disparo_Entidades db 0						; A "1", se puede generar disparo.
 
-Puntero_rancio_disparos_album defw 0
-
 Techo_Scanlines_album defw 0
 Techo_Scanlines_album_2 defw 0
 Switch db 0
@@ -441,7 +439,7 @@ Ctrl_5 db 0												;	BIT 0, "1" Indica que se ha eliminado un disparo. (Esta
 ; Gestión de Disparos.
 
 Puntero_DESPLZ_DISPARO_ENTIDADES defw 0
-
+Puntero_de_impresion_disparo_de_entidad defw 0			; Guardaremos aquí la dirección de pantalla del último scanline de la entidad en curso.
 Impacto2 db 0											; Byte de control de impactos.
 
 ;
@@ -631,13 +629,13 @@ START
 
 Main 
 ;
-; 22/08/24
+; 20/09/24
 
 ; Gestión de disparos.
 
 	call Limpia_album_de_borrado_disparos
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
-	call Motor_Disparos_Amadeus
+	call Motor_Disparos_Amadeus							; Mueve y detecta colisión de los disparos de Amadeus.
 	call Motor_de_disparos_entidades
 
 ; En el FRAME que acabamos de pintar puede existir una posible colisión entre alguna entidad y Amadeus. 
@@ -792,10 +790,6 @@ Gestiona_siguiente_entidad
 
 Gestion_de_Amadeus
  
-	xor a
-	ld (Permiso_de_disparo_Entidades),a							; Volvemos a deshabilitar el permiso de disparo para las entidades hasta que (CLOCK_disparo_entidad) llegue a "0".
-	call Genera_datos_de_impresion_disparos_Entidades
-
 	ld hl,Ctrl_3
 	bit 6,(hl)
 	jr z,Amadeus_vivo
@@ -844,6 +838,12 @@ Amadeus_vivo
 	call Genera_datos_de_impresion_Amadeus				; Genera los datos de impresión de la nave.
 
 End_frame 
+
+; 20/09/24. Deshabilitamos el permiso de disparo de entidades y generamos los scanlines de los disparos de entidades.
+
+	xor a
+	ld (Permiso_de_disparo_Entidades),a							
+	call Genera_datos_de_impresion_disparos_Entidades	; Volvemos a deshabilitar el permiso de disparo para las entidades hasta que (CLOCK_disparo_entidad) llegue a "0".
 
 ; 23/08/24 Llegados a este punto: NO HAY POSIBILIDAD DE GENERAR MÁS DISPAROS.
 ; Generamos los datos de impresión en el álbum_de_pintado y limpiamos el sobrante de datos del anterior FRAME si toca.
