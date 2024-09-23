@@ -480,8 +480,8 @@ DB_RND_disparos db 0
 Clock_next_entity defw 0								; Transcurrido este tiempo aparece una nueva entidad.
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
-CLOCK_disparo_entidad_MASTER db $90						; Reloj, decreciente.
-CLOCK_disparo_entidad db $90
+CLOCK_disparo_entidad_MASTER db $30						; Reloj, decreciente.
+CLOCK_disparo_entidad db $30
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -635,8 +635,10 @@ Main
 
 	call Limpia_album_de_borrado_disparos
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
-	call Motor_Disparos_Amadeus							; Mueve y detecta colisión de los disparos de Amadeus.
 	call Motor_de_disparos_entidades
+	call Motor_Disparos_Amadeus							; Mueve y detecta colisión de los disparos de Amadeus.
+
+;	call Inicia_Puntero_Disparo_Entidades
 
 ; En el FRAME que acabamos de pintar puede existir una posible colisión entre alguna entidad y Amadeus. 
 ; Si alguna de las coordenadas_X de alguna entidad que esté en zona de Amadeus coincide con alguna de las coordenadas_X de Amadeus, habrá que comprobar si existe colisión.
@@ -646,9 +648,9 @@ Main
 
 ; TEMPORIZACIONES !!!!!!!!!!!!!!!!
 
-;	ld hl,CLOCK_disparo_entidad
-;	dec (hl)
-;	call z,Autoriza_disparo_de_entidades
+	ld hl,CLOCK_disparo_entidad
+	dec (hl)
+	call z,Autoriza_disparo_de_entidades
 
 	ld hl,(Clock_next_entity)
 	ld bc,(FRAMES)

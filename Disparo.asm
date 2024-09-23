@@ -1,5 +1,11 @@
 Motor_de_disparos_entidades
 
+;    ld a,(Ctrl_5)
+;    bit 2,a
+;    di
+;    jr nz,$
+;    ei
+
     ld a,(Numero_de_disparos_de_entidades)
     cp 7
     ret z                                                                ; Salimos si todas las cajas están vacías.
@@ -29,30 +35,16 @@ Motor_de_disparos_entidades
 ;    ei
 
     call Extrae_address    
-    call NextScan
+;    call NextScan
+;    call NextScan 
+;    call NextScan 
     call NextScan 
-;    call NextScan 
-;    call NextScan 
 
 ; Después de mover el disparo comprobamos si ha salido por la parte baja de la pantalla.
 
-    push de
-
-    push hl
-    pop de
-
-    and a
-    ld hl,$57ff
-    sbc hl,de
-
-    di
-    jr c,$
-    ei
-
-    ex de,hl
-    pop de
-
-;    jr c,Elimina_disparo
+;    di
+;    jr $
+;    ei
 
     ex de,hl
 
@@ -60,11 +52,15 @@ Motor_de_disparos_entidades
     inc hl
     ld (hl),d
 
+    ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
+    jr 2F
+
     ret
 
-
 3 ex de,hl
-    djnz 1B
+2 djnz 1B
+
+	call Inicia_Puntero_Disparo_Entidades
 
     ret
 
@@ -80,11 +76,15 @@ Genera_datos_de_impresion_disparos_Entidades
 
     ld a,(Numero_de_disparos_de_entidades)
     cp 7
-    ret z                                                     ;? Salimos si no hay generado ningún disparo de entidad.
+    ret z                                                    
 
 ; ---------------
 
 ;   En 1er lugar nos situamos en la 1ª caja de disparos de entidades.
+
+;    di
+;    jr $
+;    ei
 
     ld a,7
     ex af,af                                                  ;? 7 Cajas como 7 soles. Contador de cajas alojado en A´.
@@ -135,7 +135,7 @@ Situa_en_siguiente_caja
     jr 1B
 
 2 ld sp,(Stack)
-
+    call Inicia_Puntero_Disparo_Entidades
     ret
 
 ; --------------------------------------------------------------------------------------
@@ -188,28 +188,35 @@ Genera_disparo_de_entidad_maldosa
 ;   (Puntero_objeto) del disparo inicial siempre será el mismo en cualquier caso, ( para que quede centrado ) en cualquier_
 ;   _ posición de cualquier entidad, (como ocurre con el puntero de impresión de las explosiones de entidades).
 ;
-    ld iy,Disparo_entidad
 
-    ld b,17
-3 call NextScan
-    djnz 3B
+    ld iy,Disparo_de_entidad
 
-    ld c,l
-    ld b,h
-
-;   Decrementa el numero de disparos de entidades.   
+;    di
+;    jr $
+;    ei
 
     ld hl,Ctrl_5
     set 2,(hl)
 
+;   Decrementa el numero de disparos de entidades.   
+
+;    ld hl,Ctrl_5
+;    set 2,(hl)
+
     ld hl,Numero_de_disparos_de_entidades
     dec (hl)
 
-;   Puntero de impresión del disparo en BC , (1 scanline libre entre la entidad y el disparo).
+;   Puntero de impresión del disparo en BC. 
 
-    ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
-1 call Extrae_address
-    
+    ld hl,Puntero_de_impresion_disparo_de_entidad
+    ld c,(hl)
+    inc hl
+    ld b,(hl)                                           
+
+
+1 ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
+    call Extrae_address
+ 
 ;   Comprobamos si la caja está vacía.
 
     inc hl
@@ -223,25 +230,27 @@ Genera_disparo_de_entidad_maldosa
     dec hl
 
     ld a,iyl
-    ld (hl),a
+    ld (hl),a                                         
     inc hl
     ld a,iyh
-    ld (hl),a
-    inc hl                                              ; Guarda el puntero objeto del disparo en la caja.
+    ld (hl),a                                           ; Guarda el (puntero objeto) del disparo en la caja.
+
+    inc hl
 
     ld (hl),c
     inc hl
-    ld (hl),b
-    inc hl                                              ; Guarda el puntero de impresión.
+    ld (hl),b                                           ; Guarda el puntero de impresión.
 
-    ld a,(Velocidad)                                    ; Byte bajo de Control guarda la velocidad de la entidad/disparo.
+    inc hl                                              
+
+    ld a,(Velocidad)                                    ; Guarda la velocidad de la entidad/disparo.
     ld (hl),a
 
     inc hl
 
 ;! Ajusta el grado de inclinación del disparo.
 
-    ld (hl),7
+    ld (hl),7                                           ; Guarda Byte de Control.
 
 ; Determina tendencia del disparo.
 
@@ -253,11 +262,11 @@ Genera_disparo_de_entidad_maldosa
 
 Disparo_a_izquierda cp 4
 
-    ret c
-    ret z
+    jr c,Salida_02
+    jr z,Salida_02
 
     set 7,(hl)
-    ret
+    jr Salida_02
 
 Disparo_a_derecha ld b,a
     ld a,$ff
@@ -265,11 +274,11 @@ Disparo_a_derecha ld b,a
 
     cp 4    
 
-    ret c
-    ret z
+    jr c,Salida_02
+    jr z,Salida_02
 
     set 6,(hl)
-    ret
+    jr Salida_02
 
 ;   --- --- ---
 
@@ -278,9 +287,14 @@ Situa_en_siguiente_disparo
     inc de
     inc de
 
-    ex de,hl
+    ld (Puntero_DESPLZ_DISPARO_ENTIDADES),de
     jr 1B
 
+Salida_02
+
+	call Inicia_Puntero_Disparo_Entidades
+    ret
+    
 ; --------------------------------------------------------------------------------------
 ;
 ;   31/08/24
@@ -561,6 +575,10 @@ Elimina_disparo
 ;
 
 Pinta_disparos 
+
+;    ld a,(Ctrl_5)
+;    bit 2,a
+;    jr nz,$
 
     ld (Stack),sp
     ld b,2
