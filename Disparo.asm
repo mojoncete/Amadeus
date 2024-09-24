@@ -1,11 +1,5 @@
 Motor_de_disparos_entidades
 
-;    ld a,(Ctrl_5)
-;    bit 2,a
-;    di
-;    jr nz,$
-;    ei
-
     ld a,(Numero_de_disparos_de_entidades)
     cp 7
     ret z                                                                ; Salimos si todas las cajas están vacías.
@@ -26,15 +20,12 @@ Motor_de_disparos_entidades
 
     inc hl
 
-;;;Mueve_disparo_Entidad
-
-;    ld a,(Ctrl_5)
-;    bit 2,a
-;    di
-;    jr nz,$
-;    ei
-
     call Extrae_address    
+;   (Puntero_de_impresion) del disparo en HL.
+
+
+;! Velocidad del disparo de entidades.
+
 ;    call NextScan
 ;    call NextScan 
 ;    call NextScan 
@@ -42,15 +33,11 @@ Motor_de_disparos_entidades
 
 ; Después de mover el disparo comprobamos si ha salido por la parte baja de la pantalla.
 
-;    di
-;    jr $
-;    ei
-
     ex de,hl
 
     ld (hl),e
     inc hl
-    ld (hl),d
+    ld (hl),d                                                            ; Nuevo (Puntero_de_impresion) en su correspondiente caja.
 
     ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
     jr 2F
@@ -59,8 +46,6 @@ Motor_de_disparos_entidades
 
 3 ex de,hl
 2 djnz 1B
-
-	call Inicia_Puntero_Disparo_Entidades
 
     ret
 
@@ -82,14 +67,11 @@ Genera_datos_de_impresion_disparos_Entidades
 
 ;   En 1er lugar nos situamos en la 1ª caja de disparos de entidades.
 
-;    di
-;    jr $
-;    ei
+    call Inicia_Puntero_Disparo_Entidades
 
     ld a,7
     ex af,af                                                  ;? 7 Cajas como 7 soles. Contador de cajas alojado en A´.
 
-    ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
 1 call Extrae_address
  
     inc hl
@@ -132,10 +114,11 @@ Situa_en_siguiente_caja
     inc de
 
     ex de,hl
+
+    ld sp,(Stack)
     jr 1B
 
 2 ld sp,(Stack)
-    call Inicia_Puntero_Disparo_Entidades
     ret
 
 ; --------------------------------------------------------------------------------------
@@ -191,17 +174,9 @@ Genera_disparo_de_entidad_maldosa
 
     ld iy,Disparo_de_entidad
 
-;    di
-;    jr $
-;    ei
-
-    ld hl,Ctrl_5
-    set 2,(hl)
+;! Debuggg
 
 ;   Decrementa el numero de disparos de entidades.   
-
-;    ld hl,Ctrl_5
-;    set 2,(hl)
 
     ld hl,Numero_de_disparos_de_entidades
     dec (hl)
@@ -213,8 +188,9 @@ Genera_disparo_de_entidad_maldosa
     inc hl
     ld b,(hl)                                           
 
+    call Inicia_Puntero_Disparo_Entidades
 
-1 ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
+1 ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)              ; En la 1ª caja del índice.
     call Extrae_address
  
 ;   Comprobamos si la caja está vacía.
@@ -262,11 +238,11 @@ Genera_disparo_de_entidad_maldosa
 
 Disparo_a_izquierda cp 4
 
-    jr c,Salida_02
-    jr z,Salida_02
+    ret c
+    ret z
 
     set 7,(hl)
-    jr Salida_02
+    ret
 
 Disparo_a_derecha ld b,a
     ld a,$ff
@@ -274,11 +250,11 @@ Disparo_a_derecha ld b,a
 
     cp 4    
 
-    jr c,Salida_02
-    jr z,Salida_02
+    ret c
+    ret z
 
     set 6,(hl)
-    jr Salida_02
+    ret
 
 ;   --- --- ---
 
@@ -290,11 +266,6 @@ Situa_en_siguiente_disparo
     ld (Puntero_DESPLZ_DISPARO_ENTIDADES),de
     jr 1B
 
-Salida_02
-
-	call Inicia_Puntero_Disparo_Entidades
-    ret
-    
 ; --------------------------------------------------------------------------------------
 ;
 ;   31/08/24
@@ -677,6 +648,7 @@ Genera_scanlines_de_disparo_Amadeus
 Salida 
 
     ld sp,(Stack)
+
     ret
 
 ; --------------------------------------------------------------------------------------
