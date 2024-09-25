@@ -27,11 +27,14 @@ Motor_de_disparos_entidades
 ;! Velocidad del disparo de entidades.
 
 ;    call NextScan
+;    call NextScan
 ;    call NextScan 
-;    call NextScan 
+    call NextScan 
     call NextScan 
 
 ; Después de mover el disparo comprobamos si ha salido por la parte baja de la pantalla.
+
+    call Fin_de_disparo_de_entidad
 
     ex de,hl
 
@@ -49,7 +52,66 @@ Motor_de_disparos_entidades
 
     ret
 
+; ------------- ------------- ------------
+;
+;   25/9/24
 
+Fin_de_disparo_de_entidad
+
+    ld a,h
+    cp $54
+    ret c
+
+    push de                                                              ; DE se encuentra en el .db (Puntero_de_impresion) de la caja del disparo que estamos moviendo.
+
+    ld e,l
+    ld d,h
+
+    ld hl,$57e0
+    sbc hl,de
+
+    jr c,Elimina_disparo_entidad                      
+
+    ld l,e
+    ld h,d
+
+    pop de
+
+    ret
+
+; ------------ ----------- ------------
+;
+;   25/9/24
+
+Elimina_disparo_entidad
+
+    ld hl,Numero_de_disparos_de_entidades
+    inc (hl)                                                            ; Incrementamos el nº de disparos de entidades.
+
+    pop hl
+    push hl
+
+    dec hl
+    dec hl                                                              ; Sitúa en el 1er .db de la caja.
+
+    ld d,6                                                              ; Contador
+    xor a                                                               ; Borrador
+
+1 ld (hl),a
+    dec d
+    inc hl
+    jr nz,1B
+
+    pop de
+
+; Debugggggg    
+    ld hl,Ctrl_5
+    set 2,(hl)
+; ----------
+
+    ld hl,0
+
+    ret 
 ; --------------------------------------------------------------------------------------
 ;
 ;   19/09/24

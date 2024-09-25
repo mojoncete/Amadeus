@@ -634,13 +634,16 @@ Main
 
 ; Gestión de disparos.
 
+	ld a,(Ctrl_5)
+	bit 2,a
+	di
+	jr nz,$
+	ei
+
 	call Limpia_album_de_borrado_disparos
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
 	call Motor_de_disparos_entidades
 	call Motor_Disparos_Amadeus							; Mueve y detecta colisión de los disparos de Amadeus.
-
-
-;	call Inicia_Puntero_Disparo_Entidades
 
 ; En el FRAME que acabamos de pintar puede existir una posible colisión entre alguna entidad y Amadeus. 
 ; Si alguna de las coordenadas_X de alguna entidad que esté en zona de Amadeus coincide con alguna de las coordenadas_X de Amadeus, habrá que comprobar si existe colisión.
