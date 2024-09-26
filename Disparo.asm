@@ -29,7 +29,7 @@ Motor_de_disparos_entidades
 ;    call NextScan
 ;    call NextScan
 ;    call NextScan 
-    call NextScan 
+;    call NextScan 
     call NextScan 
 
 ; Después de mover el disparo comprobamos si ha salido por la parte baja de la pantalla.
@@ -104,10 +104,8 @@ Elimina_disparo_entidad
 
     pop de
 
-; Debugggggg    
-    ld hl,Ctrl_5
+    ld hl,Ctrl_5                                                        ; Indica que desaparece un disparo de entidad.
     set 2,(hl)
-; ----------
 
     ld hl,0
 
@@ -122,17 +120,25 @@ Genera_datos_de_impresion_disparos_Entidades
 ;*  Exclusiones.
 
     ld a,(Numero_de_disparos_de_entidades)
-    cp 7
+    ld b,a
+    ld a,7
+    sub b
     ret z                                                    
+
+    inc a
+    ex af,af
 
 ; ---------------
 
 ;   En 1er lugar nos situamos en la 1ª caja de disparos de entidades.
 
-    call Inicia_Puntero_Disparo_Entidades
+;	ld a,(Ctrl_5)
+;	bit 2,a
+;	di
+;	jr nz,$
+;	ei
 
-    ld a,7
-    ex af,af                                                  ;? 7 Cajas como 7 soles. Contador de cajas alojado en A´.
+    call Inicia_Puntero_Disparo_Entidades
 
 1 call Extrae_address
  
@@ -165,11 +171,13 @@ Genera_scanlines_de_los_disparos_de_entidades.
     push hl                                                   ;? Sube 1er scanline al álbum.
     push bc                                                   ;? Sube Puntero_objeto del disparo al álbum.
 
+    ld sp,(Stack)
+
 Situa_en_siguiente_caja
 
     ex af,af                                                  ;? Actualiza contador de cajas y RET si "Z".
     dec a
-    jr z,2F
+    ret z
     ex af,af
 
     inc de
@@ -177,11 +185,7 @@ Situa_en_siguiente_caja
 
     ex de,hl
 
-    ld sp,(Stack)
     jr 1B
-
-2 ld sp,(Stack)
-    ret
 
 ; --------------------------------------------------------------------------------------
 ;
@@ -410,7 +414,12 @@ Activa_Impacto_en_entidad
 Limpia_album_de_borrado_disparos
 
     ld hl,Ctrl_5
-    bit 0,(hl)
+    bit 2,(hl)
+    jr z,1F
+    res 2,(hl)
+    jr Limpiando
+
+1 bit 0,(hl)
     ret z
     res 0,(hl)
 

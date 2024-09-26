@@ -431,7 +431,7 @@ Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una únic
 
 Ctrl_5 db 0												;	BIT 0, "1" Indica que se ha eliminado un disparo. (Esta información es necesaria para borrar un único disparo de la pantalla).	
 ;															BIT 1, "1" Indica que la entidad en curso es la alcanzada por nuestro disparo. La comparativa entre coordenadas ha sido satisfactoria. 
-;                                                           BIT 2, "1" DEBUG !! Indica que se ha generado un disparo de entidad.														
+;                                                           BIT 2, "1" Indica que ha desaparecido un disparo de entidad.														
 
 
 
@@ -520,7 +520,7 @@ START
 ; Limpiamos pantalla.
 
 	ld a,%00000111
-	call Cls
+;	call Cls
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
 ; INICIALIZACIÓN.
@@ -633,12 +633,6 @@ Main
 ; 20/09/24
 
 ; Gestión de disparos.
-
-	ld a,(Ctrl_5)
-	bit 2,a
-	di
-	jr nz,$
-	ei
 
 	call Limpia_album_de_borrado_disparos
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
@@ -857,7 +851,6 @@ End_frame
 
 	call Genera_datos_de_impresion_disparos_Entidades
 	call Genera_datos_de_impresion_disparos_Amadeus		; Genera los datos de impresión de los disparos de Amadeus y entidades.
-
 	call Calcula_bytes_pintado_disparos
 	call Limpia_album_de_pintado_disparos
 
