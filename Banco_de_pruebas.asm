@@ -481,8 +481,8 @@ DB_RND_disparos db 0
 Clock_next_entity defw 0								; Transcurrido este tiempo aparece una nueva entidad.
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
-CLOCK_disparo_entidad_MASTER db $30						; Reloj, decreciente.
-CLOCK_disparo_entidad db $30
+CLOCK_disparo_entidad_MASTER db $20						; Reloj, decreciente.
+CLOCK_disparo_entidad db $20
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -840,12 +840,6 @@ Amadeus_vivo
 
 End_frame 
 
-; 20/09/24. Deshabilitamos el permiso de disparo de entidades y generamos los scanlines de los disparos de entidades.
-
-	xor a
-	ld (Permiso_de_disparo_Entidades),a							
-
-
 ; 23/08/24 Llegados a este punto: NO HAY POSIBILIDAD DE GENERAR MÁS DISPAROS.
 ; Generamos los datos de impresión en el álbum_de_pintado y limpiamos el sobrante de datos del anterior FRAME si toca.
 
@@ -910,10 +904,6 @@ Autoriza_disparo_de_entidades
 ;	Nota: en la bandeja DRAW se encuentran los datos de la entidad que va a disparar.
 
 Entidad_genera_disparo_si_procede 
-
-	ld a,(Entidades_en_curso)
-	and a
-	ret z
 
 	ld a,(DB_RND_disparos)
 	bit 1,a

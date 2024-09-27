@@ -238,6 +238,9 @@ Genera_disparo_de_entidad_maldosa
 ;   _ posición de cualquier entidad, (como ocurre con el puntero de impresión de las explosiones de entidades).
 ;
 
+    ld hl,Permiso_de_disparo_Entidades			        ; No más disparos en este FRAME.			
+    dec (hl)
+
     ld iy,Disparo_de_entidad
 
 ;! Debuggg
@@ -415,13 +418,20 @@ Limpia_album_de_borrado_disparos
 
     ld hl,Ctrl_5
     bit 2,(hl)
-    jr z,1F
-    res 2,(hl)
-    jr Limpiando
-
-1 bit 0,(hl)
+;    jr z,1F
     ret z
-    res 0,(hl)
+
+    res 2,(hl)
+
+;    ld a,(Numero_de_disparos_de_entidades)
+;    cp 7
+;    jr z,Limpiando
+
+;    ret
+
+;1 bit 0,(hl)
+;    ret z
+;    res 0,(hl)
 
 Limpiando
 
