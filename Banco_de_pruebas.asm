@@ -634,8 +634,9 @@ Main
 
 ; Gestión de disparos.
 
-	call Limpia_album_de_borrado_disparos
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
+	call Limpia_album_de_borrado_disparos
+;	call Change_Disparos								; Intercambiamos los álbumes de disparos.
 	call Motor_de_disparos_entidades
 	call Motor_Disparos_Amadeus							; Mueve y detecta colisión de los disparos de Amadeus.
 
@@ -844,9 +845,9 @@ End_frame
 ; Generamos los datos de impresión en el álbum_de_pintado y limpiamos el sobrante de datos del anterior FRAME si toca.
 
 	call Genera_datos_de_impresion_disparos_Entidades
-	call Genera_datos_de_impresion_disparos_Amadeus		; Genera los datos de impresión de los disparos de Amadeus y entidades.
-	call Calcula_bytes_pintado_disparos
-	call Limpia_album_de_pintado_disparos
+;	call Genera_datos_de_impresion_disparos_Amadeus		; Genera los datos de impresión de los disparos de Amadeus y entidades.
+;	call Calcula_bytes_pintado_disparos
+;	call Limpia_album_de_pintado_disparos
 
 ; ------------ ------------- --------------
 
@@ -2030,11 +2031,11 @@ Teclado
 
 ; Está habilitado el disparo de Amadeus??, podemos disparar??. Si no es así saltamos a 1F.
 
-	ld a,$f7												; "5" para disparar.
-	in a,($fe)
-	and $10
+;	ld a,$f7												; "5" para disparar.
+;	in a,($fe)
+;	and $10
 
-	call z,Genera_disparo_Amadeus
+;	call z,Genera_disparo_Amadeus
 
 1 ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
 	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.

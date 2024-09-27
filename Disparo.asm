@@ -104,7 +104,7 @@ Elimina_disparo_entidad
 
     pop de
 
-    ld hl,Ctrl_5                                                        ; Indica que desaparece un disparo de entidad.
+    ld hl,Ctrl_5
     set 2,(hl)
 
     ld hl,0
@@ -416,18 +416,13 @@ Activa_Impacto_en_entidad
 
 Limpia_album_de_borrado_disparos
 
-    ld hl,Ctrl_5
-    bit 2,(hl)
+;    ld hl,Ctrl_5
+;    bit 2,(hl)
 ;    jr z,1F
-    ret z
 
-    res 2,(hl)
+;    res 2,(hl)
 
-;    ld a,(Numero_de_disparos_de_entidades)
-;    cp 7
-;    jr z,Limpiando
-
-;    ret
+;    jr Limpiando
 
 ;1 bit 0,(hl)
 ;    ret z
@@ -436,7 +431,7 @@ Limpia_album_de_borrado_disparos
 Limpiando
 
     xor a
-    ld hl,(Album_de_borrado_disparos)
+    ld hl,(Album_de_pintado_disparos)
     ld (hl),a
     ld e,l
     ld d,h
