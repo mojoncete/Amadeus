@@ -66,7 +66,7 @@ Disparos_scanlines_album_2 equ $82b8	;	($82b8 - $82f2)
 
 ; Disparos.
 
-	call Pinta_disparos 
+;	call Pinta_disparos 
 
 ; Shield -----------------------
 
@@ -481,8 +481,8 @@ DB_RND_disparos db 0
 Clock_next_entity defw 0								; Transcurrido este tiempo aparece una nueva entidad.
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
-CLOCK_disparo_entidad_MASTER db $20						; Reloj, decreciente.
-CLOCK_disparo_entidad db $20
+CLOCK_disparo_entidad_MASTER db $50						; Reloj, decreciente.
+CLOCK_disparo_entidad db $50
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -634,11 +634,11 @@ Main
 
 ; Gestión de disparos.
 
-	call Change_Disparos								; Intercambiamos los álbumes de disparos.
-	call Limpia_album_de_borrado_disparos
 ;	call Change_Disparos								; Intercambiamos los álbumes de disparos.
-	call Motor_de_disparos_entidades
-	call Motor_Disparos_Amadeus							; Mueve y detecta colisión de los disparos de Amadeus.
+;	call Limpia_album_de_borrado_disparos
+;	call Change_Disparos								; Intercambiamos los álbumes de disparos.
+;	call Motor_de_disparos_entidades
+;	call Motor_Disparos_Amadeus							; Mueve y detecta colisión de los disparos de Amadeus.
 
 ; En el FRAME que acabamos de pintar puede existir una posible colisión entre alguna entidad y Amadeus. 
 ; Si alguna de las coordenadas_X de alguna entidad que esté en zona de Amadeus coincide con alguna de las coordenadas_X de Amadeus, habrá que comprobar si existe colisión.
@@ -845,11 +845,17 @@ End_frame
 ; Generamos los datos de impresión en el álbum_de_pintado y limpiamos el sobrante de datos del anterior FRAME si toca.
 
 	call Genera_datos_de_impresion_disparos_Entidades
+
 ;	call Genera_datos_de_impresion_disparos_Amadeus		; Genera los datos de impresión de los disparos de Amadeus y entidades.
 ;	call Calcula_bytes_pintado_disparos
 ;	call Limpia_album_de_pintado_disparos
 
 ; ------------ ------------- --------------
+
+;!Debuggggg
+	ld hl,(Album_de_pintado_disparos)
+	ld (Nivel_scan_disparos_album_de_pintado),hl
+;!------------------------------
 
 	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl

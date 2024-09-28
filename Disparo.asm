@@ -104,8 +104,8 @@ Elimina_disparo_entidad
 
     pop de
 
-    ld hl,Ctrl_5
-    set 2,(hl)
+;    ld hl,Ctrl_5
+;    set 2,(hl)
 
     ld hl,0
 
@@ -123,20 +123,13 @@ Genera_datos_de_impresion_disparos_Entidades
     ld b,a
     ld a,7
     sub b
-    ret z                                                    
+    ret z                                                      ;? Salimos. No hay disparos de entidades generados.                                                
 
-    inc a
     ex af,af
 
 ; ---------------
 
 ;   En 1er lugar nos situamos en la 1ª caja de disparos de entidades.
-
-;	ld a,(Ctrl_5)
-;	bit 2,a
-;	di
-;	jr nz,$
-;	ei
 
     call Inicia_Puntero_Disparo_Entidades
 
@@ -216,7 +209,7 @@ Genera_disparo_de_entidad_maldosa
 
 ;*  Exclusiones.
 
-;   La entidad no podrá disparar mientras se encuentre en las filas: 0,1,14,15,16.
+;   La entidad no podrá disparar mientras se encuentre en las filas: 0,1,15,16.
 ;   La entidad no podrá disparar si hay 7 disparos en pantalla.
 
     ld a,(Numero_de_disparos_de_entidades)
@@ -230,7 +223,7 @@ Genera_disparo_de_entidad_maldosa
     dec a
     ret z
 
-    cp 14
+    cp 15
     ret nc
 
 ;   En este punto el registro B siempre está a "0" y HL apunta al `nuevo´ ( Puntero de impresión) de la entidad.
@@ -238,12 +231,10 @@ Genera_disparo_de_entidad_maldosa
 ;   _ posición de cualquier entidad, (como ocurre con el puntero de impresión de las explosiones de entidades).
 ;
 
-    ld hl,Permiso_de_disparo_Entidades			        ; No más disparos en este FRAME.			
+    ld hl,Permiso_de_disparo_Entidades			        ; No más disparos en este FRAME. 			
     dec (hl)
 
     ld iy,Disparo_de_entidad
-
-;! Debuggg
 
 ;   Decrementa el numero de disparos de entidades.   
 
@@ -416,8 +407,10 @@ Activa_Impacto_en_entidad
 
 Limpia_album_de_borrado_disparos
 
-;    ld hl,Ctrl_5
-;    bit 2,(hl)
+    ld hl,Ctrl_5
+    bit 2,(hl)
+    ret z
+
 ;    jr z,1F
 
 ;    res 2,(hl)
