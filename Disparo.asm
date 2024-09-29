@@ -104,20 +104,15 @@ Elimina_disparo_entidad
 
     pop de
 
-;    ld hl,Ctrl_5
-;    set 2,(hl)
-
     ld hl,0
 
     ret 
 ; --------------------------------------------------------------------------------------
 ;
-;   19/09/24
+;   29/09/24
 ;
 
 Genera_datos_de_impresion_disparos_Entidades
-
-;*  Exclusiones.
 
     ld a,(Numero_de_disparos_de_entidades)
     ld b,a
@@ -166,12 +161,12 @@ Genera_scanlines_de_los_disparos_de_entidades.
 
     ld sp,(Stack)
 
-Situa_en_siguiente_caja
-
     ex af,af                                                  ;? Actualiza contador de cajas y RET si "Z".
     dec a
     ret z
     ex af,af
+
+Situa_en_siguiente_caja
 
     inc de
     inc de
@@ -437,7 +432,7 @@ Limpiando
 
 ; --------------------------------------------------------------------------------------
 ;
-;   26/08/24
+;   29/09/24
 ;
 
 Calcula_bytes_pintado_disparos
@@ -454,7 +449,7 @@ Calcula_bytes_pintado_disparos
 
 ; --------------------------------------------------------------------------------------
 ;
-;   11/09/24
+;   29/09/24
 ;
 ;   Limpia la diferencia de bytes entre el (album_de_pintado_disparos) del FRAME anterior y el_
 ;   _(album_de_pintado_disparos) del FRAME actual, (siempre que el álbum del FRAME anterior contenga más_ 
@@ -462,36 +457,30 @@ Calcula_bytes_pintado_disparos
 
 Limpia_album_de_pintado_disparos
 
-;*   Exclusiones.
-
-    ld a,(Num_de_bytes_album_de_disparos_2)
+    ld a,(Num_de_bytes_album_de_disparos)   
     and a
-    ret z
+    jr z,Clean_only_one
 
-; -----
-
-    ld a,(Num_de_bytes_album_de_disparos)
-    ld b,a    
-    ld a,(Num_de_bytes_album_de_disparos_2)
-
+    ld b,a
+    ld a,$3b
     sub b
+    ld b,a
+2 xor a
 
-    ret z
-    ret c
-
-    ld hl,(Nivel_scan_disparos_album_de_pintado)
-    ld b,a                                                              ; Nº de bytes a borrar en B.
-    xor a                                                               ; "0".
-
+    ld hl,(Nivel_scan_disparos_album_de_pintado)                        ; Siempre tendremos limpio el sobrante de álbum de pintado de disparos.
 1 ld (hl),a
-    inc l
+    inc hl 
     djnz 1B
-
     ret
+
+Clean_only_one
+
+    ld b,6
+    jr 2B    
 
 ; --------------------------------------------------------------------------------------
 ;
-;   27/08/24
+;   29/09/24
 ;
 
 Motor_Disparos_Amadeus
@@ -540,7 +529,7 @@ Consulta_Impacto
     push hl
     call Genera_coordenadas_de_disparo_Amadeus
     pop hl
-    call Elimina_disparo
+    call Elimina_disparo_Amadeus
 
     ret
 
@@ -563,7 +552,7 @@ Mueve_disparo_Amadeus
     ld a,h
     sub $40
     ex de,hl
-    jr c,Elimina_disparo
+    jr c,Elimina_disparo_Amadeus
 
  ; Introduce nuevo puntero_de_impresión en la caja.
 
@@ -575,9 +564,9 @@ Mueve_disparo_Amadeus
 
 ; ----------------------
 ;
-;   11/9/24
+;   29/9/24
 
-Elimina_disparo
+Elimina_disparo_Amadeus
 
 ; HL apunta al .db (Puntero_de_impresion) del disparo.
 ; Recordemos la estructura de datos de una caja de disparos de Amadeus:

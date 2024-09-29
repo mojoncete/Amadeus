@@ -66,7 +66,7 @@ Disparos_scanlines_album_2 equ $82b8	;	($82b8 - $82f2)
 
 ; Disparos.
 
-;	call Pinta_disparos 
+	call Pinta_disparos 
 
 ; Shield -----------------------
 
@@ -381,7 +381,6 @@ Album_de_borrado_disparos defw 0
 
 Nivel_scan_disparos_album_de_pintado defw 0
 Num_de_bytes_album_de_disparos db 0
-Num_de_bytes_album_de_disparos_2 db 0
 
 Numero_de_disparos_de_entidades db 7
 
@@ -481,8 +480,8 @@ DB_RND_disparos db 0
 Clock_next_entity defw 0								; Transcurrido este tiempo aparece una nueva entidad.
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
-CLOCK_disparo_entidad_MASTER db $50						; Reloj, decreciente.
-CLOCK_disparo_entidad db $50
+CLOCK_disparo_entidad_MASTER db $20						; Reloj, decreciente.
+CLOCK_disparo_entidad db $20
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -634,11 +633,9 @@ Main
 
 ; Gestión de disparos.
 
-;	call Change_Disparos								; Intercambiamos los álbumes de disparos.
-;	call Limpia_album_de_borrado_disparos
-;	call Change_Disparos								; Intercambiamos los álbumes de disparos.
-;	call Motor_de_disparos_entidades
-;	call Motor_Disparos_Amadeus							; Mueve y detecta colisión de los disparos de Amadeus.
+	call Motor_de_disparos_entidades
+	call Motor_Disparos_Amadeus							; Mueve y detecta colisión de los disparos de Amadeus.
+	call Change_Disparos								; Intercambiamos los álbumes de disparos.
 
 ; En el FRAME que acabamos de pintar puede existir una posible colisión entre alguna entidad y Amadeus. 
 ; Si alguna de las coordenadas_X de alguna entidad que esté en zona de Amadeus coincide con alguna de las coordenadas_X de Amadeus, habrá que comprobar si existe colisión.
@@ -770,13 +767,6 @@ Gestiona_siguiente_entidad
 	call Ordena_tabla_de_impresion
 	call Inicia_punteros_de_cajas 								; Hemos terminado de mover todas las entidades. Nos situamos al principio del índice de entidades.
 
-;! Activando estas líneas podemos habilitar 2 explosiones en el mismo FRAME.
-; Hemos gestionado todas las unidades.
-; Desactivamos el flag de impacto en entidad por disparo de amadeus.
-
-;	ld hl,Ctrl_1
-;	res 2,(hl)
-
 	call Borra_diferencia
 
 	ld a,(Ctrl_3)
@@ -845,17 +835,14 @@ End_frame
 ; Generamos los datos de impresión en el álbum_de_pintado y limpiamos el sobrante de datos del anterior FRAME si toca.
 
 	call Genera_datos_de_impresion_disparos_Entidades
-
-;	call Genera_datos_de_impresion_disparos_Amadeus		; Genera los datos de impresión de los disparos de Amadeus y entidades.
-;	call Calcula_bytes_pintado_disparos
-;	call Limpia_album_de_pintado_disparos
+	call Genera_datos_de_impresion_disparos_Amadeus		; Genera los datos de impresión de los disparos de Amadeus y entidades.
+	call Calcula_bytes_pintado_disparos
+	call Limpia_album_de_pintado_disparos
 
 ; ------------ ------------- --------------
 
-;!Debuggggg
-	ld hl,(Album_de_pintado_disparos)
-	ld (Nivel_scan_disparos_album_de_pintado),hl
-;!------------------------------
+;	xor a 
+;	ld (Permiso_de_disparo_Entidades),a
 
 	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
@@ -925,96 +912,6 @@ Entidad_genera_disparo_si_procede
 	call nz,Genera_disparo_de_entidad_maldosa
 
 	ret
-
-
-; RECARGA DE NUEVA OLEADA.
-
-;	ld a,(Contador_de_frames)
-;	ld b,a
-;	ld a,(Activa_recarga_cajas)
-;	cp b
-;	jr z,20F
-
-;	ld hl,Ctrl_1
-;	set 4,(hl)
-;	jp Main
-
-;20 ld hl,Ctrl_1
-;	res 4,(hl)
-
-;	ld a,(Contador_de_frames)
-
-;! Este valor ha de ser pseudo-aleatorio. El tiempo de aparición de cada entidad ha de ser parecido, pero_
-;! _ IMPREDECIBLE !!!!
-
-;	add 10
-;	ld (Clock_next_entity),a
-
-;	jp 4B
-
-	ret
-
-; ----- ----- ----- ----- ----- ---------- ----- ----- ----- ----- ----- ---------- ----- 
-;
-;	16/11/23
-
-;;Gestiona_Amadeus
-
-;! Activa/desactiva impacto con Amadeus.
-
-;	ld a,(Impacto) 
-;	and a
-;	jr nz,2F
-
-;;	call Mov_Amadeus
-
-;;2 ld a,(Ctrl_0)
-;;	bit 4,a
-;;	jr z,1F                                            ; Omitimos BORRAR/PINTAR si no hay movimiento.
-
-;;	call Guarda_foto_entidad_a_pintar
-;;	call Guarda_datos_de_borrado_Amadeus
-
-;;1 ld hl,Ctrl_0	
-;;    res 4,(hl)											; Inicializamos el FLAG de movimiento de la entidad.
-
-;;	call Motor_de_disparos								; Borra/mueve/pinta cada uno de los disparos y crea un nuevo album de fotos.
-
-; Calculamos el nº de malotes y de disparotes para pintarlos nada más comenzar el siguiente FRAME.
-
-;	call Calcula_numero_de_disparotes
-
-;;	ret
-
-; -----------------------------
-;
-;	Prepara los registros HL' y B para ejecutar la rutina Borra_sprites.
-;
-;	INPUTS: B a de estar a "0".
-
-;Prepara_Borra_sprites 
-
-;	ld hl,(Puntero_de_scanlines_masticados_a_borrar)
-;	ld a,l
-;	ret z
-
-;	srl a
-
-;2 sub 16
-;	jr z,1F
-;	inc b
-;	jr 2B
-
-;1 inc b
-
-;	exx
-;	ld hl,Semaforo_de_rutinas_de_impresion_utilizadas
-;	exx	
-
-;	ld hl,Almacen_de_scanlines_masticados_a_borrar
-;	ld (Puntero_de_scanlines_masticados_a_borrar),hl
-
-;	ret
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- -----
 ;
@@ -1130,8 +1027,8 @@ Change_Disparos
 	ld (Album_de_borrado_disparos),de
 	ld (Nivel_scan_disparos_album_de_pintado),hl
 
-	ld a,(Num_de_bytes_album_de_disparos)
-	ld (Num_de_bytes_album_de_disparos_2),a
+;	ld a,(Num_de_bytes_album_de_disparos)
+;	ld (Num_de_bytes_album_de_disparos_2),a
 
 	ret
 
@@ -2037,11 +1934,11 @@ Teclado
 
 ; Está habilitado el disparo de Amadeus??, podemos disparar??. Si no es así saltamos a 1F.
 
-;	ld a,$f7												; "5" para disparar.
-;	in a,($fe)
-;	and $10
+	ld a,$f7												; "5" para disparar.
+	in a,($fe)
+	and $10
 
-;	call z,Genera_disparo_Amadeus
+	call z,Genera_disparo_Amadeus
 
 1 ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
 	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
