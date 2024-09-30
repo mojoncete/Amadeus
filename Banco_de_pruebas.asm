@@ -474,14 +474,14 @@ Clock_explosion_Amadeus db 5
 Temp_new_live db 100									; Tiempo que tarda en aparecer una nueva nave Amadeus tras ser destruida.
 
 RND_SP defw Numeros_aleatorios							; Puntero que se irá desplazando por el SET de nº aleatorios.
-RND_SP_Disparos defw Numeros_aleatorios					; Puntero que se irá desplazando por el SET de nº aleatorios, (para generar disparos de entidades).
-DB_RND_disparos db 0
+Puntero_num_aleatorios_disparos defw Numeros_aleatorios					; Puntero que se irá desplazando por el SET de nº aleatorios, (para generar disparos de entidades).
+Numero_rnd_disparos db 0
 
 Clock_next_entity defw 0								; Transcurrido este tiempo aparece una nueva entidad.
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
-CLOCK_disparo_entidad_MASTER db $20						; Reloj, decreciente.
-CLOCK_disparo_entidad db $20
+Repone_CLOCK_disparos db $60							; Reloj, decreciente.
+CLOCK_disparos_de_entidades db $60
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -645,7 +645,7 @@ Main
 
 ; TEMPORIZACIONES !!!!!!!!!!!!!!!!
 
-	ld hl,CLOCK_disparo_entidad
+	ld hl,CLOCK_disparos_de_entidades
 	dec (hl)
 	call z,Autoriza_disparo_de_entidades
 
@@ -844,6 +844,8 @@ End_frame
 ;	xor a 
 ;	ld (Permiso_de_disparo_Entidades),a
 
+	call Actuaiza_sp_de_disparos_de_entidades
+
 	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
 
@@ -872,24 +874,10 @@ Autoriza_disparo_de_entidades
 	ld a,1
 	ld (Permiso_de_disparo_Entidades),a
 
-	ld a,(CLOCK_disparo_entidad_MASTER)
-	ld (CLOCK_disparo_entidad),a
-
-	ld hl,(RND_SP_Disparos)
-
-2 ld a,(hl)
-	and a
-	jr z,1F
-
-	ld (DB_RND_disparos),a
-	inc hl
-	ld (RND_SP_Disparos),hl
+	ld a,(Repone_CLOCK_disparos)
+	ld (CLOCK_disparos_de_entidades),a
 
 	ret
-
-1	ld hl,Numeros_aleatorios
-	ld (RND_SP_Disparos),hl
-	jr 2B
 
 ;------------------------------------------
 ;
@@ -899,18 +887,38 @@ Autoriza_disparo_de_entidades
 
 Entidad_genera_disparo_si_procede 
 
-	ld a,(DB_RND_disparos)
-	bit 1,a
-	push af											; Guardamos FLAGS.
 
-	rla	
-	rla
+;	di
+;	jr $
+;	ei
 
-	ld (DB_RND_disparos),a
+;	xor a
+	ld hl,(Puntero_num_aleatorios_disparos)
+	set 0,(hl)
+	rl (hl)	
+;	rl (hl)
 
-	pop af
-	call nz,Genera_disparo_de_entidad_maldosa
+	call c,Genera_disparo_de_entidad_maldosa
 
+	ret
+
+; ----- ----- ----- ----- ----- ----- ----- ----- -----
+;
+;	30/09/24
+
+Actuaiza_sp_de_disparos_de_entidades
+
+	ld hl,(Puntero_num_aleatorios_disparos)
+	inc hl
+	ld (Puntero_num_aleatorios_disparos),hl
+
+	ld de,Numeros_aleatorios+7
+	ld a,e
+	sub l
+	ret nz
+
+1 ld hl,Numeros_aleatorios
+2 ld (Puntero_num_aleatorios_disparos),hl
 	ret
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- -----
@@ -1026,9 +1034,6 @@ Change_Disparos
 	ld (Album_de_pintado_disparos),hl
 	ld (Album_de_borrado_disparos),de
 	ld (Nivel_scan_disparos_album_de_pintado),hl
-
-;	ld a,(Num_de_bytes_album_de_disparos)
-;	ld (Num_de_bytes_album_de_disparos_2),a
 
 	ret
 

@@ -29,7 +29,7 @@ Motor_de_disparos_entidades
 ;    call NextScan
 ;    call NextScan
 ;    call NextScan 
-;    call NextScan 
+    call NextScan 
     call NextScan 
 
 ; Después de mover el disparo comprobamos si ha salido por la parte baja de la pantalla.
@@ -218,7 +218,7 @@ Genera_disparo_de_entidad_maldosa
     dec a
     ret z
 
-    cp 15
+    cp 16
     ret nc
 
 ;   En este punto el registro B siempre está a "0" y HL apunta al `nuevo´ ( Puntero de impresión) de la entidad.
