@@ -23,7 +23,6 @@ Motor_de_disparos_entidades
     call Extrae_address    
 ;   (Puntero_de_impresion) del disparo en HL.
 
-
 ;! Velocidad del disparo de entidades.
 
 ;    call NextScan
@@ -207,6 +206,8 @@ Genera_disparo_de_entidad_maldosa
 ;   La entidad no podrá disparar mientras se encuentre en las filas: 0,1,15,16.
 ;   La entidad no podrá disparar si hay 7 disparos en pantalla.
 
+;    set 0,(hl)          ; Añadimos "1" para no perder el bit de carry.
+
     ld a,(Numero_de_disparos_de_entidades)
     and a
     ret z
@@ -224,7 +225,6 @@ Genera_disparo_de_entidad_maldosa
 ;   En este punto el registro B siempre está a "0" y HL apunta al `nuevo´ ( Puntero de impresión) de la entidad.
 ;   (Puntero_objeto) del disparo inicial siempre será el mismo en cualquier caso, ( para que quede centrado ) en cualquier_
 ;   _ posición de cualquier entidad, (como ocurre con el puntero de impresión de las explosiones de entidades).
-;
 
     ld hl,Permiso_de_disparo_Entidades			        ; No más disparos en este FRAME. 			
     dec (hl)

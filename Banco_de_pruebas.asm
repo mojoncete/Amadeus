@@ -480,8 +480,8 @@ Numero_rnd_disparos db 0
 Clock_next_entity defw 0								; Transcurrido este tiempo aparece una nueva entidad.
 Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;														; Repite la oleada de entidades.
-Repone_CLOCK_disparos db $60							; Reloj, decreciente.
-CLOCK_disparos_de_entidades db $60
+Repone_CLOCK_disparos db $a0							; Reloj, decreciente.
+CLOCK_disparos_de_entidades db $a0
 
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -518,14 +518,19 @@ START
 
 ; Limpiamos pantalla.
 
-	ld a,%00000111
+;	ld a,%00000111
 ;	call Cls
-	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
+;	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
 ; INICIALIZACIÓN.
 
 	ld b,7   											 ; Generamos 7 nº aleatorios.
 	call Derivando_RND 									 ; Rutina de generación de nº aleatorios.
+
+	ld a,%00000111
+;	call Cls
+	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
+
 	call Extrae_numero_aleatorio_y_avanza
 
 	ld l,a
@@ -867,7 +872,7 @@ End_frame
 
 ;------------------------------------------
 ;
-;	14/09/24
+;	2/10/24
 
 Autoriza_disparo_de_entidades
 
@@ -875,6 +880,12 @@ Autoriza_disparo_de_entidades
 	ld (Permiso_de_disparo_Entidades),a
 
 	ld a,(Repone_CLOCK_disparos)
+	cp 25
+	jr c,1F
+
+	sub 8
+
+1 ld (Repone_CLOCK_disparos),a
 	ld (CLOCK_disparos_de_entidades),a
 
 	ret
@@ -887,16 +898,8 @@ Autoriza_disparo_de_entidades
 
 Entidad_genera_disparo_si_procede 
 
-
-;	di
-;	jr $
-;	ei
-
-;	xor a
 	ld hl,(Puntero_num_aleatorios_disparos)
-	set 0,(hl)
-	rl (hl)	
-;	rl (hl)
+	rlc (hl)	
 
 	call c,Genera_disparo_de_entidad_maldosa
 

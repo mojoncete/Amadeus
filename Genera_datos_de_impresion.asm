@@ -226,8 +226,8 @@ Genera_scanlines_rapidos ; -----------------------------------------------------
 
 ; El disparo aparecerá dos líneas por debajo de la entidad.
 
-    call NextScan
-    call NextScan
+;    call NextScan
+;    call NextScan
 
     ld (Puntero_de_impresion_disparo_de_entidad),hl
 
