@@ -35,7 +35,6 @@ Scanlines_album equ $8000	;	($8000 - $8118) 						; Inicialmente 280 bytes, $118
 Scanlines_album_2 equ $811a	;    ($811a - $8232)
 Amadeus_scanlines_album equ $8234	;	($8234 - $8256) 				; Inicialmente 34 bytes, $22.
 Amadeus_scanlines_album_2 equ $8258	;	($8258 - $827a)
-
 Disparos_scanlines_album equ $827c	;	($827c - $82b6) 				; Inicialmente 58 bytes, $3a.
 Disparos_scanlines_album_2 equ $82b8	;	($82b8 - $82f2)	
 

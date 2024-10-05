@@ -108,7 +108,7 @@ Elimina_disparo_entidad
     ret 
 ; --------------------------------------------------------------------------------------
 ;
-;   29/09/24
+;   05/10/24
 ;
 
 Genera_datos_de_impresion_disparos_Entidades
@@ -129,9 +129,9 @@ Genera_datos_de_impresion_disparos_Entidades
 
 1 call Extrae_address
  
-    inc hl
     ld a,(hl)
-    and a
+    inc hl
+    add (hl)
 
     jr z,Situa_en_siguiente_caja                              ;? Avanza a la siguiente caja si esta está vacía. 
    
@@ -176,7 +176,7 @@ Situa_en_siguiente_caja
 
 ; --------------------------------------------------------------------------------------
 ;
-;   18/09/24
+;   05/10/24
 ;
 
 Genera_disparo_de_entidad_maldosa
@@ -226,11 +226,17 @@ Genera_disparo_de_entidad_maldosa
 ;   (Puntero_objeto) del disparo inicial siempre será el mismo en cualquier caso, ( para que quede centrado ) en cualquier_
 ;   _ posición de cualquier entidad, (como ocurre con el puntero de impresión de las explosiones de entidades).
 
-    ld hl,Permiso_de_disparo_Entidades			        ; No más disparos en este FRAME. 			
-    dec (hl)
 
-    ld iy,Disparo_de_entidad
+    ld hl,Ctrl_5
+    set 2,(hl)
 
+
+
+    ld hl,Permiso_de_disparo_Entidades			         			
+    dec (hl)                                            ; No más disparos en este FRAME.
+
+    ld iy,(Disparo_de_entidad)
+ 
 ;   Decrementa el numero de disparos de entidades.   
 
     ld hl,Numero_de_disparos_de_entidades
@@ -238,10 +244,7 @@ Genera_disparo_de_entidad_maldosa
 
 ;   Puntero de impresión del disparo en BC. 
 
-    ld hl,Puntero_de_impresion_disparo_de_entidad
-    ld c,(hl)
-    inc hl
-    ld b,(hl)                                           
+    ld bc,(Puntero_de_impresion_disparo_de_entidad)
 
     call Inicia_Puntero_Disparo_Entidades
 
@@ -250,9 +253,9 @@ Genera_disparo_de_entidad_maldosa
  
 ;   Comprobamos si la caja está vacía.
 
-    inc hl
     ld a,(hl)
-    and a
+    inc hl
+    add (hl)
 
     jr nz,Situa_en_siguiente_disparo                    ; Avanza a la siguiente caja si esta esta completa. 
 
@@ -600,14 +603,10 @@ Elimina_disparo_Amadeus
 
 ; --------------------------------------------------------------------------------------
 ;
-;   21/8/24
+;   05/10/24
 ;
 
 Pinta_disparos 
-
-;    ld a,(Ctrl_5)
-;    bit 2,a
-;    jr nz,$
 
     ld (Stack),sp
     ld b,2
@@ -615,10 +614,9 @@ Pinta_disparos
 Borra_disparos ld sp,(Album_de_borrado_disparos)
 
 2 pop de
-    
-    inc d
-    dec d
 
+    ld a,d
+    add e
     jr z,1F
 
 Imprime_scanlines_de_disparo     
@@ -627,6 +625,16 @@ Imprime_scanlines_de_disparo
 
 ; Puntero objeto en DE.
 ; Puntero_de_impresión en HL.
+
+; Necesitamos saber que tipo de disparo es el que vamos a Imprimir.
+; En los disparos de Amadeus, DE contiene un puntero mientras que en los disparos de entidades, DE contiene datos de impresión, (que iremos rotando si es necesario).
+
+    ld iy,Disparo_0
+    ld a,iyh
+    cp d
+    jr nz,4F
+
+; Disparos de Amadeus.
 
 ; 1er scanline.
 
@@ -667,6 +675,39 @@ Imprime_scanlines_de_disparo
 1 djnz 3B
     ld sp,(Stack)
     ret
+
+; Disparos de entidades
+
+; 1er scanline.
+
+4 ld a,e
+    xor (hl)
+    ld (hl),a
+
+    inc l
+
+    ld a,d
+    xor (hl)
+    ld (hl),a
+
+; 2º scanline.
+
+    pop hl
+
+    ld a,e
+    xor (hl)
+    ld (hl),a
+
+    inc l
+
+    ld a,d
+    xor (hl)
+    ld (hl),a
+
+; Seguimos pintando / borrando disparos si los hay. SP está situado ahora en el siguiente disparo del álbum de scanlines de disparos.
+
+    jr 2B
+
 
 ; --------------------------------------------------------------------------------------
 ;
