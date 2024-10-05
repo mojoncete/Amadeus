@@ -882,7 +882,7 @@ Autoriza_disparo_de_entidades
 	cp 25
 	jr c,1F
 
-	sub 8
+	sub 5
 
 1 ld (Repone_CLOCK_disparos),a
 	ld (CLOCK_disparos_de_entidades),a
