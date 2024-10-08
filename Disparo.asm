@@ -8,17 +8,31 @@ Motor_de_disparos_entidades
     ld hl,Indice_de_disparos_entidades
 
 1 call Extrae_address 
-    inc de
-    inc de
+    inc e
+    inc e
     ld (Puntero_DESPLZ_DISPARO_ENTIDADES),de
 
-    inc hl
+ ; Caja vacía ???
 
-    inc (hl)                                                             ; Dispone de Puntero_objeto ???
-    dec (hl)
-    jr z,3F
+    ld a,(hl)
+    inc l
+    add (hl)
+    jr z,3F                                                              ; Caja vacía.
 
-    inc hl
+; --- Trabajamos con caja:
+
+    push hl
+
+; Nos situamos en el byte alto de (Control).
+
+    inc l
+    inc l
+    inc l
+    inc l
+
+    di
+    jr $
+    ei
 
     call Extrae_address    
 ;   (Puntero_de_impresion) del disparo en HL.
@@ -28,7 +42,7 @@ Motor_de_disparos_entidades
 ;    call NextScan
 ;    call NextScan
 ;    call NextScan 
-    call NextScan 
+;    call NextScan 
     call NextScan 
 
 ; Después de mover el disparo comprobamos si ha salido por la parte baja de la pantalla.
