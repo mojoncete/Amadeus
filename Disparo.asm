@@ -18,6 +18,7 @@ Motor_de_disparos_entidades
     inc l
     add (hl)
     jr z,3F                                                              ; Caja vacía.
+    dec l
 
 ; --- Trabajamos con caja:
 
@@ -25,14 +26,13 @@ Motor_de_disparos_entidades
 
 ; Nos situamos en el byte alto de (Control).
 
-    inc l
-    inc l
-    inc l
-    inc l
+    call Rota_disparo_si_procede
 
-    di
-    jr $
-    ei
+; ------------------------------------------------------------
+
+    pop hl
+    inc l
+    inc l
 
     call Extrae_address    
 ;   (Puntero_de_impresion) del disparo en HL.
@@ -92,7 +92,82 @@ Fin_de_disparo_de_entidad
 
     ret
 
-; ------------ ----------- ------------
+; ----------------------------------------------------------
+;
+;   08/10/24
+
+Rota_disparo_si_procede 
+
+;   Nos situamos en el byte alto de (Control).
+
+    push hl
+    pop iy
+
+    inc l
+    inc l
+    inc l
+    inc l
+    inc l
+
+    bit 6,(hl)
+    jr nz,Decrementa_contador_de_control_de_disparo
+    bit 7,(hl)
+    ret z                                                               ; Salimos el disparo va recto, no se modifica.
+
+Decrementa_contador_de_control_de_disparo
+
+    dec (hl)
+    ld a,(hl)
+    and 7
+    ret nz
+    
+Rotamos_disparo_segun_proceda
+
+;    di
+;    jr $
+;    ei
+
+; Vamos a rotar el disparo pero antes reiniciamos el contador.
+
+    ld a,7
+    add (hl)
+    ld (hl),a                                                           ; Contador reinicializado.
+
+    bit 6,(hl)
+    jr nz,Rota_a_derecha
+
+Rota_a_izq
+
+    push iy
+    pop hl                                                       ; (Puntero objeto) en HL, (disparo).
+
+    rlc (hl)
+    inc l
+    rlc (hl)
+
+    ret
+
+Rota_a_derecha
+
+    push iy
+    pop hl
+
+    rrc (hl)
+
+    inc l
+
+    rrc (hl)
+
+    di
+    jr c,$
+    ei
+
+
+; Se inicializa el disparo y se desplaza (Puntero_objeto) a la derecha.  
+
+    ret
+
+ ; ------------ ----------- ------------
 ;
 ;   25/9/24
 
@@ -721,7 +796,6 @@ Imprime_scanlines_de_disparo
 ; Seguimos pintando / borrando disparos si los hay. SP está situado ahora en el siguiente disparo del álbum de scanlines de disparos.
 
     jr 2B
-
 
 ; --------------------------------------------------------------------------------------
 ;
