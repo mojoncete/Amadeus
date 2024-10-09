@@ -8,7 +8,8 @@
 
 ; Disparo.
 
-Disparo_de_entidad DEFB $00,$18
+Disparo_de_entidad_derecho DEFB $18,$00,$00
+Disparo_de_entidad_izquierdo DEFB $00,$00,$18
 
 Indice_disparo_Amadeus defw Disparo_0
 	defw Disparo_f9

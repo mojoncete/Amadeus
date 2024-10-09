@@ -265,7 +265,7 @@ Situa_en_siguiente_caja
 
 ; --------------------------------------------------------------------------------------
 ;
-;   05/10/24
+;   09/10/24
 ;
 
 Genera_disparo_de_entidad_maldosa
@@ -315,31 +315,23 @@ Genera_disparo_de_entidad_maldosa
 ;   (Puntero_objeto) del disparo inicial siempre será el mismo en cualquier caso, ( para que quede centrado ) en cualquier_
 ;   _ posición de cualquier entidad, (como ocurre con el puntero de impresión de las explosiones de entidades).
 
-
-    ld hl,Ctrl_5
-    set 2,(hl)
-
-
-
     ld hl,Permiso_de_disparo_Entidades			         			
     dec (hl)                                            ; No más disparos en este FRAME.
 
-    ld iy,(Disparo_de_entidad)
- 
 ;   Decrementa el numero de disparos de entidades.   
 
     ld hl,Numero_de_disparos_de_entidades
     dec (hl)
 
-;   Puntero de impresión del disparo en BC. 
-
-    ld bc,(Puntero_de_impresion_disparo_de_entidad)
-
     call Inicia_Puntero_Disparo_Entidades
 
-1 ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)              ; En la 1ª caja del índice.
-    call Extrae_address
- 
+1 call Extrae_address
+
+    inc de
+    inc de
+
+    ld (Puntero_DESPLZ_DISPARO_ENTIDADES),de
+
 ;   Comprobamos si la caja está vacía.
 
     ld a,(hl)
@@ -348,30 +340,57 @@ Genera_disparo_de_entidad_maldosa
 
     jr nz,Situa_en_siguiente_disparo                    ; Avanza a la siguiente caja si esta esta completa. 
 
-;   Generamos disparo. !!!!!!!!!!!!!!!!
+;   Caja vacía, vamos a generar un disparo.
+;   Empezaremos de atrás hacia adelante, (1º los bytes de control), asi podremos modificar el (Puntero_de_impresión) antes de guardarlo.
 
-    dec hl
+    inc l
+    inc l
+    inc l
+    inc l
 
-    ld a,iyl
-    ld (hl),a                                         
-    inc hl
-    ld a,iyh
-    ld (hl),a                                           ; Guarda el (puntero objeto) del disparo en la caja.
+    call Genera_byte_inclinacion
 
-    inc hl
+    ld a,(hl)
+    ex af,af                                            ; Copia de seguridad del byte de inclinación en A´.
 
-    ld (hl),c
-    inc hl
-    ld (hl),b                                           ; Guarda el puntero de impresión.
+    dec l
 
-    inc hl                                              
+;   La velocidad inicial del disparo corresponde con la velocidad de la entidad que lo genera.
 
     ld a,(Velocidad)                                    ; Guarda la velocidad de la entidad/disparo.
     ld (hl),a
 
-    inc hl
+    dec l
 
-;! Ajusta el grado de inclinación del disparo.
+    call Modifica_puntero_de_impresion                  ; (También seleccionamos en IY el puntero objeto adecuado, izq. o derecha) y fija en BC el (Puntero_de_impresion).
+
+    ld (hl),b
+    dec l
+    ld (hl),c
+ 
+    dec l
+
+    ld a,iyh    
+    ld (hl),a
+    dec l
+    ld a,iyl
+    ld (hl),a
+
+    ret
+
+;   --- --- ---
+
+Situa_en_siguiente_disparo 
+
+    ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
+    jr 1B
+
+; --------------------------------------------------------------------------------------
+;
+;   09/10/24
+;
+
+Genera_byte_inclinacion
 
     ld (hl),7                                           ; Guarda Byte de Control.
 
@@ -403,15 +422,32 @@ Disparo_a_derecha ld b,a
     set 6,(hl)
     ret
 
-;   --- --- ---
+; --------------------------------------------------------------------------------------
+;
+;   09/10/24
+;
 
-Situa_en_siguiente_disparo 
+Modifica_puntero_de_impresion
 
-    inc de
-    inc de
+;   Puntero de impresión del disparo en BC. 
 
-    ld (Puntero_DESPLZ_DISPARO_ENTIDADES),de
-    jr 1B
+    ld bc,(Puntero_de_impresion_disparo_de_entidad)
+
+    ex af,af
+    bit 6,a
+    jr z,1F
+
+2 ld iy,Disparo_de_entidad_derecho
+    inc c
+    ret
+
+1 bit 7,a
+    jr z,2B
+
+    ld iy,Disparo_de_entidad_izquierdo
+    dec c
+
+    ret
 
 ; --------------------------------------------------------------------------------------
 ;
@@ -692,7 +728,7 @@ Elimina_disparo_Amadeus
 
 ; --------------------------------------------------------------------------------------
 ;
-;   05/10/24
+;   09/10/24
 ;
 
 Pinta_disparos 
@@ -716,12 +752,13 @@ Imprime_scanlines_de_disparo
 ; Puntero_de_impresión en HL.
 
 ; Necesitamos saber que tipo de disparo es el que vamos a Imprimir.
-; En los disparos de Amadeus, DE contiene un puntero mientras que en los disparos de entidades, DE contiene datos de impresión, (que iremos rotando si es necesario).
 
-    ld iy,Disparo_0
-    ld a,iyh
-    cp d
-    jr nz,4F
+    ld iy,Indice_disparo_Amadeus
+
+    ld a,e
+    cp iyl
+    jr c,4F                                             ;? Sabemos que los disparos de entidades están situados por debajo del (Indice_disparo_Amadeus). Al comparar el (Puntero objeto) del_
+;?                                                         _ disaparo a imprimir con (Indice_disparo_Amadeus) sabremos si se trata de un disparo de Amadeus o de entidad.
 
 ; Disparos de Amadeus.
 
@@ -769,27 +806,46 @@ Imprime_scanlines_de_disparo
 
 ; 1er scanline.
 
-4 ld a,e
+4 ld a,(de)
     xor (hl)
     ld (hl),a
 
     inc l
+    inc e
 
-    ld a,d
+    ld a,(de)
     xor (hl)
     ld (hl),a
+
+    inc l
+    inc e
+
+    ld a,(de)
+    xor (hl)
+    ld (hl),a
+
+    dec e
+    dec e
 
 ; 2º scanline.
 
     pop hl
 
-    ld a,e
+    ld a,(de)
     xor (hl)
     ld (hl),a
 
     inc l
+    inc e
 
-    ld a,d
+    ld a,(de)
+    xor (hl)
+    ld (hl),a
+
+    inc l
+    inc e
+
+    ld a,(de)
     xor (hl)
     ld (hl),a
 
