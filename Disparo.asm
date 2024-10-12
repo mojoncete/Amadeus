@@ -749,35 +749,39 @@ Elimina_disparo_Amadeus
 ;   12/10/24
 ;
 
-Pinta_disparos 
+Pinta_disparos
 
     ld (Stack),sp
     ld b,2
 
-Borra_disparos ld sp,(Album_de_borrado_disparos)
+    ld iy,Indice_disparo_Amadeus
+    ld a,iyh
 
-2 pop de
+    ld hl,Ctrl_5
+    bit 2,(hl)
+    jr nz,$
 
-    ld a,d
-    add e
-    jr z,1F
+    ret    
 
-Imprime_scanlines_de_disparo     
+;   Existen disparos en el album de borrado ???
 
+    ld sp,(Album_de_borrado_disparos)
+    pop de
+    cp d
+
+    
+Imprime_scanlines_de_disparo_Amadeus     
+
+    dec l
+
+    ld (Stack),sp    
+    ld sp,hl
+
+    pop de
     pop hl
 
 ; Puntero objeto en DE.
 ; Puntero_de_impresión en HL.
-
-; Necesitamos saber que tipo de disparo es el que vamos a Imprimir.
-
-    ld iy,Indice_disparo_Amadeus
-
-    ld a,iyh
-    cp d
-    jr c,4F                                               
-
-; Disparos de Amadeus.
 
 ; 1er scanline.
 
@@ -785,7 +789,7 @@ Imprime_scanlines_de_disparo
     xor (hl)
     ld (hl),a
 
-    inc de
+    inc e
     inc l
 
     ld a,(de)
@@ -795,28 +799,29 @@ Imprime_scanlines_de_disparo
 ; 2º scanline.
 
     pop hl
-    dec de
+    dec e
 
     ld a,(de)
     xor (hl)
     ld (hl),a
 
-    inc de
+    inc e
     inc l
 
     ld a,(de)
     xor (hl)
     ld (hl),a
 
+
 ; Seguimos pintando / borrando disparos si los hay. SP está situado ahora en el siguiente disparo del álbum de scanlines de disparos.
 
-    jr 2B
+;    jr 2B
 
-3 ld sp,(Album_de_pintado_disparos)
-    jr 2B
+3 ld hl,(Album_de_pintado_disparos)
+;    jr 2B
 
 1 djnz 3B
-    ld sp,(Stack)
+;    ld sp,(Stack)
     ret
 
 ; Disparos de entidades
@@ -868,7 +873,7 @@ Imprime_scanlines_de_disparo
 
 ; Seguimos pintando / borrando disparos si los hay. SP está situado ahora en el siguiente disparo del álbum de scanlines de disparos.
 
-    jr 2B
+;    jr 2B
 
 ; --------------------------------------------------------------------------------------
 ;
@@ -928,6 +933,10 @@ Genera_disparo_Amadeus
     ld (Permiso_de_disparo_Amadeus),a                        ;? No volveremos a tener permiso de disparo hasta que desaparezaca este disparo.
 
 Define_puntero_objeto_disparo
+
+
+    ld hl,Ctrl_5
+    set 2,(hl)
 
 ;   Inicializamos contador.
 
