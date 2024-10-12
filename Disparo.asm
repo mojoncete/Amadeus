@@ -130,11 +130,9 @@ Rota_a_izq
 
 Rota_a_derecha
 
-    srl (iy)
-
-    di
-    jr c,$
-    ei
+    srl (iy+0)
+    srl (iy+1)
+    srl (iy+2)
 
 ; Se inicializa el disparo y se desplaza (Puntero_objeto) a la derecha.  
 
@@ -153,10 +151,11 @@ Puntero_objeto_en_IY
     dec l
     dec l
     dec l
+    dec l
 
-    call Extrae_address 
     push hl
     pop iy
+
     pop hl
 
     ret
@@ -191,7 +190,7 @@ Elimina_disparo_entidad
     ret 
 ; --------------------------------------------------------------------------------------
 ;
-;   05/10/24
+;   12/10/24
 ;
 
 Genera_datos_de_impresion_disparos_Entidades
@@ -208,40 +207,67 @@ Genera_datos_de_impresion_disparos_Entidades
 
 ;   En 1er lugar nos situamos en la 1ª caja de disparos de entidades.
 
-    ld hl,Indice_de_disparos_entidades_00
+    ld hl,Indice_de_disparos_entidades
 
 1 call Extrae_address
  
+    inc de
+    inc de
+
+    ld (Puntero_DESPLZ_DISPARO_ENTIDADES),de 
+
+    inc l
+
     ld a,(hl)
-    inc hl
-    add (hl)
+    and a                                                     ;? Si el byte alto de control es "0" significa que la caja está vacía.
+    jr z,Situa_en_siguiente_caja                              ;? Avanzamos a la siguiente caja en ese caso.
 
-    jr z,Situa_en_siguiente_caja                              ;? Avanza a la siguiente caja si esta está vacía. 
-   
-    dec hl
+; ----- ----- ----- -----   
 
-    ld (Stack),sp
-    ld sp,hl                                                  ;? SP se sitúa en el .db (Puntero objeto) de la caja de disparos de Amadeus.
+    dec l
+    dec l
+    dec l
+
+    call Extrae_address
+    push hl                                                   
+
+    dec e
+
+    ex de,hl
+
+    ld c,(hl)                                                 ;? 3er byte del disparo de C.
+    dec l
+    ld b,(hl)                                                 ;? 2º byte del disparo de B.
+    dec l
+    ld e,(hl)                                                 ;? 1er byte del disparo de E.
+
+    pop hl                                                    ;? Puntero de impresión en HL.                                                   
 
 Genera_scanlines_de_los_disparos_de_entidades.
 
-    pop bc
-    pop hl                                                    ;? Puntero_objeto del disparo en BC.
-;                                                             ;? Puntero_de_impresión del disparo en HL.
-    ld sp,(Nivel_scan_disparos_album_de_pintado)
+    ld iy,(Nivel_scan_disparos_album_de_pintado)
+    ld (iy+0),e
+    ld (iy+1),b
+    ld (iy+2),c
 
-    pop af
-    pop af
-    pop af
+    ld (iy+3),l
+    ld (iy+4),h
 
-    ld (Nivel_scan_disparos_album_de_pintado),sp              ;? Nuevo nivel del album de disparos.
-
-    push hl                                                   ;? Sube 2º scanline al álbum.
     call NextScan
-    push hl                                                   ;? Sube 1er scanline al álbum.
-    push bc                                                   ;? Sube Puntero_objeto del disparo al álbum.
 
-    ld sp,(Stack)
+    ld (iy+5),l
+    ld (iy+6),h
+
+    push iy
+    pop hl
+
+    ld a,7
+    add l
+    ld l,a
+
+    ld (Nivel_scan_disparos_album_de_pintado),hl
+
+; ----- ----- ----- -----   
 
     ex af,af                                                  ;? Actualiza contador de cajas y RET si "Z".
     dec a
@@ -250,16 +276,12 @@ Genera_scanlines_de_los_disparos_de_entidades.
 
 Situa_en_siguiente_caja
 
-    inc de
-    inc de
-
-    ex de,hl
-
+    ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
     jr 1B
 
 ; --------------------------------------------------------------------------------------
 ;
-;   09/10/24
+;   12/10/24
 ;
 
 Genera_disparo_de_entidad_maldosa
@@ -359,10 +381,17 @@ Genera_disparo_de_entidad_maldosa
  
     dec l
 
-    ld a,iyh    
+;   Por último, generamos los tres .db que imprimirán el disparo en pantalla.
+
+    ld a,(iy+02)    
     ld (hl),a
     dec l
-    ld a,iyl
+
+    ld a,(iy+01)
+    ld (hl),a
+    dec l
+
+    ld a,(iy+00)
     ld (hl),a
 
     ret
@@ -717,7 +746,7 @@ Elimina_disparo_Amadeus
 
 ; --------------------------------------------------------------------------------------
 ;
-;   09/10/24
+;   12/10/24
 ;
 
 Pinta_disparos 
@@ -744,10 +773,9 @@ Imprime_scanlines_de_disparo
 
     ld iy,Indice_disparo_Amadeus
 
-    ld a,e
-    cp iyl
-    jr c,4F                                             ;? Sabemos que los disparos de entidades están situados por debajo del (Indice_disparo_Amadeus). Al comparar el (Puntero objeto) del_
-;?                                                         _ disaparo a imprimir con (Indice_disparo_Amadeus) sabremos si se trata de un disparo de Amadeus o de entidad.
+    ld a,iyh
+    cp d
+    jr c,4F                                               
 
 ; Disparos de Amadeus.
 

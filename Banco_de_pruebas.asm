@@ -35,8 +35,8 @@ Scanlines_album equ $8000	;	($8000 - $8118) 						; Inicialmente 280 bytes, $118
 Scanlines_album_2 equ $811a	;    ($811a - $8232)
 Amadeus_scanlines_album equ $8234	;	($8234 - $8256) 				; Inicialmente 34 bytes, $22.
 Amadeus_scanlines_album_2 equ $8258	;	($8258 - $827a)
-Disparos_scanlines_album equ $827c	;	($827c - $82b6) 				; Inicialmente 58 bytes, $3a.
-Disparos_scanlines_album_2 equ $82b8	;	($82b8 - $82f2)	
+Disparos_scanlines_album equ $827c	;	($827c - $82bd) 				; Inicialmente 65 bytes, $41.
+Disparos_scanlines_album_2 equ $82c1	;	($82c0 - $8301)	
 
 ;																		; Scanlines_album. 
 
@@ -52,7 +52,7 @@ Disparos_scanlines_album_2 equ $82b8	;	($82b8 - $82f2)
 ;	13/08/24
 ;
 
-	org $82f4
+	org $8304
 
 	push af
 	push hl
@@ -836,7 +836,7 @@ End_frame
 ; 23/08/24 Llegados a este punto: NO HAY POSIBILIDAD DE GENERAR MÁS DISPAROS.
 ; Generamos los datos de impresión en el álbum_de_pintado y limpiamos el sobrante de datos del anterior FRAME si toca.
 
-	call Genera_datos_de_impresion_disparos_Entidades
+;	call Genera_datos_de_impresion_disparos_Entidades
 	call Genera_datos_de_impresion_disparos_Amadeus		; Genera los datos de impresión de los disparos de Amadeus y entidades.
 	call Calcula_bytes_pintado_disparos
 	call Limpia_album_de_pintado_disparos
