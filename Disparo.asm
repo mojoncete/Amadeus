@@ -14,35 +14,29 @@ Motor_de_disparos_entidades
 
  ; Caja vacía ???
 
-    ld a,(hl)
     inc l
-    add (hl)
+
+    ld a,(hl)
+    and a
     jr z,3F                                                              ; Caja vacía.
-    dec l
 
 ; --- Trabajamos con caja:
 
-    push hl
-
-; Nos situamos en el byte alto de (Control).
+; En 1er lugar almacenaremos (Puntero_objeto) en IY para desplazarlo más adelante si es necesario.
 
     call Rota_disparo_si_procede
 
 ; ------------------------------------------------------------
 
-    pop hl
-    inc l
-    inc l
+    dec l
+    dec l
+    dec l
 
     call Extrae_address    
 ;   (Puntero_de_impresion) del disparo en HL.
 
 ;! Velocidad del disparo de entidades.
 
-;    call NextScan
-;    call NextScan
-;    call NextScan 
-;    call NextScan 
     call NextScan 
 
 ; Después de mover el disparo comprobamos si ha salido por la parte baja de la pantalla.
@@ -100,15 +94,6 @@ Rota_disparo_si_procede
 
 ;   Nos situamos en el byte alto de (Control).
 
-    push hl
-    pop iy
-
-    inc l
-    inc l
-    inc l
-    inc l
-    inc l
-
     bit 6,(hl)
     jr nz,Decrementa_contador_de_control_de_disparo
     bit 7,(hl)
@@ -123,51 +108,60 @@ Decrementa_contador_de_control_de_disparo
     
 Rotamos_disparo_segun_proceda
 
-;    di
-;    jr $
-;    ei
-
 ; Vamos a rotar el disparo pero antes reiniciamos el contador.
 
     ld a,7
     add (hl)
     ld (hl),a                                                           ; Contador reinicializado.
 
+    call Puntero_objeto_en_IY                                           ; Rescatamos el Puntero_objeto en IY para poder desplazar el disparo.
+
     bit 6,(hl)
     jr nz,Rota_a_derecha
 
+
 Rota_a_izq
 
-    push iy
-    pop hl                                                       ; (Puntero objeto) en HL, (disparo).
-
-    rlc (hl)
-    inc l
-    rlc (hl)
+    di
+    jr $
+    ei
 
     ret
 
 Rota_a_derecha
 
-    push iy
-    pop hl
-
-    rrc (hl)
-
-    inc l
-
-    rrc (hl)
+    srl (iy)
 
     di
     jr c,$
     ei
 
-
 ; Se inicializa el disparo y se desplaza (Puntero_objeto) a la derecha.  
 
     ret
 
- ; ------------ ----------- ------------
+; ------------ ----------- ------------
+;
+;   11/10/24
+
+Puntero_objeto_en_IY    
+
+    push hl
+
+    dec l
+    dec l
+    dec l
+    dec l
+    dec l
+
+    call Extrae_address 
+    push hl
+    pop iy
+    pop hl
+
+    ret
+
+; ------------ ----------- ------------
 ;
 ;   25/9/24
 
@@ -214,7 +208,7 @@ Genera_datos_de_impresion_disparos_Entidades
 
 ;   En 1er lugar nos situamos en la 1ª caja de disparos de entidades.
 
-    call Inicia_Puntero_Disparo_Entidades
+    ld hl,Indice_de_disparos_entidades_00
 
 1 call Extrae_address
  
@@ -323,7 +317,7 @@ Genera_disparo_de_entidad_maldosa
     ld hl,Numero_de_disparos_de_entidades
     dec (hl)
 
-    call Inicia_Puntero_Disparo_Entidades
+    ld hl,Indice_de_disparos_entidades
 
 1 call Extrae_address
 
@@ -334,19 +328,14 @@ Genera_disparo_de_entidad_maldosa
 
 ;   Comprobamos si la caja está vacía.
 
-    ld a,(hl)
-    inc hl
-    add (hl)
+    inc l                                               
 
+    ld a,(hl)
+    and a
     jr nz,Situa_en_siguiente_disparo                    ; Avanza a la siguiente caja si esta esta completa. 
 
 ;   Caja vacía, vamos a generar un disparo.
 ;   Empezaremos de atrás hacia adelante, (1º los bytes de control), asi podremos modificar el (Puntero_de_impresión) antes de guardarlo.
-
-    inc l
-    inc l
-    inc l
-    inc l
 
     call Genera_byte_inclinacion
 

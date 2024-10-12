@@ -552,8 +552,6 @@ START
 	call Inicia_albumes_de_lineas_Amadeus
 	call Inicia_albumes_de_disparos
 
-	call Inicia_Puntero_Disparo_Entidades
-
 4 call Inicia_Entidades						 
 	call Inicia_Amadeus
 
@@ -1627,16 +1625,7 @@ Inicia_punteros_de_cajas
     ret
 
 ; *************************************************************************************************************************************************************
-;
-; 8/1/23
-;
-;	Inicializamos el puntero que se irá desplazando por el índice de disparos de Entidades.
 
-Inicia_Puntero_Disparo_Entidades ld hl,Indice_de_disparos_entidades
-	ld (Puntero_DESPLZ_DISPARO_ENTIDADES),hl
-	ret
-
-; *************************************************************************************************************************************************************
 ;
 ; 20/10/22
 ;
