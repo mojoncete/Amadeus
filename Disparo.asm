@@ -543,14 +543,31 @@ Activa_Impacto_en_entidad
 
 ; --------------------------------------------------------------------------------------
 ;
+;   13/10/24
+;
+
+;   HL contiene (Album_de_pintado_disparos_Amadeus).
+
+Limpia_album_de_pintado_disparos_Amadeus
+
+    ld b,6
+    xor a
+1 ld (hl),a
+    inc l
+    djnz 1B
+
+    ret
+
+; --------------------------------------------------------------------------------------
+;
 ;   11/09/24
 ;
 
 Limpia_album_de_borrado_disparos
 
-    ld hl,Ctrl_5
-    bit 2,(hl)
-    ret z
+;    ld hl,Ctrl_5
+;    bit 2,(hl)
+;    ret z
 
 ;    jr z,1F
 
@@ -564,14 +581,14 @@ Limpia_album_de_borrado_disparos
 
 Limpiando
 
-    xor a
-    ld hl,(Album_de_pintado_disparos)
-    ld (hl),a
-    ld e,l
-    ld d,h
-    inc e                                           ; DE = HL+1
-    ld bc,$003a
-    ldir
+;    xor a
+;    ld hl,(Album_de_pintado_disparos)
+;    ld (hl),a
+;    ld e,l
+;    ld d,h
+;    inc e                                           ; DE = HL+1
+;    ld bc,$003a
+;    ldir
 
     ret
 
@@ -583,13 +600,13 @@ Limpiando
 
 Calcula_bytes_pintado_disparos
 
-    ld hl,(Album_de_pintado_disparos)
-    ld b,l
-    ld hl,(Nivel_scan_disparos_album_de_pintado)
-    ld a,l
+;    ld hl,(Album_de_pintado_disparos)
+;    ld b,l
+;    ld hl,(Nivel_scan_disparos_album_de_pintado)
+;    ld a,l
 
-    sub b
-    ld (Num_de_bytes_album_de_disparos),a
+;    sub b
+;    ld (Num_de_bytes_album_de_disparos),a
 
     ret
 
@@ -631,14 +648,12 @@ Clean_only_one
 
 Motor_Disparos_Amadeus
 
-;   Averiguamos si la 1ª caja contiene disparo, para ello nos situamos en el byte alto del (Puntero_de_impresion).
-
     ld hl,Disparo_Amad+1
 
     inc (hl)
     dec (hl)
     
-    ret z
+    ret z                                                                ; Salimos si la caja no contiene disparo.
 
 ;   Esta caja contiene un disparo.
 
@@ -736,9 +751,6 @@ Elimina_disparo_Amadeus
     ld a,1
     ld (Permiso_de_disparo_Amadeus),a
 
-    ld hl,Ctrl_5                                        ;? Indica que ha desaparecido un disparo.
-    set 0,(hl)
-
     xor a
     inc a                                               ;? Siempre que eliminamos un disparo tenemos: "NZ".
 
@@ -746,140 +758,66 @@ Elimina_disparo_Amadeus
 
 ; --------------------------------------------------------------------------------------
 ;
-;   12/10/24
+;   13/10/24
 ;
 
-Pinta_disparos
+Pinta_disparos_Amadeus
 
-    ld (Stack),sp
     ld b,2
+    ld (Stack),sp 
+    ld sp,(Album_de_borrado_disparos_Amadeus)
+3 pop de
+    inc d
+    dec d
+    jr z,1F
+    pop hl
 
-    ld iy,Indice_disparo_Amadeus
-    ld a,iyh
+Imprime_scanlines_en_pantalla
 
-    ld hl,Ctrl_5
-    bit 2,(hl)
-    jr nz,$
+; 1er scanline
 
+    ld a,(de)
+    xor (hl)
+    ld (hl),a
+
+    inc e
+    inc l
+
+    ld a,(de)
+    xor (hl)
+    ld (hl),a
+
+    dec e
+    pop hl
+
+; 2º scanline
+
+    ld a,(de)
+    xor (hl)
+    ld (hl),a
+
+    inc e
+    inc l
+
+    ld a,(de)
+    xor (hl)
+    ld (hl),a
+
+    dec e
+
+    jr 1F
+
+2 ld sp,(Album_de_pintado_disparos_Amadeus) 
+    jr 3B
+1 djnz 2B
+    ld sp,(Stack)
     ret    
-
-;   Existen disparos en el album de borrado ???
-
-    ld sp,(Album_de_borrado_disparos)
-    pop de
-    cp d
-
-    
-Imprime_scanlines_de_disparo_Amadeus     
-
-    dec l
-
-    ld (Stack),sp    
-    ld sp,hl
-
-    pop de
-    pop hl
-
-; Puntero objeto en DE.
-; Puntero_de_impresión en HL.
-
-; 1er scanline.
-
-    ld a,(de)
-    xor (hl)
-    ld (hl),a
-
-    inc e
-    inc l
-
-    ld a,(de)
-    xor (hl)
-    ld (hl),a
-
-; 2º scanline.
-
-    pop hl
-    dec e
-
-    ld a,(de)
-    xor (hl)
-    ld (hl),a
-
-    inc e
-    inc l
-
-    ld a,(de)
-    xor (hl)
-    ld (hl),a
-
-
-; Seguimos pintando / borrando disparos si los hay. SP está situado ahora en el siguiente disparo del álbum de scanlines de disparos.
-
-;    jr 2B
-
-3 ld hl,(Album_de_pintado_disparos)
-;    jr 2B
-
-1 djnz 3B
-;    ld sp,(Stack)
-    ret
-
-; Disparos de entidades
-
-; 1er scanline.
-
-4 ld a,(de)
-    xor (hl)
-    ld (hl),a
-
-    inc l
-    inc e
-
-    ld a,(de)
-    xor (hl)
-    ld (hl),a
-
-    inc l
-    inc e
-
-    ld a,(de)
-    xor (hl)
-    ld (hl),a
-
-    dec e
-    dec e
-
-; 2º scanline.
-
-    pop hl
-
-    ld a,(de)
-    xor (hl)
-    ld (hl),a
-
-    inc l
-    inc e
-
-    ld a,(de)
-    xor (hl)
-    ld (hl),a
-
-    inc l
-    inc e
-
-    ld a,(de)
-    xor (hl)
-    ld (hl),a
-
-; Seguimos pintando / borrando disparos si los hay. SP está situado ahora en el siguiente disparo del álbum de scanlines de disparos.
-
-;    jr 2B
 
 ; --------------------------------------------------------------------------------------
 ;
-;   14/09/24
+;   13/10/24
 ;
-;   Modifica: HL y DE.
+;   Modifica: HL,BC y DE.
 
 
 Genera_datos_de_impresion_disparos_Amadeus
@@ -897,13 +835,11 @@ Genera_scanlines_de_disparo_Amadeus
 
     pop hl                                                    ;? Puntero_objeto del disparo en DE.
 ;                                                             ;? Puntero_de_impresión del disparo en HL.
-    ld sp,(Nivel_scan_disparos_album_de_pintado)
+    ld sp,(Album_de_pintado_disparos_Amadeus)
 
     pop bc
     pop bc
     pop bc
-
-    ld (Nivel_scan_disparos_album_de_pintado),sp              ;? Nuevo nivel del album de disparos.
 
     push hl                                                   ;? Sube 2º scanline al álbum.
     call PreviousScan
@@ -1054,7 +990,7 @@ Detecta_impacto_en_disparo_de_Amadeus
 Extraccion_de_datos                                        
 
     inc de
-    inc de                                                 ;    Se sitúa en Puntero_objeto aumentdao del disparo para comprobar colisión.   
+    inc de                                                 ;    Se sitúa en Puntero_objeto aumentado del disparo para comprobar colisión.   
 
     ld e,(hl)
     inc hl

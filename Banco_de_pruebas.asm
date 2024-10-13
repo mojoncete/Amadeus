@@ -37,10 +37,10 @@ Amadeus_scanlines_album equ $8234	;	($8234 - $8256) 				; Inicialmente 34 bytes,
 Amadeus_scanlines_album_2 equ $8258	;	($8258 - $827a)
 
 Amadeus_disparos_scanlines_album equ $827c	;	($827c - $8281) 		; 6 Bytes, (1 único disparo).
-Amadeus_disparos_scanlines_album_2 equ $827c	;	($8284 - $8289)
+Amadeus_disparos_scanlines_album_2 equ $8284	;	($8284 - $8289)
 
-Entidades_disparos_scanlines_album equ $82c1	;	($82c1 - $82f2)		; 49 bytes, (7 disparos, 7 bytes cada uno), $31. 
-Entidades_disparos_scanlines_album_2 equ $82c1	;	($82f4 - $8325)
+Entidades_disparos_scanlines_album equ $828c	;	($828c - $82bd)		; 49 bytes, (7 disparos, 7 bytes cada uno), $31. 
+Entidades_disparos_scanlines_album_2 equ $82c0	;	($82c0 - $82f1)
 
 ;																		; Scanlines_album. 
 
@@ -56,7 +56,7 @@ Entidades_disparos_scanlines_album_2 equ $82c1	;	($82f4 - $8325)
 ;	13/08/24
 ;
 
-	org $8328
+	org $82f4
 
 	push af
 	push hl
@@ -69,7 +69,7 @@ Entidades_disparos_scanlines_album_2 equ $82c1	;	($82f4 - $8325)
 
 ; Disparos.
 
-;	call Pinta_disparos 
+	call Pinta_disparos_Amadeus 
 
 ; Shield -----------------------
 
@@ -363,7 +363,7 @@ Datos_de_entidad defw 0									; Contiene los bytes de información de la entid
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;	11/09/24
+;	13/10/24
 ;
 ;	Álbumes.
 
@@ -379,8 +379,13 @@ Album_de_pintado defw 0
 Album_de_borrado defw 0
 Album_de_pintado_Amadeus defw 0
 Album_de_borrado_Amadeus defw 0
-Album_de_pintado_disparos defw 0
-Album_de_borrado_disparos defw 0
+
+Album_de_pintado_disparos_Amadeus defw 0
+Album_de_borrado_disparos_Amadeus defw 0
+
+Album_de_pintado_disparos_Entidades defw 0
+Album_de_borrado_disparos_Entidades defw 0
+
 
 Nivel_scan_disparos_album_de_pintado defw 0
 Num_de_bytes_album_de_disparos db 0
@@ -521,18 +526,14 @@ START
 
 ; Limpiamos pantalla.
 
-;	ld a,%00000111
-;	call Cls
-;	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
+	ld a,%00000111
+	call Cls
+	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
 ; INICIALIZACIÓN.
 
 	ld b,7   											 ; Generamos 7 nº aleatorios.
 	call Derivando_RND 									 ; Rutina de generación de nº aleatorios.
-
-	ld a,%00000111
-;	call Cls
-	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
 	call Extrae_numero_aleatorio_y_avanza
 
@@ -640,8 +641,13 @@ Main
 ; Gestión de disparos.
 
 ;	call Motor_de_disparos_entidades
-;	call Motor_Disparos_Amadeus							; Mueve y detecta colisión de los disparos de Amadeus.
-;	call Change_Disparos								; Intercambiamos los álbumes de disparos.
+
+	call Change_Disparos								; Intercambiamos los álbumes de disparos.
+	call Motor_Disparos_Amadeus							; Mueve y detecta colisión de los disparos de Amadeus.
+
+
+
+
 
 ; En el FRAME que acabamos de pintar puede existir una posible colisión entre alguna entidad y Amadeus. 
 ; Si alguna de las coordenadas_X de alguna entidad que esté en zona de Amadeus coincide con alguna de las coordenadas_X de Amadeus, habrá que comprobar si existe colisión.
@@ -841,16 +847,16 @@ End_frame
 ; Generamos los datos de impresión en el álbum_de_pintado y limpiamos el sobrante de datos del anterior FRAME si toca.
 
 ;	call Genera_datos_de_impresion_disparos_Entidades
-;	call Genera_datos_de_impresion_disparos_Amadeus		; Genera los datos de impresión de los disparos de Amadeus y entidades.
+	call Genera_datos_de_impresion_disparos_Amadeus		; Genera los datos de impresión de los disparos de Amadeus y entidades.
 ;	call Calcula_bytes_pintado_disparos
-;	call Limpia_album_de_pintado_disparos
+;	call Limpia_Album_de_pintado_disparos_Amadeus
 
 ; ------------ ------------- --------------
 
 ;	xor a 
 ;	ld (Permiso_de_disparo_Entidades),a
 
-	call Actuaiza_sp_de_disparos_de_entidades
+;	call Actuaiza_sp_de_disparos_de_entidades
 
 	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
@@ -1032,12 +1038,14 @@ Change_Amadeus
 
 Change_Disparos
 
-	ld hl,(Album_de_pintado_disparos)
-	ld de,(Album_de_borrado_disparos)
+1 ld hl,(Album_de_pintado_disparos_Amadeus)
+	ld de,(Album_de_borrado_disparos_Amadeus)
 	ex de,hl
-	ld (Album_de_pintado_disparos),hl
-	ld (Album_de_borrado_disparos),de
-	ld (Nivel_scan_disparos_album_de_pintado),hl
+	ld (Album_de_pintado_disparos_Amadeus),hl
+	ld (Album_de_borrado_disparos_Amadeus),de
+;	ld (Nivel_scan_disparos_album_de_pintado),hl
+
+	call Limpia_album_de_pintado_disparos_Amadeus
 
 	ret
 
@@ -1597,19 +1605,10 @@ Inicia_albumes_de_lineas_Amadeus
 
 Inicia_albumes_de_disparos
 
-; Amadeus_disparos_scanlines_album equ $827c	;	($827c - $8281) 		; 6 Bytes, (1 único disparo).
-; Amadeus_disparos_scanlines_album_2 equ $827c	;	($8284 - $8289)
-
-; Entidades_disparos_scanlines_album equ $82c1	;	($82c1 - $82f2)		; 49 bytes, (7 disparos, 7 bytes cada uno), $31. 
-; Entidades_disparos_scanlines_album_2 equ $82c1	;	($82f4 - $8325)
-
 	ld hl,Amadeus_disparos_scanlines_album
-	ld (Album_de_pintado_disparos),hl
+	ld (Album_de_pintado_disparos_Amadeus),hl
 	ld hl,Amadeus_disparos_scanlines_album_2
-	ld (Album_de_borrado_disparos),hl
-
-	ld hl,Amadeus_disparos_scanlines_album
-	ld (Nivel_scan_disparos_album_de_pintado),hl
+	ld (Album_de_borrado_disparos_Amadeus),hl
 
 	ret
 
@@ -1940,11 +1939,11 @@ Teclado
 
 ; Está habilitado el disparo de Amadeus??, podemos disparar??. Si no es así saltamos a 1F.
 
-;	ld a,$f7												; "5" para disparar.
-;	in a,($fe)
-;	and $10
+	ld a,$f7												; "5" para disparar.
+	in a,($fe)
+	and $10
 
-;	call z,Genera_disparo_Amadeus
+	call z,Genera_disparo_Amadeus
 
 1 ld a,$f7		  											; Rutina de TECLADO. Detecta cuando se pulsan las teclas "1" y "2"  y llama a las rutinas de "Mov_izq" y "Mov_der". $f7  detecta fila de teclas: (5,4,3,2,1).
 	in a,($fe)												; Carga en A la información proveniente del puerto $FE, teclado.
