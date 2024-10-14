@@ -331,6 +331,9 @@ Genera_disparo_de_entidad_maldosa
 ;   (Puntero_objeto) del disparo inicial siempre será el mismo en cualquier caso, ( para que quede centrado ) en cualquier_
 ;   _ posición de cualquier entidad, (como ocurre con el puntero de impresión de las explosiones de entidades).
 
+    ld hl,Ctrl_5
+    set 2,(hl)
+
     ld hl,Permiso_de_disparo_Entidades			         			
     dec (hl)                                            ; No más disparos en este FRAME.
 
@@ -600,13 +603,13 @@ Limpiando
 
 Calcula_bytes_pintado_disparos
 
-;    ld hl,(Album_de_pintado_disparos)
-;    ld b,l
-;    ld hl,(Nivel_scan_disparos_album_de_pintado)
-;    ld a,l
+    ld hl,(Album_de_pintado_disparos_Entidades)
+    ld b,l
+    ld hl,(Nivel_scan_disparos_album_de_pintado)
+    ld a,l
 
-;    sub b
-;    ld (Num_de_bytes_album_de_disparos),a
+    sub b
+    ld (Num_de_bytes_album_de_disparos),a
 
     ret
 
@@ -618,14 +621,14 @@ Calcula_bytes_pintado_disparos
 ;   _(album_de_pintado_disparos) del FRAME actual, (siempre que el álbum del FRAME anterior contenga más_ 
 ;   _disparos que el álbum del FRAME actual). 
 
-Limpia_album_de_pintado_disparos
+Limpia_album_de_pintado_disparos_entidades
 
     ld a,(Num_de_bytes_album_de_disparos)   
     and a
     jr z,Clean_only_one
 
     ld b,a
-    ld a,$3b
+    ld a,$31
     sub b
     ld b,a
 2 xor a
@@ -638,7 +641,7 @@ Limpia_album_de_pintado_disparos
 
 Clean_only_one
 
-    ld b,6
+    ld b,7
     jr 2B    
 
 ; --------------------------------------------------------------------------------------
@@ -750,6 +753,8 @@ Elimina_disparo_Amadeus
 
     ld a,1
     ld (Permiso_de_disparo_Amadeus),a
+
+    call Limpia_album_de_pintado_disparos_Amadeus
 
     xor a
     inc a                                               ;? Siempre que eliminamos un disparo tenemos: "NZ".
@@ -869,10 +874,6 @@ Genera_disparo_Amadeus
     ld (Permiso_de_disparo_Amadeus),a                        ;? No volveremos a tener permiso de disparo hasta que desaparezaca este disparo.
 
 Define_puntero_objeto_disparo
-
-
-    ld hl,Ctrl_5
-    set 2,(hl)
 
 ;   Inicializamos contador.
 

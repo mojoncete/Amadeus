@@ -419,7 +419,7 @@ Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una únic
 ;															BIT 7, "1" Indica que se ha iniciado el proceso de explosión en Amadeus.
 ;																_ Mientras este bit este activo, no se generarán dos explosiones de entidades a la vez.
 
-Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una única entidad. Lo utiliza la rutina [Inicia_entidad].
+Ctrl_4 db 0 											;   3er Byte de Ctrl. general, (no específico) a una única entidad. Lo utiliza la rutina [Inicia_entidad].
 ;
 ;                                                           Los bits (0-3) indican el (Tipo) de entidad que estamos iniciando.
 ;
@@ -436,8 +436,7 @@ Ctrl_4 db 0 											; 3er Byte de Ctrl. general, (no específico) a una únic
 ;	                                                        BIT 6 (Ctrl_4) ..... MOV_MASTICADOS GENERADOS. Entidad de (Tipo)_3.
 ;	                                                        BIT 7 (Ctrl_4) ..... MOV_MASTICADOS GENERADOS. Entidad de (Tipo)_4.
 
-Ctrl_5 db 0												;	BIT 0, "1" Indica que se ha eliminado un disparo. (Esta información es necesaria para borrar un único disparo de la pantalla).	
-;															BIT 1, "1" Indica que la entidad en curso es la alcanzada por nuestro disparo. La comparativa entre coordenadas ha sido satisfactoria. 
+Ctrl_5 db 0												;	BIT 1, "1" Indica que la entidad en curso es la alcanzada por nuestro disparo. La comparativa entre coordenadas ha sido satisfactoria. 
 ;                                                           BIT 2, "1" Indica que ha desaparecido un disparo de entidad.														
 
 
@@ -638,11 +637,17 @@ Main
 ;
 ; 20/09/24
 
+
+    ld a,(Ctrl_5)
+    bit 2,a
+    di
+    jr nz,$
+    ei
+
 ; Gestión de disparos.
 
-;	call Motor_de_disparos_entidades
-
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
+;	call Motor_de_disparos_entidades
 	call Motor_Disparos_Amadeus							; Mueve y detecta colisión de los disparos de Amadeus.
 
 
@@ -760,9 +765,9 @@ Main
 
 ; TODO: Generamos disparo ???
 
-;	ld a,(Permiso_de_disparo_Entidades)
-;	and a
-;	call nz,Entidad_genera_disparo_si_procede
+	ld a,(Permiso_de_disparo_Entidades)
+	and a
+	call nz,Entidad_genera_disparo_si_procede
 
 4 call Colision_Entidad_Amadeus									; Si hay posibilidad de COLISION, set 2,(Impacto2) y (Impacto) de entidad en curso a "1".
 
@@ -846,16 +851,15 @@ End_frame
 ; 23/08/24 Llegados a este punto: NO HAY POSIBILIDAD DE GENERAR MÁS DISPAROS.
 ; Generamos los datos de impresión en el álbum_de_pintado y limpiamos el sobrante de datos del anterior FRAME si toca.
 
-;	call Genera_datos_de_impresion_disparos_Entidades
+	call Genera_datos_de_impresion_disparos_Entidades
 	call Genera_datos_de_impresion_disparos_Amadeus		; Genera los datos de impresión de los disparos de Amadeus y entidades.
-;	call Calcula_bytes_pintado_disparos
-;	call Limpia_Album_de_pintado_disparos_Amadeus
+	call Calcula_bytes_pintado_disparos
+	call Limpia_album_de_pintado_disparos_entidades
 
 ; ------------ ------------- --------------
 
 ;	xor a 
 ;	ld (Permiso_de_disparo_Entidades),a
-
 ;	call Actuaiza_sp_de_disparos_de_entidades
 
 	ld hl,(Album_de_borrado)
@@ -1038,14 +1042,26 @@ Change_Amadeus
 
 Change_Disparos
 
+; Álbumes de Amadeus.
+
 1 ld hl,(Album_de_pintado_disparos_Amadeus)
 	ld de,(Album_de_borrado_disparos_Amadeus)
 	ex de,hl
 	ld (Album_de_pintado_disparos_Amadeus),hl
 	ld (Album_de_borrado_disparos_Amadeus),de
-;	ld (Nivel_scan_disparos_album_de_pintado),hl
-
 	call Limpia_album_de_pintado_disparos_Amadeus
+
+; Álbumes de entidades.
+
+	ld hl,(Album_de_pintado_disparos_Entidades)
+	ld de,(Album_de_borrado_disparos_Entidades)
+	ex de,hl
+	ld (Album_de_pintado_disparos_Entidades),hl
+	ld (Album_de_borrado_disparos_Entidades),de
+	ld (Nivel_scan_disparos_album_de_pintado),hl
+
+	xor a
+	ld (Num_de_bytes_album_de_disparos),a
 
 	ret
 
@@ -1609,6 +1625,13 @@ Inicia_albumes_de_disparos
 	ld (Album_de_pintado_disparos_Amadeus),hl
 	ld hl,Amadeus_disparos_scanlines_album_2
 	ld (Album_de_borrado_disparos_Amadeus),hl
+
+	ld hl,Entidades_disparos_scanlines_album
+	ld (Album_de_pintado_disparos_Entidades),hl
+	ld (Nivel_scan_disparos_album_de_pintado),hl
+
+	ld hl,Entidades_disparos_scanlines_album_2
+	ld (Album_de_borrado_disparos_Entidades),hl
 
 	ret
 
