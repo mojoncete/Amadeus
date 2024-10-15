@@ -1,3 +1,65 @@
+; --------------------------------------------------------------------------------------
+;
+;   15/10/24
+;
+
+Pinta_disparos_Entidades
+
+    ld hl,Ctrl_5
+    bit 2,(hl)
+    jr nz,$
+
+;    ld b,2
+;    ld (Stack),sp 
+;    ld sp,(Album_de_borrado_disparos_Amadeus)
+;3 pop de
+;    inc d
+;    dec d
+;    jr z,1F
+;    pop hl
+
+;Imprime_scanlines_en_pantalla
+
+; 1er scanline
+
+;    ld a,(de)
+;    xor (hl)
+;    ld (hl),a
+
+;    inc e
+;    inc l
+
+;    ld a,(de)
+;    xor (hl)
+;    ld (hl),a
+
+;    dec e
+;    pop hl
+
+; 2º scanline
+
+;    ld a,(de)
+;    xor (hl)
+;    ld (hl),a
+
+;    inc e
+;    inc l
+
+;    ld a,(de)
+;    xor (hl)
+;    ld (hl),a
+
+;    dec e
+
+;    jr 1F
+
+;2 ld sp,(Album_de_pintado_disparos_Amadeus) 
+;    jr 3B
+;1 djnz 2B
+;   ld sp,(Stack)
+    ret    
+
+
 Motor_de_disparos_entidades
 
     ld a,(Numero_de_disparos_de_entidades)
@@ -561,41 +623,6 @@ Limpia_album_de_pintado_disparos_Amadeus
     djnz 1B
 
     ret
-
-; --------------------------------------------------------------------------------------
-;
-;   11/09/24
-;
-
-Limpia_album_de_borrado_disparos
-
-;    ld hl,Ctrl_5
-;    bit 2,(hl)
-;    ret z
-
-;    jr z,1F
-
-;    res 2,(hl)
-
-;    jr Limpiando
-
-;1 bit 0,(hl)
-;    ret z
-;    res 0,(hl)
-
-Limpiando
-
-;    xor a
-;    ld hl,(Album_de_pintado_disparos)
-;    ld (hl),a
-;    ld e,l
-;    ld d,h
-;    inc e                                           ; DE = HL+1
-;    ld bc,$003a
-;    ldir
-
-    ret
-
 
 ; --------------------------------------------------------------------------------------
 ;

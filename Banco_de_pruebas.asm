@@ -39,8 +39,8 @@ Amadeus_scanlines_album_2 equ $8258	;	($8258 - $827a)
 Amadeus_disparos_scanlines_album equ $827c	;	($827c - $8281) 		; 6 Bytes, (1 único disparo).
 Amadeus_disparos_scanlines_album_2 equ $8284	;	($8284 - $8289)
 
-Entidades_disparos_scanlines_album equ $828c	;	($828c - $82bd)		; 49 bytes, (7 disparos, 7 bytes cada uno), $31. 
-Entidades_disparos_scanlines_album_2 equ $82c0	;	($82c0 - $82f1)
+Entidades_disparos_scanlines_album equ $828c	;	($828c - $82bc)		; 49 bytes, (7 disparos, 7 bytes cada uno), $31. 
+Entidades_disparos_scanlines_album_2 equ $82bf	;	($82c0 - $82f1)
 
 ;																		; Scanlines_album. 
 
@@ -70,6 +70,7 @@ Entidades_disparos_scanlines_album_2 equ $82c0	;	($82c0 - $82f1)
 ; Disparos.
 
 	call Pinta_disparos_Amadeus 
+	call Pinta_disparos_Entidades
 
 ; Shield -----------------------
 
@@ -437,11 +438,7 @@ Ctrl_4 db 0 											;   3er Byte de Ctrl. general, (no específico) a una ún
 ;	                                                        BIT 7 (Ctrl_4) ..... MOV_MASTICADOS GENERADOS. Entidad de (Tipo)_4.
 
 Ctrl_5 db 0												;	BIT 1, "1" Indica que la entidad en curso es la alcanzada por nuestro disparo. La comparativa entre coordenadas ha sido satisfactoria. 
-;                                                           BIT 2, "1" Indica que ha desaparecido un disparo de entidad.														
-
-
-
-
+										
 
 ; Gestión de Disparos.
 
@@ -578,40 +575,8 @@ START
 ;! ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	call Inicia_punteros_de_cajas						 ; Situa (Puntero_store_caja) en el 1er .db de la 1ª caja del índice de entidades.
-;														 ; Situa (Puntero_restore_caja) en el 1er .db de la 2ª caja del índice de cajas de entidades.
-
-; Si Amadeus ya está iniciado, saltamos a [Inicia_punteros_de_cajas] y [Restore_entidad].
-; (Esto se dá cuando se inicia una nueva oleada).
-
-;	ld a,(Ctrl_1)
-;	bit 3,a
-;	jr nz,5F											 ; Loop
-
-;	ld de,Amadeus_db
-;	call Store_Amadeus
-
-; 	INICIA DISPAROS !!!!!
-
-; Una vez inicializadas las entidades y Amadeus, Cargamos la 1ª entidad en DRAW.
-
-;5 call Inicia_punteros_de_cajas 
-;	call Restore_entidad
-
-;	ld a,(Ctrl_1)
-;	bit 3,a
-;	jr z,6F
-
-; Se ha producido `RECARGA' de las cajas DRAW, RES 3(HL).
-
-;	ld hl,Ctrl_1
-;	res 3,(hl)
-;	jr Main
-
-; Damos por concluida la construcción del FRAME. 
-; 
 
 	call Inicia_Shield
-
 
 6 ld hl,(Scanlines_album_SP)
 	ld (Techo_Scanlines_album),hl
@@ -636,12 +601,6 @@ START
 Main 
 ;
 ; 20/09/24
-
-;    ld a,(Ctrl_5)
-;    bit 2,a
-;    di
-;    jr nz,$
-;    ei
 
 ; Gestión de disparos.
 
@@ -764,9 +723,9 @@ Main
 
 ; TODO: Generamos disparo ???
 
-;	ld a,(Permiso_de_disparo_Entidades)
-;	and a
-;	call nz,Entidad_genera_disparo_si_procede
+	ld a,(Permiso_de_disparo_Entidades)
+	and a
+	call nz,Entidad_genera_disparo_si_procede
 
 4 call Colision_Entidad_Amadeus									; Si hay posibilidad de COLISION, set 2,(Impacto2) y (Impacto) de entidad en curso a "1".
 
@@ -850,16 +809,12 @@ End_frame
 ; 23/08/24 Llegados a este punto: NO HAY POSIBILIDAD DE GENERAR MÁS DISPAROS.
 ; Generamos los datos de impresión en el álbum_de_pintado y limpiamos el sobrante de datos del anterior FRAME si toca.
 
-;	call Genera_datos_de_impresion_disparos_Entidades
+	call Genera_datos_de_impresion_disparos_Entidades
 	call Genera_datos_de_impresion_disparos_Amadeus		; Genera los datos de impresión de los disparos de Amadeus y entidades.
-;	call Calcula_bytes_pintado_disparos
+	call Calcula_bytes_pintado_disparos
 ;	call Limpia_album_de_pintado_disparos_entidades
 
 ; ------------ ------------- --------------
-
-;	xor a 
-;	ld (Permiso_de_disparo_Entidades),a
-;	call Actuaiza_sp_de_disparos_de_entidades
 
 	ld hl,(Album_de_borrado)
 	ld (Scanlines_album_SP),hl
@@ -1059,8 +1014,8 @@ Change_Disparos
 	ld (Album_de_borrado_disparos_Entidades),de
 	ld (Nivel_scan_disparos_album_de_pintado),hl
 
-	xor a
-	ld (Num_de_bytes_album_de_disparos),a
+;	xor a
+;	ld (Num_de_bytes_album_de_disparos),a
 
 	ret
 
