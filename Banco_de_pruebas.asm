@@ -637,12 +637,11 @@ Main
 ;
 ; 20/09/24
 
-
-    ld a,(Ctrl_5)
-    bit 2,a
-    di
-    jr nz,$
-    ei
+;    ld a,(Ctrl_5)
+;    bit 2,a
+;    di
+;    jr nz,$
+;    ei
 
 ; Gestión de disparos.
 
@@ -765,9 +764,9 @@ Main
 
 ; TODO: Generamos disparo ???
 
-	ld a,(Permiso_de_disparo_Entidades)
-	and a
-	call nz,Entidad_genera_disparo_si_procede
+;	ld a,(Permiso_de_disparo_Entidades)
+;	and a
+;	call nz,Entidad_genera_disparo_si_procede
 
 4 call Colision_Entidad_Amadeus									; Si hay posibilidad de COLISION, set 2,(Impacto2) y (Impacto) de entidad en curso a "1".
 
@@ -851,10 +850,10 @@ End_frame
 ; 23/08/24 Llegados a este punto: NO HAY POSIBILIDAD DE GENERAR MÁS DISPAROS.
 ; Generamos los datos de impresión en el álbum_de_pintado y limpiamos el sobrante de datos del anterior FRAME si toca.
 
-	call Genera_datos_de_impresion_disparos_Entidades
+;	call Genera_datos_de_impresion_disparos_Entidades
 	call Genera_datos_de_impresion_disparos_Amadeus		; Genera los datos de impresión de los disparos de Amadeus y entidades.
-	call Calcula_bytes_pintado_disparos
-	call Limpia_album_de_pintado_disparos_entidades
+;	call Calcula_bytes_pintado_disparos
+;	call Limpia_album_de_pintado_disparos_entidades
 
 ; ------------ ------------- --------------
 

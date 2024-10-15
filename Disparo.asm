@@ -553,6 +553,7 @@ Activa_Impacto_en_entidad
 
 Limpia_album_de_pintado_disparos_Amadeus
 
+    ld hl,(Album_de_pintado_disparos_Amadeus)
     ld b,6
     xor a
 1 ld (hl),a
