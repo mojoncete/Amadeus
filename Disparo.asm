@@ -1,6 +1,6 @@
 ; --------------------------------------------------------------------------------------
 ;
-;   15/10/24
+;   18/10/24
 ;
 
 Pinta_disparos_Entidades
@@ -9,56 +9,76 @@ Pinta_disparos_Entidades
     bit 2,(hl)
     jr nz,$
 
-;    ld b,2
-;    ld (Stack),sp 
-;    ld sp,(Album_de_borrado_disparos_Amadeus)
-;3 pop de
-;    inc d
-;    dec d
-;    jr z,1F
-;    pop hl
+    ld (Stack),sp 
+    ld sp,(Album_de_borrado_disparos_Entidades)
+    pop iy
+    pop bc                          ; 1er .db IYL
+;                                   ; 2º  .db IYH
+;                                   ; 3er .db C.
 
-;Imprime_scanlines_en_pantalla
+    ld b,2
 
-; 1er scanline
+;   Album vacío ???
 
-;    ld a,(de)
-;    xor (hl)
-;    ld (hl),a
+    ld a,iyl
+    add iyh
+    add c
+    jr z,1F
 
-;    inc e
-;    inc l
+;   Imprime album, (contiene datos).   
 
-;    ld a,(de)
-;    xor (hl)
-;    ld (hl),a
+    dec sp
 
-;    dec e
-;    pop hl
+    pop hl                          ; Puntero de impresión en HL.
 
-; 2º scanline
+; Imprime el 1er scanline del disparo.
 
-;    ld a,(de)
-;    xor (hl)
-;    ld (hl),a
+    ld a,iyl    
+    xor (hl)
+    ld (hl),a
 
-;    inc e
-;    inc l
+    inc l
 
-;    ld a,(de)
-;    xor (hl)
-;    ld (hl),a
+    ld a,iyh
+    xor (hl)
+    ld (hl),a
 
-;    dec e
+    inc l
 
-;    jr 1F
+    ld a,c
+    xor (hl)
+    ld (hl),a
 
-;2 ld sp,(Album_de_pintado_disparos_Amadeus) 
-;    jr 3B
-;1 djnz 2B
-;   ld sp,(Stack)
+; Imprime el 2º scanline del disparo.
+
+    pop hl
+
+    ld a,iyl    
+    xor (hl)
+    ld (hl),a
+
+    inc l
+
+    ld a,iyh
+    xor (hl)
+    ld (hl),a
+
+    inc l
+
+    ld a,c
+    xor (hl)
+    ld (hl),a    
+
+2 ld sp,(Album_de_pintado_disparos_Amadeus) 
+    jr 3B
+1 djnz 2B
+    ld sp,(Stack)
     ret    
 
+; --------------------------------------------------------------------------------------
+;
+;   15/10/24
+;
 
 Motor_de_disparos_entidades
 

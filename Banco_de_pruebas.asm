@@ -602,6 +602,14 @@ Main
 ;
 ; 20/09/24
 
+
+    ld hl,Ctrl_5
+    bit 2,(hl)
+    di
+    jr nz,$
+    ei
+
+
 ; Gestión de disparos.
 
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
