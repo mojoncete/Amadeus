@@ -1,23 +1,20 @@
 ; --------------------------------------------------------------------------------------
 ;
-;   18/10/24
+;   19/10/24
 ;
 
 Pinta_disparos_Entidades
 
-    ld hl,Ctrl_5
-    bit 2,(hl)
-    jr nz,$
-
     ld (Stack),sp 
     ld sp,(Album_de_borrado_disparos_Entidades)
-    pop iy
+
+    ld a,2
+    ex af,af
+
+3 pop iy
     pop bc                          ; 1er .db IYL
 ;                                   ; 2º  .db IYH
 ;                                   ; 3er .db C.
-
-    ld b,2
-
 ;   Album vacío ???
 
     ld a,iyl
@@ -69,11 +66,16 @@ Pinta_disparos_Entidades
     xor (hl)
     ld (hl),a    
 
-2 ld sp,(Album_de_pintado_disparos_Amadeus) 
-    jr 3B
-1 djnz 2B
+1 ex af,af
+    dec a
+    jr nz,2F
+
     ld sp,(Stack)
     ret    
+
+2 ld sp,(Album_de_pintado_disparos_Entidades) 
+    ex af,af
+    jr 3B
 
 ; --------------------------------------------------------------------------------------
 ;
@@ -106,7 +108,7 @@ Motor_de_disparos_entidades
 
 ; En 1er lugar almacenaremos (Puntero_objeto) en IY para desplazarlo más adelante si es necesario.
 
-    call Rota_disparo_si_procede
+;    call Rota_disparo_si_procede
 
 ; ------------------------------------------------------------
 
@@ -248,26 +250,30 @@ Puntero_objeto_en_IY
 
 Elimina_disparo_entidad
 
+    di
+    jr $
+    ei
+
     ld hl,Numero_de_disparos_de_entidades
     inc (hl)                                                            ; Incrementamos el nº de disparos de entidades.
 
-    pop hl
-    push hl
+;    pop hl
+;    push hl
 
-    dec hl
-    dec hl                                                              ; Sitúa en el 1er .db de la caja.
+;    dec hl
+;    dec hl                                                              ; Sitúa en el 1er .db de la caja.
 
-    ld d,6                                                              ; Contador
-    xor a                                                               ; Borrador
+;    ld d,6                                                              ; Contador
+;    xor a                                                               ; Borrador
 
-1 ld (hl),a
-    dec d
-    inc hl
-    jr nz,1B
+;1 ld (hl),a
+;    dec d
+;    inc hl
+;    jr nz,1B
 
-    pop de
+;    pop de
 
-    ld hl,0
+;    ld hl,0
 
     ret 
 ; --------------------------------------------------------------------------------------
@@ -534,7 +540,15 @@ Modifica_puntero_de_impresion
 
 ;   Puntero de impresión del disparo en BC. 
 
-    ld bc,(Puntero_de_impresion_disparo_de_entidad)
+    push hl
+
+    ld hl,(Puntero_de_impresion_disparo_de_entidad)
+    call NextScan
+
+    ld c,l
+    ld b,h
+
+    pop hl
 
     ex af,af
     bit 6,a

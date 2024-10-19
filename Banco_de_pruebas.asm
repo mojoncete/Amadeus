@@ -602,23 +602,11 @@ Main
 ;
 ; 20/09/24
 
-
-    ld hl,Ctrl_5
-    bit 2,(hl)
-    di
-    jr nz,$
-    ei
-
-
 ; Gestión de disparos.
 
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
-;	call Motor_de_disparos_entidades
+	call Motor_de_disparos_entidades
 	call Motor_Disparos_Amadeus							; Mueve y detecta colisión de los disparos de Amadeus.
-
-
-
-
 
 ; En el FRAME que acabamos de pintar puede existir una posible colisión entre alguna entidad y Amadeus. 
 ; Si alguna de las coordenadas_X de alguna entidad que esté en zona de Amadeus coincide con alguna de las coordenadas_X de Amadeus, habrá que comprobar si existe colisión.
@@ -819,7 +807,7 @@ End_frame
 
 	call Genera_datos_de_impresion_disparos_Entidades
 	call Genera_datos_de_impresion_disparos_Amadeus		; Genera los datos de impresión de los disparos de Amadeus y entidades.
-	call Calcula_bytes_pintado_disparos
+;	call Calcula_bytes_pintado_disparos
 ;	call Limpia_album_de_pintado_disparos_entidades
 
 ; ------------ ------------- --------------
