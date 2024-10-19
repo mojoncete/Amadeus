@@ -66,6 +66,8 @@ Pinta_disparos_Entidades
     xor (hl)
     ld (hl),a    
 
+    jr 3B
+
 1 ex af,af
     dec a
     jr nz,2F
@@ -250,32 +252,37 @@ Puntero_objeto_en_IY
 
 Elimina_disparo_entidad
 
-    di
-    jr $
-    ei
+    ld hl,Ctrl_5
+    set 2,(hl)
 
     ld hl,Numero_de_disparos_de_entidades
     inc (hl)                                                            ; Incrementamos el nº de disparos de entidades.
 
-;    pop hl
-;    push hl
+    pop hl
+    push hl
 
-;    dec hl
-;    dec hl                                                              ; Sitúa en el 1er .db de la caja.
+    inc l
+    inc l                                                              
+    inc l                                                               ; Sitúa en el 1er .db de la caja.
 
-;    ld d,6                                                              ; Contador
-;    xor a                                                               ; Borrador
+    call Borra_7_bytes
 
-;1 ld (hl),a
-;    dec d
-;    inc hl
-;    jr nz,1B
+    pop de
 
-;    pop de
-
-;    ld hl,0
+    ld hl,0
 
     ret 
+
+; ----- ----- ----- ----- -----
+
+Borra_7_bytes ld d,7                                                    ; Contador
+    xor a                                                               ; Borrador
+1 ld (hl),a
+    dec l
+    dec d
+    jr nz,1B
+    ret
+
 ; --------------------------------------------------------------------------------------
 ;
 ;   12/10/24
@@ -418,9 +425,6 @@ Genera_disparo_de_entidad_maldosa
 ;   En este punto el registro B siempre está a "0" y HL apunta al `nuevo´ ( Puntero de impresión) de la entidad.
 ;   (Puntero_objeto) del disparo inicial siempre será el mismo en cualquier caso, ( para que quede centrado ) en cualquier_
 ;   _ posición de cualquier entidad, (como ocurre con el puntero de impresión de las explosiones de entidades).
-
-    ld hl,Ctrl_5
-    set 2,(hl)
 
     ld hl,Permiso_de_disparo_Entidades			         			
     dec (hl)                                            ; No más disparos en este FRAME.
@@ -685,26 +689,45 @@ Calcula_bytes_pintado_disparos
 
 Limpia_album_de_pintado_disparos_entidades
 
+;    ld a,(Numero_de_disparos_de_entidades)
+;    cp 7
+;    ret z                                                                ; Salimos si todas las cajas están vacías.
+
+    ld a,(Ctrl_5)
+    bit 2,a
+    di
+    jr nz,$
+    ei
+
     ld a,(Num_de_bytes_album_de_disparos)   
     and a
-    jr z,Clean_only_one
+
+;    jr z,Clean_only_one
 
     ld b,a
-    ld a,$31
+    ld a,(Num_de_bytes_album_de_disparos_borrado)
     sub b
-    ld b,a
-2 xor a
 
+    ret z
+    ret c
+
+    ld b,a
+
+;    ld a,$31
+;    sub b
+;    ld b,a
+
+2 xor a
     ld hl,(Nivel_scan_disparos_album_de_pintado)                        ; Siempre tendremos limpio el sobrante de álbum de pintado de disparos.
 1 ld (hl),a
     inc hl 
     djnz 1B
     ret
 
-Clean_only_one
+;Clean_only_one
 
-    ld b,7
-    jr 2B    
+;    ld b,7
+;    jr 2B    
 
 ; --------------------------------------------------------------------------------------
 ;

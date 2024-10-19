@@ -40,7 +40,7 @@ Amadeus_disparos_scanlines_album equ $827c	;	($827c - $8281) 		; 6 Bytes, (1 ún
 Amadeus_disparos_scanlines_album_2 equ $8284	;	($8284 - $8289)
 
 Entidades_disparos_scanlines_album equ $828c	;	($828c - $82bc)		; 49 bytes, (7 disparos, 7 bytes cada uno), $31. 
-Entidades_disparos_scanlines_album_2 equ $82bf	;	($82c0 - $82f1)
+Entidades_disparos_scanlines_album_2 equ $82bf	;	($82bf - $82f1)
 
 ;																		; Scanlines_album. 
 
@@ -389,7 +389,9 @@ Album_de_borrado_disparos_Entidades defw 0
 
 
 Nivel_scan_disparos_album_de_pintado defw 0
+
 Num_de_bytes_album_de_disparos db 0
+Num_de_bytes_album_de_disparos_borrado db 0
 
 Numero_de_disparos_de_entidades db 7
 
@@ -602,6 +604,9 @@ Main
 ;
 ; 20/09/24
 
+	ld hl,Ctrl_5
+	res 2,(hl)
+
 ; Gestión de disparos.
 
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
@@ -807,8 +812,8 @@ End_frame
 
 	call Genera_datos_de_impresion_disparos_Entidades
 	call Genera_datos_de_impresion_disparos_Amadeus		; Genera los datos de impresión de los disparos de Amadeus y entidades.
-;	call Calcula_bytes_pintado_disparos
-;	call Limpia_album_de_pintado_disparos_entidades
+	call Calcula_bytes_pintado_disparos
+	call Limpia_album_de_pintado_disparos_entidades
 
 ; ------------ ------------- --------------
 
@@ -1010,8 +1015,8 @@ Change_Disparos
 	ld (Album_de_borrado_disparos_Entidades),de
 	ld (Nivel_scan_disparos_album_de_pintado),hl
 
-;	xor a
-;	ld (Num_de_bytes_album_de_disparos),a
+	ld a,(Num_de_bytes_album_de_disparos)
+	ld (Num_de_bytes_album_de_disparos_borrado),a
 
 	ret
 
