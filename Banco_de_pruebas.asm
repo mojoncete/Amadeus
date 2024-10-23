@@ -10,7 +10,7 @@
 
 	org $fdff															; (Debajo de la pila).
 
-	defw $82f4															; Indica al vector de interrupciones, (IM2), que el clock del programa se encuentra en $82a0.
+	defw $82f2															; Indica al vector de interrupciones, (IM2), que el clock del programa se encuentra en $82a0.
 
 ;
 ;	12/10/24
@@ -56,7 +56,7 @@ Entidades_disparos_scanlines_album_2 equ $82bf	;	($82bf - $82f1)
 ;	13/08/24
 ;
 
-	org $82f4
+	org $82f2
 
 	push af
 	push hl
@@ -604,8 +604,11 @@ Main
 ;
 ; 20/09/24
 
-	ld hl,Ctrl_5
-	res 2,(hl)
+    ld a,(Numero_de_disparos_de_entidades)
+    and a
+    di
+    jr z,$
+    ei
 
 ; Gestión de disparos.
 
@@ -795,8 +798,8 @@ Amadeus_vivo
 	jr nz, End_frame
 
 	call Teclado
-
 	ld hl,Ctrl_3
+
 	bit 5,(hl)
 	jr z,End_frame
 
@@ -1015,8 +1018,8 @@ Change_Disparos
 	ld (Album_de_borrado_disparos_Entidades),de
 	ld (Nivel_scan_disparos_album_de_pintado),hl
 
-	ld a,(Num_de_bytes_album_de_disparos)
-	ld (Num_de_bytes_album_de_disparos_borrado),a
+;	ld a,(Num_de_bytes_album_de_disparos)
+;	ld (Num_de_bytes_album_de_disparos_borrado),a
 
 	ret
 

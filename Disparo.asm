@@ -5,6 +5,12 @@
 
 Pinta_disparos_Entidades
 
+    ld a,(Numero_de_disparos_de_entidades)
+    and a
+    di
+    jr z,$
+    ei
+
     ld (Stack),sp 
     ld sp,(Album_de_borrado_disparos_Entidades)
 
@@ -252,9 +258,6 @@ Puntero_objeto_en_IY
 
 Elimina_disparo_entidad
 
-    ld hl,Ctrl_5
-    set 2,(hl)
-
     ld hl,Numero_de_disparos_de_entidades
     inc (hl)                                                            ; Incrementamos el nº de disparos de entidades.
 
@@ -290,19 +293,19 @@ Borra_7_bytes ld d,7                                                    ; Contad
 
 Genera_datos_de_impresion_disparos_Entidades
 
-    ld a,(Numero_de_disparos_de_entidades)
-    ld b,a
+;    ld a,(Numero_de_disparos_de_entidades)
+;    ld b,a
     ld a,7
-    sub b
-    ret z                                                      ;? Salimos. No hay disparos de entidades generados.                                                
+;    sub b
+;    ret z
 
-    ex af,af
+    ex af,af                                                  ;? Salimos. No hay disparos de entidades generados.                                                    ex af,af
 
 ; ---------------
 
 ;   En 1er lugar nos situamos en la 1ª caja de disparos de entidades.
 
-    ld hl,Indice_de_disparos_entidades
+     ld hl,Indice_de_disparos_entidades
 
 1 call Extrae_address
  
@@ -364,13 +367,13 @@ Genera_scanlines_de_los_disparos_de_entidades.
 
 ; ----- ----- ----- -----   
 
+Situa_en_siguiente_caja
+
     ex af,af                                                  ;? Actualiza contador de cajas y RET si "Z".
     dec a
     ret z
+
     ex af,af
-
-Situa_en_siguiente_caja
-
     ld hl,(Puntero_DESPLZ_DISPARO_ENTIDADES)
     jr 1B
 
@@ -690,32 +693,19 @@ Calcula_bytes_pintado_disparos
 Limpia_album_de_pintado_disparos_entidades
 
 ;    ld a,(Numero_de_disparos_de_entidades)
-;    cp 7
-;    ret z                                                                ; Salimos si todas las cajas están vacías.
-
-    ld a,(Ctrl_5)
-    bit 2,a
-    di
-    jr nz,$
-    ei
+;    and a
+;    di
+;    jr z,$
+;    ei
 
     ld a,(Num_de_bytes_album_de_disparos)   
-    and a
-
-;    jr z,Clean_only_one
-
     ld b,a
-    ld a,(Num_de_bytes_album_de_disparos_borrado)
+
+    ld a,$31
     sub b
-
     ret z
-    ret c
 
     ld b,a
-
-;    ld a,$31
-;    sub b
-;    ld b,a
 
 2 xor a
     ld hl,(Nivel_scan_disparos_album_de_pintado)                        ; Siempre tendremos limpio el sobrante de álbum de pintado de disparos.
@@ -723,11 +713,6 @@ Limpia_album_de_pintado_disparos_entidades
     inc hl 
     djnz 1B
     ret
-
-;Clean_only_one
-
-;    ld b,7
-;    jr 2B    
 
 ; --------------------------------------------------------------------------------------
 ;
