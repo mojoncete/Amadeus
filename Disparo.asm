@@ -1,15 +1,9 @@
 ; --------------------------------------------------------------------------------------
 ;
-;   19/10/24
+;   25/10/24
 ;
 
 Pinta_disparos_Entidades
-
-    ld a,(Numero_de_disparos_de_entidades)
-    and a
-    di
-    jr z,$
-    ei
 
     ld (Stack),sp 
     ld sp,(Album_de_borrado_disparos_Entidades)
@@ -17,15 +11,18 @@ Pinta_disparos_Entidades
     ld a,2
     ex af,af
 
-3 pop iy
-    pop bc                          ; 1er .db IYL
+3 ld b,7                            ; Nº máximo de disparos. Fuerza la salida del album cuando hemos pintado 7 veces_
+;                                     _ aunque IYL+IYH+E no sea "0". (No hay separacíon entre el álbum de borrado y el de pintado).
+;                                     _ No encontraría "0".
+4 pop iy
+    pop de                          ; 1er .db IYL
 ;                                   ; 2º  .db IYH
-;                                   ; 3er .db C.
+;                                   ; 3er .db E.
 ;   Album vacío ???
 
     ld a,iyl
     add iyh
-    add c
+    add e
     jr z,1F
 
 ;   Imprime album, (contiene datos).   
@@ -48,7 +45,7 @@ Pinta_disparos_Entidades
 
     inc l
 
-    ld a,c
+    ld a,e
     xor (hl)
     ld (hl),a
 
@@ -68,11 +65,11 @@ Pinta_disparos_Entidades
 
     inc l
 
-    ld a,c
+    ld a,e
     xor (hl)
     ld (hl),a    
 
-    jr 3B
+    djnz 4B
 
 1 ex af,af
     dec a
@@ -293,12 +290,7 @@ Borra_7_bytes ld d,7                                                    ; Contad
 
 Genera_datos_de_impresion_disparos_Entidades
 
-;    ld a,(Numero_de_disparos_de_entidades)
-;    ld b,a
     ld a,7
-;    sub b
-;    ret z
-
     ex af,af                                                  ;? Salimos. No hay disparos de entidades generados.                                                    ex af,af
 
 ; ---------------

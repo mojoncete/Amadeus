@@ -10,7 +10,7 @@
 
 	org $fdff															; (Debajo de la pila).
 
-	defw $82f2															; Indica al vector de interrupciones, (IM2), que el clock del programa se encuentra en $82a0.
+	defw $82ea															; Indica al vector de interrupciones, (IM2), que el clock del programa se encuentra en $82a0.
 
 ;
 ;	12/10/24
@@ -37,10 +37,10 @@ Amadeus_scanlines_album equ $8234	;	($8234 - $8256) 				; Inicialmente 34 bytes,
 Amadeus_scanlines_album_2 equ $8258	;	($8258 - $827a)
 
 Amadeus_disparos_scanlines_album equ $827c	;	($827c - $8281) 		; 6 Bytes, (1 único disparo).
-Amadeus_disparos_scanlines_album_2 equ $8284	;	($8284 - $8289)
+Amadeus_disparos_scanlines_album_2 equ $8282	;	($8284 - $8289)
 
-Entidades_disparos_scanlines_album equ $828c	;	($828c - $82bc)		; 49 bytes, (7 disparos, 7 bytes cada uno), $31. 
-Entidades_disparos_scanlines_album_2 equ $82bf	;	($82bf - $82f1)
+Entidades_disparos_scanlines_album equ $8288	;	($828c - $82bc)		; 49 bytes, (7 disparos, 7 bytes cada uno), $31. 
+Entidades_disparos_scanlines_album_2 equ $82b9	;	($82bf - $82f1)
 
 ;																		; Scanlines_album. 
 
@@ -56,7 +56,7 @@ Entidades_disparos_scanlines_album_2 equ $82bf	;	($82bf - $82f1)
 ;	13/08/24
 ;
 
-	org $82f2
+	org $82ea
 
 	push af
 	push hl
@@ -602,13 +602,7 @@ START
 
 Main 
 ;
-; 20/09/24
-
-    ld a,(Numero_de_disparos_de_entidades)
-    and a
-    di
-    jr z,$
-    ei
+; 25/10/24
 
 ; Gestión de disparos.
 
