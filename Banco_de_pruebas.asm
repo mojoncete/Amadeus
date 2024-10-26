@@ -822,6 +822,9 @@ End_frame
 	res 3,(hl)
 	res 4,(hl)
 
+	ld hl,Ctrl_5
+	res 2,(hl)
+
 	xor a
 	out ($fe),a
 
@@ -1012,8 +1015,8 @@ Change_Disparos
 	ld (Album_de_borrado_disparos_Entidades),de
 	ld (Nivel_scan_disparos_album_de_pintado),hl
 
-;	ld a,(Num_de_bytes_album_de_disparos)
-;	ld (Num_de_bytes_album_de_disparos_borrado),a
+	ld a,(Num_de_bytes_album_de_disparos)
+	ld (Num_de_bytes_album_de_disparos_borrado),a
 
 	ret
 

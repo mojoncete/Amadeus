@@ -255,6 +255,9 @@ Puntero_objeto_en_IY
 
 Elimina_disparo_entidad
 
+    ld hl,Ctrl_5
+    set 2,(hl)
+
     ld hl,Numero_de_disparos_de_entidades
     inc (hl)                                                            ; Incrementamos el nº de disparos de entidades.
 
@@ -684,26 +687,46 @@ Calcula_bytes_pintado_disparos
 
 Limpia_album_de_pintado_disparos_entidades
 
-;    ld a,(Numero_de_disparos_de_entidades)
-;    and a
-;    di
-;    jr z,$
-;    ei
+;    ld a,(Num_de_bytes_album_de_disparos)   
+;    ld b,a
 
-    ld a,(Num_de_bytes_album_de_disparos)   
-    ld b,a
+;    ld a,$31
+;    sub b
+;    ret z
 
-    ld a,$31
+;    ld b,a
+
+;2 xor a
+;    ld hl,(Nivel_scan_disparos_album_de_pintado)                        ; Siempre tendremos limpio el sobrante de álbum de pintado de disparos.
+;1 ld (hl),a
+;    inc hl 
+;    djnz 1B
+;    ret
+
+    ld hl,Ctrl_5
+    bit 2,(hl)
+    di
+    jr nz,$
+    ei
+
+    ld hl,Num_de_bytes_album_de_disparos   
+    ld b,(hl)
+    inc hl
+    ld a,(hl)
     sub b
+    ret c
     ret z
 
-    ld b,a
+; Clean.
 
-2 xor a
+    ld b,a
+    xor a
     ld hl,(Nivel_scan_disparos_album_de_pintado)                        ; Siempre tendremos limpio el sobrante de álbum de pintado de disparos.
+
 1 ld (hl),a
     inc hl 
     djnz 1B
+
     ret
 
 ; --------------------------------------------------------------------------------------
