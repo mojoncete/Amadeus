@@ -111,9 +111,7 @@ Motor_de_disparos_entidades
 
 ; --- Trabajamos con caja:
 
-; En 1er lugar almacenaremos (Puntero_objeto) en IY para desplazarlo más adelante si es necesario.
-
-;    call Rota_disparo_si_procede
+    call Rota_disparo_si_procede
 
 ; ------------------------------------------------------------
 
@@ -179,6 +177,26 @@ Fin_de_disparo_de_entidad
 ;
 ;   08/10/24
 
+;   Estructura de un disparo de entidades.
+
+;   Disparo_1 defw 0								; Puntero objeto.
+; 	defw 0											; Puntero de impresión.
+;	defw 0											; Control.
+
+;   El byte bajo de Control indica la velocidad a la que fué lanzado el disparo, (Velocidad)_
+;   _de la entidad en el momento de disparar.
+
+;   El byte alto muestra la siguiente información:
+;
+;   Nibble bajo    ..... Inicialmente contiene "7d". Utilizaremos estos bits para desplazar X nº de veces el disparo hacia abajo_
+;                        _antes de desplazarse a derecha/izquierda.
+;
+;   Nibble alto    ..... Bits (6) y (7) ..... Indican si el disparo va hacia la derecha o hacia la izquierda.
+;
+;                        10xx ..... Izquierda.
+;                        01xx ..... Derecha.
+;                        00xx ..... Recto.
+
 Rota_disparo_si_procede 
 
 ;   Nos situamos en el byte alto de (Control).
@@ -202,14 +220,14 @@ Rotamos_disparo_segun_proceda
     ld a,7
     add (hl)
     ld (hl),a                                                           ; Contador reinicializado.
-
-    call Puntero_objeto_en_IY                                           ; Rescatamos el Puntero_objeto en IY para poder desplazar el disparo.
-
     bit 6,(hl)
     jr nz,Rota_a_derecha
 
-
 Rota_a_izq
+
+    ld a,l
+    sub 6
+    ld l,a
 
     di
     jr $
@@ -219,33 +237,29 @@ Rota_a_izq
 
 Rota_a_derecha
 
-    srl (iy+0)
-    srl (iy+1)
-    srl (iy+2)
+    ld a,l
+    sub 6
+    ld l,a
+
+    di
+    jr $
+    ei
 
 ; Se inicializa el disparo y se desplaza (Puntero_objeto) a la derecha.  
 
     ret
 
-; ------------ ----------- ------------
-;
-;   11/10/24
+; ------------
 
-Puntero_objeto_en_IY    
+Situa_en_puntero_objeto
 
-    push hl
+    ld a,6
+    add l
+    ld l,a
 
-    dec l
-    dec l
-    dec l
-    dec l
-    dec l
-    dec l
 
-    push hl
-    pop iy
 
-    pop hl
+
 
     ret
 
@@ -254,9 +268,6 @@ Puntero_objeto_en_IY
 ;   25/9/24
 
 Elimina_disparo_entidad
-
-    ld hl,Ctrl_5
-    set 2,(hl)
 
     ld hl,Numero_de_disparos_de_entidades
     inc (hl)                                                            ; Incrementamos el nº de disparos de entidades.
@@ -679,7 +690,7 @@ Calcula_bytes_pintado_disparos
 
 ; --------------------------------------------------------------------------------------
 ;
-;   29/09/24
+;   26/10/24
 ;
 ;   Limpia la diferencia de bytes entre el (album_de_pintado_disparos) del FRAME anterior y el_
 ;   _(album_de_pintado_disparos) del FRAME actual, (siempre que el álbum del FRAME anterior contenga más_ 
@@ -687,42 +698,25 @@ Calcula_bytes_pintado_disparos
 
 Limpia_album_de_pintado_disparos_entidades
 
-;    ld a,(Num_de_bytes_album_de_disparos)   
-;    ld b,a
-
-;    ld a,$31
-;    sub b
-;    ret z
-
-;    ld b,a
-
-;2 xor a
-;    ld hl,(Nivel_scan_disparos_album_de_pintado)                        ; Siempre tendremos limpio el sobrante de álbum de pintado de disparos.
-;1 ld (hl),a
-;    inc hl 
-;    djnz 1B
-;    ret
-
-    ld hl,Ctrl_5
-    bit 2,(hl)
-    di
-    jr nz,$
-    ei
-
-    ld hl,Num_de_bytes_album_de_disparos   
-    ld b,(hl)
-    inc hl
+    ld hl,Num_de_bytes_album_de_disparos+1   
     ld a,(hl)
+    dec l
+    ld b,(hl)
     sub b
+
     ret c
     ret z
 
+    push af
+    add b
+    ld (hl),a
+    pop af
+
 ; Clean.
 
-    ld b,a
+2 ld b,a
     xor a
-    ld hl,(Nivel_scan_disparos_album_de_pintado)                        ; Siempre tendremos limpio el sobrante de álbum de pintado de disparos.
-
+    ld hl,(Nivel_scan_disparos_album_de_pintado)                        
 1 ld (hl),a
     inc hl 
     djnz 1B
