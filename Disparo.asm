@@ -103,7 +103,7 @@ Motor_de_disparos_entidades
 
  ; Caja vacía ???
 
-    inc l
+;    inc l
 
     ld a,(hl)
     and a
@@ -117,14 +117,24 @@ Motor_de_disparos_entidades
 
     dec l
     dec l
-    dec l
 
     call Extrae_address    
+
 ;   (Puntero_de_impresion) del disparo en HL.
+
+    ld a,(Ctrl_5)
+    bit 2,a
+    jr z,4F
+    res 2,a
+    ld (Ctrl_5),a
+
+    inc l
+    inc l
 
 ;! Velocidad del disparo de entidades.
 
-    call NextScan 
+4 call NextScan 
+    call NextScan
 
 ; Después de mover el disparo comprobamos si ha salido por la parte baja de la pantalla.
 
@@ -202,24 +212,14 @@ Rota_disparo_si_procede
 ;   Nos situamos en el byte alto de (Control).
 
     bit 6,(hl)
-    jr nz,Decrementa_contador_de_control_de_disparo
+    jr nz,Rotamos_disparo_segun_proceda
     bit 7,(hl)
     ret z                                                               ; Salimos el disparo va recto, no se modifica.
 
-Decrementa_contador_de_control_de_disparo
-
-    dec (hl)
-    ld a,(hl)
-    and 7
-    ret nz
-    
 Rotamos_disparo_segun_proceda
 
-; Vamos a rotar el disparo pero antes reiniciamos el contador.
+    push hl
 
-    ld a,7
-    add (hl)
-    ld (hl),a                                                           ; Contador reinicializado.
     bit 6,(hl)
     jr nz,Rota_a_derecha
 
@@ -241,26 +241,28 @@ Rota_a_derecha
     sub 6
     ld l,a
 
-    di
-    jr $
-    ei
+    push hl
+    pop iy
 
-; Se inicializa el disparo y se desplaza (Puntero_objeto) a la derecha.  
+    and a
 
-    ret
+    rr (iy+00)
+    rr (iy+01)
+    rr (iy+02)
 
-; ------------
+    jr nc,Exit
 
-Situa_en_puntero_objeto
+; Desplazamiento completo hasta Carry. 
+; Modificamos datos e incremento (Puntero_de_impresión).
 
-    ld a,6
-    add l
-    ld l,a
+    ld (iy+00),$01
+    ld (iy+01),$80
+    ld (iy+02),$00
 
+    ld hl,Ctrl_5
+    set 2,(hl)
 
-
-
-
+Exit pop hl
     ret
 
 ; ------------ ----------- ------------
@@ -305,7 +307,7 @@ Borra_7_bytes ld d,7                                                    ; Contad
 Genera_datos_de_impresion_disparos_Entidades
 
     ld a,7
-    ex af,af                                                  ;? Salimos. No hay disparos de entidades generados.                                                    ex af,af
+    ex af,af                                                  ;? 7 Disparos como 7 amores.
 
 ; ---------------
 
@@ -320,15 +322,12 @@ Genera_datos_de_impresion_disparos_Entidades
 
     ld (Puntero_DESPLZ_DISPARO_ENTIDADES),de 
 
-    inc l
-
     ld a,(hl)
     and a                                                     ;? Si el byte alto de control es "0" significa que la caja está vacía.
     jr z,Situa_en_siguiente_caja                              ;? Avanzamos a la siguiente caja en ese caso.
 
 ; ----- ----- ----- -----   
 
-    dec l
     dec l
     dec l
 
@@ -399,12 +398,9 @@ Genera_disparo_de_entidad_maldosa
 ;   El byte bajo de Control indica la velocidad a la que fué lanzado el disparo, (Velocidad)_
 ;   _de la entidad en el momento de disparar.
 
-;   El byte alto muestra la siguiente información:
-;
-;   Nibble bajo    ..... Inicialmente contiene "7d". Utilizaremos estos bits para desplazar X nº de veces el disparo hacia abajo_
-;                        _antes de desplazarse a derecha/izquierda.
-;
-;   Nibble alto    ..... Bits (2) y (3) ..... Indican si el disparo va hacia la derecha o hacia la izquierda.
+;   El byte de control muestra la siguiente información:
+
+;   Nibble alto    ..... Bits (6) y (7) ..... Indican si el disparo va hacia la derecha o hacia la izquierda.
 ;
 ;                        10xx ..... Izquierda.
 ;                        01xx ..... Derecha.
@@ -454,8 +450,6 @@ Genera_disparo_de_entidad_maldosa
 
 ;   Comprobamos si la caja está vacía.
 
-    inc l                                               
-
     ld a,(hl)
     and a
     jr nz,Situa_en_siguiente_disparo                    ; Avanza a la siguiente caja si esta esta completa. 
@@ -467,13 +461,6 @@ Genera_disparo_de_entidad_maldosa
 
     ld a,(hl)
     ex af,af                                            ; Copia de seguridad del byte de inclinación en A´.
-
-    dec l
-
-;   La velocidad inicial del disparo corresponde con la velocidad de la entidad que lo genera.
-
-    ld a,(Velocidad)                                    ; Guarda la velocidad de la entidad/disparo.
-    ld (hl),a
 
     dec l
 
@@ -514,8 +501,6 @@ Situa_en_siguiente_disparo
 
 Genera_byte_inclinacion
 
-    ld (hl),7                                           ; Guarda Byte de Control.
-
 ; Determina tendencia del disparo.
 
     ld a,(CX_Amadeus)
@@ -524,7 +509,7 @@ Genera_byte_inclinacion
     sub b
     jr c,Disparo_a_derecha
 
-Disparo_a_izquierda cp 4
+Disparo_a_izquierda cp 5
 
     ret c
     ret z
@@ -536,7 +521,7 @@ Disparo_a_derecha ld b,a
     ld a,$ff
     sub b
 
-    cp 4    
+    cp 5    
 
     ret c
     ret z

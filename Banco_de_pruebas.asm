@@ -440,7 +440,8 @@ Ctrl_4 db 0 											;   3er Byte de Ctrl. general, (no específico) a una ún
 ;	                                                        BIT 7 (Ctrl_4) ..... MOV_MASTICADOS GENERADOS. Entidad de (Tipo)_4.
 
 Ctrl_5 db 0												;	BIT 1, "1" Indica que la entidad en curso es la alcanzada por nuestro disparo. La comparativa entre coordenadas ha sido satisfactoria. 
-										
+;															BIT	2, "1" Indica que tras consecutivos desplazamientos del disparo hay que modificar el (Puntero_de_impresión) dos posiciones a la derecha.
+;															BIT	3, "1" Indica que tras consecutivos desplazamientos del disparo hay que modificar el (Puntero_de_impresión) dos posiciones a la izquierda.								
 
 ; Gestión de Disparos.
 
@@ -607,7 +608,7 @@ Main
 ; Gestión de disparos.
 
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
-	call Motor_de_disparos_entidades
+;	call Motor_de_disparos_entidades
 	call Motor_Disparos_Amadeus							; Mueve y detecta colisión de los disparos de Amadeus.
 
 ; En el FRAME que acabamos de pintar puede existir una posible colisión entre alguna entidad y Amadeus. 
@@ -821,9 +822,6 @@ End_frame
 	set 0,(hl) 											; Indica Frame completo. 
 	res 3,(hl)
 	res 4,(hl)
-
-	ld hl,Ctrl_5
-	res 2,(hl)
 
 	xor a
 	out ($fe),a
