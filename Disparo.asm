@@ -103,13 +103,14 @@ Motor_de_disparos_entidades
 
  ; Caja vacía ???
 
-;    inc l
-
+    dec l
     ld a,(hl)
     and a
     jr z,3F                                                              ; Caja vacía.
 
 ; --- Trabajamos con caja:
+
+    inc l
 
     call Rota_disparo_si_procede
 
@@ -212,21 +213,16 @@ Rota_disparo_si_procede
 ;   Nos situamos en el byte alto de (Control).
 
     bit 6,(hl)
-    jr nz,Rotamos_disparo_segun_proceda
+    jr nz,Rota_a_derecha
     bit 7,(hl)
     ret z                                                               ; Salimos el disparo va recto, no se modifica.
 
-Rotamos_disparo_segun_proceda
+Rota_a_izq
 
     push hl
 
-    bit 6,(hl)
-    jr nz,Rota_a_derecha
-
-Rota_a_izq
-
     ld a,l
-    sub 6
+    sub 5
     ld l,a
 
     di
@@ -237,8 +233,10 @@ Rota_a_izq
 
 Rota_a_derecha
 
+    push hl
+
     ld a,l
-    sub 6
+    sub 5
     ld l,a
 
     push hl
@@ -279,9 +277,8 @@ Elimina_disparo_entidad
 
     inc l
     inc l                                                              
-    inc l                                                               ; Sitúa en el 1er .db de la caja.
 
-    call Borra_7_bytes
+    call Borra_6_bytes
 
     pop de
 
@@ -291,12 +288,15 @@ Elimina_disparo_entidad
 
 ; ----- ----- ----- ----- -----
 
-Borra_7_bytes ld d,7                                                    ; Contador
-    xor a                                                               ; Borrador
+Borra_6_bytes 
+
+    ld d,6                                                    ; Contador
+    xor a                                                     ; Borrador
 1 ld (hl),a
     dec l
     dec d
     jr nz,1B
+
     ret
 
 ; --------------------------------------------------------------------------------------
@@ -322,6 +322,7 @@ Genera_datos_de_impresion_disparos_Entidades
 
     ld (Puntero_DESPLZ_DISPARO_ENTIDADES),de 
 
+    dec l
     ld a,(hl)
     and a                                                     ;? Si el byte alto de control es "0" significa que la caja está vacía.
     jr z,Situa_en_siguiente_caja                              ;? Avanzamos a la siguiente caja en ese caso.
@@ -329,8 +330,6 @@ Genera_datos_de_impresion_disparos_Entidades
 ; ----- ----- ----- -----   
 
     dec l
-    dec l
-
     call Extrae_address
     push hl                                                   
 
@@ -411,8 +410,6 @@ Genera_disparo_de_entidad_maldosa
 ;   La entidad no podrá disparar mientras se encuentre en las filas: 0,1,15,16.
 ;   La entidad no podrá disparar si hay 7 disparos en pantalla.
 
-;    set 0,(hl)          ; Añadimos "1" para no perder el bit de carry.
-
     ld a,(Numero_de_disparos_de_entidades)
     and a
     ret z
@@ -449,10 +446,12 @@ Genera_disparo_de_entidad_maldosa
     ld (Puntero_DESPLZ_DISPARO_ENTIDADES),de
 
 ;   Comprobamos si la caja está vacía.
-
+    
+    dec l
     ld a,(hl)
     and a
     jr nz,Situa_en_siguiente_disparo                    ; Avanza a la siguiente caja si esta esta completa. 
+    inc l
 
 ;   Caja vacía, vamos a generar un disparo.
 ;   Empezaremos de atrás hacia adelante, (1º los bytes de control), asi podremos modificar el (Puntero_de_impresión) antes de guardarlo.
@@ -682,7 +681,7 @@ Calcula_bytes_pintado_disparos
 ;   _disparos que el álbum del FRAME actual). 
 
 Limpia_album_de_pintado_disparos_entidades
-
+    
     ld hl,Num_de_bytes_album_de_disparos+1   
     ld a,(hl)
     dec l

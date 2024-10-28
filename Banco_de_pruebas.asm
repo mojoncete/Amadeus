@@ -608,7 +608,7 @@ Main
 ; Gestión de disparos.
 
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
-;	call Motor_de_disparos_entidades
+	call Motor_de_disparos_entidades
 	call Motor_Disparos_Amadeus							; Mueve y detecta colisión de los disparos de Amadeus.
 
 ; En el FRAME que acabamos de pintar puede existir una posible colisión entre alguna entidad y Amadeus. 
