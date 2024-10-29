@@ -121,20 +121,33 @@ Motor_de_disparos_entidades
 
     call Extrae_address    
 
-;   (Puntero_de_impresion) del disparo en HL.
+;   (Puntero_de_impresion) del disparo en HL 
+;   Hay que modificar el puntero de impresión ??? ---------------------
 
     ld a,(Ctrl_5)
     bit 2,a
     jr z,4F
+
     res 2,a
     ld (Ctrl_5),a
+    inc l
+    inc l
+    jr 5F
 
-    inc l
-    inc l
+4 bit 3,a
+    jr z,5F
+
+    res 3,a
+    ld (Ctrl_5),a
+    dec l
+    dec l
+    dec l
+
+; ---------------------------------------------------------------------
 
 ;! Velocidad del disparo de entidades.
 
-4 call NextScan 
+5 call NextScan 
     call NextScan
 
 ; Después de mover el disparo comprobamos si ha salido por la parte baja de la pantalla.
@@ -225,11 +238,28 @@ Rota_a_izq
     sub 5
     ld l,a
 
-    di
-    jr $
-    ei
+    push hl
+    pop iy
 
-    ret
+    and a
+
+    rl (iy+02)
+    rl (iy+01)
+    rl (iy+00)
+
+    jr nc,Exit
+
+; Desplazamiento completo hasta Carry. 
+; Modificamos datos y decremento (Puntero_de_impresión).
+
+    ld (iy+02),$03
+    ld (iy+01),$00
+    ld (iy+00),$00
+
+    ld hl,Ctrl_5
+    set 3,(hl)
+
+    jr Exit
 
 Rota_a_derecha
 
@@ -508,7 +538,7 @@ Genera_byte_inclinacion
     sub b
     jr c,Disparo_a_derecha
 
-Disparo_a_izquierda cp 5
+Disparo_a_izquierda cp 6
 
     ret c
     ret z
