@@ -607,6 +607,12 @@ Main
 
 ; Gestión de disparos.
 
+	ld hl,Ctrl_5
+	bit 4,(hl)
+	di
+	jr nz,$
+	ei
+
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
 	call Motor_de_disparos_entidades
 	call Motor_Disparos_Amadeus							; Mueve y detecta colisión de los disparos de Amadeus.

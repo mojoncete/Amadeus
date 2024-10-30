@@ -84,7 +84,7 @@ Pinta_disparos_Entidades
 
 ; --------------------------------------------------------------------------------------
 ;
-;   15/10/24
+;   30/10/24
 ;
 
 Motor_de_disparos_entidades
@@ -150,6 +150,10 @@ Motor_de_disparos_entidades
 5 call NextScan 
     call NextScan
 
+; Después de mover el disparo comprobamos si se produce colisión con Amadeus.
+
+    call Comprueba_impacto_con_Amadeus
+
 ; Después de mover el disparo comprobamos si ha salido por la parte baja de la pantalla.
 
     call Fin_de_disparo_de_entidad
@@ -169,6 +173,61 @@ Motor_de_disparos_entidades
 2 djnz 1B
 
     ret
+
+; ------------- ------------- ------------
+;
+;   30/10/24
+
+Comprueba_impacto_con_Amadeus
+
+; Salimos si no estamos en zona de Amadeus.
+
+    ld a,h
+    cp $50
+    ret c
+
+    ld a,l
+    cp $c0
+    ret c
+
+; Zona Amadeus.
+
+    push bc
+    push hl
+    push de
+
+    dec e
+    dec e
+    dec e
+
+    ld b,3
+
+; Comparador:
+
+1 ld a,(de)
+    ld c,a 
+    xor (hl)
+    cp c
+    jr nz,Coincidencia
+    inc l
+    inc e
+    djnz 1B
+
+2 pop de
+    pop hl
+    pop bc
+
+    ret
+
+Coincidencia 
+
+;    di
+;    jr $
+;    ei
+
+    ld hl,Ctrl_5
+    set 4,(hl)
+    jr 2B
 
 ; ------------- ------------- ------------
 ;
