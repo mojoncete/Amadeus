@@ -112,6 +112,11 @@ Motor_de_disparos_entidades
 
     inc l
 
+; --- Existe posibilidad de impacto ???
+
+    bit 0,(hl)
+    call nz, Comprueba_impacto_con_Amadeus
+
     call Rota_disparo_si_procede
 
 ; ------------------------------------------------------------
@@ -150,10 +155,6 @@ Motor_de_disparos_entidades
 5 call NextScan 
     call NextScan
 
-; Después de mover el disparo comprobamos si se produce colisión con Amadeus.
-
-    call Comprueba_impacto_con_Amadeus
-
 ; Después de mover el disparo comprobamos si ha salido por la parte baja de la pantalla.
 
     call Fin_de_disparo_de_entidad
@@ -180,34 +181,31 @@ Motor_de_disparos_entidades
 
 Comprueba_impacto_con_Amadeus
 
-; Salimos si no estamos en zona de Amadeus.
-
-    ld a,h
-    cp $50
-    ret c
-
-    ld a,l
-    cp $c0
-    ret c
-
-; Zona Amadeus.
+; Modificamos registros, así que guardamos ...
 
     push bc
     push hl
     push de
 
+    dec l
+    dec l
+
+    call Extrae_address
+
     dec e
     dec e
     dec e
 
-    ld b,3
+; DE en Puntero_objeto
+; HL en Puntero_de_impresión
+
+    ld b,3   ;   contador
+    xor a    ;   borrador
 
 ; Comparador:
 
 1 ld a,(de)
-    ld c,a 
-    xor (hl)
-    cp c
+    cp (hl)
     jr nz,Coincidencia
     inc l
     inc e
@@ -217,27 +215,29 @@ Comprueba_impacto_con_Amadeus
     pop hl
     pop bc
 
+; No se produce impacto, restauramos el bit0 de Control antes de salir.
+
+    res 0,(hl)
+
     ret
 
 Coincidencia 
 
-;    di
-;    jr $
-;    ei
-
-    ld hl,Ctrl_5
-    set 4,(hl)
-    jr 2B
+    di
+    jr $
+    ei
 
 ; ------------- ------------- ------------
 ;
-;   25/9/24
+;   31/10/24
 
 Fin_de_disparo_de_entidad
 
+; Estamos en zona de Amadeus ??
+
     ld a,h
     cp $54
-    ret c
+    jr c,1F
 
     push de                                                              ; DE se encuentra en el .db (Puntero_de_impresion) de la caja del disparo que estamos moviendo.
 
@@ -253,6 +253,27 @@ Fin_de_disparo_de_entidad
     ld h,d
 
     pop de
+
+1 ld a,h
+    cp $50
+    ret c
+
+    ld a,l
+    cp $c0
+    ret c
+
+; Estamos en zona de Amadeus. Ponemos a "1" el bit0 de Control del disparo para indicarlo.
+; Así podremos comprobar si hay colisión más adelante.
+
+    inc e
+    inc e
+
+    ex de,hl
+    set 0,(hl)
+    ex de,hl
+
+    dec e
+    dec e
 
     ret
 
