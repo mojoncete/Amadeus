@@ -177,11 +177,14 @@ Motor_de_disparos_entidades
 
 ; ------------- ------------- ------------
 ;
-;   30/10/24
+;   1/11/24
 
 Comprueba_impacto_con_Amadeus
 
-; Modificamos registros, así que guardamos ...
+;   El disparo se encuentra en zona de Amadeus.
+;   Comparten coordenadas ?, hay riesgo de colisión ??
+
+;   Modificamos registros, así que guardamos ...
 
     push bc
     push hl
@@ -192,24 +195,30 @@ Comprueba_impacto_con_Amadeus
 
     call Extrae_address
 
-    dec e
-    dec e
-    dec e
+    ld a,(CX_Amadeus)
+    ld c,a              ; 1ª coordenada X de Amadeus en C.
+ 
+    ld a,l
+    and $1f             ; 1ª coordenada X del disparo en A. 
 
-; DE en Puntero_objeto
-; HL en Puntero_de_impresión
+    ld b,3
 
-    ld b,3   ;   contador
-    xor a    ;   borrador
+1 cp c
+    jr z,Coincidencia 
+    inc c
+    djnz 1B 
+ 
+    dec c
+    dec c
+    dec c
 
-; Comparador:
+    inc a
+    cp c
+    jr z,Coincidencia
 
-1 ld a,(de)
-    cp (hl)
-    jr nz,Coincidencia
-    inc l
-    inc e
-    djnz 1B
+    inc a
+    cp c
+    jr z,Coincidencia
 
 2 pop de
     pop hl
@@ -222,6 +231,36 @@ Comprueba_impacto_con_Amadeus
     ret
 
 Coincidencia 
+
+;   Alguna de las coordenadas X del disparo coincide con alguna de las coordenadas X de Amadeus.
+;   Existe posibilidad de impacto.
+;   Vamos a averiguarlo ...
+
+    dec e
+    dec e
+    dec e
+
+; DE en Puntero_objeto del disparo.
+; HL en Puntero_de_impresión del disparo.
+
+; Comparador:
+
+    ld b,3
+
+3 ld a,(de)
+    ld c,a
+    and (hl)
+    cp c
+    jr nz,Amadeus_impactado
+
+    inc l
+    inc e
+
+    djnz 3B
+
+    jr 2B
+
+Amadeus_impactado 
 
     di
     jr $
