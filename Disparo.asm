@@ -262,9 +262,20 @@ Coincidencia
 
 Amadeus_impactado 
 
-    di
-    jr $
-    ei
+    ld a,(Ctrl_5)
+    set 4,a
+    ld (Ctrl_5),a
+
+; Situamos también el (Puntero_de_almacen_de_mov_masticados) de Amadeus en la primero explosión.
+
+    ld de,Indice_Explosion_Amadeus
+    ld hl,Pamm_Amadeus
+ 
+    ld (hl),e
+    inc hl
+    ld (hl),d
+
+    jr 2B
 
 ; ------------- ------------- ------------
 ;

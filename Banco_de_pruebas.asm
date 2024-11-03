@@ -509,7 +509,7 @@ Shield db 90											; Temporización principal. Indica el tiempo que el escud
 Shield_2 db 0 											; Almacena un tiempo, ( hacía el que apunta:  Puntero_datos_shield ).
 Shield_3 db 0
 
-Lives db 6
+Lives db 3
 
 ; 	INICIO  *************************************************************************************************************************************************************************
 ;
@@ -606,12 +606,6 @@ Main
 ; 25/10/24
 
 ; Gestión de disparos.
-
-	ld hl,Ctrl_5
-	bit 4,(hl)
-	di
-	jr nz,$
-	ei
 
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
 	call Motor_de_disparos_entidades
@@ -793,7 +787,18 @@ Gestion_de_Amadeus
 
 Amadeus_vivo
 
-	ld a,(Impacto_Amadeus)
+	ld hl,Ctrl_5
+	bit 4,(hl)
+	jr z,5F
+
+; El bit4 de Ctrl_5 a "1" indica que un disparo de entidad ha alcanzado a Amadeus.
+; Iniciamos el proceso de explosión de Amadeus.
+
+	res 4,(hl)
+	ld hl,Impacto_Amadeus
+	ld (hl),1
+
+5 ld a,(Impacto_Amadeus)
 	and a
 	call nz, Genera_explosion_Amadeus
 	jr nz, End_frame
