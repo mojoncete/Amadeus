@@ -787,18 +787,7 @@ Gestion_de_Amadeus
 
 Amadeus_vivo
 
-	ld hl,Ctrl_5
-	bit 4,(hl)
-	jr z,5F
-
-; El bit4 de Ctrl_5 a "1" indica que un disparo de entidad ha alcanzado a Amadeus.
-; Iniciamos el proceso de explosión de Amadeus.
-
-	res 4,(hl)
-	ld hl,Impacto_Amadeus
-	ld (hl),1
-
-5 ld a,(Impacto_Amadeus)
+	ld a,(Impacto_Amadeus)
 	and a
 	call nz, Genera_explosion_Amadeus
 	jr nz, End_frame
