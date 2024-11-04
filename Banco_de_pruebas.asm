@@ -476,18 +476,18 @@ Coordenadas_X_Amadeus ds 3								; 3 Bytes reservados para almacenar las 3 posi
 
 ; Relojes y temporizaciones.
 
-Clock_explosion db 4									; Temporización de las explosiones, (velocidad de la explosión).
+Clock_explosion db 4													; Temporización de las explosiones, (velocidad de la explosión).
 Clock_explosion_Amadeus db 5
-Temp_new_live db 100									; Tiempo que tarda en aparecer una nueva nave Amadeus tras ser destruida.
+Temp_new_live db 100													; Tiempo que tarda en aparecer una nueva nave Amadeus tras ser destruida.
 
-RND_SP defw Numeros_aleatorios							; Puntero que se irá desplazando por el SET de nº aleatorios.
+RND_SP defw Numeros_aleatorios											; Puntero que se irá desplazando por el SET de nº aleatorios.
 Puntero_num_aleatorios_disparos defw Numeros_aleatorios					; Puntero que se irá desplazando por el SET de nº aleatorios, (para generar disparos de entidades).
 Numero_rnd_disparos db 0
 
-Clock_next_entity defw 0								; Transcurrido este tiempo aparece una nueva entidad.
-Activa_recarga_cajas db 0								; Esta señal espera (Secundero)+X para habilitar el Loop.
-;														; Repite la oleada de entidades.
-Repone_CLOCK_disparos db $a0							; Reloj, decreciente.
+Clock_next_entity defw 0												; Transcurrido este tiempo aparece una nueva entidad.
+Activa_recarga_cajas db 0												; Esta señal espera (Secundero)+X para habilitar el Loop.
+;																		; Repite la oleada de entidades.
+Repone_CLOCK_disparos db $a0											; Reloj, decreciente.
 CLOCK_disparos_de_entidades db $a0
 
 ;---------------------------------------------------------------------------------------------------------------
@@ -858,7 +858,7 @@ Autoriza_disparo_de_entidades
 	cp 25
 	jr c,1F
 
-	sub 10
+	sub 5
 
 1 ld (Repone_CLOCK_disparos),a
 	ld (CLOCK_disparos_de_entidades),a
