@@ -262,13 +262,24 @@ Coincidencia
 
 Amadeus_impactado 
 
-    ld a,(Ctrl_5)
-    set 4,a
-    ld (Ctrl_5),a
+; Iniciamos el proceso de explosión de Amadeus.
+
+    ld hl,Impacto_Amadeus
+    ld (hl),1
+
+; Corregimos la posición de Amadeus siempre que se encuentre en el extremo derecho de la pantalla.
+; Evitamos así que la explosión aparezca también por el lado izquierdo de la pantalla.
+
+    ld a,(p.imp.amadeus) 
+    cp $de
+    jr nz,1F
+
+    dec a
+    ld (p.imp.amadeus),a
 
 ; Situamos también el (Puntero_de_almacen_de_mov_masticados) de Amadeus en la primero explosión.
 
-    ld de,Indice_Explosion_Amadeus
+1 ld de,Indice_Explosion_Amadeus
     ld hl,Pamm_Amadeus
  
     ld (hl),e
