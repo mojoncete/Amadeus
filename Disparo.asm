@@ -116,6 +116,7 @@ Motor_de_disparos_entidades
 
     bit 0,(hl)
     call nz, Comprueba_impacto_con_Amadeus
+    jr nz,3F
 
     call Rota_disparo_si_procede
 
@@ -227,7 +228,7 @@ Comprueba_impacto_con_Amadeus
 ; No se produce impacto, restauramos el bit0 de Control antes de salir.
 
     res 0,(hl)
-
+    xor a                       ; Z before RET.
     ret
 
 Coincidencia 
@@ -262,6 +263,19 @@ Coincidencia
 
 Amadeus_impactado 
 
+; Borramos disparo.
+
+    pop de
+    pop hl
+
+    push hl
+    push de
+
+    call Borra_6_bytes
+
+    ld hl,Numero_de_disparos_de_entidades
+    inc (hl)                                                            ; Incrementamos el nº de disparos de entidades.
+
 ; Iniciamos el proceso de explosión de Amadeus.
 
     ld hl,Impacto_Amadeus
@@ -286,7 +300,13 @@ Amadeus_impactado
     inc hl
     ld (hl),d
 
-    jr 2B
+    pop de
+    pop hl
+    pop bc
+    
+    xor a
+    inc a               ; NZ before RET.
+    ret 
 
 ; ------------- ------------- ------------
 ;
