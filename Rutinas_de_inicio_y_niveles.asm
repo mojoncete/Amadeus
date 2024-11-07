@@ -292,7 +292,7 @@ Decrementa_Contador_de_mov_masticados ld hl,(Contador_de_mov_masticados)
 
 ; ---------------------------------------------------------------------
 ;
-;	8/5/24
+;	7/11/24
 
 Reinicia_entidad_maliciosa 
 
@@ -316,9 +316,8 @@ Reinicia_entidad_maliciosa
 
 	call Cargamos_registros_con_mov_masticado
 
-; Incrementa el contador de vueltas, (el contador cuenta 4 vueltas máximo).
-; El perfil de velocidad de la entidad será: (Contador_de_vueltas)/8.
-; Ejemplos.
+; Incrementa (Contador_de_vueltas)x2. 
+; (Velocidad) de la entidad será: (Contador_de_vueltas)/4.
 
 ;	1ª vuelta: (Contador_de_vueltas)="$02" --- (Velocidad)="0".
 ;	2ª vuelta: 	""	""	""	""	""  ="$04" ---   ""	 ""	  ="1".

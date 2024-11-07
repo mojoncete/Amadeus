@@ -354,9 +354,10 @@ Repone_puntero_objeto defw 0							; Almacena (Puntero_objeto). Cuando el Sprite
 Puntero_store_caja defw 0
 Puntero_restore_caja defw 0
 Indice_restore_caja defw 0
+
 Numero_de_entidades db 0								; Nº total de entidades maliciosas que contiene el nivel.
 Numero_parcial_de_entidades db 7						; Nº de cajas que contiene un bloque de entidades. (7 Cajas).
-Entidades_en_curso db 0									; ..... ..... .....
+Entidades_en_curso db 0									; Entidades en pantalla.
 
 Puntero_indice_ENTIDADES defw 0 						; Se desplazará por el índice de entidades para `meterlas' en cajas.
 Datos_de_entidad defw 0									; Contiene los bytes de información de la entidad hacia la que apunta el 
@@ -525,8 +526,8 @@ START
 
 ; Limpiamos pantalla.
 
-	ld a,%00000111
-	call Cls
+;	ld a,%00000111
+;	call Cls
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
 ; INICIALIZACIÓN.
@@ -603,7 +604,7 @@ START
 
 Main 
 ;
-; 25/10/24
+; 07/11/24.
 
 ; Gestión de disparos.
 
@@ -629,15 +630,27 @@ Main
 	sbc hl,bc
 	jr nz,1F
 
+; GESTIÓN DE ENTIDADES.
+
 ; Si aún quedan entidades por aparecer del bloque de entidades, (7 cajas), incrementaremos (Entidades_en_curso) y calcularemos_ 
 ; _ (Clock_next_entity) para la siguiente entidad.
 
-	ld a,(Numero_parcial_de_entidades)
-	ld b,a
-	ld a,(Entidades_en_curso)
+; --- Numero_de_entidades db 0								; Nº total de entidades maliciosas que contiene el nivel.
+; --- Numero_parcial_de_entidades db 7						; Nº de cajas que contiene un bloque de entidades. (7 Cajas).
+; --- Entidades_en_curso db 0								; Entidades en pantalla.
+
+;	di
+;	jr $
+;	ei
+
+	ld hl,Numero_parcial_de_entidades
+	ld b,(hl)
+	ld a,(Entidades_en_curso)									; Entidades que hay en pantalla.
 	cp b
 	jr z,1F
 	jr nc,1F
+
+;	Incrementamos (Entidades_en_curso) y DEC (Numero_parcial_de_entidades) y (Numero_de_entidades).
 
 	inc a
 	ld (Entidades_en_curso),a
@@ -722,9 +735,9 @@ Main
 
 ; TODO: Generamos disparo ???
 
-	ld a,(Permiso_de_disparo_Entidades)
-	and a
-	call nz,Entidad_genera_disparo_si_procede
+;	ld a,(Permiso_de_disparo_Entidades)
+;	and a
+;	call nz,Entidad_genera_disparo_si_procede
 
 4 call Colision_Entidad_Amadeus									; Si hay posibilidad de COLISION, set 2,(Impacto2) y (Impacto) de entidad en curso a "1".
 
@@ -836,7 +849,7 @@ End_frame
 
 ;------------------------------------------
 ;
-;	2/10/24
+;	07/11/24
 
 Autoriza_disparo_de_entidades
 
@@ -844,10 +857,14 @@ Autoriza_disparo_de_entidades
 	ld (Permiso_de_disparo_Entidades),a
 
 	ld a,(Repone_CLOCK_disparos)
-	cp 25
+	cp 25								; 25 fps. Es el tiempo mínimo que habrá entre disparo y disparo de entidad.
 	jr c,1F
 
-	sub 5
+;	Este valor marca la frecuencia con la que se generan los disparos de las entidades.
+;	Un valor alto hace que en muy poco tiempo las entidades generen muchos disparos.
+;	Un valor bajo hace que la curva de generación de disparos sea más lenta.
+
+	sub 3 				
 
 1 ld (Repone_CLOCK_disparos),a
 	ld (CLOCK_disparos_de_entidades),a
@@ -943,15 +960,33 @@ Reinicia_Amadeus
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	12/05/24
+;	7/11/24
 
-Ajusta_velocidad_entidad ld a,(Velocidad)
-	sla a 
+Ajusta_velocidad_entidad 
+
+	ld a,(Velocidad)
+	and a
+	ret z 								; En la 1ª vuelta (Contador_de_vueltas) será "1" o "2", dependiendo de si queremos_
+	;									  _una o dos vueltas "lentas" iniciales. En ambos casos, (Velocidad)="0", pues:
+	;									  _ (Velocidad)=(Contador_de_vueltas)/4.
+
+
+; Incrementa (Contador_de_vueltas)x2. 
+; (Velocidad) de la entidad será: (Contador_de_vueltas)/4.
+
+;	1ª vuelta: (Contador_de_vueltas)="$02" --- (Velocidad)="0".
+;	2ª vuelta: 	""	""	""	""	""  ="$04" ---   ""	 ""	  ="1".
+;	3ª vuelta: 	""	""	""	""	""  ="$08" ---   ""	 ""	  ="2".
+;	4ª vuelta: 	""	""	""	""	""  ="$10" ---   ""	 ""	  ="4".
+;	5ª vuelta: 	""	""	""	""	""  ="$20" ---   ""	 ""	  ="8".   
+
+
+	sla a 								;	Multiplica x2 (Velocidad) en cada FRAME.
 	ld (Velocidad),a
 	and $10
 	ret z
 	
-; Restaura (Velocidad) a razón del nº de vueltas. 	
+; Restaura (Velocidad) a razón del nº de vueltas. Se ha superado (Velocidad)x8. 	
 
 	ld a,(Contador_de_vueltas)
 	sra a
