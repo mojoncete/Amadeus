@@ -1,6 +1,6 @@
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;   8/3/24
+;   9/11/24
 ;
 ;	Carga el nº de entidades del nivel en (Numero_de_entidades). 
 ;	Fija los perfiles de velocidad según el Nivel de dificultad.
@@ -26,29 +26,21 @@ Inicializa_Nivel
 	ld a,(hl)
 	ld (Numero_de_entidades),a					 ; Fijamos el nº de entidades que tiene el nivel.
 
-;! Las velocidades no deben de estar aquí pues pueden variar según el tipo de entidad. 
-
 	inc l
-	call Fija_velocidades					     ; Perfiles_de_velocidad según Nivel. Introduce los perfiles de velocidad en la Bandeja DRAW.
 
 	ld (Datos_de_nivel),hl						 ; (Datos_de_nivel) ahora apunta a la dirección de mem. donde se encuentra el .db que indica el (Tipo) de la 1ª entidad del Nivel.
 
 	call Situa_Puntero_indice_mov			 	 ; Sitúa (Puntero_indice_mov) según el (Tipo) de entidad en la coreografía correcta.
-
-;	di
-;	jr $
-;	ei
-
 	call Situa_Puntero_de_almacen_de_mov_masticados					; Sitúa (Puntero_de_almacen_de_mov_masticados) en el almacén adecuado según el (Tipo) de entidad. 
 
 	ret 										 
 
 ; ----------------------
 
-Fija_velocidades ld de,Perfiles_de_velocidad
-	ld bc,4
-	ldir
-	ret
+; Fija_velocidades ld de,Perfiles_de_velocidad
+; 	ld bc,4
+; 	ldir
+; 	ret
 
 Situa_Puntero_indice_mov ld a,(hl)     	 							; Cargamos A con el (Tipo) de la 1ª entidad del Nivel.       
     call Calcula_salto_en_BC
@@ -61,7 +53,7 @@ Situa_Puntero_indice_mov ld a,(hl)     	 							; Cargamos A con el (Tipo) de la
 
 Situa_Puntero_de_almacen_de_mov_masticados ld a,(Tipo)
 	call Calcula_salto_en_BC
-	ld hl,Almacen_de_movimientos_masticados_Entidad_1
+	ld hl,Indice_de_almacenes_de_mov_masticados
     and a
     adc hl,bc
     call Extrae_address

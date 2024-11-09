@@ -634,10 +634,6 @@ Main
 ; --- Numero_parcial_de_entidades db 7						; Nº de cajas que contiene un bloque de entidades. (7 Cajas).
 ; --- Entidades_en_curso db 0								; Entidades en pantalla.
 
-;	di
-;	jr $
-;	ei
-
 	ld hl,Numero_parcial_de_entidades
 	ld b,(hl)
 	ld a,(Entidades_en_curso)									; Entidades que hay en pantalla.
@@ -730,9 +726,9 @@ Main
 
 ; TODO: Generamos disparo ???
 
-;	ld a,(Permiso_de_disparo_Entidades)
-;	and a
-;	call nz,Entidad_genera_disparo_si_procede
+	ld a,(Permiso_de_disparo_Entidades)
+	and a
+	call nz,Entidad_genera_disparo_si_procede
 
 4 call Colision_Entidad_Amadeus									; Si hay posibilidad de COLISION, set 2,(Impacto2) y (Impacto) de entidad en curso a "1".
 
@@ -909,11 +905,11 @@ Reinicia_Amadeus
 ;	Reinicia posición y estado.
 
 	ld hl,$50cf
-	ld (p.imp.amadeus),hl
-	ld hl,$e0f0
-	ld (Pamm_Amadeus),hl
+	ld (p.imp.amadeus),hl						; Inicializa el puntero de impresión.
+	ld hl,$dccc
+	ld (Pamm_Amadeus),hl						; Inicializa el puntero de almacén de movimientos masticados.
 	ld hl,$003d
-	ld (Comm_Amadeus),hl
+	ld (Comm_Amadeus),hl						; Inicializa el contador de movimientos masticados.
 
 ;	limpiamos el álbum de borrado.
 
