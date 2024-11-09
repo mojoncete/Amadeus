@@ -21,15 +21,16 @@
 FRAMES equ $5c78														; Variable de 24 bits. Almacena el nº de cuadros, (frames) que llevamos construidos. Reloj en tiempo real.
 FRAMES_3 equ $5c7a
 
-Sprite_vacio equ $eae0													; ($eae0 - $eb10) 48 Bytes de "0".
+Sprite_vacio equ $f880													; 48 Bytes de "0".
 
 Centro_arriba equ $0160 												; Emplearemos estas constantes en la rutina de `recolocación´ del objeto:_
 Centro_abajo equ $0180 													; _[Comprueba_limite_horizontal]. El byte alto en las dos primeras constantes_
 Centro_izquierda equ $0f 												; _indica el tercio de pantalla, (línea $60 y $80 del 2º tercio de pantalla).
 Centro_derecha equ $10 													; Las constantes (Centro_izquierda) y (Centro_derecha) indican la columna $0f y $10 de pantalla.
 
-Almacen_de_movimientos_masticados_Entidad_1 equ $eb20					; $eb20 - $f87b ..... 3419 bytes. 
-Almacen_de_movimientos_masticados_Amadeus equ $e000						; ($e000 - $e1e3), 483 bytes. Movimientos masticados de Amadeus.
+Almacen_de_movimientos_masticados_Amadeus equ $dbdc						; ($dbdc - $ddbf), 483 bytes. $1e3. Movimientos masticados de Amadeus.
+Almacen_de_movimientos_masticados_Entidad_1 equ $ddc0					; $ddc0 - $eb1b ..... 3419 bytes. $0d5b.
+Almacen_de_movimientos_masticados_Entidad_2 equ $eb1c					; $eb1c - 
 
 Scanlines_album equ $8000	;	($8000 - $8118) 						; Inicialmente 280 bytes, $118. 
 Scanlines_album_2 equ $811a	;    ($811a - $8232)
@@ -526,25 +527,19 @@ START
 
 ; Limpiamos pantalla.
 
-;	ld a,%00000111
-;	call Cls
+	ld a,%00000111
+	call Cls
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
 ; INICIALIZACIÓN.
 
 	ld b,7   											 ; Generamos 7 nº aleatorios.
 	call Derivando_RND 									 ; Rutina de generación de nº aleatorios.
-
 	call Extrae_numero_aleatorio_y_avanza
-
 	ld l,a
 	ld h,0
 	ld (Clock_next_entity),hl 							 ; El 1er nº aleatorio define cuando aparece la 1ª entidad en pantalla. 
 
-;	Inicializa 1er Nivel.
-
-	ld hl,Indice_de_niveles
-	ld (Puntero_indice_NIVELES),hl						 ; Situamos (Puntero_indice_NIVELES) en el 1er Nivel del índice.
 	call Inicializa_Nivel								 ; Prepara el 1er Nivel del juego.
 ;														 ; Situa (Puntero_indice_NIVELES) el el primer defw., (nivel) del índice de niveles.
 ;														 ; Inicializa (Numero_de_entidades) con el nº total de malotes del nivel.

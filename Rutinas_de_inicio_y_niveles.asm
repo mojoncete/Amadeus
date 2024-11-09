@@ -14,16 +14,33 @@
 
 Inicializa_Nivel 
 
-	ld hl,(Puntero_indice_NIVELES)
+;	Inicializa 1er Nivel y sitúa (Puntero_indice_NIVELES) en el 2º Nivel.
+
+	ld hl,Indice_de_niveles
+	ld (Puntero_indice_NIVELES),hl				 ; Situamos (Puntero_indice_NIVELES) en el 1er Nivel del índice.
 	call Extrae_address   
+	inc e
+	inc e
+	ld (Puntero_indice_NIVELES),de				 ; Situamos (Puntero_indice_NIVELES) en el 2º Nivel del índice.
+
 	ld a,(hl)
 	ld (Numero_de_entidades),a					 ; Fijamos el nº de entidades que tiene el nivel.
-	inc hl
-	call Fija_velocidades					     ; Perfiles_de_velocidad según Nivel.
+
+;! Las velocidades no deben de estar aquí pues pueden variar según el tipo de entidad. 
+
+	inc l
+	call Fija_velocidades					     ; Perfiles_de_velocidad según Nivel. Introduce los perfiles de velocidad en la Bandeja DRAW.
+
 	ld (Datos_de_nivel),hl						 ; (Datos_de_nivel) ahora apunta a la dirección de mem. donde se encuentra el .db que indica el (Tipo) de la 1ª entidad del Nivel.
-	call Inicializa_Puntero_indice_mov			 ; Inicializa (Puntero_indice_mov) según el (Tipo) de Entidad. Nos situamos en la coreografía correcta.
-												 
-	call Inicializa_Puntero_de_almacen_de_mov_masticados	; Selecciona el almacén adecuado de mov_masticados según el (Tipo) de entidad. 
+
+	call Situa_Puntero_indice_mov			 	 ; Sitúa (Puntero_indice_mov) según el (Tipo) de entidad en la coreografía correcta.
+
+;	di
+;	jr $
+;	ei
+
+	call Situa_Puntero_de_almacen_de_mov_masticados					; Sitúa (Puntero_de_almacen_de_mov_masticados) en el almacén adecuado según el (Tipo) de entidad. 
+
 	ret 										 
 
 ; ----------------------
@@ -33,7 +50,7 @@ Fija_velocidades ld de,Perfiles_de_velocidad
 	ldir
 	ret
 
-Inicializa_Puntero_indice_mov ld a,(hl)     	 ; Cargamos A con el (Tipo) de la 1ª entidad del Nivel.       
+Situa_Puntero_indice_mov ld a,(hl)     	 							; Cargamos A con el (Tipo) de la 1ª entidad del Nivel.       
     call Calcula_salto_en_BC
     ld hl,Indice_de_mov_segun_tipo_de_entidad
     and a
@@ -42,7 +59,7 @@ Inicializa_Puntero_indice_mov ld a,(hl)     	 ; Cargamos A con el (Tipo) de la 1
     ld (Puntero_indice_mov),hl
     ret
 
-Inicializa_Puntero_de_almacen_de_mov_masticados ld a,(Tipo)
+Situa_Puntero_de_almacen_de_mov_masticados ld a,(Tipo)
 	call Calcula_salto_en_BC
 	ld hl,Almacen_de_movimientos_masticados_Entidad_1
     and a
@@ -473,16 +490,18 @@ Busca_mov_masticados_segun_tipo ld hl,Ctrl_4
 
 ;	------------------------------------------------------------------------------------
 ;
-;	12/01/24
+;	09/11/24
 ;
 ;	INPUTS:	A contiene el (Tipo) de entidad. 
 ;
 ;	Esta pequeña sub-rutina carga BC con 0,2,4,6,8 ... en función del tipo de entidad: (1,2,3,4,...). 
 ;	Calcula "el salto" para situarnos en los DATOS de la ENTIDAD correcta del índice de entidades según el tipo de entidad.
 
-Calcula_salto_en_BC sla a										
+Calcula_salto_en_BC and a
+	jr z,1F
+	sla a										
 	sub 2										; ("Tipo_de_entidad")*2-2.
-	ld c,a
+1 ld c,a
 	ld b,0 										
 	ret
 

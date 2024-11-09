@@ -744,7 +744,7 @@ Reinicio
 	ld hl,Posicion_actual
 	call Limpia_contenido_hl
 
-	call Inicializa_Puntero_indice_mov
+	call Situa_Puntero_indice_mov
 	call Inicia_Puntero_mov
 
 	ld hl,Incrementa_puntero
