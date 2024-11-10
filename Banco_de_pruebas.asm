@@ -424,23 +424,7 @@ Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una únic
 ;															BIT 7, "1" Indica que se ha iniciado el proceso de explosión en Amadeus.
 ;																_ Mientras este bit este activo, no se generarán dos explosiones de entidades a la vez.
 
-Ctrl_4 db 0 											;   3er Byte de Ctrl. general, (no específico) a una única entidad. Lo utiliza la rutina [Inicia_entidad].
-;
-;                                                           Los bits (0-3) indican el (Tipo) de entidad que estamos iniciando.
-;
-;                                                          	BIT 0 (Ctrl_4) ..... Entidad de (Tipo)_1.
-;															BIT 1 (Ctrl_4) ..... Entidad de (Tipo)_2.
-;	                                                        BIT 2 (Ctrl_4) ..... Entidad de (Tipo)_3.
-;	                                                        BIT 3 (Ctrl_4) ..... Entidad de (Tipo)_4.
-;
-;															Los bits (4-7) indican que (Tipo) de entidad tiene todos sus movimientos_
-;															_ masticados ya generados.
-;
-;															BIT 4 (Ctrl_4) ..... MOV_MASTICADOS GENERADOS. Entidad de (Tipo)_1.
-;															BIT 5 (Ctrl_4) ..... MOV_MASTICADOS GENERADOS. Entidad de (Tipo)_2.
-;	                                                        BIT 6 (Ctrl_4) ..... MOV_MASTICADOS GENERADOS. Entidad de (Tipo)_3.
-;	                                                        BIT 7 (Ctrl_4) ..... MOV_MASTICADOS GENERADOS. Entidad de (Tipo)_4.
-
+Ctrl_4 db 0 											
 Ctrl_5 db 0												;	BIT 1, "1" Indica que la entidad en curso es la alcanzada por nuestro disparo. La comparativa entre coordenadas ha sido satisfactoria. 
 ;															BIT	2, "1" Indica que tras consecutivos desplazamientos del disparo hay que modificar el (Puntero_de_impresión) dos posiciones a la derecha.
 ;															BIT	3, "1" Indica que tras consecutivos desplazamientos del disparo hay que modificar el (Puntero_de_impresión) dos posiciones a la izquierda.								
@@ -515,7 +499,7 @@ Lives db 3
 
 ; 	INICIO  *************************************************************************************************************************************************************************
 ;
-;	5/1/24
+;	10/11/24
 
 START 
 
@@ -531,7 +515,7 @@ START
 	call Cls
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
-; INICIALIZACIÓN.
+INICIALIZACION
 
 	ld b,7   											 ; Generamos 7 nº aleatorios.
 	call Derivando_RND 									 ; Rutina de generación de nº aleatorios.
@@ -540,7 +524,14 @@ START
 	ld h,0
 	ld (Clock_next_entity),hl 							 ; El 1er nº aleatorio define cuando aparece la 1ª entidad en pantalla. 
 
-	call Inicializa_Nivel								 ; Prepara el 1er Nivel del juego.
+; 	Con nuestros nº aleatorios mágicos podremos darle magia a nuestros patrones de movimiento.
+;	Vamos a generar los movimientos masticados de las entidades.
+	
+	call Genera_movimientos_masticados_del_nivel
+
+;	Una vez construidas las distintas coreografías de las entidades que componen el nivel, vamos a inicializarlo.
+
+;	call Inicializa_Nivel								 ; Prepara el 1er Nivel del juego.
 ;														 ; Situa (Puntero_indice_NIVELES) el el primer defw., (nivel) del índice de niveles.
 ;														 ; Inicializa (Numero_de_entidades) con el nº total de malotes del nivel.
 ;														 ; Inicializa (Datos_de_nivel) con el `tipo´ de la 1ª entidad del nivel. 
@@ -552,7 +543,9 @@ START
 	call Inicia_albumes_de_lineas_Amadeus
 	call Inicia_albumes_de_disparos
 
-4 call Inicia_Entidades						 
+4 
+
+;	call Inicia_Entidades						 
 	call Inicia_Amadeus
 
 ;														 ; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 

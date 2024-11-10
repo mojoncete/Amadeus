@@ -1,5 +1,95 @@
 ;---------------------------------------------------------------------------------------------------------------
 ;
+;   10/11/24
+
+;	BADSAT, (Satélite malvado). ------------------------------------------------------------------------------------------------------------------------------------	
+
+;	Entidad_1 db 1,2,2		                     		; (Tipo) / (Filas) / (Columns).
+;	db 1												; (Contador_de_vueltas).
+;	defw Indice_Badsat_der								; (Indice_Sprite_der).
+;	defw Indice_Badsat_izq								; (Indice_Sprite_izq).
+
+; 	Aleatoriedad en la posición de inicio de la entidad.
+; 	BadSat siempre aparecerá por la parte superior de la pantalla, $40xx. (Cuad_objeto) tendrá valor 1 o 2 dependiendo de si aparece por la mitad izquierda o derecha.
+
+;	Pos_inicio_entidad1	defw $0000	                    ; (Posicion_inicio).
+;	db 0												; (Cuad_objeto).
+
+;	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
+
+
+Genera_movimientos_masticados_del_nivel 
+
+	call Inicializa_Nivel
+
+; 	Tras ejecutar [Inicializa_Nivel] tenemos:
+
+;	(Puntero_indice_NIVELES) apunta al nivel en el que nos encontramos, (dentro del índice).
+;	(Numero_de_entidades) contiene el nº de entidades que conforman el nivel.
+;	(Datos_de_nivel) apunta al .db, (tipo) de la 1ª entidad del Nivel.
+
+1 push hl														; (Datos_de_nivel). 
+	ld a,(hl)													; A contiene el (Tipo) de la entidad del Nivel.
+
+;	Se han construido los "Movimientos masticados" de este (Tipo) de entidad ?
+
+    call Calcula_salto_en_BC
+    ld hl,Indice_de_almacenes_de_mov_masticados
+    and a
+    adc hl,bc
+    call Extrae_address
+	inc l
+	ld a,(hl)
+	and a
+	jr nz,Movimientos_masticados_construidos
+
+	pop hl														; (Datos_de_nivel). 
+	ld a,(hl)
+	push hl														; (Datos_de_nivel).
+
+	call Definicion_segun_tipo
+
+;	HL apunta al primer .db que define la entidad, (Tipo).
+
+	ld a,(hl)
+	ex af,af													; (Tipo) en áf
+
+	call Definicion_de_entidad_a_bandeja_DRAW					; Vuelca los datos de la definición de entidad en DRAW.
+
+	ex af,af
+	call Situa_Puntero_indice_mov			 	 				; Sitúa (Puntero_indice_mov) según el (Tipo) de entidad en el 1er .defw del índice de su coreogradía.
+
+; 	Antes de empezar a generar los "movimientos masticados" de esta entidad necesitamos determinar su (Posicion_inicio).
+
+	ld hl,(RND_SP)												; RND_SP Puntero que se va desplazando por el SET de nº aleatorios.
+	ld a,(hl)
+	and $1f														; Define el nº de columna por el que va a aparecer la entidad.
+
+	ld hl,Posicion_inicio
+	ld (hl),a
+
+;	Ya disponemos de una (Posicion_inicio) aleatoria y la definición de la entidad en la "Bandeja DRAW". 
+;	Generamos "Movimientos masticados" de la entidad.
+
+	call Construye_movimientos_masticados_entidad
+
+; 	Tenemos todos los movimientos masticados de este tipo de entidad generados y guardados en su correspondiente almacén.
+; 	(Puntero_de_almacen_de_mov_masticados) de esta entidad está situado al principio del almacen.
+; 	(Contador_de_mov_masticados) de esta entidad contiene: el nº total de mov. masticados de este tipo de entidad.
+; 	Contador_general_de_mov_masticados de este tipo de entidad actualizado.
+; 	Lo tenemos todo preparado para cargar los registros con el mov. masticado y hacer la correspondiente foto.
+
+Movimientos_masticados_construidos 
+
+	ld hl,Numero_de_entidades
+	dec (hl)
+	pop hl														; (Datos_de_nivel) en HL.
+	ret z
+	inc l
+	jr 1B
+
+;---------------------------------------------------------------------------------------------------------------
+;
 ;   9/11/24
 ;
 ;	Carga el nº de entidades del nivel en (Numero_de_entidades). 
@@ -17,21 +107,14 @@ Inicializa_Nivel
 ;	Inicializa 1er Nivel y sitúa (Puntero_indice_NIVELES) en el 2º Nivel.
 
 	ld hl,Indice_de_niveles
-	ld (Puntero_indice_NIVELES),hl				 ; Situamos (Puntero_indice_NIVELES) en el 1er Nivel del índice.
 	call Extrae_address   
-	inc e
-	inc e
 	ld (Puntero_indice_NIVELES),de				 ; Situamos (Puntero_indice_NIVELES) en el 2º Nivel del índice.
 
 	ld a,(hl)
 	ld (Numero_de_entidades),a					 ; Fijamos el nº de entidades que tiene el nivel.
 
 	inc l
-
 	ld (Datos_de_nivel),hl						 ; (Datos_de_nivel) ahora apunta a la dirección de mem. donde se encuentra el .db que indica el (Tipo) de la 1ª entidad del Nivel.
-
-	call Situa_Puntero_indice_mov			 	 ; Sitúa (Puntero_indice_mov) según el (Tipo) de entidad en la coreografía correcta.
-	call Situa_Puntero_de_almacen_de_mov_masticados					; Sitúa (Puntero_de_almacen_de_mov_masticados) en el almacén adecuado según el (Tipo) de entidad. 
 
 	ret 										 
 
@@ -51,14 +134,14 @@ Situa_Puntero_indice_mov ld a,(hl)     	 							; Cargamos A con el (Tipo) de la
     ld (Puntero_indice_mov),hl
     ret
 
-Situa_Puntero_de_almacen_de_mov_masticados ld a,(Tipo)
-	call Calcula_salto_en_BC
-	ld hl,Indice_de_almacenes_de_mov_masticados
-    and a
-    adc hl,bc
-    call Extrae_address
-	ld (Puntero_de_almacen_de_mov_masticados),hl
-	ret
+;Situa_Puntero_de_almacen_de_mov_masticados ld a,(Tipo)
+;	call Calcula_salto_en_BC
+;	ld hl,Indice_de_almacenes_de_mov_masticados
+;    and a
+;    adc hl,bc
+;    call Extrae_address
+;	ld (Puntero_de_almacen_de_mov_masticados),hl
+;	ret
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
@@ -81,7 +164,7 @@ Inicia_Entidades
 
 2 ld (Datos_de_nivel),hl 										; Actualizamos. Ahora nos encontramos en la siguiente entidad del Nivel.
 
-	call Activa_FLAG_Tipo_de_entidad							; La rutina identifica el (Tipo) de entidad que vamos a iniciar.					
+;	call Activa_FLAG_Tipo_de_entidad							; La rutina identifica el (Tipo) de entidad que vamos a iniciar.					
 
 	ld hl,(Datos_de_nivel)
 
@@ -99,7 +182,7 @@ Inicia_Entidades
 
 ;	Este (Tipo) de entidad ya dispone de movimientos masticados ???
 
-	call Busca_mov_masticados_segun_tipo
+;	call Busca_mov_masticados_segun_tipo
 
 	and a
 	jr z,3F														; A="1" Indica que los mov_masticados de este (Tipo) de entidad ya están generados.
@@ -122,7 +205,7 @@ Inicia_Entidades
 ; Contador_general_de_mov_masticados de este tipo de entidad actualizado.
 ; Lo tenemos todo preparado para cargar los registros con el mov. masticado y hacer la correspondiente foto.
 
-	call Activa_FLAG_mov_masticados_completos					; Activa el FLAG que indica que este (Tipo) de entidad tiene todos sus_
+;	call Activa_FLAG_mov_masticados_completos					; Activa el FLAG que indica que este (Tipo) de entidad tiene todos sus_
 ;																; _ Mov_masticados ya generados.
 
 4 call Cargamos_registros_con_mov_masticado						; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
@@ -356,129 +439,6 @@ Reinicia_entidad_maliciosa
 	sra (hl)
 
 	ret
-
-; ---------------------------------------------------------------------
-;
-;	22/01/24
-
-Activa_FLAG_mov_masticados_completos ld hl,Ctrl_4
-	bit 0,(hl)
-	jr nz,1F
-	bit 1,(hl)
-	jr nz,2F
-	bit 2,(hl)
-	jr nz,3F
-	bit 3,(hl)
-	jr nz,4F
-	ret
-
-1 set 4,(hl)
-	ret
-2 set 5,(hl)
-	ret
-3 set 6,(hl)
-	ret
-4 set 7,(hl)
-	ret
-
-; ---------------------------------------------------------------------
-;
-;	23/01/24
-;
-;	Activamos el FLAG correspondiente a cada tipo de entidad.
-;
-;	bit_0 (Ctrl_4) ..... Entidad de (Tipo)_1.
-;	bit_1 (Ctrl_4) ..... Entidad de (Tipo)_2.
-;	bit_2 (Ctrl_4) ..... Entidad de (Tipo)_3.
-;	bit_3 (Ctrl_4) ..... Entidad de (Tipo)_4.
-
-;	INPUTS: HL contiene (Datos_de_nivel), (tipo de entidad que estamos iniciando).
-
-Activa_FLAG_Tipo_de_entidad ld a,(hl)
-	dec a
-	jr nz,1F
-
-; --- Tipo_1
-
-	ld hl,Ctrl_4
-	set 0,(hl)
-	ret
-
-1 dec a
-	jr nz,2F
-
-; --- Tipo_2
-
-	ld hl,Ctrl_4
-	set 1,(hl)
-	ret
-
-2 dec a
-	jr nz,3F
-
-; --- Tipo_3
-
-	ld hl,Ctrl_4
-	set 2,(hl)
-	ret
-
-; --- Tipo_3
-
-3 ld hl,Ctrl_4
-	set 2,(hl)
-	ret
-
-; ---------------------------------------------------------------------
-;
-;	22/01/24
-
-Busca_mov_masticados_segun_tipo ld hl,Ctrl_4
-	bit 0,(hl)
-	jr nz,1F
-
-	bit 1,(hl)
-	jr nz,2F
-
-	bit 2,(hl)
-	jr nz,3F
-
-	bit 3,(hl)
-	jr nz,4F
-	jr 6F
-
-; Entidad_de_Tipo_1.
-
-1 bit 4,(hl)	
-	jr z,6F
-	jr 5F
-
-; Entidad_de_Tipo_2.
-
-2 bit 5,(hl)	
-	jr z,6F
-	jr 5F
-
-; Entidad_de_Tipo_3.
-
-3 bit 6,(hl)	
-	jr z,6F
-	jr 5F
-
-; Entidad_de_Tipo_4.
-
-4 bit 7,(hl)	
-	jr z,6F
-
-; Esta entidad TIENE MOV_MASTICADOS.
-
-5 xor a
-	inc a
-	ret
-
-; Esta entidad NO TIENE MOV_MASTICADOS.
-
-6 xor a
-	ret	
 
 ;	------------------------------------------------------------------------------------
 ;

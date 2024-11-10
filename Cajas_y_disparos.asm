@@ -196,7 +196,7 @@ Caja_7 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y)..
 
 ; -------------------------------------------------------------------------------------
 ;
-;	11/1/24
+;	10/11/24
 ;
 ;	TIPOS de "Entidades maliciosas" que quieren conquistar la Tierra.	
 ;
@@ -212,15 +212,22 @@ Indice_de_definiciones_de_entidades
 
 ;	DEFINICIONES DE ENTIDADES. (20 Bytes).
 
-;	BADSAT, (Satélite malvado).	
+;	BADSAT, (Satélite malvado). ------------------------------------------------------------------------------------------------------------------------------------	
 
 Entidad_1 db 1,2,2		                     			; (Tipo) / (Filas) / (Columns).
-	db 2												; (Contador_de_vueltas).
+	db 1												; (Contador_de_vueltas).
 	defw Indice_Badsat_der								; (Indice_Sprite_der).
 	defw Indice_Badsat_izq								; (Indice_Sprite_izq).
-	defw $4003	                                     	; (Posicion_inicio).
-	db 1												; (Cuad_objeto).
+
+; Aleatoriedad en la posición de inicio de la entidad.
+; BadSat siempre aparecerá por la parte superior de la pantalla, $40xx. (Cuad_objeto) tendrá valor 1 o 2 dependiendo de si aparece por la mitad izquierda o derecha.
+
+Pos_inicio_entidad1	defw $4000	                        ; (Posicion_inicio).
+	db 0												; (Cuad_objeto).
+
 	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
+
+;	-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Entidad_2 db 1,2,2		                     			; (Tipo) / (Filas) / (Columns).
 	db 1												; (Contador_de_vueltas).
