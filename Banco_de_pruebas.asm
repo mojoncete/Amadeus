@@ -531,10 +531,7 @@ INICIALIZACION
 
 ;	Una vez construidas las distintas coreografías de las entidades que componen el nivel, vamos a inicializarlo.
 
-;	call Inicializa_Nivel								 ; Prepara el 1er Nivel del juego.
-;														 ; Situa (Puntero_indice_NIVELES) el el primer defw., (nivel) del índice de niveles.
-;														 ; Inicializa (Numero_de_entidades) con el nº total de malotes del nivel.
-;														 ; Inicializa (Datos_de_nivel) con el `tipo´ de la 1ª entidad del nivel. 
+	jr $
 
 ;	Inicia los álbumes de líneas.
 
