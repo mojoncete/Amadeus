@@ -12,7 +12,7 @@
 ; 	Aleatoriedad en la posición de inicio de la entidad.
 ; 	BadSat siempre aparecerá por la parte superior de la pantalla, $40xx. (Cuad_objeto) tendrá valor 1 o 2 dependiendo de si aparece por la mitad izquierda o derecha.
 
-;	Pos_inicio_entidad1	defw $0000	                    ; (Posicion_inicio).
+;	Pos_inicio_entidad1	defw $4000	                    ; (Posicion_inicio).
 ;	db 0												; (Cuad_objeto).
 
 ;	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
@@ -30,8 +30,29 @@ Genera_movimientos_masticados_del_nivel
 
 1 push hl														; (Datos_de_nivel). 
 	ld a,(hl)													; A contiene el (Tipo) de la entidad del Nivel.
+;	push af
+
+;	Preparamos el puntero_master para que apunte al .defw correspondiente del índice según el (Tipo) de entidad.
+
+    call Calcula_salto_en_BC
+    ld hl,Indice_de_cajas_master
+    and a
+    adc hl,bc
+  	ld (Puntero_indice_master),hl
+
+;	Caja Master inicializada ???
+
+	call Extrae_address
+	ld a,(hl)
+	and a
+;	pop af
+	jr nz,Movimientos_masticados_construidos 
 
 ;	Se han construido los "Movimientos masticados" de este (Tipo) de entidad ?
+
+	pop hl
+	ld a,(hl)
+	push hl
 
     call Calcula_salto_en_BC
     ld hl,Indice_de_almacenes_de_mov_masticados
@@ -48,25 +69,19 @@ Genera_movimientos_masticados_del_nivel
 	push hl														; (Datos_de_nivel).
 
 	call Definicion_segun_tipo
-
-;	HL apunta al primer .db que define la entidad, (Tipo).
-
-	ld a,(hl)
-	ex af,af													; (Tipo) en áf
-
 	call Definicion_de_entidad_a_bandeja_DRAW					; Vuelca los datos de la definición de entidad en DRAW.
 
-	ex af,af
+	ld a,(Tipo)
 	call Situa_Puntero_indice_mov			 	 				; Sitúa (Puntero_indice_mov) según el (Tipo) de entidad en el 1er .defw del índice de su coreogradía.
 
 ; 	Antes de empezar a generar los "movimientos masticados" de esta entidad necesitamos determinar su (Posicion_inicio).
 
-	ld hl,(RND_SP)												; RND_SP Puntero que se va desplazando por el SET de nº aleatorios.
-	ld a,(hl)
-	and $1f														; Define el nº de columna por el que va a aparecer la entidad.
+;	ld hl,(RND_SP)												; RND_SP Puntero que se va desplazando por el SET de nº aleatorios.
+;	ld a,(hl)
+;	and $1f														; Define el nº de columna por el que va a aparecer la entidad.
 
-	ld hl,Posicion_inicio
-	ld (hl),a
+;	ld hl,Posicion_inicio
+;	ld (hl),a
 
 ;	Ya disponemos de una (Posicion_inicio) aleatoria y la definición de la entidad en la "Bandeja DRAW". 
 ;	Generamos "Movimientos masticados" de la entidad.
@@ -78,6 +93,14 @@ Genera_movimientos_masticados_del_nivel
 ; 	(Contador_de_mov_masticados) de esta entidad contiene: el nº total de mov. masticados de este tipo de entidad.
 ; 	Contador_general_de_mov_masticados de este tipo de entidad actualizado.
 ; 	Lo tenemos todo preparado para cargar los registros con el mov. masticado y hacer la correspondiente foto.
+
+	ld hl,(Puntero_indice_master)
+	call Extrae_address
+
+	ld e,l
+	ld d,h
+
+	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades Master completa.
 
 Movimientos_masticados_construidos 
 

@@ -355,6 +355,7 @@ Repone_puntero_objeto defw 0							; Almacena (Puntero_objeto). Cuando el Sprite
 Puntero_store_caja defw 0
 Puntero_restore_caja defw 0
 Indice_restore_caja defw 0
+Puntero_indice_master defw 0
 
 Numero_de_entidades db 0								; Nº total de entidades maliciosas que contiene el nivel.
 Numero_parcial_de_entidades db 7						; Nº de cajas que contiene un bloque de entidades. (7 Cajas).

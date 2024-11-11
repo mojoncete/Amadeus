@@ -76,7 +76,71 @@ Disparo_2 db 0						    	; Control.
 	db 0,0,0								; Puntero objeto.
 	defw 0									; Puntero de impresión.
 Disparo_1 db 0							    ; Control.
-						
+		
+; -------------------------------------------------------------------------------------
+;
+;	Índice de cajas_Masters.
+;
+;	11/11/24
+;
+;	12 bytes.
+
+Indice_de_cajas_master						
+
+	defw Caja_master_1
+	defw Caja_master_2
+	defw Caja_master_3
+	defw Caja_master_4
+	defw Caja_master_5
+
+Caja_master_1 db 0,0,0									; (Tipo) / (Coordenada_X) / (Coordenada_Y).
+	db 0												; (Contador_de_vueltas).
+	db 0												; (Impacto).
+	defw 0												; (Puntero_de_impresion).
+	defw 0												; (Puntero_de_almacen_de_mov_masticados).
+	defw 0 												; (Contador_de_mov_masticados).
+	db 0												; (Velocidad). 					
+
+; ---------- ---------- ---------- ---------- ----------	
+
+Caja_master_2 db 0,0,0									; (Tipo) / (Coordenada_X) / (Coordenada_Y).
+	db 0 												; (Contador_de_vueltas).
+	db 0												; (Impacto).
+	defw 0												; (Puntero_de_impresion).
+	defw 0												; (Puntero_de_almacen_de_mov_masticados).
+	defw 0 												; (Contador_de_mov_masticados).
+	db 0												; (Velocidad). 					
+
+; ---------- ---------- ---------- ---------- ----------	
+
+Caja_master_3 db 0,0,0									; (Tipo) / (Coordenada_X) / (Coordenada_Y).
+	db 0 												; (Contador_de_vueltas).
+	db 0												; (Impacto).
+	defw 0												; (Puntero_de_impresion).
+	defw 0												; (Puntero_de_almacen_de_mov_masticados).
+	defw 0 												; (Contador_de_mov_masticados).
+	db 0												; (Velocidad). 					
+
+; ---------- ---------- ---------- ---------- ----------
+
+Caja_master_4 db 0,0,0									; (Tipo) / (Coordenada_X) / (Coordenada_Y).
+	db 0 												; (Contador_de_vueltas).
+	db 0												; (Impacto).
+	defw 0												; (Puntero_de_impresion).
+	defw 0												; (Puntero_de_almacen_de_mov_masticados).
+	defw 0 												; (Contador_de_mov_masticados).
+	db 0												; (Velocidad). 					
+
+; ---------- ---------- ---------- ---------- ----------
+
+Caja_master_5 db 0,0,0									; (Tipo) / (Coordenada_X) / (Coordenada_Y).
+	db 0 												; (Contador_de_vueltas).
+	db 0												; (Impacto).
+	defw 0												; (Puntero_de_impresion).
+	defw 0												; (Puntero_de_almacen_de_mov_masticados).
+	defw 0 												; (Contador_de_mov_masticados).
+	db 0												; (Velocidad). 					
+
 ; -------------------------------------------------------------------------------------
 ;
 ;	Índice de cajas de entidades.
@@ -222,7 +286,7 @@ Entidad_1 db 1,2,2		                     			; (Tipo) / (Filas) / (Columns).
 ; Aleatoriedad en la posición de inicio de la entidad.
 ; BadSat siempre aparecerá por la parte superior de la pantalla, $40xx. (Cuad_objeto) tendrá valor 1 o 2 dependiendo de si aparece por la mitad izquierda o derecha.
 
-Pos_inicio_entidad1	defw $4000	                        ; (Posicion_inicio).
+Pos_inicio_entidad1	defw $4003	                        ; (Posicion_inicio).
 	db 0												; (Cuad_objeto).
 
 	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
