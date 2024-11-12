@@ -1,21 +1,8 @@
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;   10/11/24
+;   12/11/24
 
-;	BADSAT, (Satélite malvado). ------------------------------------------------------------------------------------------------------------------------------------	
-
-;	Entidad_1 db 1,2,2		                     		; (Tipo) / (Filas) / (Columns).
-;	db 1												; (Contador_de_vueltas).
-;	defw Indice_Badsat_der								; (Indice_Sprite_der).
-;	defw Indice_Badsat_izq								; (Indice_Sprite_izq).
-
-; 	Aleatoriedad en la posición de inicio de la entidad.
-; 	BadSat siempre aparecerá por la parte superior de la pantalla, $40xx. (Cuad_objeto) tendrá valor 1 o 2 dependiendo de si aparece por la mitad izquierda o derecha.
-
-;	Pos_inicio_entidad1	defw $4000	                    ; (Posicion_inicio).
-;	db 0												; (Cuad_objeto).
-
-;	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
+;	Prepara las CAJAS MASTER y genera los movimientos masticados de todas las entidades que aparecerán en el nivel.
 
 
 Genera_movimientos_masticados_del_nivel 
@@ -28,9 +15,12 @@ Genera_movimientos_masticados_del_nivel
 ;	(Numero_de_entidades) contiene el nº de entidades que conforman el nivel.
 ;	(Datos_de_nivel) apunta al .db, (tipo) de la 1ª entidad del Nivel.
 
-1 push hl														; (Datos_de_nivel). 
+	ld a,(Numero_de_entidades)
+	ld b,a
+1 push bc														; Push (Numero_de_entidades).
+
+ 	push hl														; (Datos_de_nivel). 
 	ld a,(hl)													; A contiene el (Tipo) de la entidad del Nivel.
-;	push af
 
 ;	Preparamos el puntero_master para que apunte al .defw correspondiente del índice según el (Tipo) de entidad.
 
@@ -45,7 +35,6 @@ Genera_movimientos_masticados_del_nivel
 	call Extrae_address
 	ld a,(hl)
 	and a
-;	pop af
 	jr nz,Movimientos_masticados_construidos 
 
 ;	Se han construido los "Movimientos masticados" de este (Tipo) de entidad ?
@@ -53,20 +42,6 @@ Genera_movimientos_masticados_del_nivel
 	pop hl
 	ld a,(hl)
 	push hl
-
-    call Calcula_salto_en_BC
-    ld hl,Indice_de_almacenes_de_mov_masticados
-    and a
-    adc hl,bc
-    call Extrae_address
-	inc l
-	ld a,(hl)
-	and a
-	jr nz,Movimientos_masticados_construidos
-
-	pop hl														; (Datos_de_nivel). 
-	ld a,(hl)
-	push hl														; (Datos_de_nivel).
 
 	call Definicion_segun_tipo
 	call Definicion_de_entidad_a_bandeja_DRAW					; Vuelca los datos de la definición de entidad en DRAW.
@@ -104,12 +79,12 @@ Genera_movimientos_masticados_del_nivel
 
 Movimientos_masticados_construidos 
 
-	ld hl,Numero_de_entidades
-	dec (hl)
-	pop hl														; (Datos_de_nivel) en HL.
-	ret z
-	inc l
-	jr 1B
+	pop hl														 
+	inc l														; Datos_de_nivel +1 en HL.
+
+	pop bc														; Pop (Numero_de_entidades).
+	djnz 1B
+	ret
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
