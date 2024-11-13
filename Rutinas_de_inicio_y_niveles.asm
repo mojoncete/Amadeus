@@ -1,13 +1,10 @@
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;   12/11/24
+;   13/11/24
 
 ;	Prepara las CAJAS MASTER y genera los movimientos masticados de todas las entidades que aparecerán en el nivel.
 
-
 Genera_movimientos_masticados_del_nivel 
-
-	call Inicializa_Nivel
 
 ; 	Tras ejecutar [Inicializa_Nivel] tenemos:
 
@@ -15,35 +12,39 @@ Genera_movimientos_masticados_del_nivel
 ;	(Numero_de_entidades) contiene el nº de entidades que conforman el nivel.
 ;	(Datos_de_nivel) apunta al .db, (tipo) de la 1ª entidad del Nivel.
 
-	ld a,(Numero_de_entidades)
-	ld b,a
-1 push bc														; Push (Numero_de_entidades).
+	dec l
+	ld b,(hl)													; B contiene (Numero_de_entidades).
+	inc l														; C contiene (Tipo) de la 1ª entidad del nivel.
+	ld c,(hl)													
 
- 	push hl														; (Datos_de_nivel). 
-	ld a,(hl)													; A contiene el (Tipo) de la entidad del Nivel.
+1 push hl														; Push (Datos_de_nivel).
+	push bc														; Push (Numero_de_entidades)/(Tipo).
 
 ;	Preparamos el puntero_master para que apunte al .defw correspondiente del índice según el (Tipo) de entidad.
 
-    call Calcula_salto_en_BC
     ld hl,Indice_de_cajas_master
+	ld a,c														; (Tipo) de la entidad en A.
+
+    call Calcula_salto_en_BC
     and a
     adc hl,bc
+
   	ld (Puntero_indice_master),hl
+	call Extrae_address
 
 ;	Caja Master inicializada ???
 
-	call Extrae_address
 	ld a,(hl)
 	and a
 	jr nz,Movimientos_masticados_construidos 
 
-;	Se han construido los "Movimientos masticados" de este (Tipo) de entidad ?
+;	Construimos movimientos masticados de este (Tipo) de entidad.
 
-	pop hl
-	ld a,(hl)
-	push hl
+	pop bc
+	ld a,c														; (Tipo) de la entidad en A.
+	push bc
 
-	call Definicion_segun_tipo
+	call Definicion_segun_tipo									; HL apunta al 1er .db que define la entidad.
 	call Definicion_de_entidad_a_bandeja_DRAW					; Vuelca los datos de la definición de entidad en DRAW.
 
 	ld a,(Tipo)
@@ -79,11 +80,14 @@ Genera_movimientos_masticados_del_nivel
 
 Movimientos_masticados_construidos 
 
-	pop hl														 
+	pop bc														; Pop (Numero_de_entidades)/(Tipo).
+
+	pop hl														; Pop (Datos_de_nivel).
 	inc l														; Datos_de_nivel +1 en HL.
 
-	pop bc														; Pop (Numero_de_entidades).
-	djnz 1B
+	ld c,(hl)													; (Tipo) de la siguiente entidad en C.
+	djnz 1B														; dec (Numero_de_entidades).
+
 	ret
 
 ;---------------------------------------------------------------------------------------------------------------
@@ -100,7 +104,7 @@ Movimientos_masticados_construidos
 ;	MODIFICA: HL,DE y A. 
 ;	ACTUALIZA: (Puntero_indice_NIVELES), (Numero_de_entidades) y (Datos_de_nivel).
 
-Inicializa_Nivel 
+Inicializa_1er_Nivel 
 
 ;	Inicializa 1er Nivel y sitúa (Puntero_indice_NIVELES) en el 2º Nivel.
 
@@ -175,15 +179,10 @@ Inicia_Entidades
 
 	ld a,(hl)
 	call Definicion_segun_tipo 									; Nos situamos en el 1er .db de datos de la definición de este tipo de entidad.
-
 	call Definicion_de_entidad_a_bandeja_DRAW					; Vuelca los datos de la definición en DRAW.
 
 ;	Este (Tipo) de entidad ya dispone de movimientos masticados ???
 
-;	call Busca_mov_masticados_segun_tipo
-
-	and a
-	jr z,3F														; A="1" Indica que los mov_masticados de este (Tipo) de entidad ya están generados.
 
 ; 	Este (Tipo) de entidad DISPONE DE MOV_MASTICADOS.
 
@@ -569,7 +568,7 @@ Inicializa_Numero_parcial_de_entidades
 ;! RESET para pruebas. Omitir esta línea en modo normal.
 ;! REINICIA EL NIVEL !!!!!!!!!!!!!!!!!!!!!!!!!!
 
-	call Inicializa_Nivel							 	 ; Inicializa el 1er NIVEL. 
+	call Inicializa_1er_Nivel							 ; Inicializa el 1er NIVEL. 
 
 ; ---------- ---------- ----------
 

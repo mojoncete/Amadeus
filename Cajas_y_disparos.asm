@@ -278,7 +278,7 @@ Indice_de_definiciones_de_entidades
 
 ;	BADSAT, (Satélite malvado). ------------------------------------------------------------------------------------------------------------------------------------	
 
-Entidad_1 db 1,2,2		                     			; (Tipo) / (Filas) / (Columns).
+Entidad_1 db $81,2,2		                     		; (Tipo) / (Filas) / (Columns).
 	db 1												; (Contador_de_vueltas).
 	defw Indice_Badsat_der								; (Indice_Sprite_der).
 	defw Indice_Badsat_izq								; (Indice_Sprite_izq).
@@ -293,7 +293,7 @@ Pos_inicio_entidad1	defw $4003	                        ; (Posicion_inicio).
 
 ;	-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Entidad_2 db 1,2,2		                     			; (Tipo) / (Filas) / (Columns).
+Entidad_2 db $81,2,2		                   			; (Tipo) / (Filas) / (Columns).
 	db 1												; (Contador_de_vueltas).
 	defw Indice_Badsat_der								; (Indice_Sprite_der).
 	defw Indice_Badsat_izq								; (Indice_Sprite_izq).

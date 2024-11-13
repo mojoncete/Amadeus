@@ -500,7 +500,7 @@ Lives db 3
 
 ; 	INICIO  *************************************************************************************************************************************************************************
 ;
-;	10/11/24
+;	13/11/24
 
 START 
 
@@ -525,13 +525,9 @@ INICIALIZACION
 	ld h,0
 	ld (Clock_next_entity),hl 							 ; El 1er nº aleatorio define cuando aparece la 1ª entidad en pantalla. 
 
-; 	Con nuestros nº aleatorios mágicos podremos darle magia a nuestros patrones de movimiento.
-;	Vamos a generar los movimientos masticados de las entidades.
-	
-	call Genera_movimientos_masticados_del_nivel
-
-;	Una vez construidas las distintas coreografías de las entidades que componen el nivel, vamos a inicializarlo.
-
+	call Inicializa_1er_Nivel							 ; Inicializa el 1er nivel del juego.
+	call Genera_movimientos_masticados_del_nivel		 ; Generamos las distintas coreografías de la entidades que componen el nivel. También se inicializan las cajas "Master" para ir_
+;														   _reponiendo entidades eliminadas.
 	jr $
 
 ;	Inicia los álbumes de líneas.
@@ -627,7 +623,7 @@ Main
 
 	ld hl,Numero_parcial_de_entidades
 	ld b,(hl)
-	ld a,(Entidades_en_curso)									; Entidades que hay en pantalla.
+	ld a,(Entidades_en_curso)								; Entidades que hay en pantalla.
 	cp b
 	jr z,1F
 	jr nc,1F
