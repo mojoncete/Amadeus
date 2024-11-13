@@ -22,15 +22,9 @@ Genera_movimientos_masticados_del_nivel
 
 ;	Preparamos el puntero_master para que apunte al .defw correspondiente del índice según el (Tipo) de entidad.
 
-    ld hl,Indice_de_cajas_master
 	ld a,c														; (Tipo) de la entidad en A.
 
-    call Calcula_salto_en_BC
-    and a
-    adc hl,bc
-
-  	ld (Puntero_indice_master),hl
-	call Extrae_address
+	call Situa_en_Caja_Master									; Situa HL en el 1er .db de la "Caja Master" que corresponde a este (Tipo) de entidad.
 
 ;	Caja Master inicializada ???
 
@@ -121,6 +115,21 @@ Inicializa_1er_Nivel
 	ret 										 
 
 ; ----------------------
+;
+;	13/11/24
+;
+
+Situa_en_Caja_Master
+
+    call Calcula_salto_en_BC
+    ld hl,Indice_de_cajas_master
+    and a
+    adc hl,bc
+  	ld (Puntero_indice_master),hl
+	call Extrae_address
+	ret
+
+; ----------------------
 
 ; Fija_velocidades ld de,Perfiles_de_velocidad
 ; 	ld bc,4
@@ -136,25 +145,14 @@ Situa_Puntero_indice_mov ld a,(hl)     	 							; Cargamos A con el (Tipo) de la
     ld (Puntero_indice_mov),hl
     ret
 
-;Situa_Puntero_de_almacen_de_mov_masticados ld a,(Tipo)
-;	call Calcula_salto_en_BC
-;	ld hl,Indice_de_almacenes_de_mov_masticados
-;    and a
-;    adc hl,bc
-;    call Extrae_address
-;	ld (Puntero_de_almacen_de_mov_masticados),hl
-;	ret
-
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;   5/1/24
+;   13/11/24
 ;
-;	Destruye A,BC,HL,DE
+;	Esta rutina se encarga de prepara todas las cajas de entidades. Cuando comienza un nivel han de estar todas completas.
 
-;	Esta rutina se encarga de preparar las CAJAS DE ENTIDADES.
-;	El tipo de entidad que vamos a `volcar´ en cada caja viene determinado por el valor de (Datos_de_nivel).
 
-Inicia_Entidades
+Prepara_Cajas_de_Entidades
 
 ; Preparamos los punteros de las cajas de entidades:
 
@@ -164,48 +162,26 @@ Inicia_Entidades
 
 	ld hl,(Datos_de_nivel)										; Tipo de la 1ª entidad del Nivel.
 
-2 ld (Datos_de_nivel),hl 										; Actualizamos. Ahora nos encontramos en la siguiente entidad del Nivel.
-
-;	call Activa_FLAG_Tipo_de_entidad							; La rutina identifica el (Tipo) de entidad que vamos a iniciar.					
-
-	ld hl,(Datos_de_nivel)
-
 ; En este punto:
 ;
-; HL está situado en los .db del Nivel que indican el `tipo´ de entidad a volcar en la caja de entidades.
-; B contiene (Numero_parcial_de_entidades), (nº de cajas que vamos a rellenar).
+; HL está situado en el 1er .db del Nivel que indica el `tipo´ de entidad a volcar en la 1ª caja de entidades.
+; B contiene (Numero_parcial_de_entidades).
 
-1 push bc 														; Guardo el nº de cajas a rellenar.
+1 push bc 														; Push (Numero_parcial_de_entidades).
 
 	ld a,(hl)
-	call Definicion_segun_tipo 									; Nos situamos en el 1er .db de datos de la definición de este tipo de entidad.
-	call Definicion_de_entidad_a_bandeja_DRAW					; Vuelca los datos de la definición en DRAW.
 
-;	Este (Tipo) de entidad ya dispone de movimientos masticados ???
+	call Situa_en_Caja_Master									; HL apunta al 1er .db, (Tipo) de la "Caja Master" correspondiente al (Tipo) de entidad.
 
+	ld de,(Puntero_store_caja)									; DE apunta al 1er .db de la "Caja de entidades" en curso. 								
+	ld bc,12
+	ldir														; Caja de entidades completa.
 
-; 	Este (Tipo) de entidad DISPONE DE MOV_MASTICADOS.
+	jr $
 
-;	Actualizamos el (Contador_de_mov_masticados) de esta entidad con el (Contador_general_de_mov_masticados)_
-;	_ de este tipo de entidad.
+; Generamos coordenadas y datos de impresión.
 
-	call Situa_en_contador_general_de_mov_masticados 									
-	call Transfiere_datos_de_contadores
-
-	jr 4F
-
-3 call Construye_movimientos_masticados_entidad
-
-; Tenemos todos los movimientos masticados de este tipo de entidad generados y guardados en su correspondiente almacén.
-; (Puntero_de_almacen_de_mov_masticados) de esta entidad está situado al principio del almacen.
-; (Contador_de_mov_masticados) de esta entidad contiene: el nº total de mov. masticados de este tipo de entidad.
-; Contador_general_de_mov_masticados de este tipo de entidad actualizado.
-; Lo tenemos todo preparado para cargar los registros con el mov. masticado y hacer la correspondiente foto.
-
-;	call Activa_FLAG_mov_masticados_completos					; Activa el FLAG que indica que este (Tipo) de entidad tiene todos sus_
-;																; _ Mov_masticados ya generados.
-
-4 call Cargamos_registros_con_mov_masticado						; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
+	call Cargamos_registros_con_mov_masticado						; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
 
 	push ix
 	pop hl 														; (Puntero_de_impresion) en HL.
@@ -247,7 +223,7 @@ Inicia_Entidades
 
 	pop bc 														; Recuperamos (Numero_parcial_de_entidades), (nº de cajas que vamos a rellenar)
 
-	djnz 2B
+	djnz 1B
 
 	ret
 
@@ -533,61 +509,42 @@ Parametros_de_bandeja_DRAW_a_caja
 
 ;---------------------------------------------------------------------------------------------------------------
 ;
-;	5/1/24
+;	13/11/24
 ;
 ;	INICIALIZA (Numero_parcial_de_entidades).
-;	DETECTA cuando hemos completado el nivel, (Numero_de_entidades)="0".
 ;
-;	Si el nº total de entidades del nivel, (Numero_de_entidades) > 7, (nº de cajas de entidades):
-;
-;	(Numero_parcial_de_entidades)="7".
-;
-;	Si el nº total de entidades del nivel, (Numero_de_entidades) < 7, (nº de cajas de entidades):
-;
-;	(Numero_parcial_de_entidades)=(Numero_de_entidades).
-;
+;	Si el nº total de entidades del nivel, (Numero_de_entidades) > 6, (Numero_parcial_de_entidades)="6".
+;	Si el nº total de entidades del nivel, (Numero_de_entidades) < 6, (Numero_parcial_de_entidades)=(Numero_de_entidades).
+
 ;	OUTPUT: B contiene (Numero_parcial_de_entidades). Nº de cajas que vamos a preparar o rellenar.
+;			- Actualiza (Numero_de_entidades).
+
 ;	MODIFICA: A y B. 
-;	ACTUALIZA: (Numero_parcial_de_entidades).
+
 
 Inicializa_Numero_parcial_de_entidades 
 
-;	Si (Numero_de_entidades)="0", hemos superado el nivel actual.
-
-	ld a,(Numero_de_entidades)
-	and a
-
-; !!!!!!!!!!! NIVEL SUPERADOOOOOOOOOOOOOO !!!!!!!!!!!!!
-;	jr z,$
-; !!!!!!!!!!! NIVEL SUPERADOOOOOOOOOOOOOO !!!!!!!!!!!!!
-
-	jr nz,3F
-
-; ---------- ---------- ----------
-
-;! RESET para pruebas. Omitir esta línea en modo normal.
-;! REINICIA EL NIVEL !!!!!!!!!!!!!!!!!!!!!!!!!!
-
-	call Inicializa_1er_Nivel							 ; Inicializa el 1er NIVEL. 
-
-; ---------- ---------- ----------
-
-3 ld a,(Numero_de_entidades)							 ; Nº TOTAL de las entidades del NIVEL.
-	cp 7												 ; "7" es el nº total de cajas de entidades de las que disponemos.
+	ld a,(Numero_de_entidades)							 ; Nº TOTAL de las entidades del NIVEL.
+	cp 6												 ; "6" es el nº total de cajas de entidades de las que disponemos.
 	jr c,1F
+	jr z,1F
 
 ; El nº de entidades es superior al que cabe en las cajas DRAW.
 ; Actualizamos variables.
 
-	ld a,7
+	sub 6
+	ld (Numero_de_entidades),a
+	ld a,6
 	ld (Numero_parcial_de_entidades),a
 	ld b,a
-	jr 2F
+	ret
 
-; El nº total de entidades no llena las 7 cajas de entidades. (Numero_parcial_de_entidades)=(Numero_de_entidades)
+; El nº total de entidades no supera el nº de cajas de entidades. 
 ; (Numero_de_entidades)="0".
 
 1 ld (Numero_parcial_de_entidades),a
 	ld b,a
-2 ret
+	xor a
+	ld (Numero_de_entidades),a
+	ret
 

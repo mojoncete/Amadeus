@@ -528,7 +528,8 @@ INICIALIZACION
 	call Inicializa_1er_Nivel							 ; Inicializa el 1er nivel del juego.
 	call Genera_movimientos_masticados_del_nivel		 ; Generamos las distintas coreografías de la entidades que componen el nivel. También se inicializan las cajas "Master" para ir_
 ;														   _reponiendo entidades eliminadas.
-	jr $
+	call Prepara_Cajas_de_Entidades
+
 
 ;	Inicia los álbumes de líneas.
 

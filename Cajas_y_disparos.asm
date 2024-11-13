@@ -156,7 +156,7 @@ Indice_de_cajas_de_entidades
 	defw Caja_4
 	defw Caja_5
 	defw Caja_6
-	defw Caja_7
+;	defw Caja_7
 
 	defw 0
 	defw 0
@@ -250,13 +250,13 @@ Caja_6 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y)..
 
 ; ---------- ---------- ---------- ---------- ----------	
 
-Caja_7 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y)..
-	db 0 												; (Contador_de_vueltas).
-	db 0												; (Impacto).
-	defw 0												; (Puntero_de_impresion).
-	defw 0												; (Puntero_de_almacen_de_mov_masticados).
-	defw 0 												; (Contador_de_mov_masticados).
-	db 0												; (Velocidad). 					
+;Caja_7 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y)..
+;	db 0 												; (Contador_de_vueltas).
+;	db 0												; (Impacto).
+;	defw 0												; (Puntero_de_impresion).
+;	defw 0												; (Puntero_de_almacen_de_mov_masticados).
+;	defw 0 												; (Contador_de_mov_masticados).
+;	db 0												; (Velocidad). 					
 
 ; -------------------------------------------------------------------------------------
 ;
