@@ -64,6 +64,15 @@ Genera_movimientos_masticados_del_nivel
 ; 	Contador_general_de_mov_masticados de este tipo de entidad actualizado.
 ; 	Lo tenemos todo preparado para cargar los registros con el mov. masticado y hacer la correspondiente foto.
 
+	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
+
+;	Generamos coordenadas y volcamos DRAW a caja Master.
+
+	push ix
+	pop hl 														; (Puntero_de_impresion) en HL.
+
+	call Genera_coordenadas
+
 	ld hl,(Puntero_indice_master)
 	call Extrae_address
 
@@ -179,17 +188,8 @@ Prepara_Cajas_de_Entidades
 
 	jr $
 
-; Generamos coordenadas y datos de impresión.
-
-	call Cargamos_registros_con_mov_masticado						; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
-
-	push ix
-	pop hl 														; (Puntero_de_impresion) en HL.
-
-	push de
-	call Genera_coordenadas
-
 	ld de,(Scanlines_album_SP)
+
 	call Recauda_informacion_de_entidad_en_curso				; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
 	pop de
 
