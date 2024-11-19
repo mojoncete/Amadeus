@@ -1450,24 +1450,46 @@ Actualiza_Puntero_de_almacen_de_mov_masticados
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	24/03/24
+;	19/11/24
 ;
-;	Cargamos los registros DE e IX y actualizamos (Puntero_de_almacen_de_mov_masticados). 
-;	
-;	IX contiene el puntero de impresión.
-;	DE contiene (Puntero_objeto).
- 
+;	INPUT:	HL está situado en el .defw (Puntero_de_almacen_de_mov_masticados) de la entidad.
+;
+;	OUTPUT:	IX contiene el puntero de impresión.
+;			DE contiene (Puntero_objeto).
+;
+;	ACTUALIZA: (Puntero_de_almacen_de_mov_masticados) de la correspondiente entidad.  
+;
+;	MODIFICA: HL,BC,AF,DE,IX 
 
 Cargamos_registros_con_mov_masticado 
 
-	ld (Stack),sp
-	ld sp,(Puntero_de_almacen_de_mov_masticados)
+	call Extrae_address
 
-	pop de 															; DE contiene Puntero_objeto
+	ld (Stack),sp
+	ld sp,hl
+	
+; DE está situado en el .defw (Puntero_de_almacen_de_mov_masticados) de la entidad.											;
+
+	pop bc 															; BC contiene Puntero_objeto
 	pop ix 															; IX contiene Puntero_de_impresion
 
-	ld (Puntero_de_almacen_de_mov_masticados),sp 					; Actualiza (Puntero_de_almacen_de_mov_masticados).
+	xor a
+	ld h,a
+	ld l,h															; HL="0".	
+
+	add hl,sp
+
+	ex de,hl														; (Puntero_de_almacen_de_mov_masticados) actualizado en DE.
+;																	; HL está situado en el .defw (Puntero_de_almacen_de_mov_masticados) de la entidad.
+
+	ld (hl),e
+	inc l
+	ld (hl),d														; (Puntero_de_almacen_de_mov_masticados) actualizado en entidad.			
+
 	ld sp,(Stack)
+
+	push bc
+	pop de															; (Puntero_objeto) en DE.
 
 	ld a,e
 	add d															; Comprueba si ya no hay datos en el almacén.

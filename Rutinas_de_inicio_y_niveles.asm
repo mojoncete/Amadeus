@@ -58,28 +58,13 @@ Genera_movimientos_masticados_del_nivel
 
 	call Construye_movimientos_masticados_entidad
 
-; 	Tenemos todos los movimientos masticados de este tipo de entidad generados y guardados en su correspondiente almacén.
-; 	(Puntero_de_almacen_de_mov_masticados) de esta entidad está situado al principio del almacen.
-; 	(Contador_de_mov_masticados) de esta entidad contiene: el nº total de mov. masticados de este tipo de entidad.
-; 	Contador_general_de_mov_masticados de este tipo de entidad actualizado.
-; 	Lo tenemos todo preparado para cargar los registros con el mov. masticado y hacer la correspondiente foto.
+	ld hl,(Puntero_indice_master)
+	call Extrae_address
 
-;	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
+	ld e,l
+	ld d,h
 
-;	Generamos coordenadas y volcamos DRAW a caja Master.
-
-;	push ix
-;	pop hl 														; (Puntero_de_impresion) en HL.
-
-;	call Genera_coordenadas
-
-;	ld hl,(Puntero_indice_master)
-;	call Extrae_address
-
-;	ld e,l
-;	ld d,h
-
-;	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades Master completa.
+	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades Master completa.
 
 Movimientos_masticados_construidos 
 
@@ -184,15 +169,22 @@ Prepara_Cajas_de_Entidades
 
 	ld de,(Puntero_store_caja)									; DE apunta al 1er .db de la "Caja de entidades" en curso. 								
 	ld bc,12
-	ldir														; Caja de entidades completa.
+	ldir														; Caja de entidades completa. HL apuntará ahora al 1er .db de la siguiente caja "Master".
+;																; DE apunta ahora al 1er .db de la siguiente caja de entidades.
+
+	ex de,hl
+	ld a,l
+	sub 5
+	ld l,a														; HL está situado en el .defw (Puntero_de_impresion) de la entidad.														
+
+	call Cargamos_registros_con_mov_masticado
+
+;			IX contiene el puntero de impresión.
+;			DE contiene (Puntero_objeto).
 
 	jr $
 
-
-
-
-
-
+	call Genera_coordenadas
 
 	ld de,(Scanlines_album_SP)
 

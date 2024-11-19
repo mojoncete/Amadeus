@@ -9,7 +9,9 @@
 ;
 ;	Modifica: A,BC y DE.
 
-Genera_coordenadas ld a,l
+Genera_coordenadas 
+
+	ld a,l
 	and $1f
 	ld (Coordenada_X),a 								; Coordenada Y del sprite, (0-$1f). Columnas.
 
