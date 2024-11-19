@@ -10,7 +10,7 @@ Genera_movimientos_masticados_del_nivel
 
 ;	(Puntero_indice_NIVELES) apunta al nivel en el que nos encontramos, (dentro del índice).
 ;	(Numero_de_entidades) contiene el nº de entidades que conforman el nivel.
-;	(Datos_de_nivel) apunta al .db, (tipo) de la 1ª entidad del Nivel.
+;	HL contiene (Datos_de_nivel), apunta al .db, (tipo) de la 1ª entidad del Nivel.
 
 	dec l
 	ld b,(hl)													; B contiene (Numero_de_entidades).
@@ -64,22 +64,22 @@ Genera_movimientos_masticados_del_nivel
 ; 	Contador_general_de_mov_masticados de este tipo de entidad actualizado.
 ; 	Lo tenemos todo preparado para cargar los registros con el mov. masticado y hacer la correspondiente foto.
 
-	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
+;	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
 
 ;	Generamos coordenadas y volcamos DRAW a caja Master.
 
-	push ix
-	pop hl 														; (Puntero_de_impresion) en HL.
+;	push ix
+;	pop hl 														; (Puntero_de_impresion) en HL.
 
-	call Genera_coordenadas
+;	call Genera_coordenadas
 
-	ld hl,(Puntero_indice_master)
-	call Extrae_address
+;	ld hl,(Puntero_indice_master)
+;	call Extrae_address
 
-	ld e,l
-	ld d,h
+;	ld e,l
+;	ld d,h
 
-	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades Master completa.
+;	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades Master completa.
 
 Movimientos_masticados_construidos 
 
@@ -187,6 +187,12 @@ Prepara_Cajas_de_Entidades
 	ldir														; Caja de entidades completa.
 
 	jr $
+
+
+
+
+
+
 
 	ld de,(Scanlines_album_SP)
 
