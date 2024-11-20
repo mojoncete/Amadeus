@@ -13,6 +13,7 @@ Genera_coordenadas
 
 	ld a,l
 	and $1f
+
 	ld (Coordenada_X),a 								; Coordenada Y del sprite, (0-$1f). Columnas.
 
 	ld a,h 												; (Coordenada_y) = "0" si estamos por debajo del 1er scanline de pantalla, (ROM).
