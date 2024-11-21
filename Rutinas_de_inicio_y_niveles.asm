@@ -60,43 +60,11 @@ Genera_movimientos_masticados_del_nivel
 
 	ld hl,(Puntero_indice_master)
 	call Extrae_address
-	push hl                                                     ; Push 1er .db (Tipo) de la entidad.
 
 	ld e,l
 	ld d,h
 
 	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades Master completa.
-
-; En este punto debemos generar coordenadas y puntero de impresión.:
-
-	ex de,hl
-	ld a,l
-	sub 5
-	ld l,a														; HL está situado en el .defw (Puntero_de_impresion) de la entidad.														
-
-	call Cargamos_registros_con_mov_masticado
-
-;			IX contiene el puntero de impresión.
-;			DE contiene (Puntero_objeto).
-
-	push ix
-	pop hl
-
-	call Genera_coordenadas
-
-	ld bc,(Coordenada_X)
-
-	pop hl														; Pop 1er .db (Tipo) de la entidad.
-
-	inc l													    ; HL apunta a (Coordenada_X) de la entidad.
-
-	ld (hl),c
-	inc l
-	ld (hl),b
-
-
-
-
 
 Movimientos_masticados_construidos 
 
@@ -204,7 +172,54 @@ Prepara_Cajas_de_Entidades
 	ldir														; Caja de entidades completa. HL apuntará ahora al 1er .db de la siguiente caja "Master".
 ;																; DE apunta ahora al 1er .db de la siguiente caja de entidades.
 
-	jr $
+; En este punto debemos generar coordenadas y puntero de impresión.:
+;
+;
+	ex de,hl
+	ld a,l
+	sub 5
+	ld l,a														; HL está situado en el .defw (Puntero_de_almacen_de_mov_masticados) de la entidad.														
+
+	push hl										
+
+	call Cargamos_registros_con_mov_masticado
+
+;			IX contiene el puntero de impresión.
+;			DE contiene (Puntero_objeto).
+
+	push ix
+	pop hl
+
+	call Genera_coordenadas
+
+; Coordenadas a caja.------------------------
+
+	ld bc,(Coordenada_X)
+
+; Sitúa en (Coordenada_X).
+
+	pop hl														; Pop .db (Puntero_de_almacen_de_mov_masticados) de la entidad.
+
+	ld a,l
+	sub 6
+	ld l,a														; HL está situado en el .defw (Puntero_de_almacen_de_mov_masticados) de la entidad.														
+
+	ld (hl),c
+	inc l
+	ld (hl),b
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	ld de,(Scanlines_album_SP)
 
