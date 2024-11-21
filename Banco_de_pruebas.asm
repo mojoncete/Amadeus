@@ -525,18 +525,18 @@ INICIALIZACION
 	ld h,0
 	ld (Clock_next_entity),hl 							 ; El 1er nº aleatorio define cuando aparece la 1ª entidad en pantalla. 
 
+;	Inicia los álbumes de líneas.
+
+	call Inicia_albumes_de_lineas						 
+	call Inicia_albumes_de_lineas_Amadeus
+	call Inicia_albumes_de_disparos
+
+;	Inicia 1er Nivel.
+
 	call Inicializa_1er_Nivel							 ; Inicializa el 1er nivel del juego.
 	call Genera_movimientos_masticados_del_nivel		 ; Generamos las distintas coreografías de la entidades que componen el nivel. También se inicializan las cajas "Master" para ir_
 ;														   _reponiendo entidades eliminadas.
 	call Prepara_Cajas_de_Entidades
-
-
-;	Inicia los álbumes de líneas.
-
-	call Inicia_albumes_de_lineas						 
-;														 
-	call Inicia_albumes_de_lineas_Amadeus
-	call Inicia_albumes_de_disparos
 
 4 
 
@@ -701,7 +701,7 @@ Main
 
 3 call Recauda_informacion_de_entidad_en_curso					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
 	call Ajusta_velocidad_entidad								; Ajusta el perfil de velocidad de la entidad en función de (Contader_de_vueltas).
-	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.
+	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.			ok.
 	call Genera_datos_de_impresion
 	call Decrementa_Contador_de_mov_masticados
 
@@ -1178,6 +1178,10 @@ Recauda_informacion_de_entidad_en_curso
 
 ; El 1er .db de la tabla almacena (Columna_Y) de la entidad en curso.
 
+	ld hl,(Puntero_store_caja)
+	call Extrae_address
+
+
 	ld a,(Coordenada_y)
 	ld hl,(India_SP)
 	ld (hl),a
@@ -1448,27 +1452,57 @@ Actualiza_Puntero_de_almacen_de_mov_masticados
 	ld (Puntero_de_almacen_de_mov_masticados),hl
 	ret
 
-; --------------------------------------------------------------------------------------------------------------
+; ------------------------------------------
 ;
-;	19/11/24
+;	21/11/24
 ;
-;	INPUT:	HL está situado en el .defw (Puntero_de_almacen_de_mov_masticados) de la entidad.
-;
-;	OUTPUT:	IX contiene el puntero de impresión.
-;			DE contiene (Puntero_objeto).
-;
-;	ACTUALIZA: (Puntero_de_almacen_de_mov_masticados) de la correspondiente entidad.  
-;
-;	MODIFICA: HL,BC,AF,DE,IX 
+;	Almacena (Puntero_de_impresion) y actualiza (Puntero_de_almacen_de_mov_masticados).
 
-Cargamos_registros_con_mov_masticado 
 
-	call Extrae_address
+Obtenemos_puntero_de_impresion
+
+	ld l,(ix+7)
+	ld h,(ix+8)
+
+;	hl apunta al .defw (Puntero_de_almacen_de_mov_masticados).
 
 	ld (Stack),sp
 	ld sp,hl
 	
-; DE está situado en el .defw (Puntero_de_almacen_de_mov_masticados) de la entidad.											;
+	xor a
+	ld h,a
+	ld l,h															; ld hl,"0"
+
+	pop bc
+	pop bc	
+
+; 	Almacena (Puntero_de_impresion).
+
+	ld (ix+5),c
+	ld (ix+6),b
+
+;	Actualiza (Puntero_de_almacen_de_mov_masticados).
+
+	add hl,sp
+	ld (ix+7),l
+	ld (ix+8),h
+
+	pop bc
+
+	ld a,c
+	add b															; Comprueba si ya no hay datos en el almacén.
+
+	call z,Reinicia_entidad_maliciosa
+
+	ld sp,(Stack)
+
+	ret
+
+; -----------------------------------------------------------------------------------
+
+Cargamos_registros_con_mov_masticado
+
+	; DE está situado en el .defw (Puntero_de_almacen_de_mov_masticados) de la entidad.											;
 
 	pop bc 															; BC contiene Puntero_objeto
 	pop ix 															; IX contiene Puntero_de_impresion

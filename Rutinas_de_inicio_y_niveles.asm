@@ -168,6 +168,10 @@ Prepara_Cajas_de_Entidades
 	call Situa_en_Caja_Master									; HL apunta al 1er .db, (Tipo) de la "Caja Master" correspondiente al (Tipo) de entidad.
 
 	ld de,(Puntero_store_caja)									; DE apunta al 1er .db de la "Caja de entidades" en curso. 								
+
+	push de
+	pop ix 														;! A partir de ahora IX apunta al 1er .db (Tipo) de la entidad, (caja de entidades correspondiente).
+
 	ld bc,12
 	ldir														; Caja de entidades completa. HL apuntará ahora al 1er .db de la siguiente caja "Master".
 ;																; DE apunta ahora al 1er .db de la siguiente caja de entidades.
@@ -175,51 +179,30 @@ Prepara_Cajas_de_Entidades
 ; En este punto debemos generar coordenadas y puntero de impresión.:
 ;
 ;
-	ex de,hl
-	ld a,l
-	sub 5
-	ld l,a														; HL está situado en el .defw (Puntero_de_almacen_de_mov_masticados) de la entidad.														
+; ------------------------------------------------------ IX
+; ------------------------------------------------------ IX
+; ------------------------------------------------------ IX
+; ------------------------------------------------------ IX
 
-	push hl										
+	call Obtenemos_puntero_de_impresion
 
-	call Cargamos_registros_con_mov_masticado
-
-;			IX contiene el puntero de impresión.
-;			DE contiene (Puntero_objeto).
-
-	push ix
-	pop hl
+	ld l,(ix+5)
+	inc l
+	ld h,(ix+6)													; (Puntero_de_impresion) en HL.
 
 	call Genera_coordenadas
 
-; Coordenadas a caja.------------------------
-
 	ld bc,(Coordenada_X)
 
-; Sitúa en (Coordenada_X).
+	ld (ix+1),c
+	ld (ix+2),b													; (Coordenada_X) y (Coordenada_Y) en caja de entidad.
 
-	pop hl														; Pop .db (Puntero_de_almacen_de_mov_masticados) de la entidad.
+; ------------------------------------------------------
+; ------------------------------------------------------
+; ------------------------------------------------------
+; ------------------------------------------------------
 
-	ld a,l
-	sub 6
-	ld l,a														; HL está situado en el .defw (Puntero_de_almacen_de_mov_masticados) de la entidad.														
-
-	ld (hl),c
-	inc l
-	ld (hl),b
-
-
-
-
-
-
-
-
-
-
-
-
-
+	jr $
 
 	ld de,(Scanlines_album_SP)
 
