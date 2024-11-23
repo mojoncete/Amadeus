@@ -699,7 +699,7 @@ Main
 
 ; -------------------------------------------
 
-3 call Recauda_informacion_de_entidad_en_curso					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
+3 call Entidad_a_Tabla_de_pintado					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
 	call Ajusta_velocidad_entidad								; Ajusta el perfil de velocidad de la entidad en función de (Contader_de_vueltas).
 	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.			ok.
 	call Genera_datos_de_impresion
@@ -1170,19 +1170,17 @@ Borra_diferencia
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	26/3/24
+;	23/11/24
+;
+;	INPUT: IX apunta al 1er .db (Tipo) de la entidad, (caja de entidades correspondiente).	
 
-Recauda_informacion_de_entidad_en_curso
+Entidad_a_Tabla_de_pintado
 
 ; Almacena la Coordenada Y de la entidad en curso.
 
 ; El 1er .db de la tabla almacena (Columna_Y) de la entidad en curso.
 
-	ld hl,(Puntero_store_caja)
-	call Extrae_address
-
-
-	ld a,(Coordenada_y)
+	ld a,(ix+2)
 	ld hl,(India_SP)
 	ld (hl),a
 	inc l
@@ -2021,7 +2019,7 @@ Genera_explosion
 
 Borra_entidad_colisionada
 
-	call Recauda_informacion_de_entidad_en_curso					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
+	call Entidad_a_Tabla_de_pintado					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
 	call Cargamos_registros_con_explosion
 	call Genera_datos_de_impresion
 

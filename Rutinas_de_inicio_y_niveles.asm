@@ -202,12 +202,9 @@ Prepara_Cajas_de_Entidades
 ; ------------------------------------------------------
 ; ------------------------------------------------------
 
+	call Entidad_a_Tabla_de_pintado								; Almacena la (Coordenada_Y) y dirección dentro de (Scanlines_album_SP) de la entidad en curso.
+
 	jr $
-
-	ld de,(Scanlines_album_SP)
-
-	call Recauda_informacion_de_entidad_en_curso				; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso.
-	pop de
 
 	call Genera_datos_de_impresion
 ;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
