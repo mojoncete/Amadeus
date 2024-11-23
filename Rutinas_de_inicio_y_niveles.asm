@@ -184,11 +184,16 @@ Prepara_Cajas_de_Entidades
 ; ------------------------------------------------------ IX
 ; ------------------------------------------------------ IX
 
+	push ix														; Push 1er .db (Tipo) de la entidad, (caja de entidades correspondiente).
+
 	call Obtenemos_puntero_de_impresion
 
 	ld l,(ix+5)
 	inc l
 	ld h,(ix+6)													; (Puntero_de_impresion) en HL.
+
+	push de														; Push (Puntero_objeto). 
+	push hl														; Push (Puntero_de_impresion).
 
 	call Genera_coordenadas
 
@@ -197,37 +202,20 @@ Prepara_Cajas_de_Entidades
 	ld (ix+1),c
 	ld (ix+2),b													; (Coordenada_X) y (Coordenada_Y) en caja de entidad.
 
-; ------------------------------------------------------
-; ------------------------------------------------------
-; ------------------------------------------------------
-; ------------------------------------------------------
-
 	call Entidad_a_Tabla_de_pintado								; Almacena la (Coordenada_Y) y dirección dentro de (Scanlines_album_SP) de la entidad en curso.
 
-	jr $
+	pop ix														; Pop (Puntero_de_impresion) en IX.
+	pop de														; Pop (Puntero_objeto) en DE.
 
 	call Genera_datos_de_impresion
-;																; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
-;																; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
-;																; La rutina [Genera_datos_de_impresion] activa las interrupciones antes del RET.
+
+	pop ix														; Pop 1er .db (Tipo) de la entidad, (caja de entidades correspondiente).
+
 ; Actualizamos (Contador_de_mov_masticados) tras la foto.	
 
 	call Decrementa_Contador_de_mov_masticados
-
-; Antes de guardar los parámetros de esta entidad en su correspondiente caja hay que actualizar coordenadas.
-
-	ld de,(Puntero_store_caja) 								
-	call Parametros_de_bandeja_DRAW_a_caja	 					; Caja de entidades completa.
-
-	call Limpiamos_bandeja_DRAW
+	call Limpiamos_bandeja_DRAW									;! Cuando el juego funcione, probar a eliminar esta línea!!!!!!!!!!!
 	call Incrementa_punteros_de_cajas
-
-; Inicializa los FLAGS que indican el (Tipo) de entidad que vamos a iniciar, pues pasamos a iniciar la siguiente_
-; _ entidad del Nivel.
-
-	ld a,(Ctrl_4)
-	and $f0
-	ld (Ctrl_4),a 												; Mantenemos FLAGS que indican MOV_MASTICADOS.
 
 ; Siguiente entidad del Nivel.
 
@@ -361,11 +349,20 @@ Limpiamos_bandeja_DRAW
 
 ; ---------------------------------------------------------------------
 ;
-;	24/03/24
+;	23/11/24
+;
+;	Actualiza el (Contador_de_mov_masticados) de la entidad.
 
-Decrementa_Contador_de_mov_masticados ld hl,(Contador_de_mov_masticados)
+Decrementa_Contador_de_mov_masticados 
+
+	ld l,(ix+9)
+	ld h,(ix+10)
+
 	dec hl
-	ld (Contador_de_mov_masticados),hl
+
+	ld (ix+9),l
+	ld (ix+10),h
+
 	ret
 
 ; ---------------------------------------------------------------------
@@ -375,6 +372,10 @@ Decrementa_Contador_de_mov_masticados ld hl,(Contador_de_mov_masticados)
 Reinicia_entidad_maliciosa 
 
 ;	En 1er lugar actualizamos el (Contador_de_mov_masticados).
+
+	di
+	jr $
+	ei
 
 	call Situa_en_contador_general_de_mov_masticados 									
 	call Transfiere_datos_de_contadores
@@ -392,7 +393,7 @@ Reinicia_entidad_maliciosa
 
 	ld (Puntero_de_almacen_de_mov_masticados),hl
 
-	call Cargamos_registros_con_mov_masticado
+	call Obtenemos_puntero_de_impresion
 
 ; Incrementa (Contador_de_vueltas)x2. 
 ; (Velocidad) de la entidad será: (Contador_de_vueltas)/4.

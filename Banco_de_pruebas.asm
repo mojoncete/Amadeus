@@ -659,8 +659,8 @@ Main
 
 2 push bc 												; Nº de entidades en curso.
 
-	call Restore_entidad								; Vuelca en la BANDEJA_DRAW la "Caja_de_Entidades" hacia la que apunta (Puntero_store_caja).
-	ld de,(Scanlines_album_SP)
+	ld ix,(Puntero_store_caja)							;! A partir de ahora IX apunta al 1er .db (Tipo) de la entidad, (caja de entidades correspondiente).
+;	ld de,(Scanlines_album_SP)
 
 ; Datos de la entidad en curso en la bandeja DRAW y puntero (Scanlines_album_SP) en DE.
 
@@ -671,12 +671,12 @@ Main
 	bit 3,a
 	call nz,Compara_con_coordenadas_de_disparo
 
-	ld a,(Impacto)
+	ld a,(ix+4)													; (ix+4) - (Impacto)
 	bit 1,a
 	call nz,Genera_explosion
 	jr nz,Gestiona_siguiente_entidad
 
-	ld a,(Impacto)										 
+	ld a,(ix+4)													; ld a,(Impacto)								 
 	and a
 	jr z,3F
 
@@ -699,11 +699,16 @@ Main
 
 ; -------------------------------------------
 
-3 call Entidad_a_Tabla_de_pintado					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
+3 call Entidad_a_Tabla_de_pintado								; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
 	call Ajusta_velocidad_entidad								; Ajusta el perfil de velocidad de la entidad en función de (Contader_de_vueltas).
-	call Cargamos_registros_con_mov_masticado					; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.			ok.
+	call Obtenemos_puntero_de_impresion							; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.			ok.
+
+	push ix														; Push .db (Tipo) de la entidad, (caja de entidades correspondiente).
+	ld ix,(Puntero_de_impresion)
 	call Genera_datos_de_impresion
-	call Decrementa_Contador_de_mov_masticados
+	pop ix														; Pop .db (Tipo) de la entidad, (caja de entidades correspondiente) en IX.							
+
+	call Decrementa_Contador_de_mov_masticados					
 
 ; -------------------------------------------
 
@@ -711,6 +716,11 @@ Main
 
 	ld hl,(Puntero_de_impresion)
 	call Genera_coordenadas
+
+	ld bc,(Coordenada_X)
+
+	ld (ix+1),c													; Actualiza las coordenadas de la entidad.
+	ld (ix+2),b			
 
 ; TODO: Generamos disparo ???
 
@@ -722,7 +732,8 @@ Main
 
 Gestiona_siguiente_entidad
  
- 	call Store_Restore_cajas
+	call Incrementa_punteros_de_cajas
+
 	pop bc
 	djnz 2B
 
@@ -939,14 +950,14 @@ Reinicia_Amadeus
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	7/11/24
+;	23/11/24
 
 Ajusta_velocidad_entidad 
 
-	ld a,(Velocidad)
+	ld a,(ix+11)						; ld a,(Velocidad)
 	and a
 	ret z 								; En la 1ª vuelta (Contador_de_vueltas) será "1" o "2", dependiendo de si queremos_
-	;									  _una o dos vueltas "lentas" iniciales. En ambos casos, (Velocidad)="0", pues:
+	;									  _ una o dos vueltas "lentas" iniciales. En ambos casos, (Velocidad)="0", pues:
 	;									  _ (Velocidad)=(Contador_de_vueltas)/4.
 
 
@@ -960,24 +971,30 @@ Ajusta_velocidad_entidad
 ;	5ª vuelta: 	""	""	""	""	""  ="$20" ---   ""	 ""	  ="8".   
 
 
-	sla a 								;	Multiplica x2 (Velocidad) en cada FRAME.
-	ld (Velocidad),a
+	sla a 								; Multiplica x2 (Velocidad) en cada FRAME.
+	ld (ix+11),a						; ld (Velocidad),a
 	and $10
 	ret z
 	
 ; Restaura (Velocidad) a razón del nº de vueltas. Se ha superado (Velocidad)x8. 	
 
-	ld a,(Contador_de_vueltas)
+	ld a,(ix+3)							; ld a,(Contador_de_vueltas)
 	sra a
 	sra a
-	ld (Velocidad),a	
+	ld (ix+11),a	
 
-	ld hl,(Puntero_de_almacen_de_mov_masticados)
+	ld l,(ix+7)
+	ld h,(ix+8)							; HL contiene (Puntero_de_almacen_de_mov_masticados)
+
+;	ld hl,(Puntero_de_almacen_de_mov_masticados)
 	inc hl
 	inc hl
 	inc hl
 	inc hl
-	ld (Puntero_de_almacen_de_mov_masticados),hl
+;	ld (Puntero_de_almacen_de_mov_masticados),hl
+
+	ld (ix+7),l
+	ld (ix+8),h							; (Puntero_de_almacen_de_mov_masticados) actualizado.
 
 	ret
 
@@ -1452,9 +1469,9 @@ Actualiza_Puntero_de_almacen_de_mov_masticados
 
 ; ------------------------------------------
 ;
-;	21/11/24
+;	23/11/24
 ;
-;	Almacena (Puntero_de_impresion) y actualiza (Puntero_de_almacen_de_mov_masticados).
+;	Almacena (Puntero_de_impresion) en su caja y en la bandeja DRAW. Actualiza (Puntero_de_almacen_de_mov_masticados).
 
 
 Obtenemos_puntero_de_impresion
@@ -1471,13 +1488,15 @@ Obtenemos_puntero_de_impresion
 	ld h,a
 	ld l,h															; ld hl,"0"
 
-	pop bc
+	pop de															; (Puntero_objeto) en DE.
 	pop bc	
 
-; 	Almacena (Puntero_de_impresion).
+; 	Almacena (Puntero_de_impresion) en caja.
 
 	ld (ix+5),c
 	ld (ix+6),b
+
+	ld (Puntero_de_impresion),bc
 
 ;	Actualiza (Puntero_de_almacen_de_mov_masticados).
 
@@ -1493,40 +1512,6 @@ Obtenemos_puntero_de_impresion
 	call z,Reinicia_entidad_maliciosa
 
 	ld sp,(Stack)
-
-	ret
-
-; -----------------------------------------------------------------------------------
-
-Cargamos_registros_con_mov_masticado
-
-	; DE está situado en el .defw (Puntero_de_almacen_de_mov_masticados) de la entidad.											;
-
-	pop bc 															; BC contiene Puntero_objeto
-	pop ix 															; IX contiene Puntero_de_impresion
-
-	xor a
-	ld h,a
-	ld l,h															; HL="0".	
-
-	add hl,sp
-
-	ex de,hl														; (Puntero_de_almacen_de_mov_masticados) actualizado en DE.
-;																	; HL está situado en el .defw (Puntero_de_almacen_de_mov_masticados) de la entidad.
-
-	ld (hl),e
-	inc l
-	ld (hl),d														; (Puntero_de_almacen_de_mov_masticados) actualizado en entidad.			
-
-	ld sp,(Stack)
-
-	push bc
-	pop de															; (Puntero_objeto) en DE.
-
-	ld a,e
-	add d															; Comprueba si ya no hay datos en el almacén.
-
-	call z,Reinicia_entidad_maliciosa
 
 	ret
 
