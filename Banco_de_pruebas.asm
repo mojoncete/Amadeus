@@ -724,9 +724,9 @@ Main
 
 ; TODO: Generamos disparo ???
 
-	ld a,(Permiso_de_disparo_Entidades)
-	and a
-	call nz,Entidad_genera_disparo_si_procede
+;	ld a,(Permiso_de_disparo_Entidades)
+;	and a
+;	call nz,Entidad_genera_disparo_si_procede
 
 4 call Colision_Entidad_Amadeus									; Si hay posibilidad de COLISION, set 2,(Impacto2) y (Impacto) de entidad en curso a "1".
 
@@ -1509,9 +1509,9 @@ Obtenemos_puntero_de_impresion
 	ld a,c
 	add b															; Comprueba si ya no hay datos en el almacén.
 
-	call z,Reinicia_entidad_maliciosa
-
 	ld sp,(Stack)
+
+	call z,Reinicia_entidad_maliciosa
 
 	ret
 

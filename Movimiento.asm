@@ -362,11 +362,11 @@ Inicializa_Puntero_indice_mov_2
 
 ; ----------------------------------------------------------------------
 ;
-;   30/01/24
+;   24/11/24
 ;
-;   Sitúa HL en la dirección donde se encuentra el Contador_general_de_mov_masticados de este (Tipo) de entidad.
+;   Sitúa HL en el .defw (Contador_general_de_mov_masticados) de este (Tipo) de entidad.
 
-Situa_en_contador_general_de_mov_masticados ld a,(Tipo)
+Situa_en_contador_general_de_mov_masticados ld a,(ix+0)             ; ld a,(Tipo)
     call Calcula_salto_en_BC
     ld hl,Contador_general_de_mov_masticados_Entidad_1
     and a
@@ -375,16 +375,15 @@ Situa_en_contador_general_de_mov_masticados ld a,(Tipo)
 
 ; ----------------------------------------------------------------------
 ;
-;   30/01/24
+;   24/11/24
 ;
-;   Transfiere los datos del Contador_general_de_mov_masticados de este (Tipo) de entidad a (Contador_de_mov_masticados).
+;   Transfiere los datos del Contador_general_de_mov_masticados de este (Tipo) de entidad al (Contador_de_mov_masticados) de la entidad correspondiente.
 ;   
-;   INPUT: HL contiene el contador de 16 bits, (Contador_general_de_mov_masticados de este (Tipo) de entidad).
+;   INPUT: HL apunta al (.defw) (Contador_general_de_mov_masticados) de este (Tipo) de entidad).
 
 Transfiere_datos_de_contadores ld c,(hl)
     inc hl
-    ld b,(hl)                                                   ; BC contiene los mov_masticados totales de esta entidad.
-    ld l,c
-    ld h,b
-    ld (Contador_de_mov_masticados),hl
+    ld b,(hl)                                                   ; BC contiene los mov_masticados totales de este (Tipo) de entidad.
+    ld (ix+9),c
+    ld (ix+10),b                                                ; ld (Contador_de_mov_masticados),bc
     ret

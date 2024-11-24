@@ -367,31 +367,28 @@ Decrementa_Contador_de_mov_masticados
 
 ; ---------------------------------------------------------------------
 ;
-;	7/11/24
+;	24/11/24
 
 Reinicia_entidad_maliciosa 
 
 ;	En 1er lugar actualizamos el (Contador_de_mov_masticados).
 
-	di
-	jr $
-	ei
-
-	call Situa_en_contador_general_de_mov_masticados 									
+	call Situa_en_contador_general_de_mov_masticados					; [[Movimiento]]
 	call Transfiere_datos_de_contadores
 
 ; 	En 2º lugar hay que inicializar el (Puntero_de_almacen_de_mov_masticados).
 
-	ld a,(Tipo)
-	call Definicion_segun_tipo
+	ld a,(ix+0)															; ld a,(Tipo)
+	call Definicion_segun_tipo											; HL apunta al 1er .db (Tipo) de la "Definición" de este (Tipo) de entidad.	
 
-	push hl
-	pop ix
+	ld a,l
+	add 11
+	ld l,a 																; Situamos en el .defw (Almacen_de_movimientos_masticados) de la definición de entidad.
 
-	ld l,(ix+11)
-	ld h,(ix+12)
+	call Extrae_address
 
-	ld (Puntero_de_almacen_de_mov_masticados),hl
+	ld (ix+7),l
+	ld (ix+8),h
 
 	call Obtenemos_puntero_de_impresion
 
@@ -404,26 +401,24 @@ Reinicia_entidad_maliciosa
 ;	4ª vuelta: 	""	""	""	""	""  ="$10" ---   ""	 ""	  ="4".
 ;	5ª vuelta: 	""	""	""	""	""  ="$20" ---   ""	 ""	  ="8".   
 
-	ld hl,Contador_de_vueltas
-	sla (hl)									; Incrementa el contador, (desplaza el bit a izquierda).
+	sla (ix+3)									; sla (Contador_de_vueltas).
 
-	ld a,(hl)	
+	ld a,(ix+3)   								; ld a,(Contador_de_vueltas)	
 	sra a
 	sra a
 
-	ld (Velocidad),a
+	ld (ix+11),a 								; ld (Velocidad),a
 
 	ld a,$40
-	cp (hl)
+	cp (ix+3)
 	ret nz
 
 ; Límitador. 
 
 ;	Limita el valor de (Contador_de_vueltas) a "$20" y de (Velocidad) a "$04". 
 
-	sra (hl)
-	ld hl,Velocidad
-	sra (hl)
+	sra (ix+3)
+	sra (ix+11)
 
 	ret
 
