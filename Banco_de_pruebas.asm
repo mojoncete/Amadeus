@@ -589,6 +589,13 @@ Main
 ;
 ; 07/11/24.
 
+
+	di
+	ld hl,Ctrl_4
+	bit 0,(hl)
+	jr nz,$
+	ei
+
 ; Gestión de disparos.
 
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
@@ -2012,6 +2019,9 @@ Borra_entidad_colisionada
 	call Genera_datos_de_impresion
 	pop ix
 
+	xor a
+	inc a 															; Necesario NZ a la salida de la subrutina.
+
 	ret
 
 Siguiente_frame_explosion
@@ -2051,14 +2061,10 @@ Siguiente_frame_explosion
 	ld bc,11
 	ldir 
 
-	xor a
-	inc a 															; Necesario NZ a la salida de la subrutina.
+	ld hl,Ctrl_4
+	set 0,(hl)
 
-	di
-	jr $
-	ei
-
-;	call Limpiamos_bandeja_DRAW
+	call Limpiamos_bandeja_DRAW
 	jr Borra_entidad_colisionada
 
 1 inc hl
