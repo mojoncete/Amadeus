@@ -1280,7 +1280,7 @@ Detecta_impacto_
 
 ; -------------------------------------------------------------------------------------------------------------
 ;
-;   8/8/24
+;   25/11//24
 ;   
 ;   La entidad se encuentra en la fila $14,$15 o $16 de pantalla.
 ;   Vamos a comprobar si la entidad ocupa alguna de las columnas ocupadas por Amadeus y por lo_
@@ -1308,7 +1308,7 @@ Colision_Entidad_Amadeus
     bit 2,(hl)
     ret nz
 
-	ld a,(Coordenada_y)
+	ld a,(ix+2)                                            ; ld a,(coordenada_y) 
 	cp $14
 	ret c                                                  ; Salimos si la entidad no está en zona de Amadeus.
 
@@ -1328,25 +1328,28 @@ Genera_coordenadas_X
 ;   Almacenamos las coordenadas X de la entidad peligrosa, (en curso).
 
     ld hl,Coordenadas_X_Entidad
-    ld a,(Coordenada_X)
+    ld a,(ix+1)                                             ; ld a,(Coordenada_X)
     call Guarda_coordenadas_X
 
 ;   Almacenamos las coordenadas X de Amadeus.
 
     ld a,(CX_Amadeus)
     call Guarda_coordenadas_X
+
+    push ix
     call Compara_coordenadas_X
+    pop ix
+
     ret nz
 
     ld a,1                                               ; El .db (Impacto)="1" indica que es altamente probable que esta_
-    ld (Impacto),a                                       ; _ entidad colisione con Amadeus, (ha superado, o está en la fila $14) y 
+    ld (ix+4),a                                          ; _ entidad colisione con Amadeus, (ha superado, o está en la fila $14) y 
 
-    ld hl,(Puntero_store_caja)
-    inc l
-    inc l
-    inc l
-    inc l
-    ld (Entidad_sospechosa_de_colision),hl               ; En caso de que no exista colisión con Amadeus hemos de poner el .db (Impacto) de la (Entidad_sospechosa_de_colision) a "0" más adelante.
+    ld a,ixl
+    add 4
+    ld ixl,a
+
+    ld (Entidad_sospechosa_de_colision),ix               ; En caso de que no exista colisión con Amadeus hemos de poner el .db (Impacto) de la (Entidad_sospechosa_de_colision) a "0" más adelante.
 
     ld hl,Impacto2                                       ; _ alguna de las columnas_X que ocupa coinciden con las de Amadeus.
     set 2,(hl)

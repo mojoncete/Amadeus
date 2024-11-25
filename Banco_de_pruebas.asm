@@ -660,9 +660,6 @@ Main
 2 push bc 												; Nº de entidades en curso.
 
 	ld ix,(Puntero_store_caja)							;! A partir de ahora IX apunta al 1er .db (Tipo) de la entidad, (caja de entidades correspondiente).
-;	ld de,(Scanlines_album_SP)
-
-; Datos de la entidad en curso en la bandeja DRAW y puntero (Scanlines_album_SP) en DE.
 
 ; En 1er lugar, ... existe (Impacto) de un disparo de Amadeus en esta entidad ???
 ; Si es así, comprobamos si es la entidad en curso la alcanzada por nuestro disparo. 
@@ -670,6 +667,8 @@ Main
 	ld a,(Impacto2)
 	bit 3,a
 	call nz,Compara_con_coordenadas_de_disparo
+
+; Existe colisión entre esta entidad y Amadeus ???
 
 	ld a,(ix+4)													; (ix+4) - (Impacto)
 	bit 1,a
@@ -1517,18 +1516,20 @@ Obtenemos_puntero_de_impresion
 
 ; ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
 ;
-;	22/7/24
+;	25/11/24
 
 Cargamos_registros_con_explosion
 
-
-	ld hl,(Puntero_de_almacen_de_mov_masticados)
+	ld l,(ix+7)
+	ld h,(ix+8)														
 	call Extrae_address
+	ex de,hl														; Puntero objeto, (Explosión), en DE.
 
-	ld e,l
-	ld d,h 															; Puntero objeto, (Explosión), en DE.
+	ld l,(ix+5)
+	ld h,(ix+6)			
 
-	ld ix,(Puntero_de_impresion)									; IX contiene Puntero_de_impresion.
+	push hl
+	pop ix															; (Puntero_de_impresion) en IX.
 
 	ret
 
@@ -2004,12 +2005,12 @@ Genera_explosion
 
 Borra_entidad_colisionada
 
-	call Entidad_a_Tabla_de_pintado					; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
+	call Entidad_a_Tabla_de_pintado									; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
+
+	push ix
 	call Cargamos_registros_con_explosion
 	call Genera_datos_de_impresion
-
-	xor a
-	inc a 															; Necesario NZ a la salida de la subrutina.
+	pop ix
 
 	ret
 
@@ -2019,7 +2020,9 @@ Siguiente_frame_explosion
 
 ; Avanza Frame de explosión.
 
-	ld hl,(Puntero_de_almacen_de_mov_masticados)
+	ld l,(ix+7)
+	ld h,(ix+8)														; ld hl,(Puntero_de_almacen_de_mov_masticados).
+
 	ld bc,Indice_Explosion_entidades+4
 
 	ld a,c
@@ -2033,12 +2036,37 @@ Siguiente_frame_explosion
 	inc hl
 	dec (hl)														; Decrementa (Numero_de_entidades) y (Numero_parcial_de_entidades).
 
-	call Limpiamos_bandeja_DRAW
+; !! Provisional. Limpia la caja de entidades.
+
+	push ix
+	pop hl
+
+	xor a
+	ld (hl),a
+
+	ld e,l
+	ld d,h
+	inc e
+	
+	ld bc,11
+	ldir 
+
+	xor a
+	inc a 															; Necesario NZ a la salida de la subrutina.
+
+	di
+	jr $
+	ei
+
+;	call Limpiamos_bandeja_DRAW
 	jr Borra_entidad_colisionada
 
 1 inc hl
 	inc hl
-	ld (Puntero_de_almacen_de_mov_masticados),hl
+
+	ld (ix+7),l
+	ld (ix+8),h														; (Puntero_de_almacen_de_mov_masticados) a la siguiente explosión.
+
 	jr Borra_entidad_colisionada
 
 ; ----- ----- ----- ----- -----
