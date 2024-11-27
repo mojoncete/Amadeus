@@ -452,15 +452,6 @@ Situa_en_datos_de_definicion and a
     ld (Datos_de_entidad),hl					
 	ret
 
-; ------------------------------------------------------------------
-
-; Avanza_caja_de_entidades ld (Puntero_store_caja),hl
-; 	inc de
-; 	inc de	
-; 	ex de,hl
-; 	ld (Indice_restore_caja),hl 				; Indice_de_cajas_de_entidades +2.
-; 	ret
-
 ; ----------------------------------------------------------------------------------------------------------
 ;
 ;	24/6/24

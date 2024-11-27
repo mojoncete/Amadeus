@@ -358,7 +358,7 @@ Indice_restore_caja defw 0
 Puntero_indice_master defw 0
 
 Numero_de_entidades db 0								; Nº total de entidades maliciosas que contiene el nivel.
-Numero_parcial_de_entidades db 7						; Nº de cajas que contiene un bloque de entidades. (7 Cajas).
+Numero_parcial_de_entidades db 0						; Nº de cajas que contiene un bloque de entidades. (7 Cajas).
 Entidades_en_curso db 0									; Entidades en pantalla.
 
 Puntero_indice_ENTIDADES defw 0 						; Se desplazará por el índice de entidades para `meterlas' en cajas.
@@ -496,7 +496,7 @@ Shield db 90											; Temporización principal. Indica el tiempo que el escud
 Shield_2 db 0 											; Almacena un tiempo, ( hacía el que apunta:  Puntero_datos_shield ).
 Shield_3 db 0
 
-Lives db 3
+Lives db 7
 
 ; 	INICIO  *************************************************************************************************************************************************************************
 ;
@@ -589,13 +589,6 @@ Main
 ;
 ; 07/11/24.
 
-
-	di
-	ld hl,Ctrl_4
-	bit 0,(hl)
-	jr nz,$
-	ei
-
 ; Gestión de disparos.
 
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
@@ -666,7 +659,14 @@ Main
 
 2 push bc 												; Nº de entidades en curso.
 
+;	di
+;	ld hl,Ctrl_4
+;	bit 0,(hl)
+;	jr nz,$
+;	ei
+
 	ld ix,(Puntero_store_caja)							;! A partir de ahora IX apunta al 1er .db (Tipo) de la entidad, (caja de entidades correspondiente).
+	call Salta_caja_de_entidades_vacia
 
 ; En 1er lugar, ... existe (Impacto) de un disparo de Amadeus en esta entidad ???
 ; Si es así, comprobamos si es la entidad en curso la alcanzada por nuestro disparo. 
@@ -1735,21 +1735,22 @@ Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)
 
 ; **************************************************************************************************
 ;
-;	06/07/24
+;	27/11/24
 ;
-;	Cargamos los datos de la caja de entidades señalada por el puntero (Puntero_store_caja) a la BANDEJA_DRAW.
+;	INPUT: IX contiene (Puntero_store_caja).
+;
+;	No situamos en la siguiente caja de entidades si esta está vacía.
 	
-Restore_entidad 
+Salta_caja_de_entidades_vacia 
 
-	ld hl,(Puntero_store_caja)						
-	ld a,(hl)
+	ld a,(ix+0)
 	and a
-	call z,Incrementa_punteros_de_cajas					; Caja vacía. Saltamos a la siguiente caja.
-	jr z,Restore_entidad
+	ret nz					
 
-	ld de,Bandeja_DRAW
-	ld bc,12
-	ldir											
+	call Incrementa_punteros_de_cajas
+	ld ix,(Puntero_store_caja)
+	jr Salta_caja_de_entidades_vacia
+
 	ret
 
 ; **************************************************************************************************
@@ -2041,10 +2042,15 @@ Siguiente_frame_explosion
 
 ; Fín de la entidad !!!!!!!!!!!!!
 
+	di
+	jr $
+	ei
+
+
 	ld hl,Numero_parcial_de_entidades
 	dec (hl)
-	inc hl
-	dec (hl)														; Decrementa (Numero_de_entidades) y (Numero_parcial_de_entidades).
+	inc hl															
+	dec (hl)														; Decrementa (Numero_parcial_de_entidades) y (Entidades_en_curso)					
 
 ; !! Provisional. Limpia la caja de entidades.
 
