@@ -756,12 +756,12 @@ Modifica_puntero_de_impresion
 
 ; --------------------------------------------------------------------------------------
 ;
-;   31/08/24
+;   28/11/24
 ;
 
 Compara_con_coordenadas_de_disparo
 
-    ld a,(Coordenada_y)
+    ld a,(ix+2)                                                 ; ld a,(coordenada_y)
     ld b,a
     ld a,(Coordenadas_disparo_certero)
     sub b
@@ -782,7 +782,7 @@ Compara_con_coordenadas_de_disparo
 
 Comprueba_coordenada_X
 
-    ld a,(Coordenada_X)
+    ld a,(ix+1)                                                  ; ld a,(Coordenada_X)
     ld b,a
     ld hl,Coordenadas_disparo_certero+1
     ld a,(hl)
@@ -810,16 +810,14 @@ Activa_Impacto_en_entidad
 ;   Indica Impacto en la entidad por disparo de Amadeus, "2".
 
     ld a,2
-    ld (Impacto),a
+    ld (ix+4),a                                                  ; (ix+4) = (Impacto)
 
 ;   (Puntero_de_almacen_de_mov_masticados) ahora apuntará a la explosión.
 
     ld de,Indice_Explosion_entidades
-    ld hl,Puntero_de_almacen_de_mov_masticados
 
-    ld (hl),e
-    inc hl
-    ld (hl),d
+    ld (ix+7),e
+    ld (ix+8),d                                                  ; (ix+7/8) = (Puntero_de_almacen_de_mov_masticados).
 
 ;   Hemos encontrado la entidad impactada, Restauramos FLAG para dejar de buscar en este FRAME.
 
