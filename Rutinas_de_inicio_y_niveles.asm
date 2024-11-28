@@ -214,7 +214,7 @@ Prepara_Cajas_de_Entidades
 ; Actualizamos (Contador_de_mov_masticados) tras la foto.	
 
 	call Decrementa_Contador_de_mov_masticados
-	call Limpiamos_bandeja_DRAW									;! Cuando el juego funcione, probar a eliminar esta línea!!!!!!!!!!!
+	call Limpiamos_bandeja_DRAW									
 	call Incrementa_punteros_de_cajas
 
 ; Siguiente entidad del Nivel.

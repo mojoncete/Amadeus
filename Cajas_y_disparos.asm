@@ -15,7 +15,7 @@ Numeros_aleatorios ds 7
 
 	org $8900	
 
-Tabla_de_pintado ds 27								 ; No puede haber cambio de byte alto en la Tabla_de_pintado, ese es el motivo del "org".
+Tabla_de_pintado ds 18								 ; No puede haber cambio de byte alto en la Tabla_de_pintado, ese es el motivo del "org".
 
 ;	db 0, defw 0
 ;	db 0, defw 0
@@ -189,6 +189,9 @@ Comm_Amadeus defw 0 									; (Contador_de_mov_masticados).
 ;	22/01/24
 ;
 ; 	Cada caja tiene 12 bytes !!!
+;
+;	Para darle más velocidad al motor incrementamos sólo el byte bajo cuando trabajamos con las cajas de entidades. Este es el motivo del ORG antes de la última caja.
+
 
 Caja_1 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	db 0												; (Contador_de_vueltas).
@@ -238,7 +241,7 @@ Caja_5 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y).
 	defw 0 												; (Contador_de_mov_masticados).
 	db 0												; (Velocidad). 					
 
-; ---------- ---------- ---------- ---------- ----------
+	org $8a00	
 
 Caja_6 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y)..
 	db 0 												; (Contador_de_vueltas).

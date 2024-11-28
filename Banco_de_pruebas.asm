@@ -2042,11 +2042,6 @@ Siguiente_frame_explosion
 
 ; Fín de la entidad !!!!!!!!!!!!!
 
-	di
-	jr $
-	ei
-
-
 	ld hl,Numero_parcial_de_entidades
 	dec (hl)
 	inc hl															
@@ -2056,21 +2051,14 @@ Siguiente_frame_explosion
 
 	push ix
 	pop hl
-
 	xor a
 	ld (hl),a
-
 	ld e,l
 	ld d,h
 	inc e
-	
 	ld bc,11
 	ldir 
 
-	ld hl,Ctrl_4
-	set 0,(hl)
-
-	call Limpiamos_bandeja_DRAW
 	jr Borra_entidad_colisionada
 
 1 inc hl
