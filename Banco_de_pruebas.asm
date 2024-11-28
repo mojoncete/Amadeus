@@ -659,12 +659,6 @@ Main
 
 2 push bc 												; Nº de entidades en curso.
 
-;	di
-;	ld hl,Ctrl_4
-;	bit 0,(hl)
-;	jr nz,$
-;	ei
-
 	ld ix,(Puntero_store_caja)							;! A partir de ahora IX apunta al 1er .db (Tipo) de la entidad, (caja de entidades correspondiente).
 	call Salta_caja_de_entidades_vacia
 
@@ -730,9 +724,9 @@ Main
 
 ; TODO: Generamos disparo ???
 
-;	ld a,(Permiso_de_disparo_Entidades)
-;	and a
-;	call nz,Entidad_genera_disparo_si_procede
+	ld a,(Permiso_de_disparo_Entidades)
+	and a
+	call nz,Entidad_genera_disparo_si_procede
 
 4 call Colision_Entidad_Amadeus									; Si hay posibilidad de COLISION, set 2,(Impacto2) y (Impacto) de entidad en curso a "1".
 
