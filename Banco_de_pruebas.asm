@@ -538,15 +538,11 @@ INICIALIZACION
 ;														   _reponiendo entidades eliminadas.
 	call Prepara_Cajas_de_Entidades
 
-4 
-
-;	call Inicia_Entidades						 
 	call Inicia_Amadeus
 
 ;														 ; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
 ;														 ; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
 ;														 ; La rutina [Genera_datos_de_impresion] activa las interrupciones antes del RET.
-
 	ld de,Amadeus_BOX
 	call Parametros_de_bandeja_DRAW_a_caja	 			 ; Volcamos Amadeus en (Amadeus_BOX).
 	call Limpiamos_bandeja_DRAW
@@ -1818,6 +1814,28 @@ Inicia_Shield
 
 	ret
 
+; ---------- ---------- ---------- ---------- ---------- 
+;
+;	30/11/24
+;
+;	Limpia la caja de entidades de una entidad eliminada. 
+; 	
+;	INPUT: IX contiene el 1er .db de la entidad en curso.
+;	MODIFY: A,BC,DE y HL.
+
+Limpia_caja_de_entidades
+
+	push ix
+	pop hl
+	xor a
+	ld (hl),a
+	ld e,l
+	ld d,h
+	inc e
+	ld bc,11
+	ldir 
+	ret
+
 ; ---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------
 ;
 ;	4/6/24
@@ -2034,25 +2052,69 @@ Siguiente_frame_explosion
 	sub l
 	jr nz,1F
 
+
 ; Fín de la entidad !!!!!!!!!!!!!
+; Gestionamos entidades !!!!!!!!!!!!!!!!!!!!!!!!!!
 
-	ld hl,Numero_parcial_de_entidades
-	dec (hl)
-	inc hl															
-	dec (hl)														; Decrementa (Numero_parcial_de_entidades) y (Entidades_en_curso)					
+; Numero_de_entidades db 0								; Nº total de entidades maliciosas que contiene el nivel.
+; Numero_parcial_de_entidades db 0						; Nº de cajas que contiene un bloque de entidades. (6 Cajas).
+; Entidades_en_curso db 0								; Entidades en pantalla.
 
-; !! Provisional. Limpia la caja de entidades.
+; La entidad eliminada, es la última del nivel ?
+
+	ld a,(Numero_de_entidades)
+	and a
+	jr z,2F
+
+; Decrementa (Numero_de_entidades)
+
+	dec a
+	ld (Numero_de_entidades),a
+
+; Restauramos una nueva entidad de la caja "Master" correspondiente.
+; IX apunta al 1er .db de la entidad eliminada.
+
+	ld hl,(Puntero_indice_master)
+	call Extrae_address
 
 	push ix
-	pop hl
-	xor a
-	ld (hl),a
-	ld e,l
-	ld d,h
-	inc e
-	ld bc,11
-	ldir 
+	pop de
 
+	ld bc,12
+	ldir	
+
+; Generamos (Puntero_de_impresion) y coordenadas de la nueva entidad restaurada.
+
+	call Obtenemos_puntero_de_impresion
+
+	ld l,(ix+5)
+	inc l
+	ld h,(ix+6)													; (Puntero_de_impresion) en HL.
+
+	call Genera_coordenadas
+
+	ld bc,(Coordenada_X)
+
+	ld (ix+1),c
+	ld (ix+2),b													; (Coordenada_X) y (Coordenada_Y) en caja de entidad.
+
+	jr Borra_entidad_colisionada
+
+; (Numero_de_entidades) = "0". (Numero_parcial_de_entidades)="0" ???
+
+2 ld hl,Numero_parcial_de_entidades
+	dec (hl)
+
+	di
+	jr z,$
+	ei																;! Nivel superado !!!!!!!!!!!!!!!
+
+	; Decrementa (Numero_parcial_de_entidades) y (Entidades_en_curso).
+
+	inc hl															
+	dec (hl)		
+
+	call Limpia_caja_de_entidades
 	jr Borra_entidad_colisionada
 
 1 inc hl
