@@ -475,7 +475,7 @@ Puntero_num_aleatorios_disparos defw Numeros_aleatorios					; Puntero que se ir�
 Numero_rnd_disparos db 0
 
 Clock_next_entity defw 0												; Transcurrido este tiempo aparece una nueva entidad.
-Activa_recarga_cajas db 0												; Esta señal espera (Secundero)+X para habilitar el Loop.
+;Activa_recarga_cajas db 0												; Esta señal espera (Secundero)+X para habilitar el Loop.
 ;																		; Repite la oleada de entidades.
 Repone_CLOCK_disparos db $a0											; Reloj, decreciente.
 CLOCK_disparos_de_entidades db $a0
@@ -612,6 +612,11 @@ Main
 	sbc hl,bc
 	jr nz,1F
 
+; - Define el tiempo que ha de transcurrir para que aparezca la siguiente entidad. ----------------------------
+
+	call Extrae_numero_aleatorio_y_avanza 					; A contiene un nº aleatorio (0-255). De 0 a 5 segundos, aproximadamente.
+	call Define_Clock_next_entity
+
 ; GESTIÓN DE ENTIDADES.
 
 ; Si aún quedan entidades por aparecer del bloque de entidades, (7 cajas), incrementaremos (Entidades_en_curso) y calcularemos_ 
@@ -638,8 +643,8 @@ Main
 
 ; - Define el tiempo que ha de transcurrir para que aparezca la siguiente entidad. ----------------------------
 
-	call Extrae_numero_aleatorio_y_avanza 					; A contiene un nº aleatorio (0-255). De 0 a 5 segundos, aproximadamente.
-	call Define_Clock_next_entity
+;	call Extrae_numero_aleatorio_y_avanza 					; A contiene un nº aleatorio (0-255). De 0 a 5 segundos, aproximadamente.
+;	call Define_Clock_next_entity
 
 1 ld a,(Entidades_en_curso)
 	and a
@@ -1085,14 +1090,12 @@ Change_Disparos
 
 Extrae_numero_aleatorio_y_avanza 
 
-	ld hl,Tabla_de_pintado
+	ld hl,Numeros_aleatorios+7
 	ex de,hl
 	ld hl,(RND_SP)
-	ex de,hl
-	and a
-	sbc hl,de
 
-	ld hl,(RND_SP)
+	ld a,e
+	sub l
 	jr nz,1F
 
 ; Sitúa HL al principio de la tabla de nº aleatorios.
