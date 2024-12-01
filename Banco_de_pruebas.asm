@@ -425,7 +425,10 @@ Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una únic
 ;															BIT 7, "1" Indica que se ha iniciado el proceso de explosión en Amadeus.
 ;																_ Mientras este bit este activo, no se generarán dos explosiones de entidades a la vez.
 
-Ctrl_4 db 0 											
+Ctrl_4 db 0												; 4º Byte de Ctrl. general, (no específico) a una única entidad.																		
+;
+;															BIT 0, "1" Cada vez que se incrementan las entidades en curso, este bit se pone a "1". Esto hará que una entidad pase de "dormida" a "activa".
+
 Ctrl_5 db 0												;	BIT 1, "1" Indica que la entidad en curso es la alcanzada por nuestro disparo. La comparativa entre coordenadas ha sido satisfactoria. 
 ;															BIT	2, "1" Indica que tras consecutivos desplazamientos del disparo hay que modificar el (Puntero_de_impresión) dos posiciones a la derecha.
 ;															BIT	3, "1" Indica que tras consecutivos desplazamientos del disparo hay que modificar el (Puntero_de_impresión) dos posiciones a la izquierda.								
@@ -630,15 +633,18 @@ Main
 	inc a
 	ld (Entidades_en_curso),a
 
+	ld hl,Ctrl_4
+	set 0,(hl)												; Permiso para activar a una entidad "dormida".
+
 ; - Define el tiempo que ha de transcurrir para que aparezca la siguiente entidad. ----------------------------
 
-	call Extrae_numero_aleatorio_y_avanza 				; A contiene un nº aleatorio (0-255). De 0 a 5 segundos, aproximadamente.
+	call Extrae_numero_aleatorio_y_avanza 					; A contiene un nº aleatorio (0-255). De 0 a 5 segundos, aproximadamente.
 	call Define_Clock_next_entity
 
 1 ld a,(Entidades_en_curso)
 	and a
-	jp z,Gestion_de_Amadeus								; Si no hay entidades en curso saltamos a [Avanza_puntero_de_Scanlines_album_de_entidades].
-	ld b,a												; No hay entidades que gestionar.
+	jp z,Gestion_de_Amadeus									; Si no hay entidades en curso saltamos a [Avanza_puntero_de_Scanlines_album_de_entidades].
+	ld b,a													; No hay entidades que gestionar.
 
 ; ( Código que ejecutamos con cada entidad: ).
 
@@ -655,13 +661,30 @@ Main
 
 2 push bc 												; Nº de entidades en curso.
 
-	ld ix,(Puntero_store_caja)							;! A partir de ahora IX apunta al 1er .db (Tipo) de la entidad, (caja de entidades correspondiente).
+6 ld ix,(Puntero_store_caja)							;! A partir de ahora IX apunta al 1er .db (Tipo) de la entidad, (caja de entidades correspondiente).
 	call Salta_caja_de_entidades_vacia
+
+; Esta caja contiene datos. Es una entidad "dormida"???. Si no es así gestionamos esta entidad, (jr 5F).
+
+	ld a,(ix+0) 
+	bit 7,a 
+	jr z,5F
+
+; Esta entidad esta "dormida", tenemos permiso para despertarla. ???
+
+	ld hl,Ctrl_4
+	bit 0,(hl)
+	call z,Incrementa_punteros_de_cajas 				; Si no tenemos permiso para despertarla saltaremos a la siguiente entidad activa.
+	jr z,6B 
+
+	res 0,(hl)											; Restaura bit "despertador".
+	res 7,a
+	ld (ix+0),a											; Convierte esta entidad dormilona en una entidad ACTIVA.
 
 ; En 1er lugar, ... existe (Impacto) de un disparo de Amadeus en esta entidad ???
 ; Si es así, comprobamos si es la entidad en curso la alcanzada por nuestro disparo. 
 
-	ld a,(Impacto2)
+5 ld a,(Impacto2)
 	bit 3,a
 	call nz,Compara_con_coordenadas_de_disparo
 
@@ -821,6 +844,9 @@ End_frame
 	set 0,(hl) 											; Indica Frame completo. 
 	res 3,(hl)
 	res 4,(hl)
+
+	ld hl,Ctrl_4
+	res 0,(hl)
 
 	xor a
 	out ($fe),a
@@ -2070,6 +2096,8 @@ Siguiente_frame_explosion
 
 	dec a
 	ld (Numero_de_entidades),a
+	ld hl,Entidades_en_curso
+	dec (hl)
 
 ; Restauramos una nueva entidad de la caja "Master" correspondiente.
 ; IX apunta al 1er .db de la entidad eliminada.
