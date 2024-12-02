@@ -84,7 +84,7 @@ Pinta_disparos_Entidades
 
 ; --------------------------------------------------------------------------------------
 ;
-;   30/10/24
+;   2/12/24
 ;
 
 Motor_de_disparos_entidades
@@ -114,11 +114,15 @@ Motor_de_disparos_entidades
 
 ; --- Existe posibilidad de impacto ???
 
+    ld a,(Shield)
+    and a
+    jr nz,6F                                                             ; No comprobamos impacto. El escudo está activado.
+
     bit 0,(hl)
     call nz, Comprueba_impacto_con_Amadeus
     jr nz,3F
 
-    call Rota_disparo_si_procede
+6 call Rota_disparo_si_procede
 
 ; ------------------------------------------------------------
 
@@ -264,6 +268,8 @@ Coincidencia
 Amadeus_impactado 
 
 ; Borramos disparo.
+
+;   Exclusion.
 
     pop de
     pop hl

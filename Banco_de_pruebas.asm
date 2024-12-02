@@ -475,8 +475,6 @@ Puntero_num_aleatorios_disparos defw Numeros_aleatorios					; Puntero que se ir√
 Numero_rnd_disparos db 0
 
 Clock_next_entity defw 0												; Transcurrido este tiempo aparece una nueva entidad.
-;Activa_recarga_cajas db 0												; Esta se√±al espera (Secundero)+X para habilitar el Loop.
-;																		; Repite la oleada de entidades.
 Repone_CLOCK_disparos db $a0											; Reloj, decreciente.
 CLOCK_disparos_de_entidades db $a0
 
@@ -628,6 +626,14 @@ Main
 
 	ld hl,Numero_parcial_de_entidades
 	ld b,(hl)
+
+	inc b
+	dec b
+
+	di
+	jr z,$													;! Nivel superado !!!!!
+	ei
+
 	ld a,(Entidades_en_curso)								; Entidades que hay en pantalla.
 	cp b
 	jr z,1F
@@ -802,7 +808,7 @@ Gestion_de_Amadeus
 ;! Fin del juego
 
 	di
-	jr z,$
+	jr z,$														;! GAME OVER !!!!!
 	ei
 
 ; Nueva nave.
@@ -2129,19 +2135,15 @@ Siguiente_frame_explosion
 	ld (ix+1),c
 	ld (ix+2),b													; (Coordenada_X) y (Coordenada_Y) en caja de entidad.
 
-	jr Borra_entidad_colisionada
+	xor a
+	inc a 														; Necesario NZ a la salida de la subrutina.
 
-; (Numero_de_entidades) = "0". (Numero_parcial_de_entidades)="0" ???
+	ret
+
+; Decrementa (Numero_parcial_de_entidades) y (Entidades_en_curso).
 
 2 ld hl,Numero_parcial_de_entidades
 	dec (hl)
-
-	di
-	jr z,$
-	ei																;! Nivel superado !!!!!!!!!!!!!!!
-
-	; Decrementa (Numero_parcial_de_entidades) y (Entidades_en_curso).
-
 	inc hl															
 	dec (hl)		
 
