@@ -864,11 +864,7 @@ End_frame
 
 	halt												
 
-; ----------------------------------------
-
-;	ld a,(Ctrl_1) 										; Existe Loop?
-;	bit 3,a												; Si este bit es "1". Hay recarga de nueva oleada.
-	jp z,Main
+	jp Main
 
 ;------------------------------------------
 ;
@@ -887,7 +883,7 @@ Autoriza_disparo_de_entidades
 ;	Un valor alto hace que en muy poco tiempo las entidades generen muchos disparos.
 ;	Un valor bajo hace que la curva de generación de disparos sea más lenta.
 
-	sub 3 				
+	sub 4								; Aumenta la cadencia del disparo. 				
 
 1 ld (Repone_CLOCK_disparos),a
 	ld (CLOCK_disparos_de_entidades),a

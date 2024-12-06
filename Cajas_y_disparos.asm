@@ -263,7 +263,7 @@ Caja_6 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y)..
 
 ; -------------------------------------------------------------------------------------
 ;
-;	10/11/24
+;	06/12/24
 ;
 ;	TIPOS de "Entidades maliciosas" que quieren conquistar la Tierra.	
 ;
@@ -282,7 +282,7 @@ Indice_de_definiciones_de_entidades
 ;	BADSAT, (Satélite malvado). ------------------------------------------------------------------------------------------------------------------------------------	
 
 Entidad_1 db $81,2,2		                     		; (Tipo) / (Filas) / (Columns).
-	db 1												; (Contador_de_vueltas).
+	db 1												; (Contador_de_vueltas). Valor inicial "2": Sólo una vuelta lenta. "1" Dos vueltas lentas. 
 	defw Indice_Badsat_der								; (Indice_Sprite_der).
 	defw Indice_Badsat_izq								; (Indice_Sprite_izq).
 

@@ -401,7 +401,7 @@ Reinicia_entidad_maliciosa
 ;	4ª vuelta: 	""	""	""	""	""  ="$10" ---   ""	 ""	  ="4".
 ;	5ª vuelta: 	""	""	""	""	""  ="$20" ---   ""	 ""	  ="8".   
 
-	sla (ix+3)									; sla (Contador_de_vueltas).
+	sla (ix+3)									; sla x2 (Contador_de_vueltas). Inicialmente es "1".
 
 	ld a,(ix+3)   								; ld a,(Contador_de_vueltas)	
 	sra a
