@@ -126,7 +126,7 @@ Codo_abajo_derecha db $11,$11,$51,1         ; Abajo/Derecha. 1rep.
     db $11,$11,$92,0                        ; Arriba/Derecha. 2rep. --- Termina movimiento.
 
 Derecha_y_subiendo db $11,$12,$13,1         ; Derecha. 4rep. vel.2
-    db $11,$11,$91,253,7,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
+    db $11,$11,$91,253,11,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
 
 Derecha_y_subiendo_1 db $11,$11,$16,1       ; Derecha. 4rep. vel.2
     db $11,$11,$91,253,2,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
@@ -137,13 +137,13 @@ F_4 db $11,$11,$11,1
     db $11,$11,$02,253,8,0
 
 Derecha_y_bajando db $11,$11,$16,1          ; Derecha. 4rep. vel.2
-    db $11,$11,$51,253,1,0
+    db $11,$11,$51,253,2,0
 
 Derecha_y_bajando_1 db $11,$12,$13,1        ; Derecha. 4rep. vel.2
-    db $11,$11,$51,253,3,0
+    db $11,$11,$51,253,6,0
 
 Derecha_y_bajando_2 db $11,$11,$16,1        ; Derecha. 4rep. vel.2
-    db $11,$11,$51,253,3,0
+    db $11,$11,$51,253,6,0
 
 ; Medio círculo bajando. Entra de izq. a derecha y sale de derecha a izq.
 
@@ -175,25 +175,25 @@ Codo_abajo_izq. db $11,$11,$61,1            ; Abajo/izq. 1rep.
     db $11,$11,$a2,0                        ; Arriba/izq. 2rep. --- Termina movimiento.
 
 Izquierda_y_subiendo db $11,$21,$23,1       ; Derecha. 4rep. vel.2
-    db $11,$11,$a1,253,7,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
+    db $11,$11,$a1,253,11,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
 
 Izquierda_y_subiendo_1 db $11,$11,$26,1     ; Derecha. 4rep. vel.2
-    db $11,$11,$a1,253,1,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
+    db $11,$11,$a1,253,2,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
 
 F_5 db $11,$11,$21,1
-    db $11,$11,$01,253,3,0
+    db $11,$11,$01,253,4,0
 
 F_6 db $11,$11,$21,1
-    db $11,$11,$02,253,3,0
+    db $11,$11,$02,253,8,0
 
 Izquierda_y_bajando db $11,$11,$26,1          ; Derecha. 4rep. vel.2
-    db $11,$11,$61,253,1,0
+    db $11,$11,$61,253,2,0
 
 Izquierda_y_bajando_1 db $11,$21,$23,1        ; Derecha. 4rep. vel.2
-    db $11,$11,$61,253,3,0
+    db $11,$11,$61,253,6,0
 
 Izquierda_y_bajando_2 db $11,$11,$26,1        ; Derecha. 4rep. vel.2
-    db $11,$11,$61,253,3,0
+    db $11,$11,$61,253,6,0
 
 Codo_izquierda_abajo db $11,$11,$a1,1          ; Arriba/Izq. 1rep.
     db $11,$11,$23,1                           ; Izq. 3rep.
