@@ -513,8 +513,8 @@ START
 
 ; Limpiamos pantalla.
 
-	ld a,%00000111
-	call Cls
+;	ld a,%00000111
+;	call Cls
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
 INICIALIZACION

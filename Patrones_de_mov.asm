@@ -92,6 +92,16 @@ Indice_mov_Baile_de_BadSat defw Bajo_decelerando
     defw Codo_izquierda_abajo
     defw 0                                  ; Fin de patrón de movimiento.
 
+
+; Notas de aleatoriedad.
+
+;   Bajo_decelerando+3 (1-2)                - Define lo que baja la entidad.
+;   Derecha_y_subiendo+8 (11)               - (11) Cuando la posición de inicio es $4001
+;   Izquierda_y_subiendo+8 (11)             - (11) Cuando la posición de inicio es $4001                    
+
+
+
+
 Bajo_decelerando db $12,$11,$4f,1           ; Abajo (vel_2). 15rep.        
     db $11,$11,$42,0                        ; Abajo.  2rep. --- Termina movimiento.
 
@@ -116,25 +126,24 @@ Codo_abajo_derecha db $11,$11,$51,1         ; Abajo/Derecha. 1rep.
     db $11,$11,$92,0                        ; Arriba/Derecha. 2rep. --- Termina movimiento.
 
 Derecha_y_subiendo db $11,$12,$13,1         ; Derecha. 4rep. vel.2
-    db $11,$11,$91,253,6,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
+    db $11,$11,$91,253,7,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
 
 Derecha_y_subiendo_1 db $11,$11,$16,1       ; Derecha. 4rep. vel.2
     db $11,$11,$91,253,2,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
 
 F_3 db $11,$11,$11,1
     db $11,$11,$01,253,4,0
-
 F_4 db $11,$11,$11,1
     db $11,$11,$02,253,8,0
 
 Derecha_y_bajando db $11,$11,$16,1          ; Derecha. 4rep. vel.2
-    db $11,$11,$51,253,2,0
+    db $11,$11,$51,253,1,0
 
 Derecha_y_bajando_1 db $11,$12,$13,1        ; Derecha. 4rep. vel.2
-    db $11,$11,$51,253,6,0
+    db $11,$11,$51,253,3,0
 
 Derecha_y_bajando_2 db $11,$11,$16,1        ; Derecha. 4rep. vel.2
-    db $11,$11,$51,253,6,0
+    db $11,$11,$51,253,3,0
 
 ; Medio círculo bajando. Entra de izq. a derecha y sale de derecha a izq.
 
@@ -166,25 +175,25 @@ Codo_abajo_izq. db $11,$11,$61,1            ; Abajo/izq. 1rep.
     db $11,$11,$a2,0                        ; Arriba/izq. 2rep. --- Termina movimiento.
 
 Izquierda_y_subiendo db $11,$21,$23,1       ; Derecha. 4rep. vel.2
-    db $11,$11,$a1,253,6,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
+    db $11,$11,$a1,253,7,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
 
 Izquierda_y_subiendo_1 db $11,$11,$26,1     ; Derecha. 4rep. vel.2
-    db $11,$11,$a1,253,2,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
+    db $11,$11,$a1,253,1,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
 
 F_5 db $11,$11,$21,1
-    db $11,$11,$01,253,4,0
+    db $11,$11,$01,253,3,0
 
 F_6 db $11,$11,$21,1
-    db $11,$11,$02,253,8,0
+    db $11,$11,$02,253,3,0
 
 Izquierda_y_bajando db $11,$11,$26,1          ; Derecha. 4rep. vel.2
-    db $11,$11,$61,253,2,0
+    db $11,$11,$61,253,1,0
 
 Izquierda_y_bajando_1 db $11,$21,$23,1        ; Derecha. 4rep. vel.2
-    db $11,$11,$61,253,6,0
+    db $11,$11,$61,253,3,0
 
 Izquierda_y_bajando_2 db $11,$11,$26,1        ; Derecha. 4rep. vel.2
-    db $11,$11,$61,253,6,0
+    db $11,$11,$61,253,3,0
 
 Codo_izquierda_abajo db $11,$11,$a1,1          ; Arriba/Izq. 1rep.
     db $11,$11,$23,1                           ; Izq. 3rep.
