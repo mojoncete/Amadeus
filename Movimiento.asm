@@ -21,6 +21,8 @@ Inicia_desplazamiento.
 
     call Ajusta_velocidad_desplazamiento
 
+; Hemos definido (Vel_left),(Vel_right),(Vel_up) y (Vel_down) en la bandeja DRAW. Ahora (Puntero_mov) está situado en el 3er byte del movimiento, (indica dirección y nº de veces que la ejecutamos).
+
 ; Iniciamos (Repetimos_mov).
 
     ld a,(hl)
@@ -43,15 +45,55 @@ Inicia_desplazamiento.
 
 Desplazamiento_iniciado
 
+;! En que parte del movimiento estamos??? Cabe el movimiento completo?
+
+; Después del codo abajo-derecha (Coordenada_X) de la entidad contendrá "4" cuando (Posicion_inicio) sea $4001.
+
+; Cuando (Coordenada_X)="4" ;   Derecha_y_subiendo+8 (11)               
+;                               Izquierda_y_subiendo+8 (11)            
+; Cuando (Coordenada_X)="5" ;   Derecha_y_subiendo+8 (8)               
+;                               Izquierda_y_subiendo+8 (8)            
+; Cuando (Coordenada_X)="6" ;   Derecha_y_subiendo+8 (8)               
+;                               Izquierda_y_subiendo+8 (8)            
+; Cuando (Coordenada_X)="7" ;   Derecha_y_subiendo+8 (7)               
+;                               Izquierda_y_subiendo+8 (8)            
+; Cuando (Coordenada_X)="8" ;   Derecha_y_subiendo+8 (6)               
+;                               Izquierda_y_subiendo+8 (8)            
+; Cuando (Coordenada_X)="9" ;   Derecha_y_subiendo+8 (5)               
+;                               Izquierda_y_subiendo+8 (7)  
+; Cuando (Coordenada_X)="a" ;   Derecha_y_subiendo+8 (4)               
+;                               Izquierda_y_subiendo+8 (7)  
+; Cuando (Coordenada_X)="b" ;   Derecha_y_subiendo+8 (3)               
+;                               Izquierda_y_subiendo+8 (7)  
+
+
+
+
+
+;    ld bc,Derecha_y_subiendo+2
+;    ld hl,(Puntero_mov)
+;    ld a,c
+;    cp l
+;    jr nz,3F
+
+;    jr $
+
+;    ld a,(Coordenada_X)
+;    sub 4
+;    jr z,4F
+
+;    ld a,(Coordenada_y)                 ; $08 - $0b
+
+;    ld b,a
+;    ld hl,Derecha_y_subiendo+7
+;    ld a,(hl)
+;    sub b
+;    ld (hl),a
+
+
     call Aplica_desplazamiento
 
-; Si en el último desplazamiento aplicado hemos aplicado reinicio, salimos del movimiento.
-
-    ld a,(Ctrl_3)
-    bit 1,a
-    ret nz
-
-3 ld hl,Repetimos_desplazamiento
+    ld hl,Repetimos_desplazamiento
     dec (hl)
     ret nz
 
@@ -217,7 +259,7 @@ Aplica_desplazamiento
 
 ; Analizamos (bit a bit) el nibble alto del 3er byte que compone el desplazamiento y ejecutamos.
 
-    ld hl, (Puntero_mov) 
+    ld hl,(Puntero_mov) 
 
     ld a,(hl)
     and $f0
@@ -226,26 +268,22 @@ Aplica_desplazamiento
     bit 7,(hl)
     jr z,1F
     call Mov_up
-1 ld hl, (Puntero_mov) 
+
+1 ld hl,(Puntero_mov) 
     bit 6,(hl)
     jr z,2F
     call Mov_down
 
-; Se ha aplicado reinicio ???
-; Si es así, dejamos de aplicar desplazamiento, (RET).
-
-;    ld a,(Ctrl_3)
-;    bit 1,a
-;    ret nz
-
-2 ld hl, (Puntero_mov)
+2 ld hl,(Puntero_mov)
     bit 5,(hl)
     jr z,3F
     call Mov_left
-3 ld hl, (Puntero_mov)
+
+3 ld hl,(Puntero_mov)
     bit 4,(hl) 
     ret z
     call Mov_right
+
     ret
 
 ; ---------- --------- --------- ---------- ----------

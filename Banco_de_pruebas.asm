@@ -412,7 +412,7 @@ India_2_SP defw Tabla_de_pintado+3
 Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una única entidad.
 ;
 ;															BIT 0, "1" Indica que el FRAME está completo, (hemos podido hacer la foto de todas las entidades).
-;															BIT 1, "1" Indica que hemos completado todo el patrón de movimientos de este tipo de entidad.
+;!															BIT 1, "1" Indica que hemos completado todo el patrón de movimientos de este tipo de entidad.
 ;																_ El almacén de movimientos masticados de este tipo de entidad quedará completo. ([Inicia_entidad]).
 ;															BIT 2, "1" Indica que se produce movimiento en alguna entidad, (modificamos el último FRAME impreso en pantalla).
 ;																Habilita el borrado/pintado de sprites.

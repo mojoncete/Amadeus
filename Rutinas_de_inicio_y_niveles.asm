@@ -46,16 +46,16 @@ Genera_movimientos_masticados_del_nivel
 
 ; 	Antes de empezar a generar los "movimientos masticados" de esta entidad necesitamos determinar su (Posicion_inicio).
 
-	ld hl,(RND_SP)												; RND_SP Puntero que se va desplazando por el SET de nº aleatorios.
-	ld a,(hl)
-	and $1f														; Define el nº de columna por el que va a aparecer la entidad.
-	and a
-	jr nz,2F													; No queremos que la entidad se inicie en la columna "0", en ese caso será "1".
+;	ld hl,(RND_SP)												; RND_SP Puntero que se va desplazando por el SET de nº aleatorios.
+;	ld a,(hl)
+;	and $1f														; Define el nº de columna por el que va a aparecer la entidad.
+;	and a
+;	jr nz,2F													; No queremos que la entidad se inicie en la columna "0", en ese caso será "1".
 
-	inc a
+;	inc a														; (Posicion_inicio) $4001.
 
-2 ld hl,Posicion_inicio
-	ld (hl),a
+;2 ld hl,Posicion_inicio
+;	ld (hl),a
 
 ;	Ya disponemos de una (Posicion_inicio) aleatoria y la definición de la entidad en la "Bandeja DRAW". 
 ;	Generamos "Movimientos masticados" de la entidad.

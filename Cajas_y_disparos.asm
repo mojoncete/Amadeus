@@ -289,7 +289,7 @@ Entidad_1 db $81,2,2		                     		; (Tipo) / (Filas) / (Columns).
 ; Aleatoriedad en la posición de inicio de la entidad.
 ; BadSat siempre aparecerá por la parte superior de la pantalla, $40xx. (Cuad_objeto) tendrá valor 1 o 2 dependiendo de si aparece por la mitad izquierda o derecha.
 
-	defw $4000											; (Posicion_inicio).
+	defw $4008											; (Posicion_inicio).
 	db 0												; (Cuad_objeto).
 
 	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
