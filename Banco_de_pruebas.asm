@@ -1418,8 +1418,15 @@ Construye_movimientos_masticados_entidad
 
 	ld hl,(Puntero_de_almacen_de_mov_masticados)			; Guardamos en la pila la dirección inicial del puntero, (para reiniciarlo más tarde).
 	push hl
+
 	call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
 ;															; _ el (Contador_de_mov_masticados).    
+
+; Tenemos una posición de inicio aleatoria, ("$01 - $1f"). Necesitamos definir (Cuad_objeto) para [Inicia_Puntero_objeto].
+; A contiene la coordenada X de la posición de inicio de la entidad.
+
+	call Cuad1_or_cuad2 
+
 	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
 	call Recompone_posicion_inicio
@@ -1452,6 +1459,26 @@ Construye_movimientos_masticados_entidad
 	inc hl
 	ld (hl),b
 
+	ret
+
+; -------------------------------------
+;
+;	07/12/24
+;
+;	(Cuad_objeto) contendrá "0" o "1" en función de la coordenada X de la posición de inicio.
+;
+;	INPUT: A contiene la Coordenada_X de la (Posicion_inicio) de la entidad.
+;
+;	MODIFY: A,(Cuad_objeto).
+;
+
+Cuad1_or_cuad2 cp $10
+	jr c,1F
+	ld a,1
+	jr 2F
+
+1 xor a
+2 ld (Cuad_objeto),a
 	ret
 
 ; -----------------------------------------------------------------------------------
@@ -1709,7 +1736,7 @@ Extrae_address ld e,(hl)
 
 ; *************************************************************************************************************************************************************
 ;
-;	20/1/24
+;	7/12/24
 ;
 ;	Iniciamos (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq). 
 ;	Sitúa (Puntero_objeto) en el Sprite correspondiente en función de su (Posicion_inicio).
@@ -1722,12 +1749,12 @@ Extrae_address ld e,(hl)
 Inicia_Puntero_objeto 
 
 	ld a,(Cuad_objeto)
-	and 1
-	push af
-	call z,Inicia_puntero_objeto_izq
-	pop af
+	and a
+
+	call z,Inicia_puntero_objeto_der
 	ret z
-	call Inicia_puntero_objeto_der
+
+	call Inicia_puntero_objeto_izq
 	ret
 
 ; Arrancamos desde la parte izquierda de la pantalla.
