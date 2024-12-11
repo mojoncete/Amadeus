@@ -17,9 +17,13 @@ Rutinas_de_pintado
     inc l
     ld sp,hl                            ; El SP irá extrayendo scanlines en HL.
 
+;   Esta parte de la rutina será el selector de rutinas:
+
     pop iy
     dec sp
     dec sp
+
+; -----------------------------------------------------------------------------------------------------------------------------
 
 ;   Seleccionamos rutina de impresión:
 
