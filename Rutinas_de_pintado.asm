@@ -1,16 +1,9 @@
 ; -----------------------------------------------------------------------------
 ;
-;   11/03/24
+;   11/12/24
 ;
 
-Pinta_Sprites 
-
-;    ld hl,(Scanlines_album_SP)
-;    call Extrae_address
-
-;    inc h
-;    dec h
-;    ret z                              ; Salimos si hemos terminado de pintar o el album de líneas está vacío.
+Rutinas_de_pintado 
 
     ld (Stack),sp
  
@@ -23,6 +16,10 @@ Pinta_Sprites
 
     inc l
     ld sp,hl                            ; El SP irá extrayendo scanlines en HL.
+
+    pop iy
+    dec sp
+    dec sp
 
 ;   Seleccionamos rutina de impresión:
 

@@ -1434,7 +1434,41 @@ Construye_movimientos_masticados_entidad
 1 call Draw
 	call Guarda_movimiento_masticado
 
-	call Movimiento
+	jr 2F
+
+;! Debuggggggg !!!!!!! -----------------------------------------------------------------------------------------
+
+	xor a
+    out ($fe),a
+;	8BFE 00           CTRL_DESPLZ
+;	8BF1 00 00        Puntero_de_almacen_de_mov_masticados defw 0	($e0f4)
+	ld a,(Coordenada_X)
+	cp 30
+	jr nz,2F
+	ld a,(CTRL_DESPLZ)
+	cp $fd
+	jr nz,2F
+;	Justo en el borde de la pantalla: Puntero_objeto $8540, Puntero_de_impresion $4f1e, Ctrl_dsplz "0".
+;						; IX (Puntero_de_impresion).
+;						; IY (Puntero_objeto).
+	push iy 
+	pop de
+	push de
+	call Genera_datos_de_impresion
+	pop de
+
+;						; Para ejecutar Rutinas_de_pintado necesitamos: 
+;
+;							HL apuntando al álbum de líneas (Scanlines_album_SP)
+;							DE (Puntero objeto).
+	ld hl,(Album_de_pintado)
+	ex de,hl
+	call Rutinas_de_pintado
+	jr $
+
+;! Debuggggggg !!!!!!! -----------------------------------------------------------------------------------------
+
+2 call Movimiento
 
 	ld a,(Ctrl_3)											; El bit1 de (Ctrl_3) a "1" indica que hemos completado todo el patrón de movimiento_
 	bit 1,a 												; _ que corresponde a esta entidad.
@@ -1919,7 +1953,7 @@ Borrando_entidades
 	inc h
 	dec h
 	jr z,Pintando_entidades
-	call Pinta_Sprites
+	call Rutinas_de_pintado												; Borra.
 	jr Borrando_entidades
 	
 Pintando_entidades
@@ -1934,7 +1968,7 @@ Pintando_entidades
 	inc e
 	ld (India_SP),de
 	call Extrae_address
-	call Pinta_Sprites
+	call Rutinas_de_pintado
 	jr Pintando_entidades
 
 ; --------------------- ----------------------- ---------------------- ---------------------- ---------------
@@ -1956,7 +1990,7 @@ Borrando_Amadeus
 	inc h
 	dec h
 	jr z,Pintando_Amadeus
-	call Pinta_Sprites
+	call Rutinas_de_pintado
 
 Pintando_Amadeus
 
@@ -1965,7 +1999,7 @@ Pintando_Amadeus
 	inc h
 	dec h
 	jr z,1F
-	call Pinta_Sprites
+	call Rutinas_de_pintado
 
 ; --------------------- ----------------------- ---------------------- ---------------------- ---------------
 
@@ -2014,7 +2048,7 @@ Borra_Amadeus_shield
 1 ld hl,(Album_de_pintado_Amadeus)
 	call Extrae_address
 
-2 call Pinta_Sprites
+2 call Rutinas_de_pintado
 
 	xor a
 	inc a											; Asegura NZ en la salida de la rutina.
@@ -2025,7 +2059,7 @@ Pinta_Amadeus_shield
 
 	ld hl,(Album_de_pintado_Amadeus)
 	call Extrae_address
-	call Pinta_Sprites
+	call Rutinas_de_pintado
 
 	xor a
 	inc a											; Asegura NZ en la salida de la rutina.
@@ -2239,7 +2273,7 @@ Siguiente_frame_explosion_Amadeus
 	include "Cls.asm"
 	include "Genera_coordenadas.asm"
 	include "Genera_datos_de_impresion.asm"
-	include "Pinta_Sprites.asm"
+	include "Rutinas_de_pintado.asm"
 	include "Draw_XOR.asm"
 	include "Direcciones.asm"
 	include "Movimiento.asm"
