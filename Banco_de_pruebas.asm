@@ -1434,37 +1434,51 @@ Construye_movimientos_masticados_entidad
 1 call Draw
 	call Guarda_movimiento_masticado
 
-	jr 2F
+;	jr 2F
 
 ;! Debuggggggg !!!!!!! -----------------------------------------------------------------------------------------
+;! Necesitamos pintar cada movimiento para depurar errores en la entrada y salida de las entidades por la pantalla !!!!!!!!!!!!!!!
 
 	xor a
-    out ($fe),a
+    out ($fe),a			; Paper 7, Ink 0, Border 0
+
 ;	8BFE 00           CTRL_DESPLZ
 ;	8BF1 00 00        Puntero_de_almacen_de_mov_masticados defw 0	($e0f4)
-	ld a,(Coordenada_X)
-	cp 30
-	jr nz,2F
-	ld a,(CTRL_DESPLZ)
-	cp $fd
-	jr nz,2F
+
+;	ld a,(Coordenada_X)
+;	cp 30
+;	jr nz,2F
+
+;	ld a,(CTRL_DESPLZ)
+;	cp $fd
+;	jr nz,2F
+
 ;	Justo en el borde de la pantalla: Puntero_objeto $8540, Puntero_de_impresion $4f1e, Ctrl_dsplz "0".
 ;						; IX (Puntero_de_impresion).
 ;						; IY (Puntero_objeto).
+
+	jr $
+
 	push iy 
 	pop de
 	push de
 	call Genera_datos_de_impresion
 	pop de
 
-;						; Para ejecutar Rutinas_de_pintado necesitamos: 
+;							; Para ejecutar Rutinas_de_pintado necesitamos: 
 ;
 ;							HL apuntando al álbum de líneas (Scanlines_album_SP)
 ;							DE (Puntero objeto).
 	ld hl,(Album_de_pintado)
 	ex de,hl
 	call Rutinas_de_pintado
+
+;	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
+
 	jr $
+
+	ld a,%00111000
+	call Cls
 
 ;! Debuggggggg !!!!!!! -----------------------------------------------------------------------------------------
 
