@@ -1436,51 +1436,87 @@ Construye_movimientos_masticados_entidad
 
 ;	jr 2F
 
-;! Debuggggggg !!!!!!! -----------------------------------------------------------------------------------------
+;! Debuggggggg !!!!!!! -----------------------------------------------------------------------------------------------------------
 ;! Necesitamos pintar cada movimiento para depurar errores en la entrada y salida de las entidades por la pantalla !!!!!!!!!!!!!!!
+;! -------------------------------------------------------------------------------------------------------------------------------
+;! -------------------------------------------------------------------------------------------------------------------------------
+
+	push af
+	push bc
+	push de
+	push hl
+	push iy
+	push ix
 
 	xor a
     out ($fe),a			; Paper 7, Ink 0, Border 0
 
 ;	8BFE 00           CTRL_DESPLZ
 ;	8BF1 00 00        Puntero_de_almacen_de_mov_masticados defw 0	($e0f4)
+;	$ddc0			  Almacén de movimientos masticados.
+;	8BEF 00 00        Puntero_de_impresion defw 0
+;	8BEB 00           Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
+;	8BEC 00  	      Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
+;	8BFA 00 00        Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
+;	8BFC 00 00		  Puntero_objeto defw 0 									; Donde están los datos para pintar el Sprite.
 
-;	ld a,(Coordenada_X)
-;	cp 30
-;	jr nz,2F
-
-;	ld a,(CTRL_DESPLZ)
-;	cp $fd
-;	jr nz,2F
-
-;	Justo en el borde de la pantalla: Puntero_objeto $8540, Puntero_de_impresion $4f1e, Ctrl_dsplz "0".
-;						; IX (Puntero_de_impresion).
-;						; IY (Puntero_objeto).
-
-	jr $
+	ld hl,(Album_de_pintado)
+	ld (Scanlines_album_SP),hl
 
 	push iy 
 	pop de
+
 	push de
 	call Genera_datos_de_impresion
 	pop de
+
 
 ;							; Para ejecutar Rutinas_de_pintado necesitamos: 
 ;
 ;							HL apuntando al álbum de líneas (Scanlines_album_SP)
 ;							DE (Puntero objeto).
+
+
 	ld hl,(Album_de_pintado)
 	ex de,hl
-	call Rutinas_de_pintado
+	call Rutinas_de_pintado	
+
+	ld a,(Coordenada_X)
+	cp 30
+	jr z,$
+	cp 31
+	jr z,$
+	cp 0
+	jr z,$
+	cp 1
+	jr z,$
 
 ;	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
-
-	jr $
-
 	ld a,%00111000
 	call Cls
 
-;! Debuggggggg !!!!!!! -----------------------------------------------------------------------------------------
+; Borra album de pintado.
+
+	xor a
+	ld hl,$8000
+	ld b,40
+23 ld (hl),a
+	inc l
+	djnz 23b
+
+; ----- ----- ----- ----- ----- 
+
+	pop ix
+	pop iy
+	pop hl
+	pop de
+	pop bc
+	pop af
+
+;! -------------------------------------------------------------------------------------------------------------------------------
+;! -------------------------------------------------------------------------------------------------------------------------------
+;! -------------------------------------------------------------------------------------------------------------------------------
+;! -------------------------------------------------------------------------------------------------------------------------------
 
 2 call Movimiento
 
