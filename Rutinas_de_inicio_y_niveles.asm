@@ -471,15 +471,16 @@ Situa_en_datos_de_definicion and a
 
 Definicion_de_entidad_a_bandeja_DRAW 	
 
+	jr $										; 2466 - 2172 = 294t/states.
+
+; Quiero optimizar esta rutina, parece un poco cutre. (Suprimimos las variables Filas y Columns).
+
+
 	ld de,Bandeja_DRAW	 						; DE apunta al 1er .db de la bandeja_DRAW, (Tipo).
 	ld a,(hl) 									; Volcamos Tipo.
 	ld (de),a
 	inc hl
-;												
-	ld de,Filas									; Volcamos (Filas) y (Columns).
-	ld bc,2
-	ldir										; Hemos volcado (Contador_de_vueltas), (Indice_Sprite_der) y (Indice_Sprite_izq).
-;												; HL, (origen), apunta ahora al .db (Posicion_inicio), hay que situar DE.
+
 	ld de,Contador_de_vueltas 
 	ld a,(hl)
 	ld (de),a
@@ -490,8 +491,8 @@ Definicion_de_entidad_a_bandeja_DRAW
 	ldir 										; Hemos volcado (Puntero_de_almacen_de_mov_masticados).
 
 	ld de,Posicion_inicio
-	ld bc,3									; 3 FRAMES de explosión.!!!!!!!!!!!!!!
-	ldir 									; Vuelco (Frames_explosion).
+	ld bc,3										; 3 FRAMES de explosión.!!!!!!!!!!!!!!
+	ldir 										; Vuelco (Frames_explosion).
 
 	ld de,Puntero_de_almacen_de_mov_masticados
 	ld bc,2

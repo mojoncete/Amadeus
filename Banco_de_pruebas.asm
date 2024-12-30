@@ -230,8 +230,6 @@ Ctrl_0 db 0 											; Byte de control. A través de este byte de control. Las
 ; 																_parte superior de la pantalla y ha de `reaparecer´ por el inferior. ([Comprueba_limite_horizontal]).
 ; 														SET 3, [Reaparece_arriba]. El bit 3 de (Ctrl_0) se coloca a "1" cuando la rutina [Mov_down] detecta que el objeto ha `desaparecido´ por la_
 ; 																_parte inferior de la pantalla y ha de `reaparecer´ por la superior. ([Comprueba_limite_horizontal]).
-; 														SET 4, El Bit4 a "1", indica que hubo movimiento de la entidad. Necesitamos esta información
-;												                _para "NO BORRAR/PINTAR" en objeto si NO hubo MOVIMIENTO. 
 ;														SET 5, La rutina [Inicializacion] de Draw_XOR.asm, pone este bit a "1". Con esta información evitamos ejecutar las
 ;																_rutinas: (Comprueba_limite_horizontal) y (Comprueba_limite_vertical) justo después de `inicializar´ un objeto.
 ; 														SET 6, Está a "1" si el Sprite que tenemos cargado en el `Engine´ es AMADEUS.
@@ -1434,7 +1432,7 @@ Construye_movimientos_masticados_entidad
 1 call Draw
 	call Guarda_movimiento_masticado
 
-;	jr 2F
+	jr 2F
 
 ;! Debuggggggg !!!!!!! -----------------------------------------------------------------------------------------------------------
 ;! Necesitamos pintar cada movimiento para depurar errores en la entrada y salida de las entidades por la pantalla !!!!!!!!!!!!!!!
@@ -1459,6 +1457,20 @@ Construye_movimientos_masticados_entidad
 ;	8BEC 00  	      Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 ;	8BFA 00 00        Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
 ;	8BFC 00 00		  Puntero_objeto defw 0 									; Donde están los datos para pintar el Sprite.
+
+; -------------------------------------------------------------------------
+
+; 	Pos_actual $43fe - 
+;	Puntero_de_impresion $44be
+;	Puntero_objeto $8540
+;	Ctrl_Desplz $00
+
+;	En función de la Posicion_actual:
+
+;	Coordenada_X $1e	
+;	Coordenada_y $07 	
+
+; -------------------------------------------------------------------------
 
 	ld hl,(Album_de_pintado)
 	ld (Scanlines_album_SP),hl

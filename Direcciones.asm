@@ -47,8 +47,8 @@ Mov_down
 
 	call Reponne_punntero_objeto									; Si la entidad no se inició en la 1ª o última columna de pantalla,_
 ;																	; _ repone (Puntero_objeto).
-	ld hl,Ctrl_0
-	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
+;	ld hl,Ctrl_0
+;	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
 ; 																	; _esta información para evitar que la entidad se vuelva borrar/pintar_
 ; 																	; _ en el caso de que no lo haya.
 	ld a,(Vel_down)
@@ -106,8 +106,8 @@ Mov_up
 
 	call Reponne_punntero_objeto										; Si la entidad no se inició en la 1ª o última columna de pantalla,_
 ;																		; _ repone (Puntero_objeto).	call Reponne_punntero_objeto
-	ld hl,Ctrl_0
-	set 4,(hl) 															; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
+;	ld hl,Ctrl_0
+;	set 4,(hl) 															; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
 ; 																		; _esta información para evitar que la entidad se vuelva borrar/pintar_
 ; 																		; _ en el caso de que no lo haya.
 	ld a,(Vel_up)
@@ -181,8 +181,11 @@ Mov_right ld a,(Ctrl_0)
 	set 4,(hl)
 	jr 8F
 
-10 ld hl,Ctrl_0
-	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
+10 
+
+;! Probar a quitar este bit de control, creo que ya no tiene sentido.
+;	ld hl,Ctrl_0
+;	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
 ; 																	; _esta información para evitar que la entidad se vuelva borrar/pintar_
 ; 																	; _ en el caso de que no lo haya.
 	ld a,(Coordenada_X)	 	  										; Estamos en el char. 31?								
@@ -343,6 +346,7 @@ modifica_parametros_1er_DESPLZ_2 ld a,(CTRL_DESPLZ)		 		  ; Incrementamos el nª
 
 	ld hl,Columns 												  
 	inc (hl)
+
 	ld a,(Cuad_objeto)
 	and 1
 	jr z,1F
@@ -352,6 +356,7 @@ modifica_parametros_1er_DESPLZ_2 ld a,(CTRL_DESPLZ)		 		  ; Incrementamos el nª
 	call Genera_coordenadas
 	call Inc_CTRL_DESPLZ
 	jr 2F
+
 1 call Inc_CTRL_DESPLZ
 2 ret
 
@@ -383,7 +388,8 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 	add b
 	ld (CTRL_DESPLZ),a 
 	jr 3F
-1 ld hl,Columns													 ; Tras 8 desplazamientos el objeto desplazado es igual al original.
+1 
+	ld hl,Columns												 ; Tras 8 desplazamientos el objeto desplazado es igual al original.
 	dec (hl) 													 ; Decrementamos el nº de (Columns).
 	xor a 														 ; Reiniciamos (CTRL_DESPLZ).
 	ld (CTRL_DESPLZ),a 
@@ -410,8 +416,8 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 ;
 Mov_left 
 
-	ld hl,Ctrl_0
-	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
+;	ld hl,Ctrl_0
+;	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
 ; 																	; _esta información para evitar que la entidad se vuelva borrar/pintar_
 ; 																	; _ en el caso de que no lo haya.
 	ld a,(Ctrl_0)

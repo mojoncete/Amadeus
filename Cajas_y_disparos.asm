@@ -163,10 +163,6 @@ Indice_de_cajas_de_entidades
 
 ; -------------------------
 
-; Relleno para que no se corrompa el movimiento. ?????
-
-;	db 0
-
 ; ---------- ---------- ---------- ---------- ----------
 ;
 ;	28/05/24
@@ -281,7 +277,7 @@ Indice_de_definiciones_de_entidades
 
 ;	BADSAT, (Satélite malvado). ------------------------------------------------------------------------------------------------------------------------------------	
 
-Entidad_1 db $81,2,2		                     		; (Tipo) / (Filas) / (Columns).
+Entidad_1 db $81			                     		; (Tipo).
 	db 1												; (Contador_de_vueltas). Valor inicial "2": Sólo una vuelta lenta. "1" Dos vueltas lentas. 
 	defw Indice_Badsat_der								; (Indice_Sprite_der).
 	defw Indice_Badsat_izq								; (Indice_Sprite_izq).
@@ -296,7 +292,7 @@ Entidad_1 db $81,2,2		                     		; (Tipo) / (Filas) / (Columns).
 
 ;	-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Entidad_2 db $81,2,2		                   			; (Tipo) / (Filas) / (Columns).
+Entidad_2 db $81			                   			; (Tipo).
 	db 1												; (Contador_de_vueltas).
 	defw Indice_Badsat_der								; (Indice_Sprite_der).
 	defw Indice_Badsat_izq								; (Indice_Sprite_izq).
@@ -313,7 +309,7 @@ Entidad_2 db $81,2,2		                   			; (Tipo) / (Filas) / (Columns).
 ;	Amadeus no utiliza el parámetro: (Contador_de_vueltas). Lo colocamos a "0".
 ;	Inicialmente situamos a Amadeus en el centro de la pantalla.
 
-Definicion_Amadeus db 0,2,2		                     	; (Tipo) / (Filas) / (Columns).
+Definicion_Amadeus db 0			                     	; (Tipo).
 	db 0												; (Contador_de_vueltas).
 	defw Indice_Amadeus_der								; (Indice_Sprite_der).
 	defw Indice_Amadeus_izq								; (Indice_Sprite_izq).
