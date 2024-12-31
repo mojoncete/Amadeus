@@ -471,32 +471,58 @@ Situa_en_datos_de_definicion and a
 
 Definicion_de_entidad_a_bandeja_DRAW 	
 
-	jr $										; 2466 - 2172 = 294t/states.
+	jr $										
 
-; Quiero optimizar esta rutina, parece un poco cutre. (Suprimimos las variables Filas y Columns).
+;! 269 t/states.
 
+	ld (Stack),sp
+	ld sp,hl
+	ld hl,Bandeja_DRAW
 
-	ld de,Bandeja_DRAW	 						; DE apunta al 1er .db de la bandeja_DRAW, (Tipo).
-	ld a,(hl) 									; Volcamos Tipo.
-	ld (de),a
+	pop de 						; (Tipo) en E.
+;								; (Contador_de_vueltas) en D.
+
+	ld (hl),e
+
+	ld hl,Contador_de_vueltas
+
+	ld (hl),d
+
+	pop de 						; (Indice_Sprite_der). 
+	pop bc 						; (Indice_Sprite_izq).
+
+	ld hl,Indice_Sprite_der
+
+	ld (hl),e
+	inc hl
+	ld (hl),d
+	inc hl
+	ld (hl),c
+	inc hl
+	ld (hl),b
+
+	pop de 						; (Posicion_inicio).
+
+	ld hl,Posicion_inicio
+
+	ld (hl),e
+	inc hl
+	ld (hl),d
 	inc hl
 
-	ld de,Contador_de_vueltas 
-	ld a,(hl)
-	ld (de),a
-	inc hl										; Hemos volcado (Posicion_inicio) y (Cuad_objeto).
+	pop de 						; (Cuad_objeto) en E.
+;								; (Puntero_de_almacen_de_mov_masticados) Byte_bajo en D.
+	pop bc 						; (Puntero_de_almacen_de_mov_masticados) Byte_alto en C.
 
-	ld de,Indice_Sprite_der
-	ld bc,4
-	ldir 										; Hemos volcado (Puntero_de_almacen_de_mov_masticados).
+	ld (hl),e
 
-	ld de,Posicion_inicio
-	ld bc,3										; 3 FRAMES de explosión.!!!!!!!!!!!!!!
-	ldir 										; Vuelco (Frames_explosion).
+	ld hl,Puntero_de_almacen_de_mov_masticados
 
-	ld de,Puntero_de_almacen_de_mov_masticados
-	ld bc,2
-	ldir
+	ld (hl),d
+	inc hl
+	ld (hl),c
+
+	ld sp,(Stack)
 
 	ret
 
