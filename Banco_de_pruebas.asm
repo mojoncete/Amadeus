@@ -1417,11 +1417,12 @@ Construye_movimientos_masticados_entidad
 	ld hl,(Puntero_de_almacen_de_mov_masticados)			; Guardamos en la pila la dirección inicial del puntero, (para reiniciarlo más tarde).
 	push hl
 
-	call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
-;															; _ el (Contador_de_mov_masticados).    
+	call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados).															; _ el (Contador_de_mov_masticados).    
 
 ; Tenemos una posición de inicio aleatoria, ("$01 - $1f"). Necesitamos definir (Cuad_objeto) para [Inicia_Puntero_objeto].
 ; A contiene la coordenada X de la posición de inicio de la entidad.
+
+	jr $
 
 	call Cuad1_or_cuad2 
 
@@ -1604,17 +1605,25 @@ Guarda_movimiento_masticado
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	12/1/24
+;	2/1/25
 ;
+;	Incrementa el (Puntero_de_almacen_de_mov_masticados) en "+4".
+
 ;	INPUTS: HL a de contener (Puntero_de_almacen_de_mov_masticados).
+;
+;   (56t/states).
 
 Actualiza_Puntero_de_almacen_de_mov_masticados 
 
 	ld hl,(Puntero_de_almacen_de_mov_masticados)
-	ld bc,4
-	and a
-	adc hl,bc
+
+	inc hl
+	inc hl
+	inc hl
+	inc hl
+
 	ld (Puntero_de_almacen_de_mov_masticados),hl
+
 	ret
 
 ; ------------------------------------------

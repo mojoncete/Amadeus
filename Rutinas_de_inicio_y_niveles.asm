@@ -458,22 +458,22 @@ Situa_en_datos_de_definicion and a
 
 ; ----------------------------------------------------------------------------------------------------------
 ;
-;	24/6/24
+;	31/12/24
+;
+;	Transfiere datos correlativos, (de una definición de entidad) a la Bandeja_DRAW.
+;	Utilizaremos la pila para extraer los datos de la definición "popeando" a los registros DE y BC.
+;	HL apuntará al DESTINO, (datos DRAW).
 ;
 ;	Introduce una definición de entidad en la bandeja DRAW para generar los "movimientos masticados" de este tipo_
 ;	_ de entidad.
 ;
-;	INPUTS: HL apunta al 1er .db de datos de la definición de la entidad.
+;	INPUTS: HL apunta al 1er .db de datos de la definición de la entidad, (ORIGEN).
 ;			
-; 
-;	MODIFICA: HL,DE y BC
-
+;	MODIFICA: HL,DE y BC.
+;
+;   (269 t/states).
 
 Definicion_de_entidad_a_bandeja_DRAW 	
-
-	jr $										
-
-;! 269 t/states.
 
 	ld (Stack),sp
 	ld sp,hl
