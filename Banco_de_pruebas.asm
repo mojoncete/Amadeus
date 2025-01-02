@@ -162,8 +162,9 @@ Tipo db 0												; Clase de la entidad. Cada `tipo´ de Entidad tiene unas c
 Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
 Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
 
-Contador_de_vueltas db 0								; Contador de vueltas de entidades. Inicialmente su valor es "1". El bit se desplaza una posición a la izquierda cada vez que la entidad_
+Contador_de_vueltas db 1								; Contador de vueltas de entidades. Inicialmente su valor es "1". El bit se desplaza una posición a la izquierda cada vez que la entidad_
 ;														; _desaparece por la parte baja de la pantalla. Esta variable se utiliza para incrementar el perfil de velocidad de las entidades.
+;														; (Contador_de_vueltas). Valor inicial "2": Sólo una vuelta lenta. "1" Dos vueltas lentas.
 
 ; Incrementa el contador de vueltas, (el contador cuenta 4 vueltas máximo).
 ; El perfil de velocidad de la entidad será: (Contador_de_vueltas)/8.
@@ -271,7 +272,7 @@ Puntero_DESPLZ_izq defw 0
 
 Posicion_inicio defw 0									; Dirección de pantalla donde aparece el objeto. [DRAW].
 Cuad_objeto db 0										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
-Columnas db 0
+Columnas db 3
 Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado en función del tamaño del Sprite. Si el objeto llega a esta línea se modifica_    
 ; 														; _(Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
 Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta columna se modifica (Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
@@ -1417,18 +1418,16 @@ Construye_movimientos_masticados_entidad
 	ld hl,(Puntero_de_almacen_de_mov_masticados)			; Guardamos en la pila la dirección inicial del puntero, (para reiniciarlo más tarde).
 	push hl
 
-	call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados).															; _ el (Contador_de_mov_masticados).    
+	call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados), +5.					  
 
 ; Tenemos una posición de inicio aleatoria, ("$01 - $1f"). Necesitamos definir (Cuad_objeto) para [Inicia_Puntero_objeto].
 ; A contiene la coordenada X de la posición de inicio de la entidad.
 
 	jr $
 
-	call Cuad1_or_cuad2 
-
 	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
-	call Recompone_posicion_inicio
+;	call Recompone_posicion_inicio
 
 1 call Draw
 	call Guarda_movimiento_masticado
@@ -1560,16 +1559,21 @@ Construye_movimientos_masticados_entidad
 
 ; -------------------------------------
 ;
-;	07/12/24
+;	02/01/25
 ;
 ;	(Cuad_objeto) contendrá "0" o "1" en función de la coordenada X de la posición de inicio.
+;	Necesitamos esta información para seleccionar el puntero_objeto adecuado: derecha o izquierda.
 ;
-;	INPUT: A contiene la Coordenada_X de la (Posicion_inicio) de la entidad.
+;	MODIFY: A,HL,(Cuad_objeto).
 ;
-;	MODIFY: A,(Cuad_objeto).
-;
+;	OUTPUT: A y (Cuad_objeto) contienen "0" o "1" en función del lado de la pantalla donde inicien su baile.
 
-Cuad1_or_cuad2 cp $10
+Cuad1_or_cuad2 
+
+	ld hl,(Posicion_inicio)
+	ld a,l
+	and $1f
+	cp $10
 	jr c,1F
 	ld a,1
 	jr 2F
@@ -1607,16 +1611,16 @@ Guarda_movimiento_masticado
 ;
 ;	2/1/25
 ;
-;	Incrementa el (Puntero_de_almacen_de_mov_masticados) en "+4".
+;	Incrementa el (Puntero_de_almacen_de_mov_masticados) en "+5".
 
 ;	INPUTS: HL a de contener (Puntero_de_almacen_de_mov_masticados).
 ;
-;   (56t/states).
 
 Actualiza_Puntero_de_almacen_de_mov_masticados 
 
 	ld hl,(Puntero_de_almacen_de_mov_masticados)
 
+	inc hl
 	inc hl
 	inc hl
 	inc hl
@@ -1841,31 +1845,52 @@ Extrae_address ld e,(hl)
 
 ; *************************************************************************************************************************************************************
 ;
-;	7/12/24
+;	2/1/25
 ;
 ;	Iniciamos (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq). 
 ;	Sitúa (Puntero_objeto) en el Sprite correspondiente en función de su (Posicion_inicio).
 ;
-;   Destruye HL y BC !!!!!, 
-;
-;	BIT 7 (Ctrl_0). "1" ..... Derecha.
-;					"0" ..... Izquierda.
+;   Destruye A,HL y BC !!!!! 
+
+;	Futura variable (Mode):
+
+;	Mode_1 ..... El objeto aparece por la izquierda, Puntero_objeto se sitúa en la última columna de la derecha del Sprite. Imprime 1 columna.
+;	Mode_2 ..... El objeto aparece por la izquierda, Puntero_objeto se sitúa en la penúltima columna de la derecha del Sprite. Imprime 2 columnas.
+;	Mode_3 ..... El objeto aparece completo en pantalla, Imprime las 3 columnas.
+;	Mode_4 ..... El objeto desaparece por el lado derecho de la pantalla, Imprime las 2 primeras columnas del Sprite.
+;	Mode_5 ..... El objeto desaparece por el lado derecho de la pantalla, Imprime la 1ª columna del Sprite.
 
 Inicia_Puntero_objeto 
 
-	ld a,(Cuad_objeto)
-	and a
+	ld hl,(Posicion_inicio)
+	ld a,l
+	and $1f
+	cp $10
+	jr c,Inicia_puntero_objeto_der
+	jr Inicia_puntero_objeto_izq
 
-	call z,Inicia_puntero_objeto_der
-	ret z
+Inicia_puntero_objeto_der 
 
-	call Inicia_puntero_objeto_izq
-	ret
+; 	Arrancamos desde la parte izquierda de la pantalla.
+; 	Iniciamos (Indice_Sprite_der).  
 
-; Arrancamos desde la parte izquierda de la pantalla.
-; Iniciamos (Indice_Sprite_der).  
+;	Antes de nada averiguaremos si el objeto está apareciendo por el lado izquierdo de la pantalla o si ya está visible completamente.
+;	En los cuadrantes 1 y 3 de pantalla, la coordenada X del (Puntero_de_impresión) será la coordenada X de la (Posicion_inicio)-2. 
+;	Si este valor queda por debajo de "0", el objeto estará apareciendo, ($ff) sólo se imprimirán las dos últimas columnas del Sprite, (Mode_2).
+;	($fe) sólo se imprimirá la última columna del Sprite, (Mode_1)
 
-Inicia_puntero_objeto_der ld hl,(Indice_Sprite_der)			
+	cp 2
+	jr nc,1F											; Mode_3
+
+;	Apareciendo por la parte izquierda de la pantalla:
+
+	ld hl,Columnas										; (Columnas) de momento indica Mode.
+	dec (hl)
+	dec a
+	jr z,1F
+	dec a
+
+1 ld hl,(Indice_Sprite_der)			
 	ld (Puntero_DESPLZ_der),hl
 	call Extrae_address
 	ld (Puntero_objeto),hl
@@ -1877,7 +1902,9 @@ Inicia_puntero_objeto_der ld hl,(Indice_Sprite_der)
 ; Arrancamos desde la parte derecha de la pantalla.
 ; Iniciamos (Indice_Sprite_izq).  
 
-Inicia_puntero_objeto_izq ld hl,(Indice_Sprite_izq)			
+Inicia_puntero_objeto_izq 
+
+2 ld hl,(Indice_Sprite_izq)			
 	ld (Puntero_DESPLZ_izq),hl
 	call Extrae_address
 	ld (Puntero_objeto),hl

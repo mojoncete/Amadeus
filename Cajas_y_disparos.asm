@@ -259,7 +259,7 @@ Caja_6 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y)..
 
 ; -------------------------------------------------------------------------------------
 ;
-;	06/12/24
+;	2/1/25
 ;
 ;	TIPOS de "Entidades maliciosas" que quieren conquistar la Tierra.	
 ;
@@ -278,26 +278,21 @@ Indice_de_definiciones_de_entidades
 ;	BADSAT, (Satélite malvado). ------------------------------------------------------------------------------------------------------------------------------------	
 
 Entidad_1 db $81			                     		; (Tipo).
-	db 1												; (Contador_de_vueltas). Valor inicial "2": Sólo una vuelta lenta. "1" Dos vueltas lentas. 
 	defw Indice_Badsat_der								; (Indice_Sprite_der).
 	defw Indice_Badsat_izq								; (Indice_Sprite_izq).
 
 ; Aleatoriedad en la posición de inicio de la entidad.
 ; BadSat siempre aparecerá por la parte superior de la pantalla, $40xx. (Cuad_objeto) tendrá valor 1 o 2 dependiendo de si aparece por la mitad izquierda o derecha.
 
-	defw $4008											; (Posicion_inicio).
-	db 0												; (Cuad_objeto).
-
+	defw $4000											; (Posicion_inicio).
 	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
 
 ;	-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Entidad_2 db $81			                   			; (Tipo).
-	db 1												; (Contador_de_vueltas).
 	defw Indice_Badsat_der								; (Indice_Sprite_der).
 	defw Indice_Badsat_izq								; (Indice_Sprite_izq).
 	defw $5040                                      	; (Posicion_inicio).
-	db 1												; (Cuad_objeto).
 	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
 
 ; -------------------------------------------------------------------------------------
@@ -310,9 +305,7 @@ Entidad_2 db $81			                   			; (Tipo).
 ;	Inicialmente situamos a Amadeus en el centro de la pantalla.
 
 Definicion_Amadeus db 0			                     	; (Tipo).
-	db 0												; (Contador_de_vueltas).
 	defw Indice_Amadeus_der								; (Indice_Sprite_der).
 	defw Indice_Amadeus_izq								; (Indice_Sprite_izq).
 	defw $50c1	                                     	; (Posicion_inicio).
-	db 3												; (Cuad_objeto).
 	defw Almacen_de_movimientos_masticados_Amadeus		; (Puntero_de_almacen_de_mov_masticados).

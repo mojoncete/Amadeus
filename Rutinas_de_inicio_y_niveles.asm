@@ -458,7 +458,7 @@ Situa_en_datos_de_definicion and a
 
 ; ----------------------------------------------------------------------------------------------------------
 ;
-;	31/12/24
+;	2/1/25
 ;
 ;	Transfiere datos correlativos, (de una definición de entidad) a la Bandeja_DRAW.
 ;	Utilizaremos la pila para extraer los datos de la definición "popeando" a los registros DE y BC.
@@ -471,7 +471,6 @@ Situa_en_datos_de_definicion and a
 ;			
 ;	MODIFICA: HL,DE y BC.
 ;
-;   (269 t/states).
 
 Definicion_de_entidad_a_bandeja_DRAW 	
 
@@ -480,13 +479,9 @@ Definicion_de_entidad_a_bandeja_DRAW
 	ld hl,Bandeja_DRAW
 
 	pop de 						; (Tipo) en E.
-;								; (Contador_de_vueltas) en D.
-
 	ld (hl),e
 
-	ld hl,Contador_de_vueltas
-
-	ld (hl),d
+	dec sp
 
 	pop de 						; (Indice_Sprite_der). 
 	pop bc 						; (Indice_Sprite_izq).
@@ -508,19 +503,14 @@ Definicion_de_entidad_a_bandeja_DRAW
 	ld (hl),e
 	inc hl
 	ld (hl),d
-	inc hl
 
-	pop de 						; (Cuad_objeto) en E.
-;								; (Puntero_de_almacen_de_mov_masticados) Byte_bajo en D.
-	pop bc 						; (Puntero_de_almacen_de_mov_masticados) Byte_alto en C.
-
-	ld (hl),e
+	pop de 						; (Puntero_de_almacen_de_mov_masticados).
 
 	ld hl,Puntero_de_almacen_de_mov_masticados
 
-	ld (hl),d
+	ld (hl),e
 	inc hl
-	ld (hl),c
+	ld (hl),d
 
 	ld sp,(Stack)
 
