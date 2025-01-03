@@ -1874,29 +1874,44 @@ Inicia_puntero_objeto_der
 ; 	Arrancamos desde la parte izquierda de la pantalla.
 ; 	Iniciamos (Indice_Sprite_der).  
 
-;	Antes de nada averiguaremos si el objeto está apareciendo por el lado izquierdo de la pantalla o si ya está visible completamente.
-;	En los cuadrantes 1 y 3 de pantalla, la coordenada X del (Puntero_de_impresión) será la coordenada X de la (Posicion_inicio)-2. 
-;	Si este valor queda por debajo de "0", el objeto estará apareciendo, ($ff) sólo se imprimirán las dos últimas columnas del Sprite, (Mode_2).
-;	($fe) sólo se imprimirá la última columna del Sprite, (Mode_1)
-
-	cp 2
-	jr nc,1F											; Mode_3
-
-;	Apareciendo por la parte izquierda de la pantalla:
-
-	ld hl,Columnas										; (Columnas) de momento indica Mode.
-	dec (hl)
-	dec a
-	jr z,1F
-	dec a
-
-1 ld hl,(Indice_Sprite_der)			
+	ld hl,(Indice_Sprite_der)			
 	ld (Puntero_DESPLZ_der),hl
 	call Extrae_address
 	ld (Puntero_objeto),hl
 
 	ld hl,(Indice_Sprite_izq)							; Cuando "Iniciamos el Sprite a derecha",_					
 	ld (Puntero_DESPLZ_izq),hl
+
+
+;	Antes de nada averiguaremos si el objeto está apareciendo por el lado izquierdo de la pantalla o si ya está visible completamente.
+;	En los cuadrantes 1 y 3 de pantalla, la coordenada X del (Puntero_de_impresión) será la coordenada X de la (Posicion_inicio)-2. 
+;	Si este valor queda por debajo de "0", el objeto estará apareciendo, ($ff) sólo se imprimirán las dos últimas columnas del Sprite, (Mode_2).
+;	($fe) sólo se imprimirá la última columna del Sprite, (Mode_1)
+
+	cp 2
+	ret nc												; Mode_3
+
+;	Apareciendo por la parte izquierda de la pantalla:
+
+	ld hl,Columnas										; (Columnas) de momento indica Mode. Inicialmente (Columnas)="3".
+	dec (hl)
+	dec a
+	jr z,Modifica_puntero_objeto_der
+	dec (hl)
+
+Modifica_puntero_objeto_der
+
+	ld a,(Columnas)
+	inc a
+
+	ld hl,(Puntero_objeto)
+	inc l
+	dec a
+	jr z,1F
+	inc l
+
+1 ld (Puntero_objeto),hl
+
 	ret
 
 ; Arrancamos desde la parte derecha de la pantalla.
@@ -1904,13 +1919,14 @@ Inicia_puntero_objeto_der
 
 Inicia_puntero_objeto_izq 
 
-2 ld hl,(Indice_Sprite_izq)			
+	ld hl,(Indice_Sprite_izq)			
 	ld (Puntero_DESPLZ_izq),hl
 	call Extrae_address
 	ld (Puntero_objeto),hl
 
 	ld hl,(Indice_Sprite_der)							; Cuando "Iniciamos el Sprite a izquierda",_					
 	ld (Puntero_DESPLZ_der),hl							; _situamos (Puntero_DESPLZ_der) en el último defw_
+
 	ret
 
 ; **************************************************************************************************
