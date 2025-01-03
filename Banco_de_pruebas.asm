@@ -1902,12 +1902,11 @@ Inicia_puntero_objeto_der
 Modifica_puntero_objeto_der
 
 	ld a,(Columnas)
-	inc a
 
 	ld hl,(Puntero_objeto)
 	inc l
 	dec a
-	jr z,1F
+	jr nz,1F
 	inc l
 
 1 ld (Puntero_objeto),hl
