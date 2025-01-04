@@ -1423,8 +1423,6 @@ Construye_movimientos_masticados_entidad
 ; Tenemos una posición de inicio aleatoria, ("$01 - $1f"). Necesitamos definir (Cuad_objeto) para [Inicia_Puntero_objeto].
 ; A contiene la coordenada X de la posición de inicio de la entidad.
 
-	jr $
-
 	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
 ;	call Recompone_posicion_inicio
@@ -1845,7 +1843,7 @@ Extrae_address ld e,(hl)
 
 ; *************************************************************************************************************************************************************
 ;
-;	2/1/25
+;	4/1/25
 ;
 ;	Iniciamos (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq). 
 ;	Sitúa (Puntero_objeto) en el Sprite correspondiente en función de su (Posicion_inicio).
@@ -1885,13 +1883,12 @@ Inicia_puntero_objeto_der
 
 ;	Antes de nada averiguaremos si el objeto está apareciendo por el lado izquierdo de la pantalla o si ya está visible completamente.
 ;	En los cuadrantes 1 y 3 de pantalla, la coordenada X del (Puntero_de_impresión) será la coordenada X de la (Posicion_inicio)-2. 
-;	Si este valor queda por debajo de "0", el objeto estará apareciendo, ($ff) sólo se imprimirán las dos últimas columnas del Sprite, (Mode_2).
-;	($fe) sólo se imprimirá la última columna del Sprite, (Mode_1)
+;	Dado que los sprites constan de 3 columnas, la coordenada_X de la posición de inicio ha de ser "$02" o superior.
 
 	cp 2
 	ret nc												; Mode_3
 
-;	Apareciendo por la parte izquierda de la pantalla:
+;	Apareciendo-desapareciendo por la parte izquierda de la pantalla:
 
 	ld hl,Columnas										; (Columnas) de momento indica Mode. Inicialmente (Columnas)="3".
 	dec (hl)
@@ -1926,7 +1923,22 @@ Inicia_puntero_objeto_izq
 	ld hl,(Indice_Sprite_der)							; Cuando "Iniciamos el Sprite a izquierda",_					
 	ld (Puntero_DESPLZ_der),hl							; _situamos (Puntero_DESPLZ_der) en el último defw_
 
-	ret
+;	Antes de nada averiguaremos si el objeto está apareciendo por el lado derecho de la pantalla o si ya está visible completamente.
+;	En los cuadrantes 2 y 4 de pantalla, la coordenada X del (Puntero_de_impresión) será la coordenada X de la (Posicion_inicio).
+;	Por lo tanto si la coordenada_X de la posición de inicio supera la columna $fd el objeto no aparecerá completo en pantalla.
+
+	cp 30
+	ret c												; Mode_3
+	push af
+
+;	Desapareciendo-apareciendo por la parte derecha de la pantalla.
+
+	ld hl,Columnas
+	inc (hl) 											
+	pop af
+	ret z												; Columnas/Mode "4".
+	inc (hl)
+	ret													; Columnas/Mode "5".
 
 ; **************************************************************************************************
 ;

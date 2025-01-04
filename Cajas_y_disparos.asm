@@ -249,7 +249,7 @@ Caja_6 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y)..
 
 ; ---------- ---------- ---------- ---------- ----------	
 
-;Caja_7 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y)..
+;Caja_7 db 0,0,0										; (Tipo) / (Coordenada_X) / (Coordenada_Y)..
 ;	db 0 												; (Contador_de_vueltas).
 ;	db 0												; (Impacto).
 ;	defw 0												; (Puntero_de_impresion).
@@ -284,7 +284,7 @@ Entidad_1 db $81			                     		; (Tipo).
 ; Aleatoriedad en la posición de inicio de la entidad.
 ; BadSat siempre aparecerá por la parte superior de la pantalla, $40xx. (Cuad_objeto) tendrá valor 1 o 2 dependiendo de si aparece por la mitad izquierda o derecha.
 
-	defw $4010											; (Posicion_inicio).
+	defw $405f											; (Posicion_inicio).
 	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
 
 ;	-----------------------------------------------------------------------------------------------------------------------------------------------------------------
