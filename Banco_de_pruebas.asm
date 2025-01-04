@@ -272,7 +272,13 @@ Puntero_DESPLZ_izq defw 0
 
 Posicion_inicio defw 0									; Dirección de pantalla donde aparece el objeto. [DRAW].
 Cuad_objeto db 0										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
-Columnas db 3
+
+Mode db 3												;	Mode_1 ..... El objeto aparece por la izquierda, Puntero_objeto se sitúa en la última columna de la derecha del Sprite. Imprime 1 columna.
+;														;	Mode_2 ..... El objeto aparece por la izquierda, Puntero_objeto se sitúa en la penúltima columna de la derecha del Sprite. Imprime 2 columnas.
+;														;	Mode_3 ..... El objeto aparece completo en pantalla, Imprime las 3 columnas.
+;														;	Mode_4 ..... El objeto desaparece por el lado derecho de la pantalla, Imprime las 2 primeras columnas del Sprite.
+;														;	Mode_5 ..... El objeto desaparece por el lado derecho de la pantalla, Imprime la 1ª columna del Sprite.
+
 Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado en función del tamaño del Sprite. Si el objeto llega a esta línea se modifica_    
 ; 														; _(Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
 Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta columna se modifica (Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
@@ -1418,6 +1424,7 @@ Construye_movimientos_masticados_entidad
 	ld hl,(Puntero_de_almacen_de_mov_masticados)			; Guardamos en la pila la dirección inicial del puntero, (para reiniciarlo más tarde).
 	push hl
 
+	dec l
 	call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados), +5.					  
 
 ; Tenemos una posición de inicio aleatoria, ("$01 - $1f"). Necesitamos definir (Cuad_objeto) para [Inicia_Puntero_objeto].
@@ -1428,6 +1435,7 @@ Construye_movimientos_masticados_entidad
 ;	call Recompone_posicion_inicio
 
 1 call Draw
+
 	call Guarda_movimiento_masticado
 
 	jr 2F
@@ -1491,15 +1499,17 @@ Construye_movimientos_masticados_entidad
 	ex de,hl
 	call Rutinas_de_pintado	
 
-	ld a,(Coordenada_X)
-	cp 30
-	jr z,$
-	cp 31
-	jr z,$
-	cp 0
-	jr z,$
-	cp 1
-	jr z,$
+;	ld a,(Coordenada_X)
+;	cp 30
+;	jr z,$
+;	cp 31
+;	jr z,$
+;	cp 0
+;	jr z,$
+;	cp 1
+;	jr z,$
+
+	jr $
 
 ;	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 	ld a,%00111000
@@ -1566,19 +1576,19 @@ Construye_movimientos_masticados_entidad
 ;
 ;	OUTPUT: A y (Cuad_objeto) contienen "0" o "1" en función del lado de la pantalla donde inicien su baile.
 
-Cuad1_or_cuad2 
+;Cuad1_or_cuad2 
 
-	ld hl,(Posicion_inicio)
-	ld a,l
-	and $1f
-	cp $10
-	jr c,1F
-	ld a,1
-	jr 2F
+;	ld hl,(Posicion_inicio)
+;	ld a,l
+;	and $1f
+;	cp $10
+;	jr c,1F
+;	ld a,1
+;	jr 2F
 
-1 xor a
-2 ld (Cuad_objeto),a
-	ret
+;1 xor a
+;2 ld (Cuad_objeto),a
+;	ret
 
 ; -----------------------------------------------------------------------------------
 ;
@@ -1590,7 +1600,13 @@ Cuad1_or_cuad2
 Guarda_movimiento_masticado	
 
 	ld (Stack),sp
-	ld sp,(Puntero_de_almacen_de_mov_masticados)			; Guardamos el movimiento masticado en el almacén.
+
+	ld hl,(Puntero_de_almacen_de_mov_masticados)
+	ld sp,hl                 								; Guardamos el movimiento masticado en el almacén.
+;	dec sp
+	
+	ld a,(Mode)
+	ld (hl),a
 
     push ix 												; Pushea el Puntero_de_impresión, (1er scanline).
     push iy 												; Pushea Puntero_objeto.
@@ -1601,6 +1617,7 @@ Guarda_movimiento_masticado
 	inc hl
 	ld (Contador_de_mov_masticados),hl
 
+	ld hl,(Puntero_de_almacen_de_mov_masticados)
     call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
 ;															; _ el (Contador_de_mov_masticados).    
     ret
@@ -1616,7 +1633,7 @@ Guarda_movimiento_masticado
 
 Actualiza_Puntero_de_almacen_de_mov_masticados 
 
-	ld hl,(Puntero_de_almacen_de_mov_masticados)
+;	ld hl,(Puntero_de_almacen_de_mov_masticados)
 
 	inc hl
 	inc hl
@@ -1890,7 +1907,7 @@ Inicia_puntero_objeto_der
 
 ;	Apareciendo-desapareciendo por la parte izquierda de la pantalla:
 
-	ld hl,Columnas										; (Columnas) de momento indica Mode. Inicialmente (Columnas)="3".
+	ld hl,Mode											; (Columnas) de momento indica Mode. Inicialmente (Columnas)="3".
 	dec (hl)
 	dec a
 	jr z,Modifica_puntero_objeto_der
@@ -1898,7 +1915,7 @@ Inicia_puntero_objeto_der
 
 Modifica_puntero_objeto_der
 
-	ld a,(Columnas)
+	ld a,(Mode)
 
 	ld hl,(Puntero_objeto)
 	inc l
@@ -1933,7 +1950,7 @@ Inicia_puntero_objeto_izq
 
 ;	Desapareciendo-apareciendo por la parte derecha de la pantalla.
 
-	ld hl,Columnas
+	ld hl,Mode
 	inc (hl) 											
 	pop af
 	ret z												; Columnas/Mode "4".
