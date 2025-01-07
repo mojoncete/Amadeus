@@ -1424,7 +1424,6 @@ Construye_movimientos_masticados_entidad
 	ld hl,(Puntero_de_almacen_de_mov_masticados)			; Guardamos en la pila la dirección inicial del puntero, (para reiniciarlo más tarde).
 	push hl
 
-	dec l
 	call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados), +5.					  
 
 ; Tenemos una posición de inicio aleatoria, ("$01 - $1f"). Necesitamos definir (Cuad_objeto) para [Inicia_Puntero_objeto].
@@ -1432,7 +1431,7 @@ Construye_movimientos_masticados_entidad
 
 	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
-;	call Recompone_posicion_inicio
+	call Recompone_posicion_inicio
 
 1 call Draw
 
@@ -1455,14 +1454,14 @@ Construye_movimientos_masticados_entidad
 	xor a
     out ($fe),a			; Paper 7, Ink 0, Border 0
 
-;	8BFE 00           CTRL_DESPLZ
-;	8BF1 00 00        Puntero_de_almacen_de_mov_masticados defw 0	($e0f4)
+;	8BF2 00           CTRL_DESPLZ
+;	8Be5 00 00        Puntero_de_almacen_de_mov_masticados defw 0	($e0f4)
 ;	$ddc0			  Almacén de movimientos masticados.
-;	8BEF 00 00        Puntero_de_impresion defw 0
-;	8BEB 00           Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
-;	8BEC 00  	      Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
-;	8BFA 00 00        Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
-;	8BFC 00 00		  Puntero_objeto defw 0 									; Donde están los datos para pintar el Sprite.
+;	8BE3 00 00        Puntero_de_impresion defw 0
+;	8Bdf 00           Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
+;	8Be0 00  	      Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
+;	8Bee 00 00        Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
+;	8Bf0 00 00		  Puntero_objeto defw 0 									; Donde están los datos para pintar el Sprite.
 
 ; -------------------------------------------------------------------------
 
@@ -1509,7 +1508,7 @@ Construye_movimientos_masticados_entidad
 ;	cp 1
 ;	jr z,$
 
-	jr $
+;	jr $
 
 ;	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 	ld a,%00111000
@@ -1600,13 +1599,7 @@ Construye_movimientos_masticados_entidad
 Guarda_movimiento_masticado	
 
 	ld (Stack),sp
-
-	ld hl,(Puntero_de_almacen_de_mov_masticados)
-	ld sp,hl                 								; Guardamos el movimiento masticado en el almacén.
-;	dec sp
-	
-	ld a,(Mode)
-	ld (hl),a
+	ld sp,(Puntero_de_almacen_de_mov_masticados)			; Guardamos el movimiento masticado en el almacén.
 
     push ix 												; Pushea el Puntero_de_impresión, (1er scanline).
     push iy 												; Pushea Puntero_objeto.
@@ -1617,11 +1610,9 @@ Guarda_movimiento_masticado
 	inc hl
 	ld (Contador_de_mov_masticados),hl
 
-	ld hl,(Puntero_de_almacen_de_mov_masticados)
     call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
 ;															; _ el (Contador_de_mov_masticados).    
     ret
-
 ; --------------------------------------------------------------------------------------------------------------
 ;
 ;	2/1/25
@@ -1633,9 +1624,10 @@ Guarda_movimiento_masticado
 
 Actualiza_Puntero_de_almacen_de_mov_masticados 
 
-;	ld hl,(Puntero_de_almacen_de_mov_masticados)
 
-	inc hl
+	ld hl,(Puntero_de_almacen_de_mov_masticados)
+
+;	inc hl
 	inc hl
 	inc hl
 	inc hl
@@ -1902,28 +1894,28 @@ Inicia_puntero_objeto_der
 ;	En los cuadrantes 1 y 3 de pantalla, la coordenada X del (Puntero_de_impresión) será la coordenada X de la (Posicion_inicio)-2. 
 ;	Dado que los sprites constan de 3 columnas, la coordenada_X de la posición de inicio ha de ser "$02" o superior.
 
-	cp 2
-	ret nc												; Mode_3
+;	cp 2
+;	ret nc												; Mode_3
 
 ;	Apareciendo-desapareciendo por la parte izquierda de la pantalla:
 
-	ld hl,Mode											; (Columnas) de momento indica Mode. Inicialmente (Columnas)="3".
-	dec (hl)
-	dec a
-	jr z,Modifica_puntero_objeto_der
-	dec (hl)
+;	ld hl,Mode											; (Columnas) de momento indica Mode. Inicialmente (Columnas)="3".
+;	dec (hl)
+;	dec a
+;	jr z,Modifica_puntero_objeto_der
+;	dec (hl)
 
 Modifica_puntero_objeto_der
 
-	ld a,(Mode)
+;	ld a,(Mode)
 
-	ld hl,(Puntero_objeto)
-	inc l
-	dec a
-	jr nz,1F
-	inc l
+;	ld hl,(Puntero_objeto)
+;	inc l
+;	dec a
+;	jr nz,1F
+;	inc l
 
-1 ld (Puntero_objeto),hl
+;1 ld (Puntero_objeto),hl
 
 	ret
 
@@ -1944,17 +1936,17 @@ Inicia_puntero_objeto_izq
 ;	En los cuadrantes 2 y 4 de pantalla, la coordenada X del (Puntero_de_impresión) será la coordenada X de la (Posicion_inicio).
 ;	Por lo tanto si la coordenada_X de la posición de inicio supera la columna $fd el objeto no aparecerá completo en pantalla.
 
-	cp 30
-	ret c												; Mode_3
-	push af
+;	cp 30
+;	ret c												; Mode_3
+;	push af
 
 ;	Desapareciendo-apareciendo por la parte derecha de la pantalla.
 
-	ld hl,Mode
-	inc (hl) 											
-	pop af
-	ret z												; Columnas/Mode "4".
-	inc (hl)
+;	ld hl,Mode
+;	inc (hl) 											
+;	pop af
+;	ret z												; Columnas/Mode "4".
+;	inc (hl)
 	ret													; Columnas/Mode "5".
 
 ; **************************************************************************************************

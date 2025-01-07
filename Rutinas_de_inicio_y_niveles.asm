@@ -40,8 +40,6 @@ Genera_movimientos_masticados_del_nivel
 
 	call Definicion_segun_tipo									; HL apunta al 1er .db que define la entidad.
 	call Definicion_de_entidad_a_bandeja_DRAW					; Vuelca los datos de la definición de entidad en DRAW.
-
-	ld a,(Tipo)
 	call Situa_Puntero_indice_mov			 	 				; Sitúa (Puntero_indice_mov) según el (Tipo) de entidad en el 1er .defw del índice de su coreogradía.
 
 ; 	Antes de empezar a generar los "movimientos masticados" de esta entidad necesitamos determinar su (Posicion_inicio).
@@ -134,7 +132,9 @@ Situa_en_Caja_Master
 ; 	ldir
 ; 	ret
 
-Situa_Puntero_indice_mov ld a,(hl)     	 							; Cargamos A con el (Tipo) de la 1ª entidad del Nivel.       
+Situa_Puntero_indice_mov 
+
+	ld a,(Tipo)  			  	 							; Cargamos A con el (Tipo) de la 1ª entidad del Nivel.       
     call Calcula_salto_en_BC
     ld hl,Indice_de_mov_segun_tipo_de_entidad
     and a

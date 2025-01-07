@@ -99,6 +99,25 @@ Indice_mov_Baile_de_BadSat defw Bajo_decelerando
 ;   Derecha_y_subiendo+8 (11)               - (11) Cuando la posición de inicio es $4001
 ;   Izquierda_y_subiendo+8 (11)             - (11) Cuando la posición de inicio es $4001                    
 
+; Después del codo abajo-derecha (Coordenada_X) de la entidad contendrá "4" cuando (Posicion_inicio) sea $4001.
+
+; Cuando (Coordenada_X)="4" ;   Derecha_y_subiendo+8 (11)               
+;                               Izquierda_y_subiendo+8 (11)            
+; Cuando (Coordenada_X)="5" ;   Derecha_y_subiendo+8 (8)               
+;                               Izquierda_y_subiendo+8 (8)            
+; Cuando (Coordenada_X)="6" ;   Derecha_y_subiendo+8 (8)               
+;                               Izquierda_y_subiendo+8 (8)            
+; Cuando (Coordenada_X)="7" ;   Derecha_y_subiendo+8 (7)               
+;                               Izquierda_y_subiendo+8 (8)            
+; Cuando (Coordenada_X)="8" ;   Derecha_y_subiendo+8 (6)               
+;                               Izquierda_y_subiendo+8 (8)            
+; Cuando (Coordenada_X)="9" ;   Derecha_y_subiendo+8 (5)               
+;                               Izquierda_y_subiendo+8 (7)  
+; Cuando (Coordenada_X)="a" ;   Derecha_y_subiendo+8 (4)               
+;                               Izquierda_y_subiendo+8 (7)  
+; Cuando (Coordenada_X)="b" ;   Derecha_y_subiendo+8 (3)               
+;                               Izquierda_y_subiendo+8 (7)  
+
 
 
 
@@ -175,7 +194,7 @@ Codo_abajo_izq. db $11,$11,$61,1            ; Abajo/izq. 1rep.
     db $11,$11,$a2,0                        ; Arriba/izq. 2rep. --- Termina movimiento.
 
 Izquierda_y_subiendo db $11,$21,$23,1       ; Derecha. 4rep. vel.2
-    db $11,$11,$a1,253,7,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
+    db $11,$11,$a1,253,11,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
 
 Izquierda_y_subiendo_1 db $11,$11,$26,1     ; Derecha. 4rep. vel.2
     db $11,$11,$a1,253,2,0                  ; Arriba/Derecha. 1rep. --- Repite Mov 12rep. --- Termina movimiento.
