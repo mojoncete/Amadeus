@@ -1437,7 +1437,7 @@ Construye_movimientos_masticados_entidad
 
 	call Guarda_movimiento_masticado
 
-	jr 2F
+;	jr 2F
 
 ;! Debuggggggg !!!!!!! -----------------------------------------------------------------------------------------------------------
 ;! Necesitamos pintar cada movimiento para depurar errores en la entrada y salida de las entidades por la pantalla !!!!!!!!!!!!!!!

@@ -1,36 +1,34 @@
 
 ; ******************************************************************************************************************************************************************************************
 ;
-;   20/05/23
+;   08/01/25
 ;
 ;	Recompone_posicion_inicio
 ;
-; 	La rutina hace una llamada a [Mov_right] o [Mov_left] según su posición de inicio.
-;	Así conseguimios que la entidad esté completamente oculta a la hora de aparecer por la izquierda_
-;	_ o derecha. Tomaremos la columna de (Posicion_inicio) como referencia para hacer la llamada_
-;	_ a una u otra rutina.
 
 Recompone_posicion_inicio 
 
-	ld hl,(Posicion_inicio) 
-	ld a,l
-	and $1f
-	jr z,1F
+;	ld hl,(Posicion_inicio) 
+;	ld a,l
+;	and $1f
+;	jr z,1F
 
-	cp $1f
-	jr z,3F
+;	cp $1f
+;	jr z,3F
 
 	ld hl,Ctrl_2
 	set 0,(hl)
 	ld hl,(Puntero_objeto)
 	ld (Repone_puntero_objeto),hl
-	jr 2F
 
-3 call Mov_left
-	jr 2F
+;	jr 2F
 
-1 call Mov_right
-2 ld hl,Sprite_vacio
+;3 call Mov_left
+;	jr 2F
+
+;1 call Mov_right
+
+	ld hl,Sprite_vacio
 	ld (Puntero_objeto),hl
 	ret
 
@@ -163,7 +161,7 @@ Reponne_punntero_objeto	ld a,(Ctrl_2)
 
 ; ******************************************************************************************************************************************************************************************
 ;
-;	19/10/22
+;	07/01/25
 ;
 ;	Mov_right.
 ;
@@ -174,7 +172,7 @@ Mov_right
 
 	ld a,(Ctrl_0)
 	bit 6,a
-	jr z,10F 														; Amadeus o Entidad ???																								
+	jr z,10F 														; Amadeus or Entity?																							
 
 	call Stop_Amadeus_right											; Estamos moviendo Amadeus???????. Si es así hemos de comprobar que no hemos llegado al char.30 de la línea, [Stop_Amadeus].
 	ret z 															; Salimos de Mov_right si hemos llegado al char.30.
@@ -253,7 +251,7 @@ Mov_right
 ;
 
 DESPLZ_DER call Desplaza_derecha
-    call modifica_parametros_1er_DESPLZ_2
+    call Decrementa_CTRL_DESPLZ_2
     call Ciclo_completo
 
 	ld hl,Ctrl_0 													; Indica que nos hemos desplazado a la derecha.
@@ -329,13 +327,13 @@ Desplaza_derecha ld a,(Vel_right)
 ;
 ;	24/7/22
 ;
-;	modifica_parametros_1er_DESPLZ_2
+;	Decrementa_CTRL_DESPLZ_2
 ;
 ;	La rutina modifica el nº de columnas del objeto en el 1er desplazamiento.
 ; 	También incrementa el byte de control de desplazamiento, (desplz. a derecha) y modifica la posición de (Puntero_datas) en función del cuadrante de pantalla en el que nos encontremos.
 ; 	Si el desplazamiento se produce en el 2º o 4º cuadrante, la rutina decrementará (Posicion_actual).
 
-modifica_parametros_1er_DESPLZ_2 
+Decrementa_CTRL_DESPLZ_2 
 
 	ld a,(CTRL_DESPLZ)									 		  ; Incrementamos el nª de (Columns) cuando desplazamos el objeto por 1ª vez.
 	and a
@@ -394,7 +392,7 @@ Ciclo_completo
 
 ; ******************************************************************************************************************************************************************************************
 ;
-;	15/02/23
+;	08/01/24
 ;
 ;	Mov_left.
 ;
@@ -402,10 +400,6 @@ Ciclo_completo
 ;
 Mov_left 
 
-;	ld hl,Ctrl_0
-;	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
-; 																	; _esta información para evitar que la entidad se vuelva borrar/pintar_
-; 																	; _ en el caso de que no lo haya.
 	ld a,(Ctrl_0)
 	bit 6,a
 	jr z,11F 														; Estamos moviendo Amadeus???????. Si es así hemos de comprobar que que no hemos llegado al char.1 de la línea, [Stop_Amadeus].
@@ -483,7 +477,7 @@ Mov_left
 DESPLZ_IZQ 
 
 	call Desplaza_izquierda
-    call modifica_parametros_1er_DESPLZ
+    call Decrementa_CTRL_DESPLZ
 	call Ciclo_completo_2
 	ld hl,Ctrl_0 													; Indica que nos hemos desplazado a la izquierda
 	res 7,(hl)
@@ -553,68 +547,69 @@ Desplaza_izquierda
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
-;	modifica_parametros_1er_DESPLZ
+;	Decrementa_CTRL_DESPLZ
 ;
-;	La rutina modifica el nº de columnas del objeto en el 1er desplazamiento.
-; 	También decrementa el byte de control de desplazamiento, (desplz. a izq) y modifica la posición de (Puntero_datas) en función del cuadrante de pantalla en el que nos encontremos.
-; 	Si el desplazamiento se produce en el 2º o 4º cuadrante, la rutina decrementará (Posicion_actual).
 
-modifica_parametros_1er_DESPLZ ld a,(CTRL_DESPLZ) 				    ; Incrementamos el nª de (Columns) cuando desplazamos el objeto por 1ª vez.
+Decrementa_CTRL_DESPLZ ld a,(CTRL_DESPLZ) 				    ; Incrementamos el nª de (Columns) cuando desplazamos el objeto por 1ª vez.
 	and a
-	jr nz,1F
-    dec a              							            	    ; Situamos en $f7 el valor de partida de (CTRL_DESPLZ) tras el 1er desplazamiento. 
-    ld (CTRL_DESPLZ),a
-	ld hl,Columns 												  
-	inc (hl)
+	jr z,1F
+
+	call nz,Dec_CTRL_DESPLZ
+	ret
+
+1 dec a
+	dec a
+
+	ld (CTRL_DESPLZ),a										; $fe.
+
 	ld a,(Cuad_objeto)
 	and 1
-	jr nz,1F
+	ret nz
+
 	ld hl,(Posicion_actual) 									    ; Decrementamos 1 char. el valor de (Posicion_actual), la primera vez que desplazamos el objeto y se encuentra en los _	
 	dec hl 														    ; _ cuadrantes 2 y 4 de pantalla.
 	ld (Posicion_actual),hl
+
 	call Genera_coordenadas
-	call Dec_CTRL_DESPLZ
-	jr 2F
-1 call Dec_CTRL_DESPLZ
-2 ret
+	ret
 
 ; ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Ciclo_completo_2 ld a,(CTRL_DESPLZ)
 	cp $f7
 	jr z,1F 												   		; Salimos de la rutina si no hemos completado 8 o más desplazamientos.
-	jr nc,3F
+;	cp $fe
+;	jr z,2F
+	ret
 
 ; (CTRL_DESPLZ) fuera de rango, (por debajo de $f7), hay que reajustar.
 
 	ld b,0
-4 inc b
+3 inc b
 	inc a
 	cp $f7
-	jr nz,4B
+	jr nz,3B
 	ld a,$ff
 	sub b
 	ld (CTRL_DESPLZ),a
-	jr 3F
+	ret
 
 ; Se completa el ciclo de movimiento. (CTRL_DESPLZ)="0", se generan coordenadas y se corrige (Posicion_actual).
 
-1 ld hl,Columns
-	dec (hl)
-	xor a
+1 xor a
 	ld (CTRL_DESPLZ),a
-	ld a,(Cuad_objeto)
+	call Inicia_puntero_objeto_izq 	
+	ret
+
+2 ld a,(Cuad_objeto)
 	and 1
-	jr z,2F
+	ret z
+
 	ld hl,(Posicion_actual)                                         ; Decrementamos (Posicion_actual) en los cuadrantes 2º y 4º.
 	dec hl
 	ld (Posicion_actual),hl
 	call Genera_coordenadas
-
-; Inicia (Puntero_DESPLZ_izq) y (Puntero_objeto).
-
-2 call Inicia_puntero_objeto_izq 
-3 ret
+	ret
 
 ; ---------- ---------- ---------- ---------- ---------- ----------
 ;
