@@ -272,6 +272,7 @@ Puntero_DESPLZ_izq defw 0
 
 Posicion_inicio defw 0									; Dirección de pantalla donde aparece el objeto. [DRAW].
 Cuad_objeto db 0										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+Columnas db 0
 
 Mode db 3												;	Mode_1 ..... El objeto aparece por la izquierda, Puntero_objeto se sitúa en la última columna de la derecha del Sprite. Imprime 1 columna.
 ;														;	Mode_2 ..... El objeto aparece por la izquierda, Puntero_objeto se sitúa en la penúltima columna de la derecha del Sprite. Imprime 2 columnas.
