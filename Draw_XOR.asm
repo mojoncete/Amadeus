@@ -6,23 +6,16 @@
 
 Draw 
 
-;	jr $
-
 	call Prepara_draw 
- 
-	ld hl,(Posicion_actual)
- 	ld a,h 						 					; El objeto existe, o se está iniciando?. Si se está iniciando, (Posicion_inicio = Posicion_actual) y saltamos_
+	ld a,h 						 					; El objeto existe, o se está iniciando?. Si se está iniciando, (Posicion_inicio = Posicion_actual) y saltamos_
 	and a 											; _a la subrutina [Inicializacion] donde asignaremos cuadrante y límites.
 	jr z,2F
-
-;	Entidad iniciada !!!!!
 
 	ld a,(Cuad_objeto)			 					; El objeto ya se inició. Cargamos en A el cuadrante de pantalla en el que lo hizo y saltamos a 1F.
 	jr 1F
 
 2 ld hl,(Posicion_inicio) 							; No hay (Posicion_actual), por lo que el objeto se está iniciando.
 	ld (Posicion_actual),hl							; Indicamos que (Posicion_actual) = (Posicion_inicio) y saltamos a la subrutina [Inicializacion], (donde asignaremos_			
-
 	call Inicializacion   							; _(Limite_horizontal), (Limite_vertical) y (Cuad_objeto). También asignaremos las coordenadas X e Y. (Posición 0,0)_
 ;													; _la esquina superior izquierda de la pantalla.	
 
@@ -40,9 +33,7 @@ Draw
 ; -----------------------
 ; -----------------------
 
-3 
-
-;	call calcula_CColumnass							; Define el valor de la variable (Columnas). Nº de columnas que se van a pintar de la entidad.
+3 call calcula_CColumnass							; Define el valor de la variable (Columnas). Nº de columnas que se van a pintar de la entidad.
 	call Calcula_puntero_de_impresion				; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
 
 	ld a,(Ctrl_0)									; Antes de salir de la rutina REStauramos el bit5 de Ctrl_0 para que nos vuelva_
@@ -343,7 +334,7 @@ Modificaccionne
 
 ; *************************************************************************************************************************************************************************************************
 ;
-;	4/1/25
+;	13/8/22
 ;
 ;	Inicializacion
 ;
@@ -355,6 +346,9 @@ Modificaccionne
 ;	_ cada vez que el objeto supera el centro de la pantalla tanto en sentido horizontal como vertical y cuando_
 ;	_ desaparece/aparece.	
 
+;	[Puntero_datas]: Dirección de memoria donde se encuentra el 1er byte que pinta el objeto. 
+;	[Puntero_attr_datas]: Dirección de memoria donde se encuentra el byte de atributos del objeto. 
+;
 ;	INPUT: [HL] contendrá la dirección de pantalla a la que queremos asignar cuadrante. HL=(Posicion_inicio).
 ; 		   [BC] contendrá (Filas)/(Columns) del objeto a inicializar.
 ; 		   [E] ="0"
@@ -413,7 +407,7 @@ primcuad
 	push de
 
 	ld hl,(Posicion_actual)
-;	call Genera_coordenadas
+	call Genera_coordenadas
 
 	pop de
 	pop hl
@@ -442,45 +436,45 @@ column ld a,l
 ;
 ;	Modifica: A y BC.
 
-;calcula_CColumnass ld a,(Cuad_objeto)
-;	and 1
-;	jr z,1F
+calcula_CColumnass ld a,(Cuad_objeto)
+	and 1
+	jr z,1F
 
 ; Nos encontramos en la parte izquierda de la pantalla
 
-;	ld a,(Coordenada_X)
-;	ld b,a
-;	inc b											; (Coordenada_X)+1 en B.
-;	ld a,c
-;	sub b											; (Columns)-[(Coordenada_X)+1] en A.
-;	jr c,2F
-;	ld b,a
-;	ld a,c
-;	sub b
-;	ld (Columnas),a
-;	jr 4F
-;2 ld a,c
-;	ld (Columnas),a
-;	jr 4F
+	ld a,(Coordenada_X)
+	ld b,a
+	inc b											; (Coordenada_X)+1 en B.
+	ld a,c
+	sub b											; (Columns)-[(Coordenada_X)+1] en A.
+	jr c,2F
+	ld b,a
+	ld a,c
+	sub b
+	ld (Columnas),a
+	jr 4F
+2 ld a,c
+	ld (Columnas),a
+	jr 4F
 
 ; Nos encontramos en la parte derecha de la pantalla.
 
-;1 ld a,(Coordenada_X)
-;	add c
-;	dec a
-;	sub $1f
-;	jr c,3F
-;	ld b,a
-;	ld a,c
-;	sub b
-;	ld (Columnas),a
-;	jr 4F
-;3 ld a,c
-;	ld (Columnas),a
-;4 exx
-;	ld c,a
-;	exx
-; ret	
+1 ld a,(Coordenada_X)
+	add c
+	dec a
+	sub $1f
+	jr c,3F
+	ld b,a
+	ld a,c
+	sub b
+	ld (Columnas),a
+	jr 4F
+3 ld a,c
+	ld (Columnas),a
+4 exx
+	ld c,a
+	exx
+ ret	
 
 ; --------------------------------------------------------------------------------------------------------------------
 ;
@@ -563,7 +557,7 @@ Calcula_puntero_de_impresion ld a,(Cuad_objeto)
 ;	DESTRUYE!!!!! HL,B y A.
 
 Operandos ld hl,(Posicion_actual)
-	ld a,3
+	ld a,(Columnas)
 	dec a
 	jr nz,1F
 	inc a
@@ -588,15 +582,11 @@ Operandos ld hl,(Posicion_actual)
 ;	Logicamente, BC,HL y E quedan destruidos.	
 
 Prepara_draw ld hl,Filas 		 					 					 ; Prepara los registros BC, E y HL. 
-	ld (hl),2
 	ld b,(hl) 														     ; Carga Filas/Columns del objeto a pintar o inicializar en BC. 
 	inc hl 												 				 ; Carga (Posicion_actual) en HL.
-	ld (hl),3
 	ld c,(hl) 											
-
 	ld hl,(Posicion_actual)
 	ld e,0 																 ; Byte de control. Ha de estar a "0" cuando llamamos a [DRAW].
-
 	ret
 
 ;----------------------------------------------------------------------------------------------------------------
