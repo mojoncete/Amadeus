@@ -47,8 +47,8 @@ Mov_down
 
 	call Reponne_punntero_objeto									; Si la entidad no se inició en la 1ª o última columna de pantalla,_
 ;																	; _ repone (Puntero_objeto).
-	ld hl,Ctrl_0
-	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
+;	ld hl,Ctrl_0
+;	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
 ; 																	; _esta información para evitar que la entidad se vuelva borrar/pintar_
 ; 																	; _ en el caso de que no lo haya.
 	ld a,(Vel_down)
@@ -106,8 +106,8 @@ Mov_up
 
 	call Reponne_punntero_objeto										; Si la entidad no se inició en la 1ª o última columna de pantalla,_
 ;																		; _ repone (Puntero_objeto).	call Reponne_punntero_objeto
-	ld hl,Ctrl_0
-	set 4,(hl) 															; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
+;	ld hl,Ctrl_0
+;	set 4,(hl) 															; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
 ; 																		; _esta información para evitar que la entidad se vuelva borrar/pintar_
 ; 																		; _ en el caso de que no lo haya.
 	ld a,(Vel_up)
@@ -177,12 +177,13 @@ Mov_right ld a,(Ctrl_0)
 	call Stop_Amadeus_right											; Estamos moviendo Amadeus???????. Si es así hemos de comprobar que no hemos llegado al char.30 de la línea, [Stop_Amadeus].
 	ret z 															; Salimos de Mov_right si hemos llegado al char.30.
 
-	ld hl,Ctrl_0
-	set 4,(hl)
+;;	ld hl,Ctrl_0
+;;	set 4,(hl)
 	jr 8F
 
-10 ld hl,Ctrl_0
-	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
+10 
+;	ld hl,Ctrl_0
+;	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
 ; 																	; _esta información para evitar que la entidad se vuelva borrar/pintar_
 ; 																	; _ en el caso de que no lo haya.
 	ld a,(Coordenada_X)	 	  										; Estamos en el char. 31?								
@@ -410,8 +411,8 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 ;
 Mov_left 
 
-	ld hl,Ctrl_0
-	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
+;	ld hl,Ctrl_0
+;	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
 ; 																	; _esta información para evitar que la entidad se vuelva borrar/pintar_
 ; 																	; _ en el caso de que no lo haya.
 	ld a,(Ctrl_0)

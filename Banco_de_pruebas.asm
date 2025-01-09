@@ -1427,7 +1427,107 @@ Construye_movimientos_masticados_entidad
 1 call Draw
 	call Guarda_movimiento_masticado
 
-	call Movimiento
+	jr 2F
+	
+;! Debuggggggg !!!!!!! -----------------------------------------------------------------------------------------------------------
+;! Necesitamos pintar cada movimiento para depurar errores en la entrada y salida de las entidades por la pantalla !!!!!!!!!!!!!!!
+;! -------------------------------------------------------------------------------------------------------------------------------
+;! -------------------------------------------------------------------------------------------------------------------------------
+
+	push af
+	push bc
+	push de
+	push hl
+	push iy
+	push ix
+
+	xor a
+    out ($fe),a			; Paper 7, Ink 0, Border 0
+
+;	8BF2 00           CTRL_DESPLZ
+;	8Be5 00 00        Puntero_de_almacen_de_mov_masticados defw 0	($e0f4)
+;	$ddc0			  Almacén de movimientos masticados.
+;	8BE3 00 00        Puntero_de_impresion defw 0
+;	8Bdf 00           Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
+;	8Be0 00  	      Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
+;	8Bee 00 00        Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
+;	8Bf0 00 00		  Puntero_objeto defw 0 									; Donde están los datos para pintar el Sprite.
+
+; -------------------------------------------------------------------------
+
+; 	Pos_actual $43fe - 
+;	Puntero_de_impresion $44be
+;	Puntero_objeto $8540
+;	Ctrl_Desplz $00
+
+;	En función de la Posicion_actual:
+
+;	Coordenada_X $1e	
+;	Coordenada_y $07 	
+
+; -------------------------------------------------------------------------
+
+	ld hl,(Album_de_pintado)
+	ld (Scanlines_album_SP),hl
+
+	push iy 
+	pop de
+
+	push de
+	call Genera_datos_de_impresion
+	pop de
+
+
+;							; Para ejecutar Rutinas_de_pintado necesitamos: 
+;
+;							HL apuntando al álbum de líneas (Scanlines_album_SP)
+;							DE (Puntero objeto).
+
+
+	ld hl,(Album_de_pintado)
+	ex de,hl
+	call Pinta_Sprites
+
+;	ld a,(Coordenada_X)
+;	cp 30
+;	jr z,$
+;	cp 31
+;	jr z,$
+;	cp 0
+;	jr z,$
+;	cp 1
+;	jr z,$
+
+;	jr $
+
+;	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
+	ld a,%00111000
+	call Cls
+
+; Borra album de pintado.
+
+	xor a
+	ld hl,$8000
+	ld b,40
+23 ld (hl),a
+	inc l
+	djnz 23b
+
+; ----- ----- ----- ----- ----- 
+
+	pop ix
+	pop iy
+	pop hl
+	pop de
+	pop bc
+	pop af
+
+;! -------------------------------------------------------------------------------------------------------------------------------
+;! -------------------------------------------------------------------------------------------------------------------------------
+;! -------------------------------------------------------------------------------------------------------------------------------
+;! -------------------------------------------------------------------------------------------------------------------------------
+
+2 call Movimiento
 
 	ld a,(Ctrl_3)											; El bit1 de (Ctrl_3) a "1" indica que hemos completado todo el patrón de movimiento_
 	bit 1,a 												; _ que corresponde a esta entidad.
