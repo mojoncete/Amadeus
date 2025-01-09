@@ -92,6 +92,27 @@ Indice_mov_Baile_de_BadSat defw Bajo_decelerando
     defw Codo_izquierda_abajo
     defw 0                                  ; Fin de patrón de movimiento.
 
+;! En que parte del movimiento estamos??? Cabe el movimiento completo?
+
+; Después del codo abajo-derecha (Coordenada_X) de la entidad contendrá "4" cuando (Posicion_inicio) sea $4001.
+
+; Cuando (Coordenada_X)="4" ;   Derecha_y_subiendo+8 (11)               
+;                               Izquierda_y_subiendo+8 (11)            
+; Cuando (Coordenada_X)="5" ;   Derecha_y_subiendo+8 (8)               
+;                               Izquierda_y_subiendo+8 (8)            
+; Cuando (Coordenada_X)="6" ;   Derecha_y_subiendo+8 (8)               
+;                               Izquierda_y_subiendo+8 (8)            
+; Cuando (Coordenada_X)="7" ;   Derecha_y_subiendo+8 (7)               
+;                               Izquierda_y_subiendo+8 (8)            
+; Cuando (Coordenada_X)="8" ;   Derecha_y_subiendo+8 (6)               
+;                               Izquierda_y_subiendo+8 (8)            
+; Cuando (Coordenada_X)="9" ;   Derecha_y_subiendo+8 (5)               
+;                               Izquierda_y_subiendo+8 (7)  
+; Cuando (Coordenada_X)="a" ;   Derecha_y_subiendo+8 (4)               
+;                               Izquierda_y_subiendo+8 (7)  
+; Cuando (Coordenada_X)="b" ;   Derecha_y_subiendo+8 (3)               
+;                               Izquierda_y_subiendo+8 (7)  
+
 Bajo_decelerando db $12,$11,$4f,1           ; Abajo (vel_2). 15rep.        
     db $11,$11,$42,0                        ; Abajo.  2rep. --- Termina movimiento.
 

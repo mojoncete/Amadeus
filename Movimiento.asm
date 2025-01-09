@@ -2,6 +2,26 @@
 ;
 ;   28/12/23
 
+;! En que parte del movimiento estamos??? Cabe el movimiento completo?
+
+; Después del codo abajo-derecha (Coordenada_X) de la entidad contendrá "4" cuando (Posicion_inicio) sea $4001.
+
+; Cuando (Coordenada_X)="4" ;   Derecha_y_subiendo+8 (11)               
+;                               Izquierda_y_subiendo+8 (11)            
+; Cuando (Coordenada_X)="5" ;   Derecha_y_subiendo+8 (8)               
+;                               Izquierda_y_subiendo+8 (8)            
+; Cuando (Coordenada_X)="6" ;   Derecha_y_subiendo+8 (8)               
+;                               Izquierda_y_subiendo+8 (8)            
+; Cuando (Coordenada_X)="7" ;   Derecha_y_subiendo+8 (7)               
+;                               Izquierda_y_subiendo+8 (8)            
+; Cuando (Coordenada_X)="8" ;   Derecha_y_subiendo+8 (6)               
+;                               Izquierda_y_subiendo+8 (8)            
+; Cuando (Coordenada_X)="9" ;   Derecha_y_subiendo+8 (5)               
+;                               Izquierda_y_subiendo+8 (7)  
+; Cuando (Coordenada_X)="a" ;   Derecha_y_subiendo+8 (4)               
+;                               Izquierda_y_subiendo+8 (7)  
+; Cuando (Coordenada_X)="b" ;   Derecha_y_subiendo+8 (3)               
+;                               Izquierda_y_subiendo+8 (7)  
 Movimiento 
 
 ; Nota: Previamente, la rutina [DRAW], ha iniciado la entidad, (Puntero_mov) ya apunta a su cadena de movimiento correspondiente.
