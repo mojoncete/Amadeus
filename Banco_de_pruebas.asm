@@ -1425,9 +1425,20 @@ Construye_movimientos_masticados_entidad
 	call Recompone_posicion_inicio
 
 1 call Draw
-	call Guarda_movimiento_masticado
 
-	jr 2F
+	ld a,(Columnas)
+	cp 2
+	ld hl,(Posicion_actual)
+	jr nz,3F
+
+	ld a,l
+	and $1f
+	cp $01
+	jr z,$
+
+3 call Guarda_movimiento_masticado
+
+;	jr 2F
 	
 ;! Debuggggggg !!!!!!! -----------------------------------------------------------------------------------------------------------
 ;! Necesitamos pintar cada movimiento para depurar errores en la entrada y salida de las entidades por la pantalla !!!!!!!!!!!!!!!
