@@ -188,6 +188,8 @@ Prepara_Cajas_de_Entidades
 
 	call Obtenemos_puntero_de_impresion
 
+;	jr $
+
 	ld l,(ix+5)
 	inc l
 	ld h,(ix+6)													; (Puntero_de_impresion) en HL.
@@ -250,7 +252,7 @@ Construye_movimientos_masticados_Amadeus
 	call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
 ;															; _ el (Contador_de_mov_masticados).    
 
-	jr $
+;	jr $
 
 	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	

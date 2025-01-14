@@ -538,6 +538,7 @@ INICIALIZACION
 	call Genera_movimientos_masticados_del_nivel		 ; Generamos las distintas coreografías de la entidades que componen el nivel. También se inicializan las cajas "Master" para ir_
 ;														   _reponiendo entidades eliminadas.
 	call Prepara_Cajas_de_Entidades
+
 	call Inicia_Amadeus
 ;														 ; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
 ;														 ; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
@@ -583,10 +584,6 @@ INICIALIZACION
 Main 
 ;
 ; 07/11/24.
-
-	di
-	jr $
-	ei
 
 ; Gestión de disparos.
 
@@ -1607,6 +1604,8 @@ Actualiza_Puntero_de_almacen_de_mov_masticados
 
 Codifica_movimiento
 
+;	jr $
+
 	ld a,(Columnas)
 	dec a
 	jr z,Una_Columna
@@ -1627,7 +1626,7 @@ Una_Columna ld a,ixh
 	inc iyl
 	ret
 
-Dos_Columnas ld a,iyh
+Dos_Columnas ld a,ixh
 	set 7,a
 	res 6,a
 	ld ixh,a
@@ -1663,15 +1662,44 @@ Obtenemos_puntero_de_impresion
 ;	Extrae movimiento del Almacen_de_movimientos_masticados de esta unidad.
 
 	pop de															; (Puntero_objeto) en DE.
-	pop bc															; (Puntero_de_impresión) CODIFICADO en DE.
+	pop bc															; (Puntero_de_impresión) CODIFICADO en BC.
 
-	jr $
+; ----- ----- ----- ----- -----
 
-Decodifica_Puntero_de_impresion
+Decodifica_Puntero_de_impresion bit 6,b
+	jr nz,1F
+
+;	(Puntero_de_impresión) codificado.
+
+	bit 7,b
+	jr z,3F
+
+;	Decodifica 2 Columnas.
+
+	bit 5,b
+	jr z,4F
+	res 7,b
+	jr 5F
+
+4 res 7,b
+	set 6,b
+
+5 ld a,2
+	jr 2F
+
+;	Decodifica 1 Columna.	
+
+3 res 5,b
+	set 6,b
+	ld a,1
+	jr 2F
 
 ; 	Almacena (Puntero_de_impresion) en caja.
 
-1 ld (ix+5),c
+1 ld a,3
+2 ld (Columnas),a
+
+	ld (ix+5),c
 	ld (ix+6),b
 
 	ld (Puntero_de_impresion),bc
