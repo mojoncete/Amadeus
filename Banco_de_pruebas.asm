@@ -1667,7 +1667,7 @@ Obtenemos_puntero_de_impresion
 
 	jr $
 
-Decodifica_Puntero_de_impresio
+Decodifica_Puntero_de_impresion
 
 ; 	Almacena (Puntero_de_impresion) en caja.
 
