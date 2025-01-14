@@ -238,7 +238,9 @@ Prepara_Cajas_de_Entidades
 ; 	Cargamos la definición de Amadeus en DRAW.
 ;	Nos situamos en el 1er .db, (Tipo), de la definición de Amadeus.
 
-Inicia_Amadeus ld hl,Definicion_Amadeus
+Inicia_Amadeus 
+
+	ld hl,Definicion_Amadeus
 	call Definicion_de_entidad_a_bandeja_DRAW				; Vuelca los datos de la definición de Amadeus en DRAW.
 
 	
@@ -247,6 +249,9 @@ Construye_movimientos_masticados_Amadeus
 	ld hl,(Puntero_de_almacen_de_mov_masticados)			; Guardamos en la pila la dirección inicial del puntero, (para reiniciarlo más tarde).
 	call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
 ;															; _ el (Contador_de_mov_masticados).    
+
+	jr $
+
 	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
 

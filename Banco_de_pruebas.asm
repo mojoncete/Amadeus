@@ -538,9 +538,7 @@ INICIALIZACION
 	call Genera_movimientos_masticados_del_nivel		 ; Generamos las distintas coreografías de la entidades que componen el nivel. También se inicializan las cajas "Master" para ir_
 ;														   _reponiendo entidades eliminadas.
 	call Prepara_Cajas_de_Entidades
-
 	call Inicia_Amadeus
-
 ;														 ; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
 ;														 ; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
 ;														 ; La rutina [Genera_datos_de_impresion] activa las interrupciones antes del RET.
@@ -585,6 +583,10 @@ INICIALIZACION
 Main 
 ;
 ; 07/11/24.
+
+	di
+	jr $
+	ei
 
 ; Gestión de disparos.
 
@@ -1426,19 +1428,10 @@ Construye_movimientos_masticados_entidad
 
 1 call Draw
 
-	ld a,(Columnas)
-	cp 2
-	ld hl,(Posicion_actual)
-	jr nz,3F
+	call Codifica_movimiento
+	call Guarda_movimiento_masticado
 
-	ld a,l
-	and $1f
-	cp $01
-	jr z,$
-
-3 call Guarda_movimiento_masticado
-
-;	jr 2F
+	jr 2F
 	
 ;! Debuggggggg !!!!!!! -----------------------------------------------------------------------------------------------------------
 ;! Necesitamos pintar cada movimiento para depurar errores en la entrada y salida de las entidades por la pantalla !!!!!!!!!!!!!!!
@@ -1605,6 +1598,47 @@ Actualiza_Puntero_de_almacen_de_mov_masticados
 	ld (Puntero_de_almacen_de_mov_masticados),hl
 	ret
 
+; --------------------------------------------------------------------------------------------------------------
+;
+;	14/1/25
+;
+;	IX ..... (Puntero_de_impresion).
+;	IY ..... (Puntero_objeto).
+
+Codifica_movimiento
+
+	ld a,(Columnas)
+	dec a
+	jr z,Una_Columna
+	dec a
+	jr z,Dos_Columnas
+	ret
+
+Una_Columna ld a,ixh
+	set 5,a
+	res 6,a
+	ld ixh,a
+
+	ld a,(Coordenada_X)
+	and a
+	ret nz
+
+	inc iyl
+	inc iyl
+	ret
+
+Dos_Columnas ld a,iyh
+	set 7,a
+	res 6,a
+	ld ixh,a
+
+	ld a,(Coordenada_X)	
+	dec a
+	ret nz
+
+	inc iyl
+	ret
+
 ; ------------------------------------------
 ;
 ;	23/11/24
@@ -1626,12 +1660,18 @@ Obtenemos_puntero_de_impresion
 	ld h,a
 	ld l,h															; ld hl,"0"
 
+;	Extrae movimiento del Almacen_de_movimientos_masticados de esta unidad.
+
 	pop de															; (Puntero_objeto) en DE.
-	pop bc	
+	pop bc															; (Puntero_de_impresión) CODIFICADO en DE.
+
+	jr $
+
+Decodifica_Puntero_de_impresio
 
 ; 	Almacena (Puntero_de_impresion) en caja.
 
-	ld (ix+5),c
+1 ld (ix+5),c
 	ld (ix+6),b
 
 	ld (Puntero_de_impresion),bc
