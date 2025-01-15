@@ -1213,7 +1213,7 @@ Borra_diferencia
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	23/11/24
+;	15/01/25
 ;
 ;	INPUT: IX apunta al 1er .db (Tipo) de la entidad, (caja de entidades correspondiente).	
 
@@ -1235,6 +1235,12 @@ Entidad_a_Tabla_de_pintado
 	ld (hl),e
 	inc l
 	ld (hl),d
+	inc l
+
+; Almacena del nº de (Columnas) que vamos a pintar de esta entidad.
+
+	ld a,(Columnas)
+	ld (hl),a
 	inc l
 
 	ld (India_SP),hl
@@ -2057,6 +2063,8 @@ Limpia_caja_de_entidades
 
 Actualiza_pantalla 
 
+;	jr $
+
 	ld a,2	
 	out ($fe),a												
 
@@ -2084,6 +2092,11 @@ Pintando_entidades
 	jr z,Ejecuta_escudo
 	inc e
 	inc e
+
+	ld a,(de)
+	ld (Columnas),a
+	inc e
+
 	ld (India_SP),de
 	call Extrae_address
 	call Pinta_Sprites

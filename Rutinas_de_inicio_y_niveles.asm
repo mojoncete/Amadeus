@@ -188,10 +188,7 @@ Prepara_Cajas_de_Entidades
 
 	call Obtenemos_puntero_de_impresion
 
-;	jr $
-
 	ld l,(ix+5)
-	inc l
 	ld h,(ix+6)													; (Puntero_de_impresion) en HL.
 
 	push de														; Push (Puntero_objeto). 
@@ -199,7 +196,7 @@ Prepara_Cajas_de_Entidades
 
 	call Genera_coordenadas
 
-	ld bc,(Coordenada_X)
+	ld bc,(Coordenada_X)										; C_(Coordenada_X), B_(Coordenada_Y). 
 
 	ld (ix+1),c
 	ld (ix+2),b													; (Coordenada_X) y (Coordenada_Y) en caja de entidad.

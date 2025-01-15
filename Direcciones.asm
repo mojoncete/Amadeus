@@ -12,25 +12,27 @@
 
 Recompone_posicion_inicio 
 
-	ld hl,(Posicion_inicio) 
-	ld a,l
-	and $1f
-	jr z,1F
+;ld hl,(Posicion_inicio) 
+;ld a,l
+;and $1f
+;jr z,1F
 
-	cp $1f
-	jr z,3F
+;cp $1f
+;jr z,3F
 
 	ld hl,Ctrl_2
 	set 0,(hl)
 	ld hl,(Puntero_objeto)
 	ld (Repone_puntero_objeto),hl
-	jr 2F
+;jr 2F
 
-3 call Mov_left
-	jr 2F
+; call Mov_left
+;jr 2F
 
-1 call Mov_right
-2 ld hl,Sprite_vacio
+; call Mov_right
+; ld hl,Sprite_vacio
+
+	ld hl,Sprite_vacio
 	ld (Puntero_objeto),hl
 	ret
 

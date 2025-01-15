@@ -3,7 +3,7 @@
 ; Índice de Patrón de movimiento para tipo de entidad.
 ; ---------------------------------------------------------------------
 
-; 30/05/24
+; 	15/01/25
 ;
 ;	En esta tabla iremos almacenando:
 ;
@@ -15,15 +15,9 @@ Numeros_aleatorios ds 7
 
 	org $8900	
 
-Tabla_de_pintado ds 18								 ; No puede haber cambio de byte alto en la Tabla_de_pintado, ese es el motivo del "org".
+Tabla_de_pintado ds 28								 ; No puede haber cambio de byte alto en la Tabla_de_pintado, ese es el motivo del "org".
 
-;	db 0, defw 0
-;	db 0, defw 0
-;	db 0, defw 0
-;	db 0, defw 0
-;	db 0, defw 0
-;	db 0, defw 0
-;	db 0, defw 0
+;	db 0, defw 0, db 0.								 ; (Columna_X), (Scanlines_album_SP), (Columnas).
 
 Indice_de_almacenes_de_mov_masticados defw Almacen_de_movimientos_masticados_Entidad_1 
 	defw Almacen_de_movimientos_masticados_Entidad_2 
@@ -289,7 +283,7 @@ Entidad_1 db $81,2,2		                     		; (Tipo) / (Filas) / (Columns).
 ; Aleatoriedad en la posición de inicio de la entidad.
 ; BadSat siempre aparecerá por la parte superior de la pantalla, $40xx. (Cuad_objeto) tendrá valor 1 o 2 dependiendo de si aparece por la mitad izquierda o derecha.
 
-Pos_inicio_entidad1	defw $4004	                        ; (Posicion_inicio).
+Pos_inicio_entidad1	defw $4004				            ; (Posicion_inicio).
 	db 0												; (Cuad_objeto).
 
 	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
